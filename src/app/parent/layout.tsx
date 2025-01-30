@@ -1,5 +1,5 @@
-import ParentHeader from '../components/Header/ParentHeader';
-import ParentFooter from '../components/Footer/ParentFooter';
+import ParentFooter from '@/components/Footer/ParentFooter';
+import ParentHeader from '@/components/Header/ParentHeader';
 
 export default function ParentLayout({
   children,
