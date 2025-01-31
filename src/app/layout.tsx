@@ -1,3 +1,4 @@
+import './globals.css';
 import type { Metadata } from 'next';
 
 import RootFooter from '@/components/Footer/RootFooter';
