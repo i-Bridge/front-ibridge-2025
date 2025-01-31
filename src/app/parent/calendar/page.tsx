@@ -1,8 +1,10 @@
 // app/parent/calendar/page.tsx
-import dynamic from 'next/dynamic';
+//import dynamic from 'next/dynamic';
+
+import Calendar from "./calendar";
 
 // 동적 import로 CSR 컴포넌트 불러오기 (클릭 이벤트 전용)
-const CalendarClient = dynamic(() => import('./calendar'), { ssr: false });
+//const CalendarClient = dynamic(() => import('./Calendar'), { ssr: false });
 
 export default function CalendarPage() {
   const today = new Date();
@@ -39,8 +41,8 @@ export default function CalendarPage() {
           ))}
         </div>
         
-        {/* 동적 CalendarClient 추가 */}
-        <CalendarClient />
+        {/* 동적 Calendar 추가 */}
+        <Calendar />
       </div>
 
       {/* 통계 그래프 */}
