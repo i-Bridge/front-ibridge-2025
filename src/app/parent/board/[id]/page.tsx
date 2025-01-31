@@ -1,4 +1,4 @@
-import { allPosts } from '@/app/parent/question/board/page';
+import { allPosts } from '@/app/parent/board/page';
 import Link from 'next/link';
 
 export default function PostDetail({ params }: { params: { id: string } }) {
@@ -24,10 +24,7 @@ export default function PostDetail({ params }: { params: { id: string } }) {
         <h2 className="text-xl font-semibold mb-2">내용:</h2>
         <p>{post.content}</p>
       </div>
-      <Link
-        href="/parent/question/board"
-        className="text-blue-600 hover:underline"
-      >
+      <Link href="/parent/board" className="text-blue-600 hover:underline">
         목록으로 돌아가기
       </Link>
     </div>

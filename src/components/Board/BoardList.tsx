@@ -41,7 +41,7 @@ export default function BoardList({
               <td className="border p-2">{post.order}</td>
               <td className="border p-2">
                 <Link
-                  href={`/parent/question/board/${post.id}`}
+                  href={`/parent/board/${post.id}`}
                   className="text-blue-600 hover:underline"
                 >
                   {post.title}

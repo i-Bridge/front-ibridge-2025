@@ -37,7 +37,7 @@ export default function ParentHeader() {
                   정기질문
                 </Link>
                 <Link
-                  href="/parent/question/board"
+                  href="/parent/board"
                   className="block px-4 py-2 hover:bg-gray-100"
                 >
                   게시판
