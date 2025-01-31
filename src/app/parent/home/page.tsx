@@ -1,6 +1,5 @@
 // src/app/parent/home/page.tsx
 import Weekly from "./weekly";
-import DailyQuestionList from "@/components/Question/DailyQuestionList";
 
 export default function HomePage() {
   return (
@@ -12,7 +11,7 @@ export default function HomePage() {
       <Weekly />
 
       {/* 일일 질문 리스트 */}
-      <DailyQuestionList />
+      
     </main>
   );
 }

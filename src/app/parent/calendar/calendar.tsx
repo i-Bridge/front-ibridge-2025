@@ -1,6 +1,6 @@
 // src/app/parent/calendar/calendar.tsx
 // 날짜버튼클릭, 상태관리, 날짜 관리 등 달력 컴포넌트
-
+"use client";
 "use client";
 
 import { useDateStore } from "@/store/DateStore";
@@ -12,7 +12,7 @@ export default function Calendar() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold">날짜 선택</h2>
+      
       <div className="grid grid-cols-7 gap-2 p-4 border rounded-md">
         {Array.from({ length: daysInMonth }, (_, i) => (
           <button
