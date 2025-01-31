@@ -39,7 +39,14 @@ export default function BoardList({
           {posts.map((post) => (
             <tr key={post.id} className="hover:bg-gray-100">
               <td className="border p-2">{post.order}</td>
-              <td className="border p-2">{post.title}</td>
+              <td className="border p-2">
+                <Link
+                  href={`/parent/question/board/${post.id}`}
+                  className="text-blue-600 hover:underline"
+                >
+                  {post.title}
+                </Link>
+              </td>
               <td className="border p-2">
                 <span
                   className={`px-2 py-1 rounded text-sm ${getStatusColor(post.status)}`}
