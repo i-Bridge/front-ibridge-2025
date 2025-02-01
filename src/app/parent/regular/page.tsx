@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, KeyboardEvent } from 'react';
-import useQuestionStore from '@/store/regular/questionStore';
+import useQuestionStore from '@/store/question/addQuestionStore';
 
 export default function RegularQuestionPage() {
   const {

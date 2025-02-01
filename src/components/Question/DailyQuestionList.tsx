@@ -1,15 +1,19 @@
 // src/components/Question/DailyQuestionList.tsx
 // 해당 일자의 질문 리스트
 
-"use client";
+'use client';
 
-import { useDateStore } from "@/store/DateStore";
-import { useQuestionStore } from "@/store/QuestionStore";
-import AnswerAnalysis from "@/components/Question/AnswerAnalysis";
+import { useDateStore } from '@/store/date/dateStore';
+import { useQuestionStore } from '@/store/question/selectedQuestionStore';
+import AnswerAnalysis from '@/components/Question/AnswerAnalysis';
 
 const sampleQuestions = {
-  "1": ["오늘 기분은 어때?", "학교에서 재미있었던 일은?", "가장 좋아하는 색깔은?"],
-  "2": ["어제 본 꿈은?", "가장 친한 친구는 누구야?", "좋아하는 음식은?"],
+  '1': [
+    '오늘 기분은 어때?',
+    '학교에서 재미있었던 일은?',
+    '가장 좋아하는 색깔은?',
+  ],
+  '2': ['어제 본 꿈은?', '가장 친한 친구는 누구야?', '좋아하는 음식은?'],
 };
 
 export default function DailyQuestionList() {
@@ -24,7 +28,7 @@ export default function DailyQuestionList() {
         {questions.map((question) => (
           <li
             key={question}
-            className={`cursor-pointer ${selectedQuestions.has(question) ? "text-blue-500" : ""}`}
+            className={`cursor-pointer ${selectedQuestions.has(question) ? 'text-blue-500' : ''}`}
             onClick={() => toggleQuestion(question)} // 질문 클릭 시 상태 토글
           >
             {question}
