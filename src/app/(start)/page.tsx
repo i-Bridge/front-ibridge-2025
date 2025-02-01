@@ -12,9 +12,15 @@ export default function HomePage() {
       <h3>(시작 페이지)</h3>
       <Link
         href="/parent/home"
-        className="fixed bottom-5 right-5 bg-blue-500 text-white px-4 py-3 rounded-lg font-bold hover:bg-blue-600 transition"
+        className="fixed bottom-30 right-5 bg-blue-500 text-white px-4 py-3 rounded-lg font-bold hover:bg-blue-600 transition"
       >
         부모용 홈 페이지
+      </Link>
+      <Link
+        href="/setup"
+        className="fixed bottom-20 right-5 bg-blue-500 text-white px-4 py-3 rounded-lg font-bold hover:bg-blue-600 transition"
+      >
+        Set up 페이지
       </Link>
     </div>
   );
