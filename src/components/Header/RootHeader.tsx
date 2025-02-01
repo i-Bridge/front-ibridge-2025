@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 export default function RootHeader() {
   return (
-    <header className="p-2.5 px-5 flex items-center border-b-2 border-gray-300">
+    <header className="p-2.5 px-8 flex items-center border-b-2 border-gray-300">
       <div className="flex items-center">
         <Image
           src="/images/logo.png"
