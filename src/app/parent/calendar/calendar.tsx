@@ -1,6 +1,6 @@
 // src/app/parent/calendar/calendar.tsx
 // 날짜버튼클릭, 상태관리, 날짜 관리 등 달력 컴포넌트
-"use client";
+
 "use client";
 
 import { useDateStore } from "@/store/DateStore";
@@ -26,6 +26,7 @@ export default function Calendar() {
           </button>
         ))}
       </div>
+      
 
       {selectedDate && <DailyQuestionList />} {/* 날짜 선택 시 질문 리스트 표시 */}
     </div>

@@ -25,14 +25,15 @@ export default function CalendarPage() {
       {/* SSR 달력 UI */}
       <div className="w-full md:w-1/2 lg:w-1/3 p-4 bg-gray-100 rounded-lg shadow">
         <h2 className="text-lg font-semibold mb-2">{year}년 {month + 1}월 📅</h2>
+        {/*
         <div className="grid grid-cols-7 gap-2">
         
-          {/* 요일 표시 */}
+          
           {['일', '월', '화', '수', '목', '금', '토'].map((day) => (
             <div key={day} className="text-center font-medium text-gray-600">{day}</div>
           ))}
 
-          {/* 해당 월 날짜 UI */}
+          
           {days.map((day, i) => (
             <div key={i} className={`w-10 h-10 flex items-center justify-center rounded-md shadow-sm 
               ${day ? 'bg-white text-gray-800' : 'bg-transparent'}`}>
@@ -40,8 +41,8 @@ export default function CalendarPage() {
             </div>
           ))}
         </div>
+        */}
         
-        {/* 동적 CalendarClient 추가 */}
         <Calendar />
       </div>
 
