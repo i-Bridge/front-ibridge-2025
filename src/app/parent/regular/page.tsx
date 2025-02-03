@@ -2,6 +2,7 @@
 
 import { useState, KeyboardEvent } from 'react';
 import useQuestionStore from '@/store/regular/questionStore';
+import { Period } from '@/types/Regular/question';
 
 export default function RegularQuestionPage() {
   const {
@@ -12,6 +13,7 @@ export default function RegularQuestionPage() {
   } = useQuestionStore();
   const [newDailyQuestion, setNewDailyQuestion] = useState('');
   const [newPeriodicQuestion, setNewPeriodicQuestion] = useState('');
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>('매주');
 
   const handleAddDailyQuestion = () => {
     if (newDailyQuestion.trim()) {
@@ -22,7 +24,10 @@ export default function RegularQuestionPage() {
 
   const handleAddPeriodicQuestion = () => {
     if (newPeriodicQuestion.trim()) {
-      addPeriodicQuestion(newPeriodicQuestion);
+      addPeriodicQuestion({
+        content: newPeriodicQuestion,
+        period: selectedPeriod,
+      });
       setNewPeriodicQuestion('');
     }
   };
@@ -72,7 +77,7 @@ export default function RegularQuestionPage() {
         <ul className="list-disc pl-5 mb-4">
           {periodicQuestions.map((question) => (
             <li key={question.id} className="mb-2">
-              {question.content}
+              {question.content} - {question.period}
             </li>
           ))}
         </ul>
@@ -85,6 +90,15 @@ export default function RegularQuestionPage() {
             className="flex-grow border border-gray-300 rounded-l px-4 py-2"
             placeholder="새로운 주기 질문 추가"
           />
+          <select
+            value={selectedPeriod}
+            onChange={(e) => setSelectedPeriod(e.target.value as Period)}
+            className="border-t border-b border-gray-300 px-4 py-2"
+          >
+            <option value="매일">매일</option>
+            <option value="매주">매주</option>
+            <option value="매월">매월</option>
+          </select>
           <button
             onClick={handleAddPeriodicQuestion}
             className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600"
