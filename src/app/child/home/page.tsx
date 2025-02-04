@@ -1,1 +1,3 @@
-// src/app/child/home
+export default function page() {
+  return <div>page</div>;
+}
