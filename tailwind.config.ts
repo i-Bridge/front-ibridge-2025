@@ -8,7 +8,18 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {},
+      colors: {
+        'i-red': '#ff5d21', //기본
+        'i-skyblue': '#57B5CE',
+        'i-yellow': '#FDD504',
+        'i-ivory': '#Fff6ef', //배경
+        'i-lightgreen': '#C3E93F',
+        'i-lightpurple': '#F1D1EC',
+        'i-pink': '#FFB1D0',
+        'i-darkblue': '#034892', //기본
+        'i-lightgrey': '#D9D9D9',
+        'i-black': '#202123',
+      },
     },
   },
   plugins: [],

@@ -37,7 +37,7 @@ export default function RegularQuestionPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container bg-white mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">정기 질문</h1>
 
       <div className="mb-12">
