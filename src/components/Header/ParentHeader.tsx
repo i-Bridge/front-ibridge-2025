@@ -32,7 +32,7 @@ export default function ParentHeader() {
             alt="Logo"
             width={100}
             height={100}
-            className="rounded-full mr-10"
+            className="mr-10"
           />
         </Link>
         <div className="flex items-center gap-10">

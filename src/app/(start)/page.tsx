@@ -5,7 +5,7 @@ export default function Portfolio() {
       <main>
         {/* Portfolio Title */}
         <div className="mb-12">
-          <h1 className="text-6xl text-i-pink font-bold mb-4">Portfolio</h1>
+          <h1 className="text-6xl text-i-pink font-bold mb-4">iBridge</h1>
           <h1 className="text-6xl text-i-darkblue font-bold mb-4">Portfolio</h1>
           <h1 className="text-6xl text-i-skyblue font-bold mb-4">Portfolio</h1>
 
@@ -22,7 +22,7 @@ export default function Portfolio() {
           <div className="max-w-xl">
             <h2 className="text-4xl text-i-darkblue font-bold mb-6">Hello!</h2>
             <p className="text-blue-900 leading-relaxed">
-              It's Marcella! A graphic design student majored in Visual
+              한국어라서 안예쁘게 보이는걸까요? I'm Marcella Aurelia, a Graphic
               Communication Design based in Tangerang. I'm interested in
               challenging myself to gain new knowledges and developing my
               creativity in fun and creative designs. I consider myself as a

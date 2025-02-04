@@ -9,7 +9,7 @@ export default function RootHeader() {
           alt="Logo"
           width={100}
           height={100}
-          className="rounded-full mr-10"
+          className="mr-10"
         />
         <div className="flex items-center gap-5">
           <span className="text-lg text-gray-800 font-medium">부모용 소개</span>
