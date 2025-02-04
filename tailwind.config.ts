@@ -9,7 +9,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        'i-red': '#ff5d21', //기본
+        'i-orange': '#FF662D',
         'i-skyblue': '#57B5CE',
         'i-yellow': '#FDD504',
         'i-ivory': '#Fff6ef', //배경
