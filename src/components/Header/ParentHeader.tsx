@@ -28,10 +28,10 @@ export default function ParentHeader() {
       <div className="flex items-center">
         <Link href="/parent/home">
           <Image
-            src="/images/logo.png"
+            src="/images/logo.svg"
             alt="Logo"
-            width={50}
-            height={50}
+            width={100}
+            height={100}
             className="rounded-full mr-10"
           />
         </Link>
