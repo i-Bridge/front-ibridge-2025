@@ -1,18 +1,18 @@
-// pages/index.tsx
-import Image from 'next/image';
-
 export default function Portfolio() {
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-i-ivory">
       {/* Main Content */}
       <main>
         {/* Portfolio Title */}
         <div className="mb-12">
-          <h1 className="text-6xl text-blue-600 font-bold mb-4">Portfolio</h1>
-          <div className="bg-lime-400 text-black w-fit px-4 py-1 rounded-full text-sm">
+          <h1 className="text-6xl text-i-pink font-bold mb-4">Portfolio</h1>
+          <h1 className="text-6xl text-i-darkblue font-bold mb-4">Portfolio</h1>
+          <h1 className="text-6xl text-i-skyblue font-bold mb-4">Portfolio</h1>
+
+          <div className="bg-i-lightpurple text-blue-900 w-fit px-4 py-1 rounded-full text-sm">
             2023 Edition
           </div>
-          <div className="bg-red-400 text-white px-4 py-1 rounded-md w-fit mt-4">
+          <div className="bg-i-lightgrey text-blue-900 px-4 py-1 rounded-md w-fit mt-4">
             Graphic Designer
           </div>
         </div>
@@ -20,7 +20,7 @@ export default function Portfolio() {
         {/* Introduction */}
         <div className="flex justify-between items-start mb-16">
           <div className="max-w-xl">
-            <h2 className="text-4xl text-blue-600 font-bold mb-6">Hello!</h2>
+            <h2 className="text-4xl text-i-darkblue font-bold mb-6">Hello!</h2>
             <p className="text-blue-900 leading-relaxed">
               It's Marcella! A graphic design student majored in Visual
               Communication Design based in Tangerang. I'm interested in
@@ -29,21 +29,29 @@ export default function Portfolio() {
               hard-working and easy to adapt. I hope my abilities able to
               contribute to the growth of your firm.
             </p>
-            <div className="bg-lime-400 rounded-full px-6 py-2 mt-6 w-fit">
+            <div className="bg-i-lightgreen text-blue-900 rounded-full px-6 py-2 mt-6 w-fit">
+              linkedin.com/in/marcella-aurelia/
+            </div>
+            <div className="bg-i-yellow text-blue-900 rounded-full px-6 py-2 mt-6 w-fit">
+              linkedin.com/in/marcella-aurelia/
+            </div>
+            <div className="bg-i-lightpurple text-blue-900 rounded-full px-6 py-2 mt-6 w-fit">
+              linkedin.com/in/marcella-aurelia/
+            </div>
+            <div className="bg-i-skyblue text-blue-900 rounded-full px-6 py-2 mt-6 w-fit">
+              linkedin.com/in/marcella-aurelia/
+            </div>
+            <div className="bg-i-lightgrey text-blue-900 rounded-full px-6 py-2 mt-6 w-fit">
+              linkedin.com/in/marcella-aurelia/
+            </div>
+            <div className="bg-i-pink text-blue-900 rounded-full px-6 py-2 mt-6 w-fit">
               linkedin.com/in/marcella-aurelia/
             </div>
           </div>
           <div className="relative">
-            <Image
-              src="/profile.jpg"
-              alt="Marcella Aurelia"
-              width={200}
-              height={200}
-              className="rounded-lg"
-            />
             <div className="bg-white p-4 rounded-lg mt-4">
               <h3 className="font-medium mb-2">Marcella Aurelia</h3>
-              <p className="text-gray-600">Indonesia</p>
+              <p className="text-i-pink">Indonesia</p>
               <p className="text-gray-600">@marcellaaurelia_</p>
               <p className="text-gray-600">marcviin02@gmail.com</p>
             </div>
@@ -53,7 +61,7 @@ export default function Portfolio() {
         {/* Experience & Education */}
         <div className="grid grid-cols-2 gap-12 mb-16">
           <div>
-            <h2 className="text-2xl text-blue-600 font-bold mb-6">
+            <h2 className="text-2xl text-i-darkblue font-bold mb-6">
               EXPERIENCES
             </h2>
             <div className="space-y-6">
@@ -97,7 +105,7 @@ export default function Portfolio() {
 
         {/* Expertise */}
         <div>
-          <h2 className="text-2xl text-blue-600 font-bold mb-6">EXPERTISE</h2>
+          <h2 className="text-2xl bg-i-orange font-bold mb-6">EXPERTISE</h2>
           <div className="flex flex-wrap gap-4">
             <div className="bg-blue-100 px-4 py-2 rounded">Ps</div>
             <div className="bg-orange-100 px-4 py-2 rounded">Ai</div>
