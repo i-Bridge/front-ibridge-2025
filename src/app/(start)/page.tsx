@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function StartPage() {
   const [scrollY, setScrollY] = useState(0);
@@ -11,11 +12,6 @@ export default function StartPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const logoVariants = {
-    hidden: { opacity: 0, y: -50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
-
   const sectionVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -25,14 +21,13 @@ export default function StartPage() {
     <div className="min-h-screen bg-i-ivory">
       <header className="fixed top-0 left-0 right-0 bg-i-ivory bg-opacity-90 z-50 shadow-md">
         <nav className="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
-          <motion.h1
-            className="text-4xl text-i-pink font-bold"
-            initial="hidden"
-            animate="visible"
-            variants={logoVariants}
-          >
-            iBridge
-          </motion.h1>
+          <Image
+            src="/images/logo.svg"
+            alt="Logo"
+            width={100}
+            height={100}
+            className="mr-10"
+          />
           <div className="flex gap-4">
             <a
               href="#parent"
@@ -236,7 +231,7 @@ export default function StartPage() {
         </motion.section>
       </main>
 
-      <footer className="bg-i-darkblue text-white py-8">
+      <footer className="bg-i-orange text-white py-8">
         <div className="max-w-7xl mx-auto px-8 flex justify-between items-center">
           <p>© 2025 iBridge. All rights reserved.</p>
           <div className="flex gap-4">
