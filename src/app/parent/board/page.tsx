@@ -128,8 +128,8 @@ export default function BoardPage({
   const paginatedPosts = allPosts.slice(startIndex, endIndex);
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">게시판</h1>
+    <main className="max-w-2xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6 text-center">게시판</h1>
       <BoardList
         posts={paginatedPosts}
         currentPage={page}
