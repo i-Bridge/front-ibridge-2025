@@ -1,14 +1,24 @@
-// store/setupStore.ts (Zustand 스토어 - 단계 관리)
 import { create } from 'zustand';
 
 interface SetupState {
   step: number;
-  nextStep: () => void;
-  prevStep: () => void;
+  childrenCount: number;
+  currentChildIndex: number;
+  setStep: (step: number) => void;
+  setChildrenCount: (count: number) => void;
+  nextChild: () => void;
 }
 
 export const useSetupStore = create<SetupState>((set) => ({
   step: 1,
-  nextStep: () => set((state) => ({ step: Math.min(state.step + 1, 3) })),
-  prevStep: () => set((state) => ({ step: Math.max(state.step - 1, 1) })),
+  childrenCount: 0,
+  currentChildIndex: 0,
+  setStep: (step) => set({ step }), // ✅ step 변경 함수
+  setChildrenCount: (count) => set({ childrenCount: count, currentChildIndex: 0 }),
+  nextChild: () => set((state) => {
+    if (state.currentChildIndex + 1 >= state.childrenCount) {
+      return { step: 3 }; // 마지막 step이면 다음 단계로
+    }
+    return { currentChildIndex: state.currentChildIndex + 1 };
+  }),
 }));
