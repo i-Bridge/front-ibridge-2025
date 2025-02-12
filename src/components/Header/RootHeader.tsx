@@ -5,11 +5,11 @@ export default function RootHeader() {
     <header className="p-2.5 px-8 flex items-center border-b-2 border-gray-300">
       <div className="flex items-center">
         <Image
-          src="/images/logo.png"
+          src="/images/logo.svg"
           alt="Logo"
-          width={50}
-          height={50}
-          className="rounded-full mr-10"
+          width={100}
+          height={100}
+          className="mr-10"
         />
         <div className="flex items-center gap-5">
           <span className="text-lg text-gray-800 font-medium">부모용 소개</span>

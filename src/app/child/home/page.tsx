@@ -17,4 +17,5 @@ export default function ChildHome() {
       <Progress />
     </div>
   );
+
 }
