@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { PostTodos } from '@/api/todo';
+import { postTodos } from '@/api/todo';
 
 export default function TestPostTodos() {
   const [response, setResponse] = useState(null);
@@ -15,7 +15,7 @@ export default function TestPostTodos() {
     console.log('Attempting to sign in...');
 
     try {
-      const result = await PostTodos();
+      const result = await postTodos();
       setResponse(result.data);
       console.log('SignIn successful. Response:', result.data);
       console.log('Full response object:', result);
