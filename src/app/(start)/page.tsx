@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import LoginButton from '@/components/Login/LoginButton';
 
 export default function StartPage() {
   const [scrollY, setScrollY] = useState(0);
@@ -19,7 +20,6 @@ export default function StartPage() {
   };
 
   return (
-
     <div className="min-h-screen">
       <header className="fixed top-0 left-0 right-0 bg-opacity-90 z-50 shadow-md">
         <nav className="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
@@ -54,6 +54,7 @@ export default function StartPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-8 pt-24">
+        <LoginButton />
         <motion.section
           className="flex justify-between items-start mb-16 mt-12"
           initial="hidden"
