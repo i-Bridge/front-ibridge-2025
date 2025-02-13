@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function StartPage() {
   const [scrollY, setScrollY] = useState(0);
@@ -82,24 +83,28 @@ export default function StartPage() {
               </h3>
               <div className="space-y-3">
                 {/* Social login buttons (same as before) */}
-                <button className="w-full bg-[#4285F4] text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#357ABD] transition-colors">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
-                    />
-                  </svg>
-                  Google 로그인
-                </button>
-                <button className="w-full bg-[#FAE100] text-[#391B1B] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#FDD835] transition-colors">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z"
-                    />
-                  </svg>
-                  카카오 로그인
-                </button>
+                <Link href="/setup">
+                  <button className="w-full bg-[#4285F4] text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#357ABD] transition-colors">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
+                      />
+                    </svg>
+                    Google 로그인
+                  </button>
+                </Link>
+                <Link href="/parent/home">
+                  <button className="w-full bg-[#FAE100] text-[#391B1B] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#FDD835] transition-colors">
+                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z"
+                      />
+                    </svg>
+                    카카오 로그인
+                  </button>
+                </Link>
                 <button className="w-full bg-[#03C75A] text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#02B150] transition-colors">
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path
