@@ -6,7 +6,7 @@ import React from 'react';
 import Setup from './setup';
 import ProgressBar from './progressBar';
 
-const Page = () => {
+export default function SetUpPage() {
     return (
       <div className="w-full inset-y-0 flex justify-center items-center bg-gray-100">
         <div className="bg-gray-300 p-6 rounded-lg w-[25vw] h-[50vh] flex flex-col absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -20,5 +20,3 @@ const Page = () => {
     );
   };
   
-
-export default Page;
