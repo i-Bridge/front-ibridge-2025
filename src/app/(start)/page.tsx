@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import LoginButton from '@/components/Login/LoginButton';
+import UserInfo from '@/components/Login/UserInfo';
 
 export default function StartPage() {
   const [scrollY, setScrollY] = useState(0);
@@ -55,6 +56,7 @@ export default function StartPage() {
 
       <main className="max-w-7xl mx-auto px-8 pt-24">
         <LoginButton />
+        <UserInfo />
         <motion.section
           className="flex justify-between items-start mb-16 mt-12"
           initial="hidden"
