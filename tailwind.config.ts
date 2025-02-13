@@ -12,7 +12,7 @@ export default {
         'i-orange': '#FF662D',
         'i-skyblue': '#57B5CE',
         'i-yellow': '#FDD504',
-        'i-ivory': '#Fff6ef', //배경
+        'i-ivory': '#FFF6ef', //배경
         'i-lightgreen': '#C3E93F',
         'i-lightpurple': '#F1D1EC',
         'i-pink': '#FFB1D0',
