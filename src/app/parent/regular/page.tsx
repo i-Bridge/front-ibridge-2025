@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, KeyboardEvent } from 'react';
-import useQuestionStore from '@/store/regular/questionStore';
-import { Period } from '@/types/Regular/question';
+import useQuestionStore from '@/store/question/addQuestionStore';
 
+import { Period } from '@/types/Regular/question';
 export default function RegularQuestionPage() {
   const {
     dailyQuestions,

@@ -10,7 +10,7 @@ interface QuestionState {
 }
 
 export const useQuestionStore = create<QuestionState>((set) => ({
-  selectedQuestions: new Set<number>(), // 처음엔 선택된 질문 없음
+  selectedQuestions: new Set<number>(), 
   toggleQuestion: (question) =>
     set((state) => {
       const newSelectedQuestions = new Set(state.selectedQuestions);
