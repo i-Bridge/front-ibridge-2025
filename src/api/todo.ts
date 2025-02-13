@@ -1,5 +1,4 @@
-// src/api/todo.ts
-import apiClient from './index';
+import axiosInstance from '.';
 
-export const postTodos = () => apiClient.post('/start/signin');
-export const createTodo = () => apiClient.post('/todos');
+export const postTodos = () => axiosInstance.post('/start/signin');
+export const createTodo = () => axiosInstance.post('/todos');
