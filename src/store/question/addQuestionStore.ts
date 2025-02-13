@@ -6,6 +6,8 @@ interface QuestionStore {
   periodicQuestions: PeriodicQuestion[];
   addDailyQuestion: (content: string) => void;
   addPeriodicQuestion: (question: Omit<PeriodicQuestion, 'id'>) => void;
+  deleteDailyQuestion: (id: number) => void;
+  deletePeriodicQuestion: (id: number) => void;
 }
 
 const useQuestionStore = create<QuestionStore>((set) => ({
@@ -37,6 +39,18 @@ const useQuestionStore = create<QuestionStore>((set) => ({
           ...question,
         },
       ],
+    })),
+  deleteDailyQuestion: (id) =>
+    set((state) => ({
+      dailyQuestions: state.dailyQuestions.filter(
+        (question) => question.id !== id,
+      ),
+    })),
+  deletePeriodicQuestion: (id) =>
+    set((state) => ({
+      periodicQuestions: state.periodicQuestions.filter(
+        (question) => question.id !== id,
+      ),
     })),
 }));
 

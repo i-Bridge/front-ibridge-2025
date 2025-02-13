@@ -10,6 +10,8 @@ export default function RegularQuestionPage() {
     periodicQuestions,
     addDailyQuestion,
     addPeriodicQuestion,
+    deleteDailyQuestion, // 추가
+    deletePeriodicQuestion,
   } = useQuestionStore();
   const [newDailyQuestion, setNewDailyQuestion] = useState('');
   const [newPeriodicQuestion, setNewPeriodicQuestion] = useState('');
@@ -60,8 +62,28 @@ export default function RegularQuestionPage() {
         <h2 className="text-2xl font-semibold mb-4">오늘의 기본 질문</h2>
         <ul className="list-disc pl-5 mb-4">
           {dailyQuestions.map((question) => (
-            <li key={question.id} className="mb-2">
-              {question.content}
+            <li
+              key={question.id}
+              className="mb-2 flex items-center justify-between"
+            >
+              <span>{question.content}</span>
+              <button
+                onClick={() => deleteDailyQuestion(question.id)}
+                className="ml-2 text-red-500 hover:text-red-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
             </li>
           ))}
         </ul>
@@ -90,16 +112,32 @@ export default function RegularQuestionPage() {
         <ul className="list-none pl-0 mb-4">
           {periodicQuestions.map((question) => (
             <li key={question.id} className="mb-2 flex items-center">
-              {/* 주기에 따른 색상 표시 */}
               <span
                 className={`w-3 h-3 rounded-full mr-3 ${getPeriodColor(
                   question.period,
                 )}`}
               ></span>
-              {question.content}
-              <span className="ml-auto text-sm text-gray-500">
+              <span className="flex-grow">{question.content}</span>
+              <span className="text-sm text-gray-500 mx-2">
                 ({question.period})
               </span>
+              <button
+                onClick={() => deletePeriodicQuestion(question.id)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
             </li>
           ))}
         </ul>
