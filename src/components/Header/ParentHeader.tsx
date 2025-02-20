@@ -33,7 +33,7 @@ export default function ParentHeader() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-opacity-90 z-50 shadow-md">
+    <header className="fixed top-0 left-0 right-0  bg-i-ivory bg-opacity-95 z-50 shadow-md">
       <nav className="max-w-7xl mx-auto px-8 py-3 flex justify-between items-center">
         {/* 로고 */}
         <div className="flex items-center">
