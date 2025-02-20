@@ -22,12 +22,12 @@ export default function StartPage() {
 
   return (
     <div className="min-h-screen">
-      <header className="fixed top-0 left-0 right-0 bg-opacity-90 z-50 shadow-md">
-        <nav className="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
+      <header className="fixed top-0 left-0 right-0 bg-opacity-95 z-50 shadow-md">
+        <nav className="max-w-7xl mx-auto px-8 py-3 flex justify-between items-center">
           <Image
             src="/images/logo.svg"
             alt="Logo"
-            width={100}
+            width={100} // 로고 크기도 줄일 수 있음
             height={100}
             className="mr-10"
           />
