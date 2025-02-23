@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ParentHeader() {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -9,7 +10,6 @@ export default function ParentHeader() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
-  // 드롭다운 외부 클릭 감지
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -32,10 +32,15 @@ export default function ParentHeader() {
     };
   }, []);
 
+  const menuVariants = {
+    hidden: { opacity: 0, y: -5 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+    exit: { opacity: 0, y: -5, transition: { duration: 0.2 } },
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0  bg-i-ivory bg-opacity-95 z-50 shadow-md">
+    <header className="fixed top-0 left-0 right-0 bg-i-ivory bg-opacity-95 z-50 shadow-md transition-all duration-300">
       <nav className="max-w-7xl mx-auto px-8 py-3 flex justify-between items-center">
-        {/* 로고 */}
         <div className="flex items-center">
           <Link href="/parent/home">
             <Image
@@ -43,72 +48,82 @@ export default function ParentHeader() {
               alt="Logo"
               width={100}
               height={100}
-              className="mr-10"
+              className="mr-10 transition-transform duration-300 hover:scale-105"
             />
           </Link>
           <div className="flex items-center gap-10">
-            <span className="text-lg text-gray-800 font-medium">
-              서비스 소개
-            </span>
-            <div
-              ref={dropdownRef}
-              className="relative"
-              onClick={() => setShowDropdown(!showDropdown)}
+            <Link
+              href="/about"
+              className="text-lg text-gray-800 font-medium hover:text-blue-600 transition-colors duration-300"
             >
-              <span className="text-lg text-gray-800 font-medium cursor-pointer">
+              서비스 소개
+            </Link>
+            <div ref={dropdownRef} className="relative">
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="text-lg text-gray-800 font-medium hover:text-blue-600 transition-colors duration-300 focus:outline-none"
+              >
                 질문하기
-              </span>
-              {showDropdown && (
-                <div className="absolute top-[110%] left-0 bg-white border border-gray-300 rounded shadow-md w-40 z-10">
-                  <Link
-                    href="/parent/regular"
-                    className="block px-4 py-2 hover:bg-gray-100 w-full"
+              </button>
+              <AnimatePresence>
+                {showDropdown && (
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    variants={menuVariants}
+                    className="absolute top-full left-0 bg-white border border-gray-200 rounded-lg shadow-xl w-48 overflow-hidden"
                   >
-                    정기질문
-                  </Link>
-                  <hr className="border-t border-gray-300" />
-                  <Link
-                    href="/parent/board"
-                    className="block px-4 py-2 hover:bg-gray-100 w-full"
-                  >
-                    게시판
-                  </Link>
-                </div>
-              )}
+                    <Link
+                      href="/parent/regular"
+                      className="block px-4 py-3 hover:bg-gray-100 transition-colors duration-200"
+                    >
+                      정기질문
+                    </Link>
+                    <Link
+                      href="/parent/board"
+                      className="block px-4 py-3 hover:bg-gray-100 transition-colors duration-200"
+                    >
+                      게시판
+                    </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
 
-        {/* 우측 메뉴 */}
         <div className="flex items-center gap-10">
-          <span className="text-lg text-gray-800 font-medium">
-            자주 묻는 질문
-          </span>
           <Link
-            href="/parent/calendar"
-            className="bg-none border-none p-0 cursor-pointer flex items-center hover:opacity-70"
+            href="/faq"
+            className="text-lg text-gray-800 font-medium hover:text-blue-600 transition-colors duration-300"
           >
+            자주 묻는 질문
+          </Link>
+          <Link href="/parent/calendar" className="relative group">
             <Image
               src="/images/calendar.png"
               alt="Calendar"
-              width={35}
-              height={35}
-              className="rounded-lg"
+              width={30}
+              height={30}
+              className="rounded-lg transition-transform duration-300 group-hover:scale-110"
             />
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              3
+            </span>
           </Link>
 
-          {/* 프로필 버튼 */}
           <div ref={profileMenuRef} className="relative">
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="bg-none border-none p-0 cursor-pointer flex items-center hover:opacity-70"
+              className="focus:outline-none group"
             >
               <Image
                 src="/images/profile.png"
                 alt="Profile"
                 width={40}
                 height={40}
-                className="rounded-full border border-gray-300 shadow-sm"
+                className="rounded-full border-2 border-gray-300 transition-all duration-300 group-hover:border-blue-500 group-hover:shadow-md"
               />
             </button>
 
