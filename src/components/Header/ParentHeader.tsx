@@ -7,8 +7,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function ParentHeader() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false); // State for notifications dropdown
   const dropdownRef = useRef<HTMLDivElement>(null);
   const profileMenuRef = useRef<HTMLDivElement>(null);
+  const notificationsRef = useRef<HTMLDivElement>(null); // Ref for notifications dropdown
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -24,6 +26,12 @@ export default function ParentHeader() {
       ) {
         setShowProfileMenu(false);
       }
+      if (
+        notificationsRef.current &&
+        !notificationsRef.current.contains(event.target as Node)
+      ) {
+        setShowNotifications(false);
+      }
     }
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -37,6 +45,11 @@ export default function ParentHeader() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
     exit: { opacity: 0, y: -5, transition: { duration: 0.2 } },
   };
+
+  const notifications = [
+    { id: 1, message: '가족 초대가 도착했습니다!', time: '5분 전' },
+    { id: 2, message: '새로운 메시지가 있습니다.', time: '30분 전' },
+  ];
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-i-ivory bg-opacity-95 z-50 shadow-md transition-all duration-300">
@@ -93,13 +106,66 @@ export default function ParentHeader() {
           </div>
         </div>
 
-        <div className="flex items-center gap-10">
+        <div className="flex items-center gap-5">
+          {' '}
+          {/* Reduced gap for better spacing */}
           <Link
             href="/faq"
             className="text-lg text-gray-800 font-medium hover:text-blue-600 transition-colors duration-300"
           >
             자주 묻는 질문
           </Link>
+          {/* In-Mail Notifications Button */}
+          <div ref={notificationsRef} className="relative">
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="focus:outline-none relative"
+            >
+              <Image
+                src="/images/mail.png"
+                alt="mail"
+                width={30}
+                height={30}
+                className="mr-10 transition-transform duration-300 hover:scale-105"
+              ></Image>
+              {notifications.length > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                  {notifications.length}
+                </span>
+              )}
+            </button>
+            <AnimatePresence>
+              {showNotifications && (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={menuVariants}
+                  className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-md shadow-xl overflow-hidden"
+                >
+                  <div className="py-2">
+                    {notifications.length > 0 ? (
+                      notifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                        >
+                          {notification.message}
+                          <div className="text-xs text-gray-500">
+                            {notification.time}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-4 py-2 text-sm text-gray-700">
+                        새로운 알림이 없습니다.
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           <Link href="/parent/calendar" className="relative group">
             <Image
               src="/images/calendar.png"
@@ -112,7 +178,6 @@ export default function ParentHeader() {
               3
             </span>
           </Link>
-
           <div ref={profileMenuRef} className="relative">
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
@@ -129,7 +194,13 @@ export default function ParentHeader() {
 
             {/* 프로필 드롭다운 메뉴 */}
             {showProfileMenu && (
-              <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                variants={menuVariants}
+                className="absolute right-0 mt-2 w-72 bg-white border border-gray-300 rounded-lg shadow-lg z-10"
+              >
                 {/* 상단 사용자 정보 */}
                 <div className="p-4 bg-gray-100 rounded-t-lg text-center">
                   <Image
@@ -202,7 +273,7 @@ export default function ParentHeader() {
                     로그아웃
                   </button>
                 </div>
-              </div>
+              </motion.div>
             )}
           </div>
         </div>
