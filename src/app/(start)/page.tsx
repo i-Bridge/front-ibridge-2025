@@ -102,7 +102,7 @@ export default function StartPage() {
                 
                 
                   <button className="w-full bg-[#FAE100] text-[#391B1B] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#FDD835] transition-colors">
-                  <Link href="/parent/home">
+                  <Link href="/parent/1/home">
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path
                         fill="currentColor"

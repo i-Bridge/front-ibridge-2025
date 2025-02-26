@@ -1,10 +1,16 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ParentHeader() {
+  const params = useParams();
+  const childId = params.childId as string;
+
+  console.log("Params 값 헤더", childId); 
+
   const [dropdowns, setDropdowns] = useState<Record<string, boolean>>({
     menu: false,
     profile: false,
@@ -58,7 +64,7 @@ export default function ParentHeader() {
       <nav className="max-w-7xl mx-auto px-8 py-3 flex justify-between items-center">
         {/* 로고 및 네비게이션 */}
         <div className="flex items-center gap-10">
-          <Link href="/parent/home">
+          <Link href="/parent/${childId}/home">
             <Image
               src="/images/logo.svg"
               alt="Logo"
@@ -91,13 +97,13 @@ export default function ParentHeader() {
                   className="absolute top-full left-0 bg-white border rounded-lg shadow-xl w-48"
                 >
                   <Link
-                    href="/parent/regular"
+                     href={`/parent/${childId}/regular`}
                     className="block px-4 py-3 hover:bg-gray-100"
                   >
                     정기질문
                   </Link>
                   <Link
-                    href="/parent/board"
+                     href={`/parent/${childId}/board`}
                     className="block px-4 py-3 hover:bg-gray-100"
                   >
                     게시판
@@ -163,7 +169,7 @@ export default function ParentHeader() {
           </div>
 
           {/* 달력 */}
-          <Link href="/parent/calendar" className="relative group">
+          <Link  href={`/parent/${childId}/calendar`} className="relative group">
             <Image
               src="/images/calendar.png"
               alt="Calendar"
