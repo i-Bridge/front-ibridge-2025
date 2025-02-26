@@ -6,7 +6,7 @@
 import { useDateStore } from "@/store/date/dateStore";
 import { useEffect, useRef, useState } from "react";
 
-import { getDayInfo } from '@/api/todo';
+import { getMainInfo } from '@/api/todo';
 
 export default function Weekly() {
   const [response, setResponse] = useState(null);
@@ -19,7 +19,7 @@ export default function Weekly() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const result = await getDayInfo(); // ✅ API 호출
+        const result = await getMainInfo(); // ✅ API 호출
         setResponse(result.data);
       } catch (err: any) {
         setError(err.response?.data?.message || "데이터를 불러오는 중 오류 발생");
