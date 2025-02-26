@@ -7,8 +7,8 @@
   --foreground: theme('colors.i-darkblue');
 }
 
-
 body {
+  padding-top: 80px; /* 헤더 높이만큼 조정 */
   color: var(--foreground);
   background: var(--background);
   font-family: 'Pretendard-Regular', Arial, Helvetica, sans-serif;
@@ -19,6 +19,7 @@ body {
     @apply antialiased;
   }
 }
+
 
 @font-face {
   font-family: 'Pretendard-Regular';
