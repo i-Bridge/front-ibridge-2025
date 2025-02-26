@@ -1,6 +1,6 @@
 // src/app/parent/home/page.tsx
 import Weekly from "./weekly";
-import DateSelector from "./dateSelector";
+import DateSelector from "./monthSelector";
 import DailyQuestionList from "@/components/Question/DailyQuestionList"; // DailyQuestionList 컴포넌트 import
 
 

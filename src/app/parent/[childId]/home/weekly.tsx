@@ -4,12 +4,36 @@
 "use client";
 
 import { useDateStore } from "@/store/date/dateStore";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import { getDayInfo } from '@/api/todo';
 
 export default function Weekly() {
+  const [response, setResponse] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  
+  // ✅ 컴포넌트가 마운트되면 API 요청 실행
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const result = await getDayInfo(); // ✅ API 호출
+        setResponse(result.data);
+      } catch (err: any) {
+        setError(err.response?.data?.message || "데이터를 불러오는 중 오류 발생");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []); // ✅ 빈 배열 → 페이지가 로드될 때 한 번만 실행
+
   const { selectedDate, setSelectedDate } = useDateStore();
   const containerRef = useRef<HTMLDivElement>(null);
-
+  
   const [year, month, selectedDay] = selectedDate.split("-").map(Number);
   const daysInMonth = new Date(year, month, 0).getDate();
 
@@ -32,8 +56,8 @@ export default function Weekly() {
   }, [selectedDate]);
 
   return (
-    <div className="w-[600px] overflow-x-auto scrollbar-hide flex" ref={containerRef}>
-      <div className="flex space-x-2">
+    <div className="w-[600px] overflow-x-auto scrollbar-custom  flex" ref={containerRef}>
+      <div className="flex space-x-2 mt-5 mb-4">
         {Array.from({ length: daysInMonth }).map((_, index) => {
           const day = index + 1;
           const isSelected = day === selectedDay;
@@ -42,9 +66,9 @@ export default function Weekly() {
           return (
             <button
               key={day}
-              className={`w-10 h-10 flex items-center justify-center rounded-full shadow-md 
-                ${isSelected ? "bg-pink-500 text-white selected" : "bg-blue-500 text-white"}
-                ${isToday ? "bg-yellow-400 text-black font-bold" : ""}`} // 오늘 날짜에 노란색 배경 추가
+              className={`w-11 h-11 flex items-center justify-center rounded-[20px] shadow-md 
+                ${isSelected ? "bg-i-lightpurple border-2 border-i-orange text-white selected" : "bg-i-lightpurple text-white"}
+                ${isToday ? "bg-i-yellow text-black font-bold" : ""}`} // 오늘 날짜에 노란색 배경 추가
               onClick={() => handleClick(day)}
             >
               {day}

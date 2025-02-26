@@ -87,37 +87,45 @@ export default function StartPage() {
               </h3>
               <div className="space-y-3">
                 {/* Social login buttons (same as before) */}
-                <Link href="/setup">
+                
                   <button className="w-full bg-[#4285F4] text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#357ABD] transition-colors">
+                  <Link href="/setup">
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path
                         fill="currentColor"
                         d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
                       />
                     </svg>
-                    Google 로그인
+                    Google 로그인 (/setup)
+                    </Link>
                   </button>
-                </Link>
-                <Link href="/parent/home">
+                
+                
                   <button className="w-full bg-[#FAE100] text-[#391B1B] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#FDD835] transition-colors">
+                  <Link href="/parent/home">
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path
                         fill="currentColor"
                         d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z"
                       />
                     </svg>
-                    카카오 로그인
+                    카카오 로그인 (/parent/home)
+                    </Link>
                   </button>
-                </Link>
+                
+                
                 <button className="w-full bg-[#03C75A] text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#02B150] transition-colors">
+                <Link href="/profile">
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path
                       fill="currentColor"
                       d="M16,2H8C4.691,2,2,4.691,2,8v13c0,0.553,0.447,1,1,1h13c3.309,0,6-2.691,6-6V8C22,4.691,19.309,2,16,2z M20,16c0,2.206-1.794,4-4,4H4V8c0-2.206,1.794-4,4-4h8c2.206,0,4,1.794,4,4V16z"
                     />
                   </svg>
-                  네이버 로그인
+                  네이버 로그인(/profile)
+                  </Link>
                 </button>
+                
               </div>
             </div>
           </div>

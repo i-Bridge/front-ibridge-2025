@@ -19,3 +19,29 @@ body {
     @apply antialiased;
   }
 }
+
+
+/* 스크롤바 숨기기 (웹킷 기반 브라우저) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* 스크롤바 커스텀 스타일 */
+.scrollbar-custom::-webkit-scrollbar {
+  height: 8px; /* 가로 스크롤바 높이 */
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: #f0f0f0; /* 트랙 배경 */
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: theme('colors.i-skyblue'); /* 스크롤바 색상 */
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: #888; /* 호버 시 색상 변경 */
+}
