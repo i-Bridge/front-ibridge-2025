@@ -64,7 +64,7 @@ export default function ParentHeader() {
       <nav className="max-w-7xl mx-auto px-8 py-3 flex justify-between items-center">
         {/* 로고 및 네비게이션 */}
         <div className="flex items-center gap-10">
-          <Link href="/parent/${childId}/home">
+          <Link  href={`/parent/${childId}/home`}>
             <Image
               src="/images/logo.svg"
               alt="Logo"
@@ -169,7 +169,7 @@ export default function ParentHeader() {
           </div>
 
           {/* 달력 */}
-          <Link  href={`/parent/${childId}/calendar`} className="relative group">
+          <Link  href={`/parent/${childId}/regular`} className="relative group">
             <Image
               src="/images/calendar.png"
               alt="Calendar"
