@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import RootFooter from '@/components/Footer/RootFooter';
-import RootHeader from '@/components/Header/RootHeader';
 
 export const metadata: Metadata = {
   title: { template: 'iBridge - %s', default: 'iBridge' },

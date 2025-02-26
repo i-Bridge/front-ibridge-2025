@@ -1,7 +1,8 @@
-// src/api/todo.ts
-import apiClient from './index';
+import axiosInstance from '.';
 
-export const postTodos = () => apiClient.post('/start/signin');
-export const createTodo = () => apiClient.post('/todos');
 
-export const getDayInfo = () => apiClient.get('/parent/{childId}/home'); //url 수정 필요
+export const postTodos = () => axiosInstance.post('/start/signin');
+export const createTodo = () => axiosInstance.post('/todos');
+
+export const getDayInfo = () => axiosInstance.get('/parent/{childId}/home'); //url 수정 필요
+
