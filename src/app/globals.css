@@ -7,8 +7,8 @@
   --foreground: theme('colors.i-darkblue');
 }
 
-
 body {
+  padding-top: 80px; /* 헤더 높이만큼 조정 */
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
@@ -19,7 +19,6 @@ body {
     @apply antialiased;
   }
 }
-
 
 /* 스크롤바 숨기기 (웹킷 기반 브라우저) */
 .scrollbar-hide::-webkit-scrollbar {

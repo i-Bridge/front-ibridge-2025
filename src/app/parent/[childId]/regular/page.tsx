@@ -1,18 +1,20 @@
 'use client';
 
 import { useState, KeyboardEvent } from 'react';
+import { motion } from 'framer-motion';
 import useQuestionStore from '@/store/question/addQuestionStore';
-
 import { Period } from '@/types/Regular/question';
+
 export default function RegularQuestionPage() {
   const {
     dailyQuestions,
     periodicQuestions,
     addDailyQuestion,
     addPeriodicQuestion,
-    deleteDailyQuestion, // 추가
+    deleteDailyQuestion,
     deletePeriodicQuestion,
   } = useQuestionStore();
+
   const [newDailyQuestion, setNewDailyQuestion] = useState('');
   const [newPeriodicQuestion, setNewPeriodicQuestion] = useState('');
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('매주');
@@ -43,129 +45,114 @@ export default function RegularQuestionPage() {
     }
   };
 
-  const getPeriodColor = (period: Period) => {
-    switch (period) {
-      case '매주':
-        return 'bg-green-500'; // 초록색
-      case '매월':
-        return 'bg-yellow-500'; // 노란색
-      default:
-        return 'bg-gray-500'; // 기본 회색
-    }
-  };
-
   return (
-    <div className="max-w-3xl bg-white mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">정기 질문</h1>
+    <div className="max-w-3xl mx-auto p-10 space-y-10 bg-white rounded-3xl shadow-xl border border-gray-200">
+      <h1 className="text-4xl font-bold text-center text-gray-800 tracking-wide">
+        정기 질문
+      </h1>
 
-      <div className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">오늘의 기본 질문</h2>
-        <ul className="list-disc pl-5 mb-4">
+      {/* Daily Questions Section */}
+      <motion.div
+        className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-2xl shadow-lg"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">
+          오늘의 질문
+        </h2>
+        <ul className="space-y-3">
           {dailyQuestions.map((question) => (
-            <li
+            <motion.li
               key={question.id}
-              className="mb-2 flex items-center justify-between"
+              className="flex items-center justify-between p-3 bg-white rounded-xl shadow-md hover:shadow-lg transition"
+              whileHover={{ scale: 1.02 }}
             >
-              <span>{question.content}</span>
+              <span className="text-lg font-medium text-gray-800">
+                {question.content}
+              </span>
               <button
+                className="text-red-400 hover:text-red-600 transition"
                 onClick={() => deleteDailyQuestion(question.id)}
-                className="ml-2 text-red-500 hover:text-red-700"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                ✖
               </button>
-            </li>
+            </motion.li>
           ))}
         </ul>
-        <div className="flex">
+        <div className="flex mt-4 space-x-2">
           <input
-            type="text"
             value={newDailyQuestion}
             onChange={(e) => setNewDailyQuestion(e.target.value)}
             onKeyPress={(e) => handleKeyPress(e, handleAddDailyQuestion)}
-            className="flex-grow border border-gray-300 rounded-l px-4 py-2"
-            placeholder="새로운 매일 질문 추가"
+            className="flex-grow border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-blue-400 shadow-sm"
+            placeholder="새로운 질문 추가..."
           />
           <button
             onClick={handleAddDailyQuestion}
-            className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600"
+            className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600 transition shadow-md"
           >
             추가
           </button>
         </div>
-      </div>
+      </motion.div>
 
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">
-          정기적으로 계속하고 싶은 질문/추이를 알고 싶은 질문
-        </h2>
-        <ul className="list-none pl-0 mb-4">
+      {/* Periodic Questions Section */}
+      <motion.div
+        className="bg-gradient-to-r from-purple-50 to-purple-100 p-6 rounded-2xl shadow-lg"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">정기 질문</h2>
+        <ul className="space-y-3">
           {periodicQuestions.map((question) => (
-            <li key={question.id} className="mb-2 flex items-center">
-              <span
-                className={`w-3 h-3 rounded-full mr-3 ${getPeriodColor(
-                  question.period,
-                )}`}
-              ></span>
-              <span className="flex-grow">{question.content}</span>
-              <span className="text-sm text-gray-500 mx-2">
-                ({question.period})
-              </span>
+            <motion.li
+              key={question.id}
+              className="flex items-center justify-between p-3 bg-white rounded-xl shadow-md hover:shadow-lg transition"
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="flex items-center space-x-3">
+                <span
+                  className={`w-4 h-4 rounded-full ${question.period === '매주' ? 'bg-green-400' : 'bg-yellow-400'}`}
+                ></span>
+                <span className="text-lg font-medium text-gray-800">
+                  {question.content}
+                </span>
+              </div>
               <button
+                className="text-red-400 hover:text-red-600 transition"
                 onClick={() => deletePeriodicQuestion(question.id)}
-                className="text-red-500 hover:text-red-700"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                ✖
               </button>
-            </li>
+            </motion.li>
           ))}
         </ul>
-        <div className="flex">
+        <div className="flex mt-4 space-x-2">
           <input
-            type="text"
             value={newPeriodicQuestion}
             onChange={(e) => setNewPeriodicQuestion(e.target.value)}
             onKeyPress={(e) => handleKeyPress(e, handleAddPeriodicQuestion)}
-            className="flex-grow border border-gray-300 rounded-l px-4 py-2"
-            placeholder="새로운 주기 질문 추가"
+            className="flex-grow border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-400 shadow-sm"
+            placeholder="새로운 정기 질문 추가..."
           />
           <select
             value={selectedPeriod}
             onChange={(e) => setSelectedPeriod(e.target.value as Period)}
-            className="border-t border-b border-gray-300 px-4 py-2"
+            className="border border-gray-300 rounded-xl px-4 py-2 shadow-sm"
           >
             <option value="매주">매주</option>
             <option value="매월">매월</option>
           </select>
           <button
             onClick={handleAddPeriodicQuestion}
-            className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600"
+            className="bg-purple-500 text-white px-4 py-2 rounded-xl hover:bg-purple-600 transition shadow-md"
           >
             추가
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
