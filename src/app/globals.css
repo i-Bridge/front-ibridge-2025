@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
 :root {
   --background: theme('colors.i-ivory');
   --foreground: theme('colors.i-darkblue');
@@ -11,13 +13,23 @@ body {
   padding-top: 80px; /* 헤더 높이만큼 조정 */
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  
 }
 
 @layer base {
   body {
     @apply antialiased;
+    font-family:'Noto Sans KR';
   }
+}
+
+
+
+.noto-sans-kr {
+  font-family: "Noto Sans KR", serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
 }
 
 /* 스크롤바 숨기기 (웹킷 기반 브라우저) */

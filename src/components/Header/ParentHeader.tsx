@@ -169,7 +169,7 @@ export default function ParentHeader() {
           </div>
 
           {/* 달력 */}
-          <Link href={`/parent/${childId}/regular`} className="relative group">
+          <Link  href={`/parent/${childId}/calendar`} className="relative group">
             <Image
               src="/images/calendar.png"
               alt="Calendar"
