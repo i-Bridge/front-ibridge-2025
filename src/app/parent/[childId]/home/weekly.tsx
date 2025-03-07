@@ -56,7 +56,7 @@ export default function Weekly() {
   }, [selectedDate]);
 
   return (
-    <div className="w-[600px] overflow-x-auto scrollbar-custom  flex" ref={containerRef}>
+    <div className="w-[400px] overflow-x-auto scrollbar-custom  flex" ref={containerRef}>
       <div className="flex space-x-2 mt-5 mb-4">
         {Array.from({ length: daysInMonth }).map((_, index) => {
           const day = index + 1;
