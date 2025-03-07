@@ -9,7 +9,7 @@ export default function ParentHeader() {
   const params = useParams();
   const childId = params.childId as string;
 
-  console.log("Params 값 헤더", childId); 
+  console.log('Params 값 헤더', childId);
 
   const [dropdowns, setDropdowns] = useState<Record<string, boolean>>({
     menu: false,
@@ -64,7 +64,7 @@ export default function ParentHeader() {
       <nav className="max-w-7xl mx-auto px-8 py-3 flex justify-between items-center">
         {/* 로고 및 네비게이션 */}
         <div className="flex items-center gap-10">
-          <Link  href={`/parent/${childId}/home`}>
+          <Link href={`/parent/${childId}/home`}>
             <Image
               src="/images/logo.svg"
               alt="Logo"
@@ -97,13 +97,13 @@ export default function ParentHeader() {
                   className="absolute top-full left-0 bg-white border rounded-lg shadow-xl w-48"
                 >
                   <Link
-                     href={`/parent/${childId}/regular`}
+                    href={`/parent/${childId}/regular`}
                     className="block px-4 py-3 hover:bg-gray-100"
                   >
                     정기질문
                   </Link>
                   <Link
-                     href={`/parent/${childId}/board`}
+                    href={`/parent/${childId}/board`}
                     className="block px-4 py-3 hover:bg-gray-100"
                   >
                     게시판
@@ -169,7 +169,7 @@ export default function ParentHeader() {
           </div>
 
           {/* 달력 */}
-          <Link  href={`/parent/${childId}/regular`} className="relative group">
+          <Link href={`/parent/${childId}/regular`} className="relative group">
             <Image
               src="/images/calendar.png"
               alt="Calendar"
@@ -217,16 +217,13 @@ export default function ParentHeader() {
                     <p className="text-sm text-gray-600">user@example.com</p>
                   </div>
                   <ul className="py-2">
-                    <li>
-                      <button className="block w-full px-4 py-2 text-left hover:bg-gray-100">
-                        회원 정보 수정
-                      </button>
-                    </li>
-                    <li>
-                      <button className="block w-full px-4 py-2 text-left hover:bg-gray-100">
-                        자식 정보 수정
-                      </button>
-                    </li>
+                    <Link href={`/parent/mypage/${childId}/childedit`}>
+                      <li>
+                        <button className="block w-full px-4 py-2 text-left hover:bg-gray-100">
+                          가족 정보 수정
+                        </button>
+                      </li>
+                    </Link>
                     <li>
                       <button className="block w-full px-4 py-2 text-left hover:bg-gray-100">
                         자식 변경
