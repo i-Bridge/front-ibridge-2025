@@ -46,21 +46,6 @@ export default function LoginButton() {
           Google로 로그인
         </button>
 
-        {/* Kakao 로그인 버튼 */}
-        <button
-          onClick={() => signIn('kakao')}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#FEE500',
-            color: '#000',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-          }}
-        >
-          Kakao로 로그인
-        </button>
-
         {/* Naver 로그인 버튼 */}
         <button
           onClick={() => signIn('naver')}
