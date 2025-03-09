@@ -33,30 +33,16 @@ export default function StartPage() {
           />
           <div className="flex gap-4">
             <a
-              href="#parent"
-              className="text-i-darkblue hover:text-i-pink transition-colors"
-            >
-              For Parent
-            </a>
-            <a
-              href="#child"
-              className="text-i-darkblue hover:text-i-pink transition-colors"
-            >
-              For Child
-            </a>
-            <a
               href="#faq"
               className="text-i-darkblue hover:text-i-pink transition-colors"
             >
-              FAQ
+              자주 묻는 질문
             </a>
           </div>
         </nav>
       </header>
 
       <main className="max-w-7xl mx-auto px-8 pt-24">
-        <LoginButton />
-        <UserInfo />
         <motion.section
           className="flex justify-between items-start mb-16 mt-12"
           initial="hidden"
@@ -81,134 +67,85 @@ export default function StartPage() {
           </div>
 
           <div className="w-80">
-            <div className="bg-white p-6 rounded-2xl shadow-lg">
-              <h3 className="text-i-darkblue font-bold mb-4 text-xl">
+            <div className="bg-white p-6 rounded-md shadow-md border border-gray-200 relative overflow-hidden">
+              {/* 상단 데코 요소 */}
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-400 to-green-400"></div>
+
+              <h3 className="text-gray-900 font-semibold mb-4 text-lg text-center">
                 소셜 로그인
               </h3>
+
+              <p className="text-gray-500 text-sm text-center mb-4">
+                간편하게 로그인하고 서비스를 이용하세요.
+              </p>
+
               <div className="space-y-3">
-                {/* Social login buttons (same as before) */}
-                
-                  <button className="w-full bg-[#4285F4] text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#357ABD] transition-colors">
-                  <Link href="/setup">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
-                      />
-                    </svg>
-                    Google 로그인 (/setup)
-                    </Link>
-                  </button>
-                
-                
-                  <button className="w-full bg-[#FAE100] text-[#391B1B] py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#FDD835] transition-colors">
-                  <Link href="/parent/1/home">
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z"
-                      />
-                    </svg>
-                    카카오 로그인 (/parent/home)
-                    </Link>
-                  </button>
-                
-                
-                <button className="w-full bg-[#03C75A] text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#02B150] transition-colors">
-                <Link href="/profile">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M16,2H8C4.691,2,2,4.691,2,8v13c0,0.553,0.447,1,1,1h13c3.309,0,6-2.691,6-6V8C22,4.691,19.309,2,16,2z M20,16c0,2.206-1.794,4-4,4H4V8c0-2.206,1.794-4,4-4h8c2.206,0,4,1.794,4,4V16z"
-                    />
-                  </svg>
-                  네이버 로그인(/profile)
-                  </Link>
-                </button>
-                
+                <LoginButton />
               </div>
             </div>
           </div>
         </motion.section>
 
-        <motion.section
-          id="parent"
-          className="mb-16 bg-white rounded-3xl p-12 shadow-lg"
-          initial="hidden"
-          animate={scrollY > 200 ? 'visible' : 'hidden'}
-          variants={sectionVariants}
-        >
-          {/* Parent Service Section */}
+        {/* Parent Service Section */}
 
-          <div className="max-w-3xl">
-            <h2 className="text-4xl text-i-darkblue font-bold mb-8">
-              For Parent
-            </h2>
-            <p className="text-blue-900 leading-relaxed mb-8">
-              부모님을 위한 서비스를 소개하는 섹션입니다. 아이의 성장과 발달을
-              체계적으로 관리하고 모니터링할 수 있는 다양한 기능을 제공합니다.
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                '성장기록',
-                '일정관리',
-                '건강체크',
-                '교육정보',
-                '상담서비스',
-                '커뮤니티',
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className={`
+        <div className="max-w-3xl">
+          <h2 className="text-4xl text-i-darkblue font-bold mb-8">
+            For Parent
+          </h2>
+          <p className="text-blue-900 leading-relaxed mb-8">
+            부모님을 위한 서비스를 소개하는 섹션입니다. 아이의 성장과 발달을
+            체계적으로 관리하고 모니터링할 수 있는 다양한 기능을 제공합니다.
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              '성장기록',
+              '일정관리',
+              '건강체크',
+              '교육정보',
+              '상담서비스',
+              '커뮤니티',
+            ].map((item, index) => (
+              <div
+                key={index}
+                className={`
                   bg-i-${['lightgreen', 'yellow', 'lightpurple', 'skyblue', 'lightgrey', 'pink'][index]} 
                   text-blue-900 rounded-full px-6 py-3 text-center font-medium hover:transform hover:scale-105 transition-transform
                 `}
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
+              >
+                {item}
+              </div>
+            ))}
           </div>
-        </motion.section>
+        </div>
 
-        <motion.section
-          id="child"
-          className="mb-16 bg-i-lightgrey rounded-3xl p-12 shadow-lg"
-          initial="hidden"
-          animate={scrollY > 600 ? 'visible' : 'hidden'}
-          variants={sectionVariants}
-        >
-          {/* Child Service Section */}
-          <div className="max-w-3xl">
-            <h2 className="text-4xl text-i-darkblue font-bold mb-8">
-              For Child
-            </h2>
-            <p className="text-blue-900 leading-relaxed mb-8">
-              아이들을 위한 특별한 서비스입니다. 재미있는 활동과 교육적인
-              콘텐츠로 즐겁게 배우고 성장할 수 있습니다.
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                '학습게임',
-                '창작활동',
-                '운동기록',
-                '독서일기',
-                '친구만들기',
-                '보상시스템',
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className={`
+        {/* Child Service Section */}
+        <div className="max-w-3xl">
+          <h2 className="text-4xl text-i-darkblue font-bold mb-8">For Child</h2>
+          <p className="text-blue-900 leading-relaxed mb-8">
+            아이들을 위한 특별한 서비스입니다. 재미있는 활동과 교육적인 콘텐츠로
+            즐겁게 배우고 성장할 수 있습니다.
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              '학습게임',
+              '창작활동',
+              '운동기록',
+              '독서일기',
+              '친구만들기',
+              '보상시스템',
+            ].map((item, index) => (
+              <div
+                key={index}
+                className={`
                   bg-i-${['lightgreen', 'yellow', 'lightpurple', 'skyblue', 'white', 'pink'][index]} 
                   text-blue-900 rounded-full px-6 py-3 text-center font-medium hover:transform hover:scale-105 transition-transform
                 `}
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
+              >
+                {item}
+              </div>
+            ))}
           </div>
-        </motion.section>
+        </div>
 
         <motion.section
           id="faq"
