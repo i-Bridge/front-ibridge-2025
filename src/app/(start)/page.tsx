@@ -19,7 +19,7 @@ export default function StartPage() {
   };
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen flex flex-col relative">
       <header className="fixed top-0 left-0 right-0 bg-i-ivory bg-opacity-95 z-50 shadow-md">
         <nav className="max-w-7xl mx-auto px-8 py-3 flex justify-between items-center">
           <Image
@@ -40,45 +40,48 @@ export default function StartPage() {
         </nav>
       </header>
 
-      <main className="mx-auto px-8 pt-24 relative z-10">
-        <motion.section
-          className="flex justify-between items-start mb-16 mt-12"
-          initial="hidden"
-          animate="visible"
-          variants={sectionVariants}
-        >
-          <div className="flex-1">
-            <h2 className="text-6xl text-i-darkblue font-bold mb-4">
-              Welcome to iBridge
-            </h2>
-            <p className="text-xl text-i-darkblue mb-8">
-              Connecting parents and children for a brighter future
-            </p>
-            <div className="flex gap-4">
-              <div className="bg-i-lightpurple text-blue-900 px-4 py-1 rounded-full text-sm">
-                2026
-              </div>
-              <div className="bg-i-lightgrey text-blue-900 px-4 py-1 rounded-md text-sm">
-                Team i-Bridge
-              </div>
-            </div>
-          </div>
-
-          <div className="w-80">
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 relative overflow-hidden">
-              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-i-lightpurple to-i-pink"></div>
-              <h3 className="text-i-darkblue font-semibold mb-4 text-lg text-center">
-                소셜 로그인
-              </h3>
-              <p className="text-gray-500 text-sm text-center mb-4">
-                간편하게 로그인하고 서비스를 이용하세요.
+      <main className="flex-grow">
+        {/* Hero Section */}
+        <section className="bg-i-ivory py-24 px-6">
+          <motion.div
+            className="max-w-7xl mx-auto flex justify-between items-center"
+            initial="hidden"
+            animate="visible"
+            variants={sectionVariants}
+          >
+            <div className="flex-1">
+              <h2 className="text-6xl text-i-darkblue font-bold mb-4">
+                Welcome to iBridge
+              </h2>
+              <p className="text-xl text-i-darkblue mb-8">
+                Connecting parents and children for a brighter future
               </p>
-              <div className="space-y-3">
-                <LoginButton />
+              <div className="flex gap-4">
+                <div className="bg-i-lightpurple text-blue-900 px-4 py-1 rounded-full text-sm">
+                  2026
+                </div>
+                <div className="bg-i-lightgrey text-blue-900 px-4 py-1 rounded-md text-sm">
+                  Team i-Bridge
+                </div>
               </div>
             </div>
-          </div>
-        </motion.section>
+
+            <div className="w-80">
+              <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 relative overflow-hidden">
+                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-i-lightpurple to-i-pink"></div>
+                <h3 className="text-i-darkblue font-semibold mb-4 text-lg text-center">
+                  소셜 로그인
+                </h3>
+                <p className="text-gray-500 text-sm text-center mb-4">
+                  간편하게 로그인하고 서비스를 이용하세요.
+                </p>
+                <div className="space-y-3">
+                  <LoginButton />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </section>
 
         <div className="max-w-5xl mx-auto px-16 mb-32 relative">
           {/* 배경 이미지 및 투명 오버레이 */}
