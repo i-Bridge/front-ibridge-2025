@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,31 +7,39 @@
 
 
 :root {
-  --background: theme('colors.i-ivory');
-  --foreground: theme('colors.i-darkblue');
+  --font-noto: 'Noto Sans KR', sans-serif;
+  --background: white;
+  --foreground: theme('colors.i-black');
 }
 
 body {
-  padding-top: 80px; /* 헤더 높이만큼 조정 */
+  padding-top: 2.5rem; /* 헤더 높이만큼 조정 */
   color: var(--foreground);
   background: var(--background);
-  
 }
 
 @layer base {
   body {
     @apply antialiased;
-    font-family:'Noto Sans KR';
+    font-family: var(--font-noto);
   }
 }
 
 
+.noto-light {
+  font-weight: 100; 
+}
 
-.noto-sans-kr {
-  font-family: "Noto Sans KR", serif;
-  font-optical-sizing: auto;
-  font-weight: 500;
-  font-style: normal;
+.noto-regular {
+  font-weight: 400; /* 기본 */
+}
+
+.noto-bold {
+  font-weight: 700;
+}
+
+.noto-black {
+  font-weight: 900;
 }
 
 /* 스크롤바 숨기기 (웹킷 기반 브라우저) */
@@ -43,16 +53,16 @@ body {
 }
 
 .scrollbar-custom::-webkit-scrollbar-track {
-  background: #f0f0f0; /* 트랙 배경 */
+  
   border-radius: 10px;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb {
-  background: theme('colors.i-skyblue'); /* 스크롤바 색상 */
+  background: theme('colors.i-lightpurple'); /* 스크롤바 색상 */
   border-radius: 10px;
   transition: background 0.3s;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background: #888; /* 호버 시 색상 변경 */
+  background: theme('colors.i-orange'); /* 호버 시 색상 변경 */
 }

@@ -21,7 +21,7 @@ export default {
         'i-black': '#202123',
       },
       fontFamily: {
-        'noto-sans-kr': ['"Noto Sans KR"', 'serif'], // Noto Sans KR 폰트를 기본 폰트로 설정
+        noto: 'var(--font-noto)', 
       },
     },
   },
