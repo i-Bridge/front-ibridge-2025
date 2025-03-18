@@ -1,56 +1,41 @@
 'use client';
-import { useState } from 'react';
-import { PostTodos } from '@/api/todo';
 
-export default function TestPostTodos() {
-  const [response, setResponse] = useState(null);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+import Link from 'next/link';
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
+// 샘플 데이터 (나중에 API에서 받아올 수도 있음)
+const profiles = [
+  { childId: 1, parentId: 10 },
+  { childId: 2, parentId: 20 },
+];
 
-    console.log('Attempting to sign in...');
-
-    try {
-      const result = await PostTodos();
-      setResponse(result.data);
-      console.log('SignIn successful. Response:', result.data);
-      console.log('Full response object:', result);
-    } catch (err: any) {
-      setError(err.response?.data?.message || err.message);
-      console.error('Error during SignIn:', err);
-      console.log('Full error object:', err);
-      if (err.response) {
-        console.log('Error response data:', err.response.data);
-        console.log('Error response status:', err.response.status);
-        console.log('Error response headers:', err.response.headers);
-      }
-    } finally {
-      setIsLoading(false);
-      console.log('Sign in attempt completed.');
-    }
-  };
-
+export default function Profile() {
   return (
-    <div>
-      <h1>Test SignIn</h1>
-      <form onSubmit={handleSubmit}>
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Signing In...' : 'Sign In'}
-        </button>
-      </form>
+    <div className="w-full h-screen flex flex-col bg-gray-100">
+      {/* 상단: 관리 계정 프로필 */}
+      <div className="flex justify-center items-center flex-wrap gap-8 p-8 bg-white border-b">
+        {profiles.map(({ childId, parentId }) => (
+          <div key={parentId} className="flex flex-col items-center">
+            <Link href={`/parent/${parentId}/home`}>
+              <div className="w-32 h-32 bg-blue-500 rounded-full hover:ring-4 hover:ring-blue-300 cursor-pointer flex items-center justify-center text-white">
+                자식 {childId} 부모 
+              </div>
+            </Link>
+          </div>
+        ))}
+      </div>
 
-      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
-
-      {response && (
-        <div>
-          <h2>Response:</h2>
-          <pre>{JSON.stringify(response, null, 2)}</pre>
-        </div>
-      )}
+      {/* 하단: 자식 계정 프로필 */}
+      <div className="flex justify-center items-center flex-wrap gap-8 p-8">
+        {profiles.map(({ childId }) => (
+          <div key={childId} className="flex flex-col items-center">
+            <Link href={`/child/${childId}`}>
+              <div className="w-32 h-32 bg-blue-300 rounded-full hover:ring-4 hover:ring-blue-500 cursor-pointer flex items-center justify-center text-white">
+                자식 {childId} 계정
+              </div>
+            </Link>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { allPosts } from '@/app/parent/board/page';
+import { allPosts } from '@/app/parent/[childId]/board/page';
 import Link from 'next/link';
 
 export default function PostDetail({ params }: { params: { id: string } }) {

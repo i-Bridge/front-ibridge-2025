@@ -1,21 +1,39 @@
 // src/app/parent/home/weekly.tsx // 일주일치 버튼, 데이터에 따른 버튼 모양
 
-/* 수정 사안
- - ssr,csr고려 날짜 버튼, 질문 리스트는 csr, 나머지는 다 ssr이도록
- - 선택 날짜 년도 등 상세 설정 되도록
- - 현재 일자가 가운데에 오도록, 스크롤바도 가운데
- - 
-*/
 
 "use client";
 
 import { useDateStore } from "@/store/date/dateStore";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import { getMainInfo } from '@/api/todo';
 
 export default function Weekly() {
+  const [response, setResponse] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  
+  // ✅ 컴포넌트가 마운트되면 API 요청 실행
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const result = await getMainInfo(); // ✅ API 호출
+        setResponse(result.data);
+      } catch (err: any) {
+        setError(err.response?.data?.message || "데이터를 불러오는 중 오류 발생");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []); // ✅ 빈 배열 → 페이지가 로드될 때 한 번만 실행
+
   const { selectedDate, setSelectedDate } = useDateStore();
   const containerRef = useRef<HTMLDivElement>(null);
-
+  
   const [year, month, selectedDay] = selectedDate.split("-").map(Number);
   const daysInMonth = new Date(year, month, 0).getDate();
 
@@ -38,26 +56,32 @@ export default function Weekly() {
   }, [selectedDate]);
 
   return (
-    <div className="w-[600px] overflow-x-auto scrollbar-hide flex" ref={containerRef}>
-      <div className="flex space-x-2">
+    <div className="  mt-2 overflow-x-auto scrollbar-custom flex max-w-2xl" ref={containerRef}  >
+      <div className="border border-i-lightgrey rounded-full flex space-x-3 mt-4 mb-2 p-2 ">
         {Array.from({ length: daysInMonth }).map((_, index) => {
           const day = index + 1;
           const isSelected = day === selectedDay;
           const isToday = year === todayYear && month === todayMonth && day === todayDay; // 오늘 날짜 체크
-
+  
+          
           return (
             <button
               key={day}
-              className={`w-10 h-10 flex items-center justify-center rounded-full shadow-md 
-                ${isSelected ? "bg-pink-500 text-white selected" : "bg-blue-500 text-white"}
-                ${isToday ? "bg-yellow-400 text-black font-bold" : ""}`} // 오늘 날짜에 노란색 배경 추가
+              className="w-11 h-11 flex items-center justify-center rounded-[20px] "
               onClick={() => handleClick(day)}
             >
-              {day}
+              <span
+                className={`w-full h-full flex items-center justify-center rounded-[20px]  shadow-md
+                  ${isSelected ? "bg-i-yellow border-2 border-i-orange text-white" : `bg-i-lightpurple text-white`} 
+                  ${isToday ? "bg-i-orange text-white font-bold" : ""}`} // 오늘 날짜는 오렌지색 유지
+              >
+                {day}
+              </span>
             </button>
           );
         })}
       </div>
     </div>
   );
+  
 }
