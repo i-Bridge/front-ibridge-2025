@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useDateStore } from "@/store/date/dateStore";
 
 const months = [
-  "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+  "1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"
 ];
 
 export default function MonthSelector() {
@@ -31,12 +31,14 @@ export default function MonthSelector() {
   return (
     <div className="relative w-40 flex flex-col items-start">
       <div className="flex items-center space-x-2">
-        <span className="text-sm text-gray-500 font-medium">{selectedMonth.year}</span>
+        
         <div 
-          className="font-bold text-lg cursor-pointer p-2 hover:bg-gray-200 rounded-md" 
+          className="font-bold text-sm  cursor-pointer p-2 hover:bg-i-lightgrey rounded-full" 
           onClick={() => setIsOpen(!isOpen)}
         >
-          {selectedMonth.name}
+          <span className="text-sm  font-medium mr-2">{selectedMonth.year}</span>
+          <span className="text-sm  font-bold">{selectedMonth.name}</span>
+          
         </div>
       </div>
       {isOpen && (

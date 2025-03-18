@@ -8,7 +8,7 @@
 
 :root {
   --font-noto: 'Noto Sans KR', sans-serif;
-  --background: white;
+  --background: theme('colors.i-ivory');
   --foreground: theme('colors.i-black');
 }
 
@@ -58,11 +58,11 @@ body {
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb {
-  background: theme('colors.i-lightpurple'); /* 스크롤바 색상 */
+  background: theme('colors.i-lightgrey'); /* 스크롤바 색상 */
   border-radius: 10px;
   transition: background 0.3s;
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background: theme('colors.i-orange'); /* 호버 시 색상 변경 */
+  background: rgb(180, 178, 178); /* 호버 시 색상 변경 */
 }

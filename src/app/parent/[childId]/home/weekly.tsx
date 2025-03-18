@@ -56,26 +56,32 @@ export default function Weekly() {
   }, [selectedDate]);
 
   return (
-    <div className="w-[400px] overflow-x-auto scrollbar-custom  flex" ref={containerRef}>
-      <div className="flex space-x-2 mt-5 mb-4">
+    <div className="  mt-2 overflow-x-auto scrollbar-custom flex max-w-2xl" ref={containerRef}  >
+      <div className="border border-i-lightgrey rounded-full flex space-x-3 mt-4 mb-2 p-2 ">
         {Array.from({ length: daysInMonth }).map((_, index) => {
           const day = index + 1;
           const isSelected = day === selectedDay;
           const isToday = year === todayYear && month === todayMonth && day === todayDay; // 오늘 날짜 체크
-
+  
+          
           return (
             <button
               key={day}
-              className={`w-11 h-11 flex items-center justify-center rounded-[20px] shadow-md 
-                ${isSelected ? "bg-i-lightpurple border-2 border-i-orange text-white selected" : "bg-i-lightpurple text-white"}
-                ${isToday ? "bg-i-yellow text-black font-bold" : ""}`} // 오늘 날짜에 노란색 배경 추가
+              className="w-11 h-11 flex items-center justify-center rounded-[20px] "
               onClick={() => handleClick(day)}
             >
-              {day}
+              <span
+                className={`w-full h-full flex items-center justify-center rounded-[20px]  shadow-md
+                  ${isSelected ? "bg-i-yellow border-2 border-i-orange text-white" : `bg-i-lightpurple text-white`} 
+                  ${isToday ? "bg-i-orange text-white font-bold" : ""}`} // 오늘 날짜는 오렌지색 유지
+              >
+                {day}
+              </span>
             </button>
           );
         })}
       </div>
     </div>
   );
+  
 }
