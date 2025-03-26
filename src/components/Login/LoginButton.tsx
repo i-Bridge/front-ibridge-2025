@@ -3,7 +3,6 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
 import axiosInstance from '@/api/index';
 import { useEffect } from 'react';
-import Image from 'next/image';
 
 export default function LoginButton() {
   const { data: session } = useSession(); // 세션 정보를 가져옴
