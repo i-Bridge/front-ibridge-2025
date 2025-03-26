@@ -1,6 +1,3 @@
-// src/app/parent/home/weekly.tsx // 일주일치 버튼, 데이터에 따른 버튼 모양
-
-
 "use client";
 
 import { useDateStore } from "@/store/date/dateStore";
@@ -13,7 +10,6 @@ export default function Weekly() {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  
   // ✅ 컴포넌트가 마운트되면 API 요청 실행
   useEffect(() => {
     const fetchData = async () => {
@@ -52,36 +48,70 @@ export default function Weekly() {
     const selectedButton = containerRef.current?.querySelector(".selected");
     if (selectedButton) {
       selectedButton.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    } else {
+      // 오늘 날짜가 선택된 날짜로 없으면 오늘 날짜로 스크롤
+      const todayButton = containerRef.current?.querySelector(".today");
+      if (todayButton) {
+        todayButton.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
     }
   }, [selectedDate]);
 
+  const scroll = (direction: "left" | "right") => {
+    if (containerRef.current) {
+      const scrollAmount = 100; // 한 번에 스크롤할 양
+      const currentScroll = containerRef.current.scrollLeft;
+      const newScroll = direction === "left" ? currentScroll - scrollAmount : currentScroll + scrollAmount;
+      containerRef.current.scrollTo({ left: newScroll, behavior: "smooth" });
+    }
+  };
+
   return (
-    <div className="  mt-2 overflow-x-auto scrollbar-custom flex max-w-2xl" ref={containerRef}  >
-      <div className="border border-i-lightgrey rounded-full flex space-x-3 mt-4 mb-2 p-2 ">
-        {Array.from({ length: daysInMonth }).map((_, index) => {
-          const day = index + 1;
-          const isSelected = day === selectedDay;
-          const isToday = year === todayYear && month === todayMonth && day === todayDay; // 오늘 날짜 체크
+    <div className="mt-2 relative flex max-w-2xl">
+      {/* 왼쪽 화살표 버튼 */}
+      <button
+        onClick={() => scroll("left")}
+        className="w-10 h-10 flex items-center justify-center rounded-full text-white bg-i-lightgray shadow-md absolute left-[-50] top-[25]"
+      >
+        &#8592;
+      </button>
   
-          
-          return (
-            <button
-              key={day}
-              className="w-11 h-11 flex items-center justify-center rounded-[20px] "
-              onClick={() => handleClick(day)}
-            >
-              <span
-                className={`w-full h-full flex items-center justify-center rounded-[20px]  shadow-md
-                  ${isSelected ? "bg-i-yellow border-2 border-i-orange text-white" : `bg-i-lightpurple text-white`} 
-                  ${isToday ? "bg-i-orange text-white font-bold" : ""}`} // 오늘 날짜는 오렌지색 유지
+      <div className="mt-2 overflow-x-hidden flex border border-i-lightgrey rounded-full" ref={containerRef}>
+        {/* 날짜 버튼들 */}
+        <div className="flex space-x-3 mt-2 mb-2 p-2">
+          {Array.from({ length: daysInMonth }).map((_, index) => {
+            const day = index + 1;
+            const isSelected = day === selectedDay;
+            const isToday = year === todayYear && month === todayMonth && day === todayDay; // 오늘 날짜 체크
+  
+            return (
+              <button
+                key={day}
+                className="w-11 h-11 flex items-center justify-center rounded-[20px]"
+                onClick={() => handleClick(day)}
               >
-                {day}
-              </span>
-            </button>
-          );
-        })}
+                <span
+                  className={`w-full h-full flex items-center justify-center rounded-[20px] shadow-md
+                    
+                     
+                      ${isToday ? "bg-i-orange text-white font-bold today" : 
+                        isSelected ? " bg-i-lightgreen border-4 border-i-orange text-white selected" : "bg-i-lightgreen text-white"}`}
+                >
+                  {day}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
+  
+      {/* 오른쪽 화살표 버튼 */}
+      <button
+        onClick={() => scroll("right")}
+        className="w-10 h-10 flex items-center justify-center rounded-full text-white bg-i-lightorange shadow-md absolute right-[-50] top-[25]"
+      >
+        &#8594;
+      </button>
     </div>
   );
   
-}
