@@ -3,12 +3,14 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useHeaderContext } from '@/context/HeaderContext';
 
 export default function ParentHeader() {
   const params = useParams();
   const childId = params.childId as string;
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
+  const { hideHeader } = useHeaderContext();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -27,6 +29,8 @@ export default function ParentHeader() {
     hidden: { opacity: 0, y: -5 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
   };
+
+  if (hideHeader) return null; // hideHeader가 true이면 헤더를 렌더링하지 않음
 
   return (
     <header className="fixed top-0 left-0 right-0  bg-i-ivory bg-opacity-95 z-50 shadow-sm">
