@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useReplyStepsStore } from '@/store/child/replyStepStore';
 import { useRouter } from 'next/navigation';
 
@@ -20,12 +21,19 @@ export default function ReplyPage() {
       </h1>
       
       {/* 캐릭터 자리 */}
-      <div className="absolute left-24 top-1/2 transform -translate-y-1/2 w-80 h-60 bg-gray-300 rounded-full flex items-center justify-center text-lg font-bold">
-        캐릭터
+      <div className="absolute left-24 top-1/2 transform -translate-y-2/3 ">
+      
+      <Image 
+        src="/images/characterDefault.png" 
+        alt="My Image" 
+        width={400} 
+        height={400} 
+      />
+    
       </div>
       
       {/* 말풍선 자리 */}
-      <div className="absolute left-50 top-1/3 w-80 min-h-20 bg-gray-200 p-4 rounded-lg shadow-md">
+      <div className="absolute left-50 top-1/3 w-80 min-h-20 bg-white p-4 rounded-lg shadow-md">
         질문내용
       </div>
       
@@ -40,7 +48,7 @@ export default function ReplyPage() {
       </div>
       
       {/* 영상 통화 화면 자리 */}
-      <div className="absolute bottom-8 right-10 w-60 h-40 bg-gray-400 flex items-center justify-center text-lg font-bold">
+      <div className="absolute bottom-8 right-10 w-60 h-40 bg-white flex items-center justify-center text-lg font-bold">
         영상
       </div>
     </div>
