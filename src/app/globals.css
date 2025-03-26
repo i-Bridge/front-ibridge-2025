@@ -58,7 +58,7 @@ body {
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb {
-  background: theme('colors.i-lightgrey'); /* 스크롤바 색상 */
+  background: theme('colors.i-lightgray'); /* 스크롤바 색상 */
   border-radius: 10px;
   transition: background 0.3s;
 }

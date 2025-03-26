@@ -15,11 +15,11 @@ export default {
         'i-lightorange':'#F4A259 ',
         'i-yellow': '#FDD504',
         'i-ivory': '#FFF6ef',
-        'i-lightgreen': '#C3E93F',
+        'i-lightgreen': '#b2e04d',
         'i-lightpurple': '#F1D1EC',
         'i-pink': '#FFB1D0',
         'i-darkblue': '#034892',
-        'i-lightgrey': '#D9D9D9',
+        'i-lightgray': '#D9D9D9',
         'i-black': '#202123',
       },
       fontFamily: {
