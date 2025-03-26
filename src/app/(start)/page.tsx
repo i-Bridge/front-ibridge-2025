@@ -20,26 +20,6 @@ export default function StartPage() {
 
   return (
     <div className="min-h-screen flex flex-col relative">
-      <header className="fixed top-0 left-0 right-0 bg-i-ivory bg-opacity-95 z-50 shadow-md">
-        <nav className="max-w-7xl mx-auto px-8 py-3 flex justify-between items-center">
-          <Image
-            src="/images/logo.svg"
-            alt="Logo"
-            width={100}
-            height={100}
-            className="mr-10"
-          />
-          <div className="flex gap-4">
-            <a
-              href="#faq"
-              className="text-i-darkblue hover:text-i-pink transition-colors"
-            >
-              자주 묻는 질문
-            </a>
-          </div>
-        </nav>
-      </header>
-
       <main className="flex-grow">
         {/* Hero Section */}
         <section className="bg-i-ivory py-24 px-6">

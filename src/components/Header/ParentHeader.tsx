@@ -29,7 +29,7 @@ export default function ParentHeader() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-opacity-95 z-50">
+    <header className="fixed top-0 left-0 right-0  bg-i-ivory bg-opacity-95 z-50 shadow-sm">
       <nav className="max-w-7xl mx-auto px-8 py-1 flex justify-between items-center">
         {/* 로고 */}
         <Link href={`/parent/${childId}/home`}>
