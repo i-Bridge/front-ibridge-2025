@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import LoginButton from '@/components/Login/LoginButton';
 
@@ -13,42 +12,12 @@ export default function StartPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const sectionVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
-
   return (
     <div className="min-h-screen flex flex-col relative">
-      <header className="fixed top-0 left-0 right-0 bg-i-ivory bg-opacity-95 z-50 shadow-md">
-        <nav className="max-w-7xl mx-auto px-8 py-3 flex justify-between items-center">
-          <Image
-            src="/images/logo.svg"
-            alt="Logo"
-            width={100}
-            height={100}
-            className="mr-10"
-          />
-          <div className="flex gap-4">
-            <a
-              href="#faq"
-              className="text-i-darkblue hover:text-i-pink transition-colors"
-            >
-              자주 묻는 질문
-            </a>
-          </div>
-        </nav>
-      </header>
-
       <main className="flex-grow">
         {/* Hero Section */}
         <section className="bg-i-ivory py-24 px-6">
-          <motion.div
-            className="max-w-7xl mx-auto flex justify-between items-center"
-            initial="hidden"
-            animate="visible"
-            variants={sectionVariants}
-          >
+          <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div className="flex-1">
               <h2 className="text-6xl text-i-darkblue font-bold mb-4">
                 Welcome to iBridge
@@ -80,7 +49,7 @@ export default function StartPage() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </section>
 
         <div className="max-w-5xl mx-auto px-16 mb-32 relative">
