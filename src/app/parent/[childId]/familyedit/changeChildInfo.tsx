@@ -84,8 +84,7 @@ export default function ChildrenForm() {
 
   return (
     <div className="relative pt-8">
-      {' '}
-      {/* Added padding to the top for spacing */}
+      <p className="text-2xl font-semibold py-10">자식 정보 수정하기</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-16">
         {children.map((child) => (
           <div
