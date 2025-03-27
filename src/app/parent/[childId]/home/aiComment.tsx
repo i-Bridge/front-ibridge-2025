@@ -15,7 +15,7 @@ const mockupData = [
     ];
   
     return (
-      <div className="w-full bg-i-lightorange py-12">
+      <div className="w-full bg-i-lightorange py-14">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-start gap-4 mb-4">
             {mockupData.slice(0, 2).map((text, index) => (
