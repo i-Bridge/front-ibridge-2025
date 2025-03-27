@@ -96,7 +96,7 @@ export default function ParentHeader() {
 
                 {/* 메뉴 */}
                 <ul className="py-2">
-                  <Link href={`/parent/mypage/${childId}/childedit`}>
+                  <Link href={`/parent/${childId}/familyedit`}>
                     <li>
                       <button className="block w-full px-4 py-2 text-left hover:bg-gray-100">
                         가족 정보 수정
