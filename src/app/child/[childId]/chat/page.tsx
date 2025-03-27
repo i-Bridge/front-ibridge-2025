@@ -66,7 +66,7 @@ export default function ReplyPage() {
       )}
 
       {/* 버튼 또는 녹화 화면 */}
-      <div className="ml-16 flex flex-col gap-6 text-center">
+      <div className="ml-32 flex flex-col gap-8 text-center">
         {!isQuestionVisible ? (
           <>
             <button
