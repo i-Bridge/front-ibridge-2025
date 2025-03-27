@@ -1,7 +1,7 @@
 'use client';
 
 import { signIn, signOut, useSession } from 'next-auth/react';
-import axiosInstance from '@/api/index';
+import axiosInstance from '@/lib/axiosInstance';
 import { useEffect } from 'react';
 
 export default function LoginButton() {
