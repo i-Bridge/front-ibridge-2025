@@ -1,4 +1,4 @@
-import ChildrenForm from './changeChildInfo';
+import ChildrenForm from '../../../../components/Familyedit/changeChildInfo';
 import FamilyTree from './familyTree';
 export default function ChildrenSettingsPage() {
   return (
