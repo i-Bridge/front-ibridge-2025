@@ -10,16 +10,14 @@ export default function HomePage() {
   return (
     <div className="flex flex-col justify-center items-center w-full pt-3">
       <AIComment/>
-    <div className=" min-h-screen w-[680px] pt-8">
-      
+    <div className="  pt-4">
       <DateSelector />
       <Weekly />
-      <div  className="mt-8 ml-16 mr-16">
+    </div>
+
+    <div className="mt-4">
       <DailyQuestionList />
       </div>
-      
-
-    </div>
     </div>
   );
 }
