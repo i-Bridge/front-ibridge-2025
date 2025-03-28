@@ -1,21 +1,8 @@
-// types.ts 파일에서 타입 정의
-export interface Child {
-  id: number;
-  name: string;
-  birthday: string;
-  gender: string;
-  profileImage: string;
-}
-
-export interface UserData {
-  children: Child[]; // 자식들의 배열
-}
-
-// axiosInstance 정의가 필요하다면 아래와 같이 설정 가능
 import axiosInstance from '@/lib/axiosInstance';
+import { ChildData } from '@/types';
 
 // fetchUserData 함수
-export const fetchUserData = async (): Promise<UserData | null> => {
+export const fetchUserData = async (): Promise<ChildData | null> => {
   try {
     const response = await axiosInstance.get('/parent/mypage/edit'); // 실제 API 경로로 교체
 
@@ -42,7 +29,7 @@ export const fetchUserData = async (): Promise<UserData | null> => {
 };
 
 // 타입 검증 함수
-const isUserData = (data: any): data is UserData => {
+const isUserData = (data: any): data is ChildData => {
   // data가 UserData 타입인지 확인하는 로직
   return (
     Array.isArray(data.children) &&

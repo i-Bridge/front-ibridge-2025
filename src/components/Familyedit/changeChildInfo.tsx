@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchUserData } from '@/app/services/familyedit/fetchUserData'; // API 호출 함수
-import { Child, UserData } from '@/app/services/familyedit/fetchUserData'; // 타입 임포트
+import { Child, ChildData } from '@/types';
 
 export default function ChildrenForm() {
   const [children, setChildren] = useState<Child[]>([]);
@@ -12,7 +12,7 @@ export default function ChildrenForm() {
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const data: UserData | null = await fetchUserData(); // UserData 타입으로 지정
+        const data: ChildData | null = await fetchUserData(); // UserData 타입으로 지정
         if (data && data.children) {
           setChildren(data.children); // 받아온 자식 데이터 상태에 설정
         }
