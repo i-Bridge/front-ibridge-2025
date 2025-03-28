@@ -10,12 +10,19 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   async (config) => {
     const session = await getSession();
-    if (session?.user?.email) {
-      config.headers['X-User-Email'] = session.user.email; // 사용자 이메일 헤더 추가
-      if (session?.accessToken) {
+
+    if (session?.user) {
+      if (session.user.email) {
+        config.headers['X-User-Email'] = session.user.email; // 사용자 이메일 추가
+      }
+      if (session.user.name) {
+        config.headers['X-User-Name'] = session.user.name; // 사용자 이름 추가
+      }
+      if (session.accessToken) {
         config.headers.Authorization = `Bearer ${session.accessToken}`;
       }
     }
+
     return config;
   },
   (error) => {
@@ -25,11 +32,9 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   (response) => {
-    // 응답 데이터 처리
     return response;
   },
   (error) => {
-    // 에러 처리
     return Promise.reject(error);
   },
 );

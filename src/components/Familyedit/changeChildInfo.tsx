@@ -1,53 +1,27 @@
 'use client';
 
-import { useState } from 'react';
-
-interface Child {
-  id: number;
-  name: string;
-  birthday: string;
-  gender: string;
-  profileImage: string;
-}
+import { useState, useEffect } from 'react';
+import { fetchUserData } from '@/app/services/familyedit/fetchUserData'; // API 호출 함수
+import { Child, ChildData } from '@/types';
 
 export default function ChildrenForm() {
-  const initialChildren: Child[] = [
-    {
-      id: 1,
-      name: 'Child 1',
-      birthday: '2015-05-10',
-      gender: 'Male',
-      profileImage:
-        'https://via.placeholder.com/150/0000FF/808080?text=Profile+1',
-    },
-    {
-      id: 2,
-      name: 'Child 2',
-      birthday: '2017-03-22',
-      gender: 'Female',
-      profileImage:
-        'https://via.placeholder.com/150/FF0000/808080?text=Profile+2',
-    },
-    {
-      id: 3,
-      name: 'Child 3',
-      birthday: '2018-06-15',
-      gender: 'Male',
-      profileImage:
-        'https://via.placeholder.com/150/00FF00/808080?text=Profile+3',
-    },
-    {
-      id: 4,
-      name: 'Child 4',
-      birthday: '2019-02-07',
-      gender: 'Female',
-      profileImage:
-        'https://via.placeholder.com/150/FF00FF/808080?text=Profile+4',
-    },
-  ];
-
-  const [children, setChildren] = useState<Child[]>(initialChildren);
+  const [children, setChildren] = useState<Child[]>([]);
   const [editMode, setEditMode] = useState<number[]>([]);
+
+  // 컴포넌트가 마운트될 때 fetchUserData 호출하여 데이터를 받아옵니다.
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const data: ChildData | null = await fetchUserData(); // UserData 타입으로 지정
+        if (data && data.children) {
+          setChildren(data.children); // 받아온 자식 데이터 상태에 설정
+        }
+      } catch (error) {
+        console.error('데이터 가져오기 실패:', error);
+      }
+    };
+    getUserData();
+  }, []);
 
   const handleAddChild = () => {
     const newChild: Child = {

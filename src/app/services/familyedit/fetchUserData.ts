@@ -1,29 +1,45 @@
 import axiosInstance from '@/lib/axiosInstance';
+import { ChildData } from '@/types';
 
-// 요청을 보내는 함수 예시
-const fetchUserData = async () => {
+// fetchUserData 함수
+export const fetchUserData = async (): Promise<ChildData | null> => {
   try {
     const response = await axiosInstance.get('/parent/mypage/edit'); // 실제 API 경로로 교체
 
+    // 응답이 성공적이면 데이터 반환
     if (response?.data?.isSuccess) {
-      // 응답이 성공적이면 data를 반환
       const { data } = response.data;
-      console.log('응답 데이터:', data);
 
-      // data에 있는 정보 활용
-      const { name, familyName, children } = data;
-      console.log('이름:', name);
-      console.log('성:', familyName);
-      console.log('자녀들:', children);
+      // 타입 검증: data가 UserData 타입에 부합하는지 체크
+      if (isUserData(data)) {
+        console.log('응답 데이터:', data);
+        return data; // 타입 검증이 완료된 data 반환
+      } else {
+        console.error('응답 데이터가 예상 타입과 일치하지 않습니다:', data);
+        return null; // 타입 불일치 시 null 반환
+      }
     } else {
-      // 실패한 경우 메시지 출력
       console.log('응답 실패:', response.data.message);
+      return null; // 실패한 경우 null 반환
     }
   } catch (error) {
-    // 네트워크 오류 등 에러 처리
     console.error('에러 발생:', error);
+    return null; // 에러 발생 시 null 반환
   }
 };
 
-// 호출 예시
-fetchUserData();
+// 타입 검증 함수
+const isUserData = (data: any): data is ChildData => {
+  // data가 UserData 타입인지 확인하는 로직
+  return (
+    Array.isArray(data.children) &&
+    data.children.every(
+      (child: any) =>
+        typeof child.id === 'number' &&
+        typeof child.name === 'string' &&
+        typeof child.birthday === 'string' &&
+        typeof child.gender === 'string' &&
+        typeof child.profileImage === 'string',
+    )
+  );
+};
