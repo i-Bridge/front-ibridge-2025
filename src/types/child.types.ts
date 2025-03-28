@@ -1,11 +1,10 @@
-export interface Child {
-  id: number;
+export interface ChildwithoutId {
   name: string;
   birthday: string;
   gender: string;
-  profileImage: string;
+  //profileImage: string;
 }
 
-export interface ChildData {
-  children: Child[]; // 자식들의 배열
+export interface Child extends ChildwithoutId {
+  id: number;
 }
