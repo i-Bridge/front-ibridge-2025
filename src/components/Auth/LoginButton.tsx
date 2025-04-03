@@ -1,8 +1,9 @@
 'use client';
 
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import axiosInstance from '@/lib/axiosInstance';
 import { useEffect } from 'react';
+import LogoutButton from './LogoutButton';
 
 export default function LoginButton() {
   const { data: session } = useSession(); // 세션 정보를 가져옴
@@ -10,7 +11,7 @@ export default function LoginButton() {
   useEffect(() => {
     if (session?.user) {
       sendUserDataToBackend({
-        name: session.user.name ?? undefined, // null 값 방지
+        name: session.user.name ?? undefined,
         email: session.user.email ?? undefined,
       });
     }
@@ -25,10 +26,8 @@ export default function LoginButton() {
         name: user.name,
         email: user.email,
       });
-      console.log(axiosInstance.defaults.baseURL);
       console.log('사용자 정보 백엔드 전송 성공');
     } catch (error) {
-      console.log(axiosInstance.defaults.baseURL);
       console.error('사용자 정보 전송 실패:', error);
     }
   };
@@ -37,19 +36,7 @@ export default function LoginButton() {
     return (
       <>
         <p>Welcome, {session.user?.name}!</p>
-        <button
-          onClick={() => signOut()}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#DB4437',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-          }}
-        >
-          로그아웃
-        </button>
+        <LogoutButton />
       </>
     );
   }

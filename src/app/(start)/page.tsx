@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import LoginButton from '@/components/Login/LoginButton';
+import LoginButton from '@/components/Auth/LoginButton';
 
 export default function StartPage() {
   const [scrollY, setScrollY] = useState(0);
