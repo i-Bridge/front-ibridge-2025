@@ -14,6 +14,13 @@ const handler = NextAuth({
     NaverProvider({
       clientId: process.env.NAVER_CLIENT_ID || '',
       clientSecret: process.env.NAVER_CLIENT_SECRET || '',
+      authorization: {
+        url: 'https://nid.naver.com/oauth2.0/authorize',
+        params: {
+          response_type: 'code',
+          scope: 'name',
+        },
+      },
     }),
   ],
   callbacks: {
@@ -21,6 +28,7 @@ const handler = NextAuth({
       if (account) {
         token.accessToken = account.access_token;
       }
+
       return token;
     },
     async session({ session, token }) {
