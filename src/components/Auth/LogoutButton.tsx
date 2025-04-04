@@ -2,13 +2,13 @@
 
 import { signOut } from 'next-auth/react';
 
-export default function LogoutButton() {
-  const handleLogout = async () => {
-    sessionStorage.clear();
-    localStorage.clear();
-    await signOut({ callbackUrl: '/' });
-  };
+export const handleLogout = async () => {
+  sessionStorage.clear();
+  localStorage.clear();
+  await signOut({ callbackUrl: '/' });
+};
 
+export default function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
