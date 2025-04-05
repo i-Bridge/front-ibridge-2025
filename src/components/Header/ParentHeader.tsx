@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useHeaderContext } from '@/context/HeaderContext';
+import { handleLogout } from '@/components/Auth/LogoutButton';
 
 export default function ParentHeader() {
   const params = useParams();
@@ -103,14 +104,8 @@ export default function ParentHeader() {
                       </button>
                     </li>
                   </Link>
-                  <li>
-                    <button className="block w-full px-4 py-2 text-left hover:bg-gray-100">
-                      자식 변경
-                    </button>
-                  </li>
                 </ul>
 
-                {/* 기타 */}
                 <div className="border-t border-gray-300">
                   <ul>
                     <li>
@@ -118,7 +113,7 @@ export default function ParentHeader() {
                         onClick={() => alert('새 프로필 추가')}
                         className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
                       >
-                        새 프로필 추가
+                        자식 프로필 자리
                       </button>
                     </li>
                     <li>
@@ -126,7 +121,7 @@ export default function ParentHeader() {
                         onClick={() => alert('프로필 관리')}
                         className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-b-lg"
                       >
-                        프로필 관리
+                        두개 넘어가면 두줄로
                       </button>
                     </li>
                   </ul>
@@ -134,6 +129,15 @@ export default function ParentHeader() {
 
                 <div className="border-t">
                   <button className="block w-full px-4 py-2 text-left text-red-600 hover:bg-red-100">
+                    나가기
+                  </button>
+                </div>
+
+                <div className="border-t">
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full px-4 py-2 text-left text-red-600 hover:bg-red-100"
+                  >
                     로그아웃
                   </button>
                 </div>
