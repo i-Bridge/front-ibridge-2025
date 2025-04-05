@@ -12,7 +12,7 @@ const mockQuestions = {
     { questionId: 2, question: '아이의 이야기: 나 오늘 학교에서 선생님께 칭찬받았어', isAnswer: false },
   ],
   '2025-02-12': [
-    { questionId: 1, question: '만약 네가 마법의 능력을 가질 수 있다면 어떤 능력을 갖고 싶어? ', isAnswer: false },
+    { questionId: 1, question: '어떤 꿈을 가지고 있어? ', isAnswer: false },
   ],
 };
 
