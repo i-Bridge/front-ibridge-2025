@@ -2,11 +2,16 @@
 
 import { signIn, useSession } from 'next-auth/react';
 import axiosInstance from '@/lib/axiosInstance';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import LogoutButton from './LogoutButton';
+import { useRouter } from 'next/navigation';
 
 export default function LoginButton() {
-  const { data: session } = useSession(); // 세션 정보를 가져옴
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [status, setStatus] = useState<
+    'idle' | 'checking' | 'firstLogin' | 'waiting' | 'done'
+  >('idle');
 
   useEffect(() => {
     if (session?.user) {
@@ -21,30 +26,36 @@ export default function LoginButton() {
     name?: string;
     email?: string;
   }) => {
+    setStatus('checking');
     try {
-      const response = await axiosInstance.post('/start/signin', {
+      const signinResponse = await axiosInstance.post('/start/signin', {
         name: user.name,
         email: user.email,
       });
 
-      console.log('사용자 정보 백엔드 전송 성공');
+      const { first } = signinResponse.data.data;
+      console.log('📌 /start/signin 응답:', signinResponse.data.data);
 
-      const { isFirst } = response.data.data;
-      console.log(response.data.data);
-
-      if (isFirst) {
-        // 첫 로그인 사용자일 때 로직
-        console.log('첫 로그인입니다. 온보딩 페이지로 이동합니다.');
-        // 예: 라우터 이동
-        // router.push('/onboarding');
+      if (first) {
+        setStatus('firstLogin');
       } else {
-        // 기존 사용자일 때 로직
-        console.log('기존 사용자입니다. 메인 페이지로 이동합니다.');
-        // 예: 라우터 이동
-        // router.push('/home');
+        const loginResponse = await axiosInstance.get('/start/login', {
+          params: { email: user.email },
+        });
+
+        const loginData = loginResponse.data.data;
+        console.log('📌 /start/login 응답:', loginData);
+
+        if (loginData.isAccepted) {
+          // ✅ 수락된 경우 → 프로필 페이지로 이동
+          router.push('/profile');
+        } else {
+          // ❌ 아직 수락되지 않은 경우
+          setStatus('waiting');
+        }
       }
     } catch (error) {
-      console.error('사용자 정보 전송 실패:', error);
+      console.error('❌ 사용자 정보 전송 실패:', error);
     }
   };
 
@@ -52,6 +63,18 @@ export default function LoginButton() {
     return (
       <>
         <p>Welcome, {session.user?.name}!</p>
+        {status === 'firstLogin' && (
+          <div>
+            <p>기존 가족이 있나요?</p>
+            <button onClick={() => console.log('✅ O 클릭됨')}>O</button>
+            <button onClick={() => console.log('❌ X 클릭됨')}>X</button>
+          </div>
+        )}
+        {status === 'waiting' && (
+          <div>
+            <p>수락 요청 중입니다...</p>
+          </div>
+        )}
         <LogoutButton />
       </>
     );

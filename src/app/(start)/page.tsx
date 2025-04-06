@@ -66,7 +66,6 @@ export default function StartPage() {
             >
               <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 relative overflow-hidden">
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-i-lightpurple to-i-pink"></div>
-
                 <div className="space-y-3">
                   <LoginButton />
                 </div>
