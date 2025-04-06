@@ -22,11 +22,27 @@ export default function LoginButton() {
     email?: string;
   }) => {
     try {
-      await axiosInstance.post('/start/signin', {
+      const response = await axiosInstance.post('/start/signin', {
         name: user.name,
         email: user.email,
       });
+
       console.log('사용자 정보 백엔드 전송 성공');
+
+      const { isFirst } = response.data.data;
+      console.log(response.data.data);
+
+      if (isFirst) {
+        // 첫 로그인 사용자일 때 로직
+        console.log('첫 로그인입니다. 온보딩 페이지로 이동합니다.');
+        // 예: 라우터 이동
+        // router.push('/onboarding');
+      } else {
+        // 기존 사용자일 때 로직
+        console.log('기존 사용자입니다. 메인 페이지로 이동합니다.');
+        // 예: 라우터 이동
+        // router.push('/home');
+      }
     } catch (error) {
       console.error('사용자 정보 전송 실패:', error);
     }
@@ -43,8 +59,14 @@ export default function LoginButton() {
 
   return (
     <>
+      <h3 className="text-i-darkblue font-semibold mb-4 text-lg text-center">
+        소셜 로그인
+      </h3>
+      <p className="text-gray-500 text-sm text-center mb-4">
+        간편하게 로그인하고 서비스를 이용하세요.
+      </p>
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {/* Google 로그인 버튼 */}
         <button
           onClick={() => signIn('google')}
           style={{

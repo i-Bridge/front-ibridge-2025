@@ -66,12 +66,7 @@ export default function StartPage() {
             >
               <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 relative overflow-hidden">
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-i-lightpurple to-i-pink"></div>
-                <h3 className="text-i-darkblue font-semibold mb-4 text-lg text-center">
-                  소셜 로그인
-                </h3>
-                <p className="text-gray-500 text-sm text-center mb-4">
-                  간편하게 로그인하고 서비스를 이용하세요.
-                </p>
+
                 <div className="space-y-3">
                   <LoginButton />
                 </div>
