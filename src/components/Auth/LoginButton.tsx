@@ -13,15 +13,17 @@ export default function LoginButton() {
     'idle' | 'checking' | 'firstLogin' | 'waiting' | 'enterFamilyName' | 'done'
   >('idle');
   const [familyName, setFamilyName] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (session?.user) {
-      sendUserDataToBackend({
-        name: session.user.name ?? undefined,
-        email: session.user.email ?? undefined,
-      });
-    }
-  }, [session]);
+    if (!session?.user) return;
+    if (status !== 'idle') return; // 이미 실행된 상태면 재실행 방지
+
+    sendUserDataToBackend({
+      name: session.user.name ?? undefined,
+      email: session.user.email ?? undefined,
+    });
+  }, [session, status]);
 
   const sendUserDataToBackend = async (user: {
     name?: string;
@@ -60,6 +62,9 @@ export default function LoginButton() {
 
   const handleSubmitFamily = async () => {
     if (!familyName) return alert('가족 이름을 입력해주세요!');
+    if (loading) return;
+
+    setLoading(true);
     try {
       const res = await axiosInstance.post('/start/signup/exist', {
         familyName,
@@ -68,6 +73,7 @@ export default function LoginButton() {
       console.log('📌 /start/signup/exist 응답:', res.data);
 
       if (res.data.code === '200') {
+        setFamilyName(''); // input 비우기 UX 개선
         setStatus('waiting');
       } else {
         alert('가족 등록에 실패했습니다.');
@@ -75,6 +81,8 @@ export default function LoginButton() {
     } catch (err) {
       console.error('❌ 가족 이름 등록 실패:', err);
       alert('오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
     }
   };
 
