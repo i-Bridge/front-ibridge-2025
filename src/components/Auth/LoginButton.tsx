@@ -10,8 +10,9 @@ export default function LoginButton() {
   const { data: session } = useSession();
   const router = useRouter();
   const [status, setStatus] = useState<
-    'idle' | 'checking' | 'firstLogin' | 'waiting' | 'done'
+    'idle' | 'checking' | 'firstLogin' | 'waiting' | 'enterFamilyName' | 'done'
   >('idle');
+  const [familyName, setFamilyName] = useState('');
 
   useEffect(() => {
     if (session?.user) {
@@ -47,10 +48,8 @@ export default function LoginButton() {
         console.log('📌 /start/login 응답:', loginData);
 
         if (loginData.isAccepted) {
-          // ✅ 수락된 경우 → 프로필 페이지로 이동
           router.push('/profile');
         } else {
-          // ❌ 아직 수락되지 않은 경우
           setStatus('waiting');
         }
       }
@@ -59,22 +58,88 @@ export default function LoginButton() {
     }
   };
 
+  const handleSubmitFamily = async () => {
+    if (!familyName) return alert('가족 이름을 입력해주세요!');
+    try {
+      const res = await axiosInstance.post('/start/signup/exist', {
+        familyName,
+      });
+
+      console.log('📌 /start/signup/exist 응답:', res.data);
+
+      if (res.data.code === '200') {
+        setStatus('waiting');
+      } else {
+        alert('가족 등록에 실패했습니다.');
+      }
+    } catch (err) {
+      console.error('❌ 가족 이름 등록 실패:', err);
+      alert('오류가 발생했습니다.');
+    }
+  };
+
   if (session) {
     return (
       <>
-        <p>Welcome, {session.user?.name}!</p>
+        <p>{session.user?.name}님 반가워요!</p>
+
+        {/* 첫 로그인 시 가족 여부 확인 */}
         {status === 'firstLogin' && (
-          <div>
-            <p>기존 가족이 있나요?</p>
-            <button onClick={() => console.log('✅ O 클릭됨')}>O</button>
-            <button onClick={() => console.log('❌ X 클릭됨')}>X</button>
+          <div className="mt-4 p-4 border rounded-xl shadow-sm bg-white max-w-md">
+            <p className="text-lg font-semibold mb-4 text-gray-800">
+              🧩 기존 가족이 있나요?
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setStatus('enterFamilyName')}
+                className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+              >
+                O
+              </button>
+              <button
+                onClick={() => router.push('/setup')}
+                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+              >
+                X
+              </button>
+            </div>
           </div>
         )}
+
+        {/* 가족 이름 입력 화면 */}
+        {status === 'enterFamilyName' && (
+          <div className="mt-4 p-4 border rounded-xl shadow-sm bg-white max-w-md">
+            <p className="text-lg font-semibold mb-2 text-gray-800">
+              👨‍👩‍👧 가족 이름을 입력해주세요:
+            </p>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="가족 이름"
+                value={familyName}
+                onChange={(e) => setFamilyName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSubmitFamily();
+                }}
+                className="px-4 py-2 border rounded-lg flex-1"
+              />
+              <button
+                onClick={handleSubmitFamily}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 수락 대기 메시지 */}
         {status === 'waiting' && (
-          <div>
-            <p>수락 요청 중입니다...</p>
+          <div className="mt-4 p-4 border rounded-xl shadow-sm bg-yellow-50 text-gray-800">
+            <p>⏳ 수락 요청 중입니다...</p>
           </div>
         )}
+
         <LogoutButton />
       </>
     );
