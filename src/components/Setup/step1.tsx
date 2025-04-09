@@ -1,22 +1,65 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import axiosInstance from '@/lib/axiosInstance';
+import { ApiResponse } from '@/types';
 import { useSetupStore } from '@/store/setup/setupStore';
 
-const Step1 = () => {
-  const { setChildrenCount, setStep, registeredFamilyNames } = useSetupStore();
-  const [familyName, setFamilyName] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isNameChecked, setIsNameChecked] = useState(false);
+interface DupFamilyNameData {
+  isExist: false;
+}
 
-  const handleCheckName = () => {
-    if (registeredFamilyNames.includes(familyName)) {
-      setError('이미 등록된 가족 이름입니다. 다른 이름을 입력해주세요.');
-      setIsNameChecked(false);
-    } else {
-      setError(null);
-      setIsNameChecked(true);
+export default function Step1() {
+  const [dupFamilyNameData, setDupFamilyNameData] =
+    useState<DupFamilyNameData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const { setChildrenCount, setStep, registeredFamilyNames } = useSetupStore();
+
+  useEffect(() => {
+    async function fetchDupFamilyName() {
+      try {
+        const res =
+          await axiosInstance.post<
+            ApiResponse<DupFamilyNameData, { isSuccess: boolean }>
+          >('/start/signup/dup');
+
+        if (res.data.code !== '200') {
+          console.error('API 응답 실패:', res.data.message);
+          setError(`서버 오류: ${res.data.message}`);
+          return;
+        }
+
+        if (!res.data.isSuccess) {
+          console.log('isSuccess: false');
+          setError('데이터 로드 실패');
+          return;
+        }
+
+        setDupFamilyNameData(res.data.data);
+      } catch (err) {
+        console.error('요청 중 오류 발생:', err);
+        setError('요청 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
     }
-  };
+
+    fetchDupFamilyName();
+  }, []);
+
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!dupFamilyNameData) {
+    return <div>데이터 없음</div>;
+  }
+
 
   const handleNext = () => {
     if (!isNameChecked) {
@@ -24,14 +67,16 @@ const Step1 = () => {
       return;
     }
 
-    const inputElement = document.getElementById('childrenCount') as HTMLInputElement;
+    const inputElement = document.getElementById(
+      'childrenCount',
+    ) as HTMLInputElement;
     const count = parseInt(inputElement.value, 10) || 0;
 
-    console.log("입력된 자녀 수:", count);
+    console.log('입력된 자녀 수:', count);
     setChildrenCount(count);
     setStep(2);
 
-    console.log("step 변경됨: 2");
+    console.log('step 변경됨: 2');
   };
 
   return (
@@ -58,7 +103,13 @@ const Step1 = () => {
 
       <div className="flex justify-between">
         <span>자녀 수</span>
-        <input id="childrenCount" type="number" min="0" max="10" className="border p-1" />
+        <input
+          id="childrenCount"
+          type="number"
+          min="0"
+          max="10"
+          className="border p-1"
+        />
       </div>
 
       <button
@@ -71,5 +122,3 @@ const Step1 = () => {
     </div>
   );
 };
-
-export default Step1;
