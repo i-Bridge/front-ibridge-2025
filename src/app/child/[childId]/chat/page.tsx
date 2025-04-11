@@ -48,7 +48,6 @@ export default function ReplyPage() {
         alt="캐릭터"
         width={500}
         height={500}
-        layout="intrinsic"
         onLoadingComplete={handleImageLoad}
         className={`transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
       />
