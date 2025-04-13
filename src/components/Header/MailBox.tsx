@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher} from '@/lib/fetcher';
+ import { useRouter } from 'next/navigation';
 interface Notice {
   noticeId: number;
   type: 1 | 2 | 3; // 1: 답변 완료, 2: 가족 가입 수락, 3: 서버 점검
@@ -15,9 +16,44 @@ interface NoticeData {
 }
 
 export default function MailBox() {
-  const [noticeData, setNoticeData] = useState<NoticeData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+    const [noticeData, setNoticeData] = useState<NoticeData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    async function handleAccept(senderId: number | null) {
+      if (!senderId) return; // senderId 없으면 요청 안 보냄
+  
+      try {
+        const res = await Fetcher(
+          '/parent/notice/accept',
+          {
+            method: 'POST',
+            data:{ senderId}, // ✅ 이렇게 보내야 함
+          }
+        );
+  
+        if (res.isSuccess) {
+          // 성공했으면 다시 새로고침하거나 notice 다시 불러오기
+          router.refresh(); // ✅ 간단하게 이걸로 새로고침
+        } else {
+          console.error('수락 실패:', res.message);
+        }
+      } catch (err) {
+        console.error('수락 요청 중 오류 발생:', err);
+      }
+    }
+    useEffect(() => {
+      async function fetchNotice() {
+        try {
+          const res = await Fetcher< NoticeData>('/parent/notice');
+  
+         
+          if (res !== undefined) {
+            setNoticeData(res);
+          } else {
+            setNoticeData(null); // data가 없으면 null로 설정
+          }
+
 
   useEffect(() => {
     async function fetchNotice() {
@@ -130,8 +166,25 @@ export default function MailBox() {
                   : mail.type === 2
                     ? `${mail.senderName ?? '누군가'}님이 가족 가입을 요청했어요`
                     : '서버 점검 공지'}
-              </span>
-            </div>
+
+                </span>
+              
+              </div>
+          
+    
+              {/* 가족 가입 요청일 때만 수락/거절 버튼 표시 */}
+              {mail.type === 2 && (
+                <div className="flex space-x-2 ml-2">
+                  <button  onClick={() => handleAccept(mail.senderId)} className="text-xs border border-blue-500 text-blue-600 rounded px-2 py-1 hover:bg-blue-50">
+                    수락
+                  </button>
+                  <button className="text-xs border border-red-500 text-red-500 rounded px-2 py-1 hover:bg-red-50">
+                    거절
+                  </button>
+                </div>
+              )}
+
+
 
             {/* 가족 가입 요청일 때만 수락/거절 버튼 표시 */}
             {mail.type === 2 && (

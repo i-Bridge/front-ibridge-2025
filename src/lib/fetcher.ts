@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Session } from 'next-auth';
 import { getServerSession } from 'next-auth';
 import { getSession } from 'next-auth/react';
 import { authOptions } from '@/lib/auth';
@@ -31,15 +32,26 @@ export async function Fetcher<T = undefined>(
   let userName = '';
 
   try {
+    let session;
+
     if (isServer) {
-      const session = await getServerSession(authOptions);
+      session = await getServerSession(authOptions);
       if (process.env.NODE_ENV === 'development') {
         console.log('✅ Server session:', session);
       }
       userEmail = session?.user?.email ?? '';
       userName = session?.user?.name ?? '';
     } else {
-      const session = await getSession();
+      session = await new Promise<Session | null>((resolve) => {
+        const interval = setInterval(async () => {
+          const sess = await getSession();
+          if (sess) {
+            clearInterval(interval);
+            resolve(sess);
+          }
+        }, 100);
+      });
+      console.log('👀 CSR session:', session);
       userEmail = session?.user?.email ?? '';
       userName = session?.user?.name ?? '';
     }
