@@ -53,7 +53,6 @@ export async function Fetcher<T = undefined>(
         ? { data: options.data }
         : {}),
       params: options.params,
-      withCredentials: true,
     });
 
     const responseData = res.data as ApiResponse<T>;
