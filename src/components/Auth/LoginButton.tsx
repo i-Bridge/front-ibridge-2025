@@ -1,7 +1,7 @@
 'use client';
 
 import { signIn, useSession } from 'next-auth/react';
-import axiosInstance from '@/lib/axiosInstance';
+import { Fetcher } from '@/lib/fetcher';
 import { useEffect, useState } from 'react';
 import LogoutButton from './LogoutButton';
 import { useRouter } from 'next/navigation';
@@ -32,18 +32,28 @@ export default function LoginButton() {
   }) => {
     setStatus('checking');
     try {
-      const signinResponse = await axiosInstance.post('/start/signin');
-      const { first } = signinResponse.data.data;
-      console.log('📌 /start/signin 응답:', signinResponse.data.data);
+      const signinResponse = await Fetcher<{ first: boolean }>(
+        '/start/signin',
+        {
+          method: 'POST',
+        },
+      );
+      const { first } = signinResponse;
+      console.log('📌 /start/signin 응답:', signinResponse);
 
       if (first) {
         alert('회원가입되었습니다. 처음 만나서 반가워요.');
         setStatus('firstLogin');
-        return; // 이후 코드 실행 방지
+        return;
       }
 
-      const loginResponse = await axiosInstance.get('/start/login');
-      const loginData = loginResponse.data.data;
+      const loginData = await Fetcher<{
+        accepted: boolean;
+        send: boolean;
+        familyName: string;
+        children: { id: number; name: string; birth: string; gender: number }[];
+      }>('/start/login');
+
       console.log('📌 /start/login 응답:', loginData);
 
       if (loginData.accepted) {
@@ -52,7 +62,6 @@ export default function LoginButton() {
         if (loginData.send) {
           setStatus('waiting');
         } else {
-          // 기존 회원이지만 아직 가족 가입 요청 안 한 경우 → UI만 firstLogin 흐름으로
           setStatus('firstLogin');
         }
       }
@@ -69,24 +78,20 @@ export default function LoginButton() {
     setFamilyError(null);
 
     try {
-      const res = await axiosInstance.post('/start/signup/exist', {
-        familyName,
+      const res = await Fetcher<{ exist: boolean }>('/start/signup/exist', {
+        method: 'POST',
+        data: { familyName },
       });
 
-      console.log('📌 /start/signup/exist 응답:', res.data);
+      console.log('📌 /start/signup/exist 응답:', res);
 
-      if (res.data.code === '200') {
-        const exist = res.data.data.exist;
-        if (!exist) {
-          setFamilyError('❗ 존재하지 않는 가족 이름입니다. 다시 입력하세요.');
-          return;
-        }
-
-        setFamilyName('');
-        setStatus('waiting');
-      } else {
-        alert('가족 등록에 실패했습니다.');
+      if (!res.exist) {
+        setFamilyError('❗ 존재하지 않는 가족 이름입니다. 다시 입력하세요.');
+        return;
       }
+
+      setFamilyName('');
+      setStatus('waiting');
     } catch (err) {
       console.error('❌ 가족 이름 등록 실패:', err);
       alert('오류가 발생했습니다.');
