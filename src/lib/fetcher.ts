@@ -19,11 +19,16 @@ export interface ApiResponse<T = undefined> {
   data?: T;
 }
 
+const encodeHeaderValue = (value: string) => {
+  return Buffer.from(value, 'utf-8').toString('base64');
+};
+
 export async function Fetcher<T = undefined>(
   url: string,
   options: FetcherOptions = {},
 ): Promise<T> {
   let userEmail = '';
+  let userName = '';
 
   try {
     if (isServer) {
@@ -32,14 +37,19 @@ export async function Fetcher<T = undefined>(
         console.log('✅ Server session:', session);
       }
       userEmail = session?.user?.email ?? '';
+      userName = session?.user?.name ?? '';
     } else {
       const session = await getSession();
       userEmail = session?.user?.email ?? '';
+      userName = session?.user?.name ?? '';
     }
 
     if (!userEmail) {
       throw new Error('로그인이 필요한 요청입니다.');
     }
+
+    const isSignin =
+      url === '/start/signin' && (options.method ?? 'GET') === 'POST';
 
     const res = await axios({
       url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
@@ -47,6 +57,7 @@ export async function Fetcher<T = undefined>(
       headers: {
         'Content-Type': 'application/json',
         'X-User-Email': userEmail,
+        ...(isSignin ? { 'X-User-Name': encodeHeaderValue(userName) } : {}),
         ...options.headers,
       },
       ...(options.method !== 'GET' && options.data
@@ -66,10 +77,12 @@ export async function Fetcher<T = undefined>(
     return responseData.data as T;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
+      console.error('❌ axios error:', error.response?.data);
       throw new Error(
         error.response?.data?.message || error.message || '서버 통신 오류',
       );
     }
+    console.error('❌ 일반 error:', error);
     throw new Error('서버 통신 오류');
   }
 }
