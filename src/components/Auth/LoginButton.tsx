@@ -18,9 +18,6 @@ export default function LoginButton() {
   useEffect(() => {
     if (!session?.user) return;
     if (status !== 'idle') return; // 이미 실행된 상태면 재실행 방지
-
-    document.cookie = `userEmail=${encodeURIComponent(session.user.email ?? '')}; path=/;`;
-
     sendUserDataToBackend({
       name: session.user.name ?? undefined,
       email: session.user.email ?? undefined,
