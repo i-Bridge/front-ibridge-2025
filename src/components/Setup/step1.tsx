@@ -1,21 +1,24 @@
 'use client';
+
 import { useState } from 'react';
 import { Fetcher } from '@/lib/fetcher';
 import { useSetupStore } from '@/store/setup/setupStore';
 
 interface DupFamilyNameData {
-  exist: false;
+  exist: boolean;
 }
 
 export default function Step1() {
-  const [dupFamilyNameData, setDupFamilyNameData] =
-    useState<DupFamilyNameData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [familyName, setFamilyName] = useState<string>('');
   const [isNameChecked, setIsNameChecked] = useState<boolean>(false);
 
-  const { setChildrenCount, setStep, setFamilyName: storeSetFamilyName } = useSetupStore();
+  const {
+    setChildrenCount,
+    setStep,
+    setFamilyName: storeSetFamilyName,
+  } = useSetupStore();
 
   const handleCheckName = async () => {
     if (!familyName) {
@@ -24,21 +27,22 @@ export default function Step1() {
     }
 
     setError(null);
+    setLoading(true);
+
     try {
       const res = await Fetcher<DupFamilyNameData>('/start/signup/dup', {
         method: 'POST',
         data: { familyName },
       });
 
-      console.log('중복 확인 API 응답:', res);
-      setDupFamilyNameData(res ?? null);
+      console.log('중복 확인 API 응답:', res); // res = { exist: true }
 
-      if ( res.exist) {
+      if (res.exist) {
         setError('이미 존재하는 가족 이름입니다.');
-        console.log("가족 불가");
+        console.log('❌ 가족 불가');
         setIsNameChecked(false);
       } else {
-        console.log("가족 가능");
+        console.log('✅ 가족 가능');
         setIsNameChecked(true);
         storeSetFamilyName(familyName);
       }
@@ -46,6 +50,8 @@ export default function Step1() {
       console.error('중복 확인 중 오류 발생:', err);
       setError('중복 확인 중 오류가 발생했습니다.');
       setIsNameChecked(false);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,9 +86,10 @@ export default function Step1() {
           />
           <button
             onClick={handleCheckName}
-            className="bg-green-500 text-white px-2 py-1 text-xs"
+            disabled={loading}
+            className="bg-green-500 text-white px-2 py-1 text-xs disabled:opacity-50"
           >
-            중복 확인
+            {loading ? '확인 중...' : '중복 확인'}
           </button>
         </div>
       </div>
