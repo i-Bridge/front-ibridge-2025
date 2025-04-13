@@ -5,61 +5,54 @@ import { ApiResponse } from '@/types';
 import { useSetupStore } from '@/store/setup/setupStore';
 
 interface DupFamilyNameData {
-  isExist: false;
+  exist: false;
 }
 
 export default function Step1() {
-  const [dupFamilyNameData, setDupFamilyNameData] =
-    useState<DupFamilyNameData | null>(null);
+  const [dupFamilyNameData, setDupFamilyNameData] = useState<DupFamilyNameData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [familyName, setFamilyName] = useState<string>(''); // familyName 상태 추가
+  const [isNameChecked, setIsNameChecked] = useState<boolean>(false); // 이름 중복 확인 여부 상태 추가
 
-  const { setChildrenCount, setStep, registeredFamilyNames } = useSetupStore();
+  const { setChildrenCount, setStep} = useSetupStore();
 
-  useEffect(() => {
-    async function fetchDupFamilyName() {
-      try {
-        const res =
-          await axiosInstance.post<
-            ApiResponse<DupFamilyNameData, { isSuccess: boolean }>
-          >('/start/signup/dup');
 
-        if (res.data.code !== '200') {
-          console.error('API 응답 실패:', res.data.message);
-          setError(`서버 오류: ${res.data.message}`);
-          return;
-        }
 
-        if (!res.data.isSuccess) {
-          console.log('isSuccess: false');
-          setError('데이터 로드 실패');
-          return;
-        }
-
-        setDupFamilyNameData(res.data.data);
-      } catch (err) {
-        console.error('요청 중 오류 발생:', err);
-        setError('요청 중 오류가 발생했습니다.');
-      } finally {
-        setLoading(false);
-      }
+  // familyName 중복 확인 함수
+  const handleCheckName = async () => {
+    if (!familyName) {
+      setError('가족 이름을 입력해 주세요.');
+      return;
     }
 
-    fetchDupFamilyName();
-  }, []);
+    try {
+      // 중복 확인 API 요청
+      const res = await axiosInstance.post<ApiResponse<DupFamilyNameData,{ isSuccess: boolean }>>('/start/signup/dup', {
+        familyName,
+      });
 
-  if (loading) {
-    return <div>로딩 중...</div>;
-  }
+      console.log('중복 확인 API 응답:', res);
+      setDupFamilyNameData(res.data.data ?? null);
 
-  if (error) {
-    return <div>{error}</div>;
-  }
+      if (res.data.code !== '200' || !res.data.isSuccess) {
+        setError('중복 확인 실패');
+        return;
+      }
 
-  if (!dupFamilyNameData) {
-    return <div>데이터 없음</div>;
-  }
-
+    } catch (err) {
+      console.error('중복 확인 중 오류 발생:', err);
+      setError('중복 확인 중 오류가 발생했습니다.');
+    }
+    
+    if(!dupFamilyNameData?.exist){
+      console.log("사용가능");
+      setIsNameChecked(true);
+    }else{
+      console.log("사용불가");
+      setIsNameChecked(false);
+    }
+  };
 
   const handleNext = () => {
     if (!isNameChecked) {
@@ -67,9 +60,7 @@ export default function Step1() {
       return;
     }
 
-    const inputElement = document.getElementById(
-      'childrenCount',
-    ) as HTMLInputElement;
+    const inputElement = document.getElementById('childrenCount') as HTMLInputElement;
     const count = parseInt(inputElement.value, 10) || 0;
 
     console.log('입력된 자녀 수:', count);
@@ -82,7 +73,7 @@ export default function Step1() {
   return (
     <div className="w-full flex flex-col gap-4">
       <div className="flex justify-between items-center">
-        <span>가족 이름 설정 </span>
+        <span>가족 이름 설정</span>
         <div className="flex items-center gap-2">
           <input
             type="text"
@@ -121,4 +112,4 @@ export default function Step1() {
       </button>
     </div>
   );
-};
+}
