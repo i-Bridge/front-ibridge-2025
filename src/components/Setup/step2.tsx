@@ -9,7 +9,7 @@ const Step2 = () => {
     { name: string; gender: number; birth: string }[]
   >([]);
 
-  const { nextChild, currentChildIndex, childrenCount } = useSetupStore();
+  const { nextChild, currentChildIndex, childrenCount, familyName } = useSetupStore();
   const router = useRouter();
 
   const [name, setName] = useState('');
@@ -37,7 +37,7 @@ const Step2 = () => {
       try {
         const res = await Fetcher('/start/signup/new', {
           method: 'POST',
-          data: { children: updatedChildren },
+          data: { familyName,children: updatedChildren },
         });
         console.log('서버 전송:', res);
         router.push('/profile');
