@@ -27,7 +27,7 @@ const encodeHeaderValue = (value: string) => {
 export async function Fetcher<T = undefined>(
   url: string,
   options: FetcherOptions = {},
-): Promise<T> {
+): Promise<ApiResponse<T>> {
   let userEmail = '';
   let userName = '';
 
@@ -86,7 +86,7 @@ export async function Fetcher<T = undefined>(
       );
     }
 
-    return responseData as T;
+    return responseData;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error('❌ axios error:', error.response?.data);

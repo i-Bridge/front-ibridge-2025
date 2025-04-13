@@ -20,46 +20,36 @@ export default function LoginButton() {
     if (!session?.user) return;
     if (status !== 'idle') return;
 
-    sendUserDataToBackend({
-      name: session.user.name ?? undefined,
-      email: session.user.email ?? undefined,
-    });
+    sendUserDataToBackend();
   }, [session, status]);
 
-  const sendUserDataToBackend = async (user: {
-    name?: string;
-    email?: string;
-  }) => {
+  const sendUserDataToBackend = async () => {
     setStatus('checking');
     try {
-      const res = await Fetcher<{ first: boolean }>('/start/signin', {
+      const signinRes = await Fetcher<{ first: boolean }>('/start/signin', {
         method: 'POST',
       });
 
-      const signinResponse = res.data;
-
-      console.log('📌 /start/signin 응답:', res.data);
-
-      if (signinResponse.first) {
+      const first = signinRes?.data?.first;
+      if (first) {
         alert('회원가입되었습니다. 처음 만나서 반가워요.');
         setStatus('firstLogin');
         return;
       }
 
-      const res2 = await Fetcher<{
+      const loginRes = await Fetcher<{
         accepted: boolean;
         send: boolean;
         familyName: string;
         children: { id: number; name: string; birth: string; gender: number }[];
       }>('/start/login');
 
-      const loginData = res2.data;
-      console.log('📌 /start/login 응답:', loginData);
+      const loginData = loginRes?.data;
 
-      if (loginData.accepted) {
+      if (loginData?.accepted) {
         router.push('/profile');
       } else {
-        if (loginData.send) {
+        if (loginData?.send) {
           setStatus('waiting');
         } else {
           setStatus('firstLogin');
@@ -83,9 +73,7 @@ export default function LoginButton() {
         data: { familyName },
       });
 
-      console.log('📌 /start/signup/exist 응답:', res);
-
-      if (!res.exist) {
+      if (!res?.data?.exist) {
         setFamilyError('❗ 존재하지 않는 가족 이름입니다. 다시 입력하세요.');
         return;
       }

@@ -48,7 +48,7 @@ export default function MailBox() {
       try {
         const res = await Fetcher<NoticeData>('/parent/notice');
 
-        if (res !== undefined) {
+        if (res && res.data) {
           setNoticeData(res.data);
         } else {
           setNoticeData(null); // data가 없으면 null로 설정

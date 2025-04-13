@@ -21,7 +21,7 @@ export default async function HomeHeader({ childId }: PageProps) {
   const session = await getServerSession(authOptions);
   const userEmail = session?.user?.email || '';
   const userName = session?.user?.name || '';
-  let mypageData: MyPageData | null = null;
+  let mypageData: MyPageData | undefined = undefined;
 
   try {
     const res = await Fetcher<MyPageData>('/start/login');

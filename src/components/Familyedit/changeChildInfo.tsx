@@ -1,20 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchUserData } from '@/app/services/familyedit/fetchUserData'; // API 호출 함수
+import { Fetcher } from '@/lib/fetcher';
 import { Child, ChildData } from '@/types';
 
 export default function ChildrenForm() {
   const [children, setChildren] = useState<Child[]>([]);
   const [editMode, setEditMode] = useState<number[]>([]);
 
-  // 컴포넌트가 마운트될 때 fetchUserData 호출하여 데이터를 받아옵니다.
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const data: ChildData | null = await fetchUserData(); // UserData 타입으로 지정
+        const data = await Fetcher<ChildData>('/parent/children');
         if (data && data.children) {
-          setChildren(data.children); // 받아온 자식 데이터 상태에 설정
+          setChildren(data.children);
         }
       } catch (error) {
         console.error('데이터 가져오기 실패:', error);
@@ -25,7 +24,7 @@ export default function ChildrenForm() {
 
   const handleAddChild = () => {
     const newChild: Child = {
-      id: children.length + 1,
+      id: Date.now(),
       name: '',
       birthday: '',
       gender: 'Male',
@@ -36,24 +35,42 @@ export default function ChildrenForm() {
   };
 
   const handleChange = (id: number, field: keyof Child, value: string) => {
-    setChildren((prevChildren) =>
-      prevChildren.map((child) =>
+    setChildren((prev) =>
+      prev.map((child) =>
         child.id === id ? { ...child, [field]: value } : child,
       ),
     );
   };
 
-  const handleSave = (id: number) => {
+  const handleSave = async (id: number) => {
     setEditMode(editMode.filter((item) => item !== id));
-    alert(`Child ${id} information applied!`);
+    const childToUpdate = children.find((child) => child.id === id);
+    if (!childToUpdate) return;
+
+    try {
+      await Fetcher(`/parent/children/${id}`, {
+        method: 'PUT',
+        data: childToUpdate,
+      });
+      alert(`Child ${id} information applied!`);
+    } catch (error) {
+      console.error('자식 정보 저장 실패:', error);
+    }
   };
 
   const handleEdit = (id: number) => {
     setEditMode([...editMode, id]);
   };
 
-  const handleDelete = (id: number) => {
-    setChildren(children.filter((child) => child.id !== id));
+  const handleDelete = async (id: number) => {
+    try {
+      await Fetcher(`/parent/children/${id}`, {
+        method: 'DELETE',
+      });
+      setChildren(children.filter((child) => child.id !== id));
+    } catch (error) {
+      console.error('삭제 실패:', error);
+    }
   };
 
   return (
