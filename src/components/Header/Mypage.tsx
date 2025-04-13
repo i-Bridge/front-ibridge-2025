@@ -1,5 +1,3 @@
-
-
 import Link from 'next/link';
 import MailBox from './MailBox';
 import LogoutButton from '@/components/Auth/LogoutButton';
@@ -7,8 +5,8 @@ import LogoutButton from '@/components/Auth/LogoutButton';
 type ChildProfileListProps = {
   childId: number;
   mypageData: MyPageData;
-  userName: string;  
-  userEmail: string; 
+  userName: string;
+  userEmail: string;
 };
 
 interface MyPageData {
@@ -20,11 +18,12 @@ interface MyPageData {
   }[];
 }
 
-
-
-export default function Mypage({childId,mypageData, userName, userEmail }: ChildProfileListProps) {
-  
-
+export default function Mypage({
+  childId,
+  mypageData,
+  userName,
+  userEmail,
+}: ChildProfileListProps) {
   return (
     <div>
       <div className="flex items-center p-4 border-b ">
@@ -47,11 +46,9 @@ export default function Mypage({childId,mypageData, userName, userEmail }: Child
 
         <div className="ml-3">
           <p className="text-sm font-medium text-gray-900 leading-tight">
-          {userName}
+            {userName}
           </p>
-          <p className="text-xs text-gray-600 leading-tight">
-           {userEmail}
-          </p>
+          <p className="text-xs text-gray-600 leading-tight">{userEmail}</p>
         </div>
       </div>
 
@@ -59,7 +56,7 @@ export default function Mypage({childId,mypageData, userName, userEmail }: Child
         <p className="font-semibold text-sm text-center mt-3 text-gray-800">
           📬 mailbox
         </p>
-        <MailBox/>
+        <MailBox />
       </div>
 
       {/* 자식 프로필 리스트 */}

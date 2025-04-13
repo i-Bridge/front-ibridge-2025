@@ -20,7 +20,7 @@ export default async function Profile() {
     console.log('받아온 profile res:', res);
 
     // 정상적으로 데이터를 가져온 경우
-    profileData = res;
+    profileData = res.data;
   } catch (err) {
     console.error('API 호출 중 오류 발생:', err);
     return <div>데이터를 불러오지 못했습니다.</div>; // 오류 발생 시 표시

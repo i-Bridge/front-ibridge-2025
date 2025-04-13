@@ -32,28 +32,28 @@ export default function LoginButton() {
   }) => {
     setStatus('checking');
     try {
-      const signinResponse = await Fetcher<{ first: boolean }>(
-        '/start/signin',
-        {
-          method: 'POST',
-        },
-      );
-      const { first } = signinResponse;
-      console.log('📌 /start/signin 응답:', signinResponse);
+      const res = await Fetcher<{ first: boolean }>('/start/signin', {
+        method: 'POST',
+      });
 
-      if (first) {
+      const signinResponse = res.data;
+
+      console.log('📌 /start/signin 응답:', res.data);
+
+      if (signinResponse.first) {
         alert('회원가입되었습니다. 처음 만나서 반가워요.');
         setStatus('firstLogin');
         return;
       }
 
-      const loginData = await Fetcher<{
+      const res2 = await Fetcher<{
         accepted: boolean;
         send: boolean;
         familyName: string;
         children: { id: number; name: string; birth: string; gender: number }[];
       }>('/start/login');
 
+      const loginData = res2.data;
       console.log('📌 /start/login 응답:', loginData);
 
       if (loginData.accepted) {
