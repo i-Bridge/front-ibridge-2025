@@ -18,8 +18,6 @@ export default function LoginButton() {
   useEffect(() => {
     if (!session?.user) return;
     if (status !== 'idle') return; // 이미 실행된 상태면 재실행 방지
-    
-    
     sendUserDataToBackend({
       name: session.user.name ?? undefined,
       email: session.user.email ?? undefined,
@@ -32,10 +30,7 @@ export default function LoginButton() {
   }) => {
     setStatus('checking');
     try {
-      const signinResponse = await axiosInstance.post('/start/signin', {
-        name: user.name,
-        email: user.email,
-      });
+      const signinResponse = await axiosInstance.post('/start/signin');
 
       const { first } = signinResponse.data.data;
       console.log('📌 /start/signin 응답:', signinResponse.data.data);
@@ -43,14 +38,12 @@ export default function LoginButton() {
       if (first) {
         setStatus('firstLogin');
       } else {
-        const loginResponse = await axiosInstance.get('/start/login', {
-          params: { email: user.email },
-        });
+        const loginResponse = await axiosInstance.get('/start/login');
 
         const loginData = loginResponse.data.data;
         console.log('📌 /start/login 응답:', loginData);
 
-        if (loginData.isAccepted) {
+        if (loginData.accepted) {
           router.push('/profile');
         } else {
           setStatus('waiting');
