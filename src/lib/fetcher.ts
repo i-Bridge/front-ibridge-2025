@@ -24,6 +24,7 @@ export async function Fetcher<T = undefined>(
   options: FetcherOptions = {},
 ): Promise<T> {
   let userEmail = '';
+  let userName = '';
 
   try {
     if (isServer) {
@@ -32,14 +33,19 @@ export async function Fetcher<T = undefined>(
         console.log('✅ Server session:', session);
       }
       userEmail = session?.user?.email ?? '';
+      userName = session?.user?.name ?? '';
     } else {
       const session = await getSession();
       userEmail = session?.user?.email ?? '';
+      userName = session?.user?.name ?? '';
     }
 
     if (!userEmail) {
       throw new Error('로그인이 필요한 요청입니다.');
     }
+
+    const isSignin =
+      url === '/start/signin' && (options.method ?? 'GET') === 'POST';
 
     const res = await axios({
       url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
@@ -47,6 +53,7 @@ export async function Fetcher<T = undefined>(
       headers: {
         'Content-Type': 'application/json',
         'X-User-Email': userEmail,
+        ...(isSignin ? { 'X-User-Name': userName } : {}),
         ...options.headers,
       },
       ...(options.method !== 'GET' && options.data
