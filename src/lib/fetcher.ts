@@ -74,7 +74,7 @@ export async function Fetcher<T = undefined>(
       );
     }
 
-    return responseData.data as T;
+    return responseData as T;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error('❌ axios error:', error.response?.data);

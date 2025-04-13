@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 interface SetupState {
   step: number;
+  familyName: string; 
   childrenCount: number;
   currentChildIndex: number;
   setStep: (step: number) => void;
@@ -11,9 +12,11 @@ interface SetupState {
 
 export const useSetupStore = create<SetupState>((set) => ({
   step: 1,
+  familyName: '',
   childrenCount: 0,
   currentChildIndex: 0,
   setStep: (step) => set({ step }), // ✅ step 변경 함수
+  setFamilyName: (name) => set({ familyName: name }),
   setChildrenCount: (count) => set({ childrenCount: count, currentChildIndex: 0 }),
   nextChild: () => set((state) => {
     if (state.currentChildIndex + 1 >= state.childrenCount) {
