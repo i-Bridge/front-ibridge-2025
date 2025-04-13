@@ -12,14 +12,11 @@ export interface ProfileData {
 export default async function Profile() {
   let profileData: ProfileData | null = null; // try-catch 바깥에서 선언
 
-  try {
-    const res = await Fetcher<{ isSuccess: boolean; data: ProfileData }>(
-      '/start/login',
-    );
-
-    if (!res) {
+  try {const res = await Fetcher<ProfileData>('/start/login');
+      if (!res) {
       return <div>로딩 중...</div>; // 서버에서 데이터를 못 가져온 경우
     }
+    console.log('받아온 profile res:', res);
 
     // 정상적으로 데이터를 가져온 경우
     profileData = res.data;
