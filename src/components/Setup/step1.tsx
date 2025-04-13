@@ -25,19 +25,15 @@ export default function Step1() {
 
     setError(null);
     try {
-      const res = await Fetcher<{
-        isSuccess: boolean;
-        data: DupFamilyNameData;
-      }>('/start/signup/dup', {
+      const res = await Fetcher<DupFamilyNameData>('/start/signup/dup', {
         method: 'POST',
         data: { familyName },
       });
 
       console.log('중복 확인 API 응답:', res);
-      setDupFamilyNameData(res.data ?? null);
-      console.log('중복 확인 데이터:', dupFamilyNameData);
+      setDupFamilyNameData(res ?? null);
 
-      if (!res || res.data.exist) {
+      if (!res || res.exist) {
         setError('이미 존재하는 가족 이름입니다.');
         setIsNameChecked(false);
       } else {
@@ -46,13 +42,6 @@ export default function Step1() {
     } catch (err) {
       console.error('중복 확인 중 오류 발생:', err);
       setError('중복 확인 중 오류가 발생했습니다.');
-    }
-
-    if (!dupFamilyNameData?.exist) {
-      console.log('사용가능');
-      setIsNameChecked(true);
-    } else {
-      console.log('사용불가');
       setIsNameChecked(false);
     }
   };
