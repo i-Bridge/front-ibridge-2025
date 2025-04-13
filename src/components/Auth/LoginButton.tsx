@@ -14,10 +14,12 @@ export default function LoginButton() {
   >('idle');
   const [familyName, setFamilyName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [familyError, setFamilyError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!session?.user) return;
-    if (status !== 'idle') return; // 이미 실행된 상태면 재실행 방지
+    if (status !== 'idle') return;
+
     sendUserDataToBackend({
       name: session.user.name ?? undefined,
       email: session.user.email ?? undefined,
@@ -31,22 +33,27 @@ export default function LoginButton() {
     setStatus('checking');
     try {
       const signinResponse = await axiosInstance.post('/start/signin');
-
       const { first } = signinResponse.data.data;
       console.log('📌 /start/signin 응답:', signinResponse.data.data);
 
       if (first) {
+        alert('회원가입되었습니다. 처음 만나서 반가워요.');
         setStatus('firstLogin');
+        return; // 이후 코드 실행 방지
+      }
+
+      const loginResponse = await axiosInstance.get('/start/login');
+      const loginData = loginResponse.data.data;
+      console.log('📌 /start/login 응답:', loginData);
+
+      if (loginData.accepted) {
+        router.push('/profile');
       } else {
-        const loginResponse = await axiosInstance.get('/start/login');
-
-        const loginData = loginResponse.data.data;
-        console.log('📌 /start/login 응답:', loginData);
-
-        if (loginData.accepted) {
-          router.push('/profile');
-        } else {
+        if (loginData.send) {
           setStatus('waiting');
+        } else {
+          // 기존 회원이지만 아직 가족 가입 요청 안 한 경우 → UI만 firstLogin 흐름으로
+          setStatus('firstLogin');
         }
       }
     } catch (error) {
@@ -59,6 +66,8 @@ export default function LoginButton() {
     if (loading) return;
 
     setLoading(true);
+    setFamilyError(null);
+
     try {
       const res = await axiosInstance.post('/start/signup/exist', {
         familyName,
@@ -67,7 +76,13 @@ export default function LoginButton() {
       console.log('📌 /start/signup/exist 응답:', res.data);
 
       if (res.data.code === '200') {
-        setFamilyName(''); // input 비우기 UX 개선
+        const exist = res.data.data.exist;
+        if (!exist) {
+          setFamilyError('❗ 존재하지 않는 가족 이름입니다. 다시 입력하세요.');
+          return;
+        }
+
+        setFamilyName('');
         setStatus('waiting');
       } else {
         alert('가족 등록에 실패했습니다.');
@@ -85,7 +100,6 @@ export default function LoginButton() {
       <>
         <p>{session.user?.name}님 반가워요!</p>
 
-        {/* 첫 로그인 시 가족 여부 확인 */}
         {status === 'firstLogin' && (
           <div className="mt-4 p-4 border rounded-xl shadow-sm bg-white max-w-md">
             <p className="text-lg font-semibold mb-4 text-gray-800">
@@ -108,7 +122,6 @@ export default function LoginButton() {
           </div>
         )}
 
-        {/* 가족 이름 입력 화면 */}
         {status === 'enterFamilyName' && (
           <div className="mt-4 p-4 border rounded-xl shadow-sm bg-white max-w-md">
             <p className="text-lg font-semibold mb-2 text-gray-800">
@@ -119,7 +132,10 @@ export default function LoginButton() {
                 type="text"
                 placeholder="가족 이름"
                 value={familyName}
-                onChange={(e) => setFamilyName(e.target.value)}
+                onChange={(e) => {
+                  setFamilyName(e.target.value);
+                  setFamilyError(null);
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSubmitFamily();
                 }}
@@ -132,10 +148,12 @@ export default function LoginButton() {
                 확인
               </button>
             </div>
+            {familyError && (
+              <p className="mt-2 text-sm text-red-500">{familyError}</p>
+            )}
           </div>
         )}
 
-        {/* 수락 대기 메시지 */}
         {status === 'waiting' && (
           <div className="mt-4 p-4 border rounded-xl shadow-sm bg-yellow-50 text-gray-800">
             <p>⏳ 수락 요청 중입니다...</p>
@@ -202,7 +220,6 @@ export default function LoginButton() {
           <span>Google로 로그인</span>
         </button>
 
-        {/* Naver 로그인 버튼 */}
         <button
           onClick={() => signIn('naver')}
           style={{

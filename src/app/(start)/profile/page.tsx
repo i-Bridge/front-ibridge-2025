@@ -34,6 +34,7 @@ export default async function Profile() {
   }
   // ProfileData의 accepted와 send 값에 따른 처리
   if (!profileData.accepted) {
+
     return <div>isAccepted: false</div>;
   }
 
@@ -43,6 +44,7 @@ export default async function Profile() {
   }
 
   console.log('받아온 profileData:', profileData);
+
 
   return (
     <div className="w-full h-screen flex flex-col bg-gray-100">
@@ -78,3 +80,5 @@ export default async function Profile() {
     </div>
   );
 }
+
+
