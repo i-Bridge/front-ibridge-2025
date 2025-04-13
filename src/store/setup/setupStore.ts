@@ -16,7 +16,7 @@ export const useSetupStore = create<SetupState>((set) => ({
   childrenCount: 0,
   currentChildIndex: 0,
   setStep: (step) => set({ step }), // ✅ step 변경 함수
-  setFamilyName: (name) => set({ familyName: name }),
+  setFamilyName: (name: string) => set({ familyName: name }),
   setChildrenCount: (count) => set({ childrenCount: count, currentChildIndex: 0 }),
   nextChild: () => set((state) => {
     if (state.currentChildIndex + 1 >= state.childrenCount) {

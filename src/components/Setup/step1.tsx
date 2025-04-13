@@ -4,7 +4,7 @@ import { Fetcher } from '@/lib/fetcher';
 import { useSetupStore } from '@/store/setup/setupStore';
 
 interface DupFamilyNameData {
-  exist: false;
+  exist: boolean;
 }
 
 export default function Step1() {
@@ -33,7 +33,7 @@ export default function Step1() {
       console.log('중복 확인 API 응답:', res);
       setDupFamilyNameData(res ?? null);
 
-      if ( res.exist) {
+      if ( res.data?.exist) {
         setError('이미 존재하는 가족 이름입니다.');
         console.log("가족 불가");
         setIsNameChecked(false);
