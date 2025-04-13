@@ -1,23 +1,25 @@
 'use client';
 import { useSetupStore } from '@/store/setup/setupStore';
-import axiosInstance from '@/lib/axiosInstance';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { Fetcher } from '@/lib/fetcher';
 
 const Step2 = () => {
-  const [childrenInfo, setChildrenInfo] = useState<{ name: string; gender: number; birth: string }[]>([]);
+  const [childrenInfo, setChildrenInfo] = useState<
+    { name: string; gender: number; birth: string }[]
+  >([]);
 
   const { nextChild, currentChildIndex, childrenCount } = useSetupStore();
   const router = useRouter();
 
   const [name, setName] = useState('');
   const [birth, setBirthdate] = useState('');
-  const [gender, setGender] = useState<number | null>(null); // ✅ 성별 추가 (0: 남자, 1: 여자)
+  const [gender, setGender] = useState<number | null>(null);
 
   useEffect(() => {
     setName('');
     setBirthdate('');
-    setGender(null); // ✅ 자녀 변경 시 성별도 초기화
+    setGender(null);
   }, [currentChildIndex]);
 
   const handleNext = async () => {
@@ -27,27 +29,31 @@ const Step2 = () => {
     }
 
     // 현재 자녀 정보 저장
-    setChildrenInfo((prev) => [...prev, { name, gender, birth }]);
+    const updatedChildren = [...childrenInfo, { name, gender, birth }];
+    setChildrenInfo(updatedChildren);
 
     if (currentChildIndex + 1 >= childrenCount) {
-      // 마지막 자녀면 -> API 호출
+      // 마지막 자녀면 → API 호출
       try {
-        const response = await axiosInstance.post('/start/signup/new', {
-          children: [...childrenInfo, { name, gender, birth }], // 마지막 입력도 포함
+        const res = await Fetcher('/start/signup/new', {
+          method: 'POST',
+          data: { children: updatedChildren },
         });
-        console.log('서버 전송:', response.data);
-        router.push('/profile'); // 완료 후 이동
+        console.log('서버 전송:', res);
+        router.push('/profile');
       } catch (error) {
         console.error('자녀 정보 저장 실패:', error);
       }
     } else {
-      nextChild(); // 다음 자녀 입력 단계로 이동
+      nextChild();
     }
   };
 
   return (
     <div className="w-full flex flex-col gap-4">
-      <h2 className="text-center">자녀 정보 입력 ({currentChildIndex + 1}/{childrenCount})</h2>
+      <h2 className="text-center">
+        자녀 정보 입력 ({currentChildIndex + 1}/{childrenCount})
+      </h2>
 
       <div className="flex justify-between items-center">
         <span>이름</span>
@@ -59,7 +65,6 @@ const Step2 = () => {
         />
       </div>
 
-      {/* ✅ 성별 선택 영역 */}
       <div className="flex justify-between items-center">
         <span>성별</span>
         <div className="flex gap-4">

@@ -19,6 +19,10 @@ export interface ApiResponse<T = undefined> {
   data?: T;
 }
 
+const encodeHeaderValue = (value: string) => {
+  return Buffer.from(value, 'utf-8').toString('base64');
+};
+
 export async function Fetcher<T = undefined>(
   url: string,
   options: FetcherOptions = {},
@@ -53,7 +57,7 @@ export async function Fetcher<T = undefined>(
       headers: {
         'Content-Type': 'application/json',
         'X-User-Email': userEmail,
-        ...(isSignin ? { 'X-User-Name': userName } : {}),
+        ...(isSignin ? { 'X-User-Name': encodeHeaderValue(userName) } : {}),
         ...options.headers,
       },
       ...(options.method !== 'GET' && options.data
@@ -73,10 +77,12 @@ export async function Fetcher<T = undefined>(
     return responseData.data as T;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
+      console.error('❌ axios error:', error.response?.data);
       throw new Error(
         error.response?.data?.message || error.message || '서버 통신 오류',
       );
     }
+    console.error('❌ 일반 error:', error);
     throw new Error('서버 통신 오류');
   }
 }

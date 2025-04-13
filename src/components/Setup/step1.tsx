@@ -1,7 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
-import axiosInstance from '@/lib/axiosInstance';
-import { ApiResponse } from '@/types';
+import { useState } from 'react';
+import { Fetcher } from '@/lib/fetcher';
 import { useSetupStore } from '@/store/setup/setupStore';
 
 interface DupFamilyNameData {
@@ -9,47 +8,51 @@ interface DupFamilyNameData {
 }
 
 export default function Step1() {
-  const [dupFamilyNameData, setDupFamilyNameData] = useState<DupFamilyNameData | null>(null);
+  const [dupFamilyNameData, setDupFamilyNameData] =
+    useState<DupFamilyNameData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [familyName, setFamilyName] = useState<string>(''); // familyName 상태 추가
-  const [isNameChecked, setIsNameChecked] = useState<boolean>(false); // 이름 중복 확인 여부 상태 추가
+  const [familyName, setFamilyName] = useState<string>('');
+  const [isNameChecked, setIsNameChecked] = useState<boolean>(false);
 
-  const { setChildrenCount, setStep} = useSetupStore();
+  const { setChildrenCount, setStep } = useSetupStore();
 
-
-
-  // familyName 중복 확인 함수
   const handleCheckName = async () => {
     if (!familyName) {
       setError('가족 이름을 입력해 주세요.');
       return;
     }
 
+    setError(null);
     try {
-      // 중복 확인 API 요청
-      const res = await axiosInstance.post<ApiResponse<DupFamilyNameData,{ isSuccess: boolean }>>('/start/signup/dup', {
-        familyName,
+      const res = await Fetcher<{
+        isSuccess: boolean;
+        data: DupFamilyNameData;
+      }>('/start/signup/dup', {
+        method: 'POST',
+        data: { familyName },
       });
 
       console.log('중복 확인 API 응답:', res);
-      setDupFamilyNameData(res.data.data ?? null);
+      setDupFamilyNameData(res.data ?? null);
+      console.log('중복 확인 데이터:', dupFamilyNameData);
 
-      if (res.data.code !== '200' || !res.data.isSuccess) {
-        setError('중복 확인 실패');
-        return;
+      if (!res || res.data.exist) {
+        setError('이미 존재하는 가족 이름입니다.');
+        setIsNameChecked(false);
+      } else {
+        setIsNameChecked(true);
       }
-
     } catch (err) {
       console.error('중복 확인 중 오류 발생:', err);
       setError('중복 확인 중 오류가 발생했습니다.');
     }
-    
-    if(!dupFamilyNameData?.exist){
-      console.log("사용가능");
+
+    if (!dupFamilyNameData?.exist) {
+      console.log('사용가능');
       setIsNameChecked(true);
-    }else{
-      console.log("사용불가");
+    } else {
+      console.log('사용불가');
       setIsNameChecked(false);
     }
   };
@@ -60,7 +63,9 @@ export default function Step1() {
       return;
     }
 
-    const inputElement = document.getElementById('childrenCount') as HTMLInputElement;
+    const inputElement = document.getElementById(
+      'childrenCount',
+    ) as HTMLInputElement;
     const count = parseInt(inputElement.value, 10) || 0;
 
     console.log('입력된 자녀 수:', count);
