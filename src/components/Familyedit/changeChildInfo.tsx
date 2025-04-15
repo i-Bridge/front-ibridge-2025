@@ -2,177 +2,254 @@
 
 import { useState, useEffect } from 'react';
 import { Fetcher } from '@/lib/fetcher';
-import { Child, ChildData } from '@/types';
+import Image from 'next/image';
+
+interface ParentInfo {
+  parentId: number;
+  parentName: string;
+}
+
+interface ChildInfo {
+  childId?: number;
+  childName: string;
+  childBirth: string;
+  childGender: 0 | 1; // 0: 남자, 1: 여자
+  isNew?: boolean;
+}
+
+interface FamilyData {
+  familyName: string;
+  parents: ParentInfo[];
+  children: ChildInfo[];
+}
 
 export default function ChildrenForm() {
-  const [children, setChildren] = useState<Child[]>([]);
+  const [familyInfo, setFamilyInfo] = useState<FamilyData | null>(null);
   const [editMode, setEditMode] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const getUserData = async () => {
+    const fetchFamilyInfo = async () => {
       try {
-        const data = await Fetcher<ChildData>('/parent/children');
-        if (data && data.children) {
-          setChildren(data.children);
+        const res = await Fetcher<FamilyData>('/parent/mypage/edit');
+        console.log('가족 정보 응답:', res);
+        if (res?.data) {
+          setFamilyInfo(res.data);
+        } else {
+          setError('가족 정보를 불러오지 못했습니다.');
         }
-      } catch (error) {
-        console.error('데이터 가져오기 실패:', error);
+      } catch (err) {
+        console.error('가족 정보 요청 실패:', err);
+        setError('가족 정보 요청 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
       }
     };
-    getUserData();
+
+    fetchFamilyInfo();
   }, []);
 
-  const handleAddChild = () => {
-    const newChild: Child = {
-      id: Date.now(),
-      name: '',
-      birthday: '',
-      gender: 'Male',
-      profileImage:
-        'https://via.placeholder.com/150/00FF00/808080?text=New+Profile',
-    };
-    setChildren([...children, newChild]);
-  };
-
-  const handleChange = (id: number, field: keyof Child, value: string) => {
-    setChildren((prev) =>
-      prev.map((child) =>
-        child.id === id ? { ...child, [field]: value } : child,
-      ),
+  const handleChange = (
+    id: number | undefined,
+    field: keyof ChildInfo,
+    value: string | number,
+  ) => {
+    if (!familyInfo) return;
+    console.log(`변경: id=${id}, field=${field}, value=${value}`);
+    const updatedChildren = familyInfo.children.map((child) =>
+      child.childId === id ? { ...child, [field]: value } : child,
     );
+    setFamilyInfo({ ...familyInfo, children: updatedChildren });
   };
 
-  const handleSave = async (id: number) => {
-    setEditMode(editMode.filter((item) => item !== id));
-    const childToUpdate = children.find((child) => child.id === id);
-    if (!childToUpdate) return;
+  const handleAddChild = () => {
+    if (!familyInfo) return;
+    const newChild: ChildInfo = {
+      childName: '',
+      childBirth: '',
+      childGender: 0,
+      isNew: true,
+    };
+    console.log('자녀 추가:', newChild);
+    setFamilyInfo({
+      ...familyInfo,
+      children: [...familyInfo.children, newChild],
+    });
+  };
 
-    try {
-      await Fetcher(`/parent/children/${id}`, {
-        method: 'PUT',
-        data: childToUpdate,
-      });
-      alert(`Child ${id} information applied!`);
-    } catch (error) {
-      console.error('자식 정보 저장 실패:', error);
+  const handleEdit = (id: number | undefined) => {
+    console.log('수정 모드 진입: id =', id);
+    if (id !== undefined) {
+      setEditMode((prev) => [...prev, id]);
     }
   };
 
-  const handleEdit = (id: number) => {
-    setEditMode([...editMode, id]);
+  const handleSave = async (child: ChildInfo) => {
+    try {
+      console.log('저장 요청:', child);
+      if (child.isNew) {
+        const res = await Fetcher<{ childId: number }>(
+          '/parent/mypage/edit/add',
+          {
+            method: 'POST',
+            data: {
+              name: child.childName,
+              birthday: child.childBirth,
+              gender: child.childGender,
+            },
+          },
+        );
+        console.log('자녀 추가 응답:', res);
+        if (res?.data?.childId) {
+          child.childId = res.data.childId;
+          child.isNew = false;
+        }
+      } else {
+        const res = await Fetcher(`/parent/mypage/edit/${child.childId}`, {
+          method: 'PATCH',
+          data: {
+            childId: child.childId,
+            name: child.childName,
+            birthday: child.childBirth,
+            gender: child.childGender,
+          },
+        });
+        console.log('자녀 수정 응답:', res);
+        setEditMode((prev) => prev.filter((id) => id !== child.childId));
+      }
+    } catch (error) {
+      console.error('자녀 정보 저장 실패:', error);
+    }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (child: ChildInfo) => {
     try {
-      await Fetcher(`/parent/children/${id}`, {
-        method: 'DELETE',
+      console.log('삭제 요청:', child);
+      if (child.childId) {
+        const res = await Fetcher('/parent/mypage/edit/delete', {
+          method: 'DELETE',
+          data: { childId: child.childId },
+        });
+        console.log('자녀 삭제 응답:', res);
+      }
+      setFamilyInfo({
+        ...familyInfo!,
+        children: familyInfo!.children.filter((c) => c !== child),
       });
-      setChildren(children.filter((child) => child.id !== id));
     } catch (error) {
       console.error('삭제 실패:', error);
     }
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    return date.toISOString().split('T')[0];
+  };
+
+  if (loading) return <p>로딩 중...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+  if (!familyInfo) return <p>가족 정보가 없습니다.</p>;
+
   return (
     <div className="relative pt-8">
-      <p className="text-2xl font-semibold py-10">자식 정보 수정하기</p>
+      <p className="text-2xl font-semibold py-10">자녀 정보 수정하기</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-16">
-        {children.map((child) => (
+        {familyInfo.children.map((child, index) => (
           <div
-            key={child.id}
+            key={child.childId ?? `new-${index}`}
             className="flex items-center justify-center bg-white p-4 rounded-lg shadow-md"
           >
-            <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 mr-4">
-              <img
-                src={child.profileImage}
-                alt={`Profile of ${child.name}`}
-                className="object-cover w-full h-full"
+            <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 mr-4 relative">
+              <Image
+                src={
+                  child.childGender === 0
+                    ? '/images/boy.svg'
+                    : '/images/girl.svg'
+                }
+                alt={`Profile of ${child.childName}`}
+                fill
+                className="object-cover"
+                priority
               />
             </div>
-
             <div className="flex-1 space-y-2">
               <div>
-                <label
-                  htmlFor={`name-${child.id}`}
-                  className="block text-xs font-medium text-gray-700"
-                >
-                  Name
+                <label className="block text-xs font-medium text-gray-700">
+                  이름
                 </label>
                 <input
-                  id={`name-${child.id}`}
                   type="text"
-                  value={child.name}
+                  value={child.childName}
                   onChange={(e) =>
-                    handleChange(child.id, 'name', e.target.value)
+                    handleChange(child.childId, 'childName', e.target.value)
                   }
-                  disabled={!editMode.includes(child.id)}
+                  disabled={
+                    !child.isNew && !editMode.includes(child.childId ?? -1)
+                  }
                   className="mt-1 block w-full p-2 text-sm border border-gray-300 rounded-md"
                 />
               </div>
-
               <div>
-                <label
-                  htmlFor={`birthday-${child.id}`}
-                  className="block text-xs font-medium text-gray-700"
-                >
-                  Birthday
+                <label className="block text-xs font-medium text-gray-700">
+                  생일
                 </label>
                 <input
-                  id={`birthday-${child.id}`}
                   type="date"
-                  value={child.birthday}
+                  value={formatDate(child.childBirth)}
                   onChange={(e) =>
-                    handleChange(child.id, 'birthday', e.target.value)
+                    handleChange(child.childId, 'childBirth', e.target.value)
                   }
-                  disabled={!editMode.includes(child.id)}
+                  disabled={
+                    !child.isNew && !editMode.includes(child.childId ?? -1)
+                  }
                   className="mt-1 block w-full p-2 text-sm border border-gray-300 rounded-md"
                 />
               </div>
-
               <div>
-                <label
-                  htmlFor={`gender-${child.id}`}
-                  className="block text-xs font-medium text-gray-700"
-                >
-                  Gender
+                <label className="block text-xs font-medium text-gray-700">
+                  성별
                 </label>
                 <select
-                  id={`gender-${child.id}`}
-                  value={child.gender}
+                  value={child.childGender}
                   onChange={(e) =>
-                    handleChange(child.id, 'gender', e.target.value)
+                    handleChange(
+                      child.childId,
+                      'childGender',
+                      Number(e.target.value),
+                    )
                   }
-                  disabled={!editMode.includes(child.id)}
+                  disabled={
+                    !child.isNew && !editMode.includes(child.childId ?? -1)
+                  }
                   className="mt-1 block w-full p-2 text-sm border border-gray-300 rounded-md"
                 >
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
+                  <option value={0}>남자</option>
+                  <option value={1}>여자</option>
                 </select>
               </div>
-
               <div className="flex justify-between mt-3">
-                {!editMode.includes(child.id) ? (
+                {!child.isNew && !editMode.includes(child.childId ?? -1) ? (
                   <button
-                    onClick={() => handleEdit(child.id)}
+                    onClick={() => handleEdit(child.childId)}
                     className="py-1 px-4 bg-yellow-500 text-white font-semibold rounded-md hover:bg-yellow-600 text-sm"
                   >
-                    Edit
+                    수정
                   </button>
                 ) : (
                   <button
-                    onClick={() => handleSave(child.id)}
+                    onClick={() => handleSave(child)}
                     className="py-1 px-4 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 text-sm"
                   >
-                    Apply
+                    저장
                   </button>
                 )}
-
                 <button
-                  onClick={() => handleDelete(child.id)}
+                  onClick={() => handleDelete(child)}
                   className="py-1 px-4 text-black font-semibold rounded-md text-sm"
                 >
-                  Delete
+                  삭제
                 </button>
               </div>
             </div>
@@ -184,7 +261,7 @@ export default function ChildrenForm() {
           onClick={handleAddChild}
           className="py-2 px-6 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600 text-sm"
         >
-          + Add Child
+          + 자녀 추가
         </button>
       </div>
     </div>
