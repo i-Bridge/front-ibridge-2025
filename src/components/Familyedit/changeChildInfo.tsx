@@ -33,6 +33,7 @@ export default function ChildrenForm() {
     const fetchFamilyInfo = async () => {
       try {
         const res = await Fetcher<FamilyData>('/parent/mypage/edit');
+        console.log('가족 정보 응답:', res);
         if (res?.data) {
           setFamilyInfo(res.data);
         } else {
@@ -55,6 +56,7 @@ export default function ChildrenForm() {
     value: string | number,
   ) => {
     if (!familyInfo) return;
+    console.log(`변경: id=${id}, field=${field}, value=${value}`);
     const updatedChildren = familyInfo.children.map((child) =>
       child.childId === id ? { ...child, [field]: value } : child,
     );
@@ -69,6 +71,7 @@ export default function ChildrenForm() {
       childGender: 0,
       isNew: true,
     };
+    console.log('자녀 추가:', newChild);
     setFamilyInfo({
       ...familyInfo,
       children: [...familyInfo.children, newChild],
@@ -76,6 +79,7 @@ export default function ChildrenForm() {
   };
 
   const handleEdit = (id: number | undefined) => {
+    console.log('수정 모드 진입: id =', id);
     if (id !== undefined) {
       setEditMode((prev) => [...prev, id]);
     }
@@ -83,6 +87,7 @@ export default function ChildrenForm() {
 
   const handleSave = async (child: ChildInfo) => {
     try {
+      console.log('저장 요청:', child);
       if (child.isNew) {
         const res = await Fetcher<{ childId: number }>(
           '/parent/mypage/edit/add',
@@ -95,12 +100,13 @@ export default function ChildrenForm() {
             },
           },
         );
+        console.log('자녀 추가 응답:', res);
         if (res?.data?.childId) {
           child.childId = res.data.childId;
           child.isNew = false;
         }
       } else {
-        await Fetcher(`/parent/mypage/edit/${child.childId}`, {
+        const res = await Fetcher(`/parent/mypage/edit/${child.childId}`, {
           method: 'PATCH',
           data: {
             childId: child.childId,
@@ -109,6 +115,7 @@ export default function ChildrenForm() {
             gender: child.childGender,
           },
         });
+        console.log('자녀 수정 응답:', res);
         setEditMode((prev) => prev.filter((id) => id !== child.childId));
       }
     } catch (error) {
@@ -118,11 +125,13 @@ export default function ChildrenForm() {
 
   const handleDelete = async (child: ChildInfo) => {
     try {
+      console.log('삭제 요청:', child);
       if (child.childId) {
-        await Fetcher('/parent/mypage/edit/delete', {
+        const res = await Fetcher('/parent/mypage/edit/delete', {
           method: 'DELETE',
           data: { childId: child.childId },
         });
+        console.log('자녀 삭제 응답:', res);
       }
       setFamilyInfo({
         ...familyInfo!,
@@ -131,6 +140,12 @@ export default function ChildrenForm() {
     } catch (error) {
       console.error('삭제 실패:', error);
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    return date.toISOString().split('T')[0];
   };
 
   if (loading) return <p>로딩 중...</p>;
@@ -182,7 +197,7 @@ export default function ChildrenForm() {
                 </label>
                 <input
                   type="date"
-                  value={child.childBirth}
+                  value={formatDate(child.childBirth)}
                   onChange={(e) =>
                     handleChange(child.childId, 'childBirth', e.target.value)
                   }
