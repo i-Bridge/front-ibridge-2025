@@ -165,7 +165,7 @@ export default function FamilyTree() {
         transition={{ duration: 1 }}
         className="text-4xl font-semibold text-center py-10 mb-12"
       >
-        행복한 우리 가족 ({familyInfo?.familyName})
+        🏠행복한 {familyInfo?.familyName}
       </motion.p>
       {renderTree()}
 
