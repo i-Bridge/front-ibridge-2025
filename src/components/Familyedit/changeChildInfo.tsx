@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Fetcher } from '@/lib/fetcher';
+import Image from 'next/image';
 
 interface ParentInfo {
   parentId: number;
@@ -12,7 +13,7 @@ interface ChildInfo {
   childId?: number;
   childName: string;
   childBirth: string;
-  childGender: number; // 0: 남자, 1: 여자
+  childGender: 0 | 1; // 0: 남자, 1: 여자
   isNew?: boolean;
 }
 
@@ -145,11 +146,17 @@ export default function ChildrenForm() {
             key={child.childId ?? `new-${index}`}
             className="flex items-center justify-center bg-white p-4 rounded-lg shadow-md"
           >
-            <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 mr-4">
-              <img
-                src="/images/default_profile.png"
+            <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 mr-4 relative">
+              <Image
+                src={
+                  child.childGender === 0
+                    ? '/images/boy.svg'
+                    : '/images/girl.svg'
+                }
                 alt={`Profile of ${child.childName}`}
-                className="object-cover w-full h-full"
+                fill
+                className="object-cover"
+                priority
               />
             </div>
             <div className="flex-1 space-y-2">
