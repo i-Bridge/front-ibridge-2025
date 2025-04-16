@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Mypage from './Mypage';
 
-
 interface MyPageData {
   name: string;
   familyName: string;
@@ -15,13 +14,18 @@ interface MyPageData {
 }
 
 type ClientComponentProps = {
-  childId: number;
+  childId: string;
   mypageData: MyPageData;
-  userName: string;  
-  userEmail: string; 
+  userName: string;
+  userEmail: string;
 };
 
-export default function DropMotionMypage({ childId, mypageData,userName, userEmail }: ClientComponentProps) {
+export default function DropMotionMypage({
+  childId,
+  mypageData,
+  userName,
+  userEmail,
+}: ClientComponentProps) {
   const pathname = usePathname();
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement | null>(null);
@@ -44,7 +48,6 @@ export default function DropMotionMypage({ childId, mypageData,userName, userEma
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
 
   return (
     <div>
@@ -99,7 +102,12 @@ export default function DropMotionMypage({ childId, mypageData,userName, userEma
                 variants={menuVariants}
                 className="absolute right-0 mt-2 w-80 p-2 bg-white border rounded-lg shadow-lg"
               >
-                <Mypage childId={childId} mypageData={mypageData} userName={userName} userEmail={userEmail} />
+                <Mypage
+                  childId={childId}
+                  mypageData={mypageData}
+                  userName={userName}
+                  userEmail={userEmail}
+                />
               </motion.div>
             )}
           </AnimatePresence>

@@ -12,22 +12,21 @@ type PageProps = {
 };
 
 export default async function HomePage({ params }: PageProps) {
-  const { childId } = params; // URL에서 [childid]를 가져옵니다.
-
+  const { childId } = params; // URL에서 [childid]를 가져옴. type은 string
   return (
     <div>
-      <HomeHeader  childId={Number(childId)}  />
-    <div className="flex flex-col justify-center items-center w-full pt-3">
-      <AIComment />
-      <div className="  pt-4">
-        <MonthSelector />
-        <Weekly />
-      </div>
+      <HomeHeader childId={childId} />
+      <div className="flex flex-col justify-center items-center w-full pt-3">
+        <AIComment />
+        <div className="  pt-4">
+          <MonthSelector />
+          <Weekly />
+        </div>
 
-      <div className="mt-4">
-        <DailyQuestionList />
+        <div className="mt-4">
+          <DailyQuestionList />
+        </div>
       </div>
-    </div>
     </div>
   );
 }
