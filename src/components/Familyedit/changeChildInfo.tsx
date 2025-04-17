@@ -114,6 +114,8 @@ export default function ChildrenForm() {
         if (res?.data?.childId) {
           const newId = res.data.childId;
 
+          if (!familyInfo) return; // ← 이 라인을 추가해줘
+
           // 자녀 상태 업데이트
           const updatedChildren = familyInfo.children.map((c) =>
             c === child ? { ...updated, childId: newId, isNew: false } : c,
