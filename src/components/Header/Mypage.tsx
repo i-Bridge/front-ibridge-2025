@@ -3,7 +3,7 @@ import MailBox from './MailBox';
 import LogoutButton from '@/components/Auth/LogoutButton';
 
 type ChildProfileListProps = {
-  childId: number;
+  childId: string;
   mypageData: MyPageData;
   userName: string;
   userEmail: string;
