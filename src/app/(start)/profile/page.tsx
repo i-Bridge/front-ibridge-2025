@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Fetcher } from '@/lib/fetcher';
 import { Child } from '@/types';
 
-export interface ProfileData {
+interface ProfileData {
   accepted: boolean;
   send: boolean;
   familyName: string;

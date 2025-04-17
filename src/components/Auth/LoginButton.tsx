@@ -18,7 +18,6 @@ export default function LoginButton() {
 
   useEffect(() => {
     if (!session?.user) return;
-    if (status !== 'idle') return;
 
     sendUserDataToBackend();
   }, [session, status]);
