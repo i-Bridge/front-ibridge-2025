@@ -91,12 +91,17 @@ export default function FamilyTree() {
   const [inviteModal, setInviteModal] = useState(false);
   const [familyInfo, setFamilyInfo] = useState<FamilyData | null>(null);
   const [email, setEmail] = useState('');
+  const [editingFamilyName, setEditingFamilyName] = useState(false);
+  const [newFamilyName, setNewFamilyName] = useState('');
 
   useEffect(() => {
     const fetchFamilyInfo = async () => {
       try {
         const res = await Fetcher<FamilyData>('/parent/mypage/edit');
-        if (res?.data) setFamilyInfo(res.data);
+        if (res?.data) {
+          setFamilyInfo(res.data);
+          setNewFamilyName(res.data.familyName);
+        }
       } catch (err) {
         console.error('가족 정보 가져오기 실패:', err);
       }
@@ -118,6 +123,21 @@ export default function FamilyTree() {
   const handleInviteSubmit = () => {
     alert(`"${email}"로 초대장이 발송되었습니다!`);
     setInviteModal(false);
+  };
+
+  const handleFamilyNameSave = async () => {
+    try {
+      await Fetcher('/parent/mypage/edit/familyName', {
+        method: 'PATCH',
+        data: { familyName: newFamilyName },
+      });
+      setFamilyInfo((prev) =>
+        prev ? { ...prev, familyName: newFamilyName } : prev,
+      );
+      setEditingFamilyName(false);
+    } catch (error) {
+      console.error('가족 이름 수정 실패:', error);
+    }
   };
 
   const renderTree = () => {
@@ -159,14 +179,49 @@ export default function FamilyTree() {
 
   return (
     <div className="flex flex-col items-center py-10 w-full bg-i-lightpurple">
-      <motion.p
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
-        className="text-4xl font-semibold text-center py-10 mb-12"
+        className="text-4xl font-semibold text-center py-10 mb-12 flex items-center gap-2"
       >
-        🏠행복한 {familyInfo?.familyName}
-      </motion.p>
+        {editingFamilyName ? (
+          <>
+            <input
+              type="text"
+              value={newFamilyName}
+              onChange={(e) => setNewFamilyName(e.target.value)}
+              className="border border-gray-400 rounded-md p-1 text-lg"
+            />
+            <button
+              onClick={handleFamilyNameSave}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              저장
+            </button>
+          </>
+        ) : (
+          <>
+            🏠행복한 {familyInfo?.familyName}
+            <button onClick={() => setEditingFamilyName(true)}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-6 h-6 text-gray-600 hover:text-gray-800"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+                />
+              </svg>
+            </button>
+          </>
+        )}
+      </motion.div>
       {renderTree()}
 
       {inviteModal && (
