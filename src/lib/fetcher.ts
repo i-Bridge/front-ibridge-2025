@@ -43,11 +43,13 @@ export async function Fetcher<T = undefined>(
       userName = session?.user?.name ?? '';
     } else {
       session = await new Promise<Session | null>((resolve) => {
+        const start = Date.now();
         const interval = setInterval(async () => {
           const sess = await getSession();
-          if (sess) {
+          if (sess || Date.now() - start > 3000) {
+            // 최대 3초만 기다림
             clearInterval(interval);
-            resolve(sess);
+            resolve(sess ?? null);
           }
         }, 100);
       });
