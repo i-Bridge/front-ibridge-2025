@@ -15,7 +15,7 @@ interface MyPageData {
 }
 
 type ClientComponentProps = {
-  childId: number;
+  childId: string;
   mypageData: MyPageData;
   userName: string;  
   userEmail: string; 
