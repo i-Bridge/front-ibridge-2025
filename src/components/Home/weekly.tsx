@@ -3,7 +3,6 @@
 import { useDateStore } from "@/store/date/dateStore";
 import { useEffect, useRef, useState } from "react";
 
-import { getMainInfo } from '@/app/services/familyedit/todo';
 
 export default function Weekly() {
   

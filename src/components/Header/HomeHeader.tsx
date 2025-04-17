@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { Fetcher } from '@/lib/fetcher';
 import DropMotionMypage from './DropMotionMypage';
+import MailBox from './MailBox';
 
 type PageProps = {
   childId: string;
@@ -51,6 +52,7 @@ export default async function HomeHeader({ childId }: PageProps) {
           userName={userName}
           userEmail={userEmail}
         />
+        <MailBox/>
       </nav>
     </header>
   );

@@ -17,9 +17,8 @@ export default function LoginButton() {
   const [familyError, setFamilyError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!session?.user) return;
-    if (status !== 'idle') return;
-
+    if (!session?.user || status !== 'idle') return;
+  
     sendUserDataToBackend();
   }, [session, status]);
 
