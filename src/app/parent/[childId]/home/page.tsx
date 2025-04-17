@@ -57,6 +57,7 @@ export default async function HomePage({ params }: PageProps) {
           <Weekly />
           <SubjectList initialSubjects={homeData.subjects} />
           <SubjectDetailPanel />
+
         </div>
       </div>
     </div>

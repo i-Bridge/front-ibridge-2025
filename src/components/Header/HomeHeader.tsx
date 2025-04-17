@@ -35,7 +35,7 @@ export default async function HomeHeader({ childId }: PageProps) {
   if (!mypageData) {
     return <div>로딩 중...</div>;
   }
-
+  console.log(typeof childId);
   return (
     <header className="fixed top-0 left-0 right-0 bg-i-ivory bg-opacity-95 z-50 shadow-sm">
       <nav className="max-w-7xl mx-auto px-8 py-1 flex justify-between items-center">
