@@ -73,6 +73,7 @@ export default function MailBox() {
         } else {
           setNoticeData(null);
         }
+        console.log('💓받아온 NoticeData:', res);
       } catch (err) {
         console.error('요청 중 오류 발생:', err);
         setError('요청 중 오류가 발생했습니다.');
