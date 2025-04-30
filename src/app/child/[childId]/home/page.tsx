@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 export default function Child() {
   const params = useParams(); // 현재 URL에서 params 받아오기
-  const childId = params.id as string; // childId 가져오기
+  const childId = params.childId as string;
 
   console.log('Params 값 시작화면:', params); // params 확인
 
