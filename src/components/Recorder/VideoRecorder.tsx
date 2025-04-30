@@ -166,6 +166,7 @@ export default function VideoRecorder() {
         <button
           onClick={startRecording}
           className="px-6 py-3 bg-green-500 text-white rounded-lg"
+          disabled={isRecording} // 이미 녹화 중이면 비활성화
         >
           녹화 시작
         </button>
