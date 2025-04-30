@@ -1,3 +1,4 @@
+// 동영상이 끝나면 chat 페이지로 이동
 'use client';
 
 import { useParams } from 'next/navigation';
@@ -17,7 +18,7 @@ export default function Child() {
 
       <div className="w-40 bg-red-300 text-black mt-10 cursor-pointer">
         {/* Link로 동적 URL 이동 */}
-        <Link href={`/child/home`}>child 홈 화면으로 이동</Link>
+        <Link href={`/child/${childId}/chat`}>chat 화면으로 이동</Link>
       </div>
     </div>
   );
