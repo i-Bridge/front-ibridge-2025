@@ -12,6 +12,10 @@ export default function VideoRecorder() {
   const [isThumbnailCaptured, setIsThumbnailCaptured] = useState(false);
 
   const startRecording = async () => {
+    if (mediaRecorderRef.current) {
+      console.warn('이미 녹화 중입니다.');
+      return;
+    }
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: true,
@@ -42,7 +46,6 @@ export default function VideoRecorder() {
       recorder.start();
       setIsRecording(true);
 
-      // ✅ 3초 후 썸네일 자동 캡처
       setTimeout(() => {
         if (!isThumbnailCaptured) {
           captureAndUploadThumbnail();
