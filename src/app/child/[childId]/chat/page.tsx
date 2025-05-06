@@ -10,6 +10,7 @@ import VideoRecorder from '@/components/Recorder/VideoRecorder';
 export default function ReplyPage() {
   const { completedSteps, completeStep } = useReplyStepsStore();
   const router = useRouter();
+
   const [displayText, setDisplayText] = useState('');
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isQuestionVisible, setIsQuestionVisible] = useState(false);
@@ -24,13 +25,17 @@ export default function ReplyPage() {
     if (!isQuestionVisible || message !== fullText) return;
 
     let index = 0;
+    setDisplayText(''); // 초기화
+
     const interval = setInterval(() => {
-      if (index < fullText.length - 1) {
-        setDisplayText((prev) => prev + fullText[index]);
+      setDisplayText((prev) => {
+        const nextText = prev + fullText[index];
         index++;
-      } else {
-        clearInterval(interval);
-      }
+        if (index >= fullText.length) {
+          clearInterval(interval);
+        }
+        return nextText;
+      });
     }, 100);
 
     return () => clearInterval(interval);
@@ -61,7 +66,7 @@ export default function ReplyPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-xl font-semibold">{message}</p>
+          <p className="text-xl font-semibold">{displayText}</p>
         </motion.div>
       )}
 
@@ -82,6 +87,7 @@ export default function ReplyPage() {
               onClick={() => {
                 setIsQuestionVisible(true);
                 setMessage('얘기해봐!');
+                setDisplayText('얘기해봐!');
               }}
               className="w-64 px-8 py-6 text-lg bg-blue-500 text-white rounded-lg shadow-lg"
             >
@@ -89,7 +95,7 @@ export default function ReplyPage() {
             </button>
           </>
         ) : (
-          <VideoRecorder /> // ✅ 녹화 컴포넌트 삽입
+          <VideoRecorder />
         )}
       </div>
 
