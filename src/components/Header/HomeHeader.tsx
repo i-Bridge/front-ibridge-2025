@@ -5,7 +5,7 @@ import { Fetcher } from '@/lib/fetcher';
 import DropMotionMypage from './DropMotionMypage';
 import MailBox from './MailBox';
 
-type PageProps = {
+type HeaderProps = {
   childId: string;
 };
 
@@ -18,7 +18,7 @@ interface MyPageData {
   }[];
 }
 
-export default async function HomeHeader({ childId }: PageProps) {
+export default async function HomeHeader({ childId }: HeaderProps) {
   const session = await getServerSession(authOptions);
   const userEmail = session?.user?.email || '';
   const userName = session?.user?.name || '';
@@ -52,7 +52,7 @@ export default async function HomeHeader({ childId }: PageProps) {
           userName={userName}
           userEmail={userEmail}
         />
-        <MailBox/>
+        <MailBox />
       </nav>
     </header>
   );
