@@ -18,7 +18,7 @@ export default function LoginButton() {
 
   useEffect(() => {
     if (!session?.user || status !== 'idle') return;
-  
+
     sendUserDataToBackend();
   }, [session, status]);
 
@@ -115,7 +115,7 @@ export default function LoginButton() {
         )}
 
         {status === 'enterFamilyName' && (
-          <div className="mt-4 p-4 border rounded-xl shadow-sm bg-white max-w-md">
+          <div className="mt-4 p-4 border rounded-xl shadow-sm bg-white w-full max-w-sm">
             <p className="text-lg font-semibold mb-2 text-gray-800">
               👨‍👩‍👧 가족 이름을 입력해주세요:
             </p>
@@ -131,11 +131,11 @@ export default function LoginButton() {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSubmitFamily();
                 }}
-                className="px-4 py-2 border rounded-lg flex-1"
+                className="w-48 px-3 py-2 border border-gray-300 rounded-lg"
               />
               <button
                 onClick={handleSubmitFamily}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition whitespace-nowrap"
               >
                 확인
               </button>

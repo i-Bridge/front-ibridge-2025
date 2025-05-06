@@ -5,6 +5,7 @@ import { useReplyStepsStore } from '@/store/child/replyStepStore';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import VideoRecorder from '@/components/Recorder/VideoRecorder';
 
 export default function ReplyPage() {
   const { completedSteps, completeStep } = useReplyStepsStore();
@@ -88,9 +89,7 @@ export default function ReplyPage() {
             </button>
           </>
         ) : (
-          <div className="w-72 h-48 bg-white flex items-center justify-center text-lg font-bold shadow-lg rounded-lg">
-            녹화 화면
-          </div>
+          <VideoRecorder /> // ✅ 녹화 컴포넌트 삽입
         )}
       </div>
 

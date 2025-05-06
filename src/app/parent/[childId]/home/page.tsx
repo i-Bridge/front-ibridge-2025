@@ -6,10 +6,6 @@ import Weekly from '@/components/Home/weekly';
 import SubjectList from '@/components/Question/SubjectList';
 import SubjectDetailPanel from '@/components/Question/SubjectDetailPanel';
 
-interface PageProps {
-  params: { childId: string };
-}
-
 interface Subject {
   subjectId: number;
   subjectTitle: string;
@@ -20,7 +16,11 @@ interface HomeData {
   subjects: Subject[];
 }
 
-export default async function HomePage({ params }: PageProps) {
+export default async function HomePage({
+  params,
+}: {
+  params: { childId: string };
+}) {
   const { childId } = params;
 
   if (!childId) {
@@ -57,7 +57,6 @@ export default async function HomePage({ params }: PageProps) {
           <Weekly />
           <SubjectList initialSubjects={homeData.subjects} />
           <SubjectDetailPanel />
-
         </div>
       </div>
     </div>
