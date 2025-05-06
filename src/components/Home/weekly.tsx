@@ -1,7 +1,7 @@
 "use client";
 
 import { useDateStore } from "@/store/date/dateStore";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 
 export default function Weekly() {

@@ -51,6 +51,7 @@ export default function DropMotionMypage({
 
   return (
     <div>
+      
       {pathname !== '/' && (
         <div
           ref={profileRef}

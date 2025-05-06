@@ -90,10 +90,9 @@ export default function MailBox() {
       {/* 드롭다운 버튼 */}
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg shadow hover:shadow-md transition-all"
+        className="flex items-center gap-2 px-3 py-2"
       >
         <span className="text-xl">📬</span>
-        <span className="text-sm font-medium text-gray-700">Mailbox</span>
       </button>
 
       {/* 드롭다운 내용 */}
