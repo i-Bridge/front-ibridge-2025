@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from 'react';
 import { useDateStore } from '@/store/date/dateStore';
-import DailyQuestionList from '@/components/Question/DailyQuestionList';
 
 export default function Calendar() {
   const { selectedDate, setSelectedDate } = useDateStore();
@@ -26,7 +25,9 @@ export default function Calendar() {
     const adjustedDay = Math.min(parseInt(selectedDay, 10), lastDay)
       .toString()
       .padStart(2, '0');
-    setSelectedDate(`${year}-${month.toString().padStart(2, '0')}-${adjustedDay}`);
+    setSelectedDate(
+      `${year}-${month.toString().padStart(2, '0')}-${adjustedDay}`,
+    );
   }, [year, month, selectedDate, setSelectedDate]);
 
   return (
@@ -38,7 +39,10 @@ export default function Calendar() {
           onChange={(e) => setYear(Number(e.target.value))}
           className="border p-1 rounded-md"
         >
-          {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 5 + i).map((y) => (
+          {Array.from(
+            { length: 10 },
+            (_, i) => new Date().getFullYear() - 5 + i,
+          ).map((y) => (
             <option key={y} value={y}>
               {y}년
             </option>
@@ -75,7 +79,9 @@ export default function Calendar() {
         ))}
         {Array.from({ length: daysInMonth }, (_, i) => {
           const today = new Date().toISOString().split('T')[0];
-          const dateString = `${year}-${month.toString().padStart(2, '0')}-${(i + 1)
+          const dateString = `${year}-${month.toString().padStart(2, '0')}-${(
+            i + 1
+          )
             .toString()
             .padStart(2, '0')}`;
 
@@ -93,7 +99,7 @@ export default function Calendar() {
         })}
       </div>
 
-      {selectedDate && <DailyQuestionList />}
+      {/* {selectedDate && <DailyQuestionList />} */}
     </div>
   );
 }
