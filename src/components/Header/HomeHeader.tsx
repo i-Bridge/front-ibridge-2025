@@ -46,13 +46,15 @@ export default async function HomeHeader({ childId }: PageProps) {
             className="w-24 h-auto transition-transform duration-300 hover:scale-105"
           />
         </Link>
+        <div className="absolute right-48 top-1"><MailBox/></div>
+        
         <DropMotionMypage
           childId={childId}
           mypageData={mypageData}
           userName={userName}
           userEmail={userEmail}
         />
-        <MailBox/>
+        
       </nav>
     </header>
   );

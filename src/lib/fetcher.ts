@@ -89,14 +89,17 @@ export async function Fetcher<T = undefined>(
     }
 
     return responseData;
+
   } catch (error: unknown) {
+    // api의 error 처리
+    
     if (axios.isAxiosError(error)) {
       console.error('❌ axios error:', error.response?.data);
       throw new Error(
         error.response?.data?.message || error.message || '서버 통신 오류',
       );
     }
-    console.error('❌ 일반 error:', error);
-    throw new Error('서버 통신 오류');
+    console.error('❌ 일반 api error:', error);
+    throw new Error('일반 api 오류');
   }
 }
