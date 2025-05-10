@@ -1,18 +1,24 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { Fetcher } from '@/lib/fetcher';
+import { useRef, useState, useEffect } from 'react';
 import { usePresignedUrl } from '@/hooks/s3/usePresignedUrl';
+import { useAnswerAI } from '@/hooks/chat/useAnswerAI';
 
 export default function VideoRecorder() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+
   const [isRecording, setIsRecording] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isThumbnailCaptured, setIsThumbnailCaptured] = useState(false);
+  const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
+  const [uploadedThumbnailUrl, setUploadedThumbnailUrl] = useState<
+    string | null
+  >(null);
 
   const { getPresignedUrl } = usePresignedUrl();
+  const { postAnswer } = useAnswerAI();
 
   const startRecording = async () => {
     if (mediaRecorderRef.current) {
@@ -27,6 +33,8 @@ export default function VideoRecorder() {
       });
       setStream(mediaStream);
       setIsThumbnailCaptured(false);
+      setUploadedVideoUrl(null);
+      setUploadedThumbnailUrl(null);
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -92,10 +100,7 @@ export default function VideoRecorder() {
         if (!res.ok) throw new Error('썸네일 S3 업로드 실패');
         console.log('✅ 썸네일 업로드 완료:', url);
 
-        await Fetcher('/save-thumbnail-url', {
-          method: 'POST',
-          data: { url },
-        });
+        setUploadedThumbnailUrl(url);
       } catch (err) {
         console.error('썸네일 업로드 실패:', err);
       }
@@ -113,19 +118,35 @@ export default function VideoRecorder() {
       });
 
       if (!res.ok) {
-        throw new Error('S3 업로드 실패');
+        throw new Error('영상 S3 업로드 실패');
       }
 
       console.log('✅ 영상 업로드 완료:', url);
-
-      await Fetcher('/save-video-url', {
-        method: 'POST',
-        data: { url },
-      });
+      setUploadedVideoUrl(url);
     } catch (err) {
-      console.error('🎥 업로드 실패:', err);
+      console.error('🎥 영상 업로드 실패:', err);
     }
   };
+
+  // 영상과 썸네일 업로드가 모두 끝나면 백엔드에 전송
+  useEffect(() => {
+    const sendToBackend = async () => {
+      if (uploadedVideoUrl && uploadedThumbnailUrl && !isRecording) {
+        const aiResponse = await postAnswer({
+          isFinished: false,
+          video: uploadedVideoUrl,
+          thumbnail: uploadedThumbnailUrl,
+        });
+
+        if (aiResponse) {
+          console.log('🤖 GPT 응답:', aiResponse);
+          // TODO: aiResponse로 다음 질문 표시 or TTS 연결
+        }
+      }
+    };
+
+    sendToBackend();
+  }, [uploadedVideoUrl, uploadedThumbnailUrl, isRecording]);
 
   return (
     <div className="flex flex-col items-center gap-4">
