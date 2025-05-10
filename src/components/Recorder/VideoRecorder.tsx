@@ -101,15 +101,22 @@ export default function VideoRecorder() {
       const url = await getPresignedUrl();
       if (!url) return;
 
+      console.log('📦 썸네일 blob size:', blob.size);
+      console.log('📤 업로드 대상 URL:', url);
+
       try {
         const res = await fetch(url, {
           method: 'PUT',
           body: blob,
         });
 
-        if (!res.ok) throw new Error('썸네일 S3 업로드 실패');
-        console.log('✅ 썸네일 업로드 완료:', url);
+        if (!res.ok) {
+          const errorText = await res.text(); // 🧠 AWS 오류 메시지 확인
+          console.error('❌ 썸네일 S3 업로드 실패 본문:', errorText);
+          throw new Error('썸네일 S3 업로드 실패');
+        }
 
+        console.log('✅ 썸네일 업로드 완료:', url);
         setUploadedThumbnailUrl(url);
       } catch (err) {
         console.error('❌ 썸네일 업로드 실패:', err);
@@ -122,15 +129,22 @@ export default function VideoRecorder() {
     const url = await getPresignedUrl();
     if (!url) return;
 
+    console.log('📦 영상 blob size:', blob.size);
+    console.log('📤 업로드 대상 URL:', url);
+
     try {
       const res = await fetch(url, {
         method: 'PUT',
         body: blob,
       });
 
-      if (!res.ok) throw new Error('영상 S3 업로드 실패');
-      console.log('✅ 영상 업로드 완료:', url);
+      if (!res.ok) {
+        const errorText = await res.text(); // 🧠 AWS 오류 메시지 확인
+        console.error('❌ 영상 S3 업로드 실패 본문:', errorText);
+        throw new Error('영상 S3 업로드 실패');
+      }
 
+      console.log('✅ 영상 업로드 완료:', url);
       setUploadedVideoUrl(url);
     } catch (err) {
       console.error('❌ 영상 업로드 실패:', err);
