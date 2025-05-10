@@ -16,17 +16,37 @@ export default function LoginButton() {
   const [loading, setLoading] = useState(false);
   const [familyError, setFamilyError] = useState<string | null>(null);
 
+  // 🔐 Refresh 실패 대응
   useEffect(() => {
-    if (!session?.user || status !== 'idle') return;
+    if (session?.error === 'RefreshAccessTokenError') {
+      alert('로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
+      router.push('/');
+    }
+  }, [session?.error]);
+
+  // ✅ 로그인 후 유저 정보 백엔드 전송
+  useEffect(() => {
+    if (!session?.user || !session?.accessToken || status !== 'idle') return;
 
     sendUserDataToBackend();
   }, [session, status]);
+
+  // 🐞 디버깅용 accessToken 로그 (선택)
+  useEffect(() => {
+    if (session?.accessToken) {
+      console.log('🔐 accessToken:', session.accessToken);
+    }
+  }, [session?.accessToken]);
 
   const sendUserDataToBackend = async () => {
     setStatus('checking');
     try {
       const signinRes = await Fetcher<{ first: boolean }>('/start/signin', {
         method: 'POST',
+        data: {
+          name: session?.user?.name,
+          email: session?.user?.email,
+        },
       });
 
       const first = signinRes?.data?.first;
