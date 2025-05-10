@@ -3,7 +3,6 @@ import GoogleProvider from 'next-auth/providers/google';
 import NaverProvider from 'next-auth/providers/naver';
 import { JWT } from 'next-auth/jwt';
 
-// ✅ access_token 만료 시 refresh_token으로 새로 갱신하는 함수
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
     if (token.provider === 'naver') {
