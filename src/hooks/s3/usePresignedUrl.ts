@@ -12,7 +12,10 @@ export const usePresignedUrl = () => {
     try {
       const { data, isSuccess } = await Fetcher<{ url: string }>(
         `/child/${childId}/getURL`,
-        { method: 'GET' },
+        {
+          method: 'GET',
+          skipAuthHeader: true, // ✅ 인증 헤더 생략
+        },
       );
 
       if (!isSuccess || !data?.url) {
