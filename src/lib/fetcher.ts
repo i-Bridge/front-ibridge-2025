@@ -8,9 +8,9 @@ const isServer = typeof window === 'undefined';
 
 export type FetcherOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  data?: Record<string, any>;
-  params?: Record<string, string | number>;
-  headers?: Record<string, string>;
+  data?: Record<string, unknown>;
+  params?: Record<string, string | number>; //날짜 쿼리스트링으로 보냄
+  headers?: Record<string, string>; //이메일 정보
 };
 
 export interface ApiResponse<T = undefined> {
@@ -27,7 +27,7 @@ const encodeHeaderValue = (value: string) => {
 export async function Fetcher<T = undefined>(
   url: string,
   options: FetcherOptions = {},
-): Promise<ApiResponse<T>> {
+): Promise<ApiResponse<T>> { // data만 반환 X, 전체 ApiResponse 반환
   let userEmail = '';
   let userName = '';
 
@@ -37,7 +37,7 @@ export async function Fetcher<T = undefined>(
     if (isServer) {
       session = await getServerSession(authOptions);
       if (process.env.NODE_ENV === 'development') {
-        console.log('✅ Server session:', session);
+        console.log('✅ Server session:', session);  //추후 삭제 예정
       }
       userEmail = session?.user?.email ?? '';
       userName = session?.user?.name ?? '';
@@ -47,13 +47,12 @@ export async function Fetcher<T = undefined>(
         const interval = setInterval(async () => {
           const sess = await getSession();
           if (sess || Date.now() - start > 3000) {
-            // 최대 3초만 기다림
             clearInterval(interval);
             resolve(sess ?? null);
           }
         }, 100);
       });
-      console.log('👀 CSR session:', session);
+      console.log('👀 CSR session:', session);  //추후 삭제 예정
       userEmail = session?.user?.email ?? '';
       userName = session?.user?.name ?? '';
     }
@@ -82,24 +81,36 @@ export async function Fetcher<T = undefined>(
 
     const responseData = res.data as ApiResponse<T>;
 
+    {/*code, error 오류 처리*/}
+
     if (responseData.code !== '200') {
-      throw new Error(
-        responseData.message || 'API 요청 중 오류가 발생했습니다.',
+      console.warn(
+        `⚠️ API 응답: 실패 [${responseData.code}]: ${responseData.message}`,
       );
+      return responseData;
     }
 
     return responseData;
 
   } catch (error: unknown) {
-    // api의 error 처리
-    
+
     if (axios.isAxiosError(error)) {
-      console.error('❌ axios error:', error.response?.data);
-      throw new Error(
-        error.response?.data?.message || error.message || '서버 통신 오류',
+      const status = error.response?.status;
+      const errorUrl = error.config?.url;
+      const errorMessage =
+        error.response?.data?.message || error.message || '서버 통신 오류';
+
+      console.error(
+        `❌ Axios Error [${status}] at ${errorUrl}: ${errorMessage}`,
+        {
+          response: error.response?.data,
+        },
       );
+
+      throw new Error(errorMessage);
     }
-    console.error('❌ 일반 api error:', error);
-    throw new Error('일반 api 오류');
+
+    console.error('❌ 일반 API Error:', error);
+    throw new Error('알 수 없는 API 오류가 발생했습니다.');
   }
 }
