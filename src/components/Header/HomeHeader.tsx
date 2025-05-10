@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { Fetcher } from '@/lib/fetcher';
@@ -35,12 +36,14 @@ export default async function HomeHeader({ childId }: HeaderProps) {
   if (!mypageData) {
     return <div>로딩 중...</div>;
   }
+
   console.log(typeof childId);
+
   return (
     <header className="fixed top-0 left-0 right-0 bg-i-ivory bg-opacity-95 z-50 shadow-sm">
       <nav className="max-w-7xl mx-auto px-8 py-1 flex justify-between items-center">
         <Link href={`/parent/${childId}/home`}>
-          <img
+          <Image
             src="/images/logo.svg"
             alt="Logo"
             className="w-24 h-auto transition-transform duration-300 hover:scale-105"

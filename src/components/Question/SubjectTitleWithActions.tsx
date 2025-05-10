@@ -42,10 +42,13 @@ const SubjectTitleWithActions = ({ subjectId, subjectTitle }: Props) => {
 
   const handleSave = async () => {
     try {
-      const res = await Fetcher(`/parent/${childId}/questions/edit?date=${selectedDate}&subjectId=${subjectId}`, {
-        method: 'POST',
-        data: { title: inputValue },
-      });
+      const res = await Fetcher(
+        `/parent/${childId}/questions/edit?date=${selectedDate}&subjectId=${subjectId}`,
+        {
+          method: 'POST',
+          data: { title: inputValue },
+        },
+      );
 
       if (res?.isSuccess) {
         setTitle(inputValue);
@@ -66,10 +69,17 @@ const SubjectTitleWithActions = ({ subjectId, subjectTitle }: Props) => {
     }
 
     try {
-      const res = await Fetcher<Props>(`/parent/${childId}/questions/reroll?date=${selectedDate}&subjectId=${subjectId}`);
+      const res = await Fetcher<Props>(
+        `/parent/${childId}/questions/reroll?date=${selectedDate}&subjectId=${subjectId}`,
+      );
 
+      const subjectdata = res.data;
+
+      if (!subjectdata) {
+        return <div>로딩 중...</div>;
+      }
       if (res?.isSuccess) {
-        const newTitle = res.data.subjectTitle;
+        const newTitle = subjectdata.subjectTitle;
         setTitle(newTitle);
         setInputValue(newTitle);
 
@@ -96,35 +106,44 @@ const SubjectTitleWithActions = ({ subjectId, subjectTitle }: Props) => {
         <span className="font-semibold">{title}</span>
       )}
 
-      
-        <div className="flex gap-2">
-          {editing ? (
-            <>
-              <button onClick={handleSave} className="text-green-600 hover:underline">
-                저장
-              </button>
-              <button onClick={handleCancel} className="text-gray-500 hover:underline">
-                취소
-              </button>
-            </>
-          ) : (
-            <>
-              <button onClick={handleEditClick} className="text-blue-600 hover:underline">
-                편집
-              </button>
-              <button
-                onClick={handleReroll}
-                className={`text-orange-600 hover:underline ${
-                  refreshCount >= MAX_REFRESH_COUNT ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-                disabled={refreshCount >= MAX_REFRESH_COUNT}
-              >
-                새로고침
-              </button>
-            </>
-          )}
-        </div>
-      
+      <div className="flex gap-2">
+        {editing ? (
+          <>
+            <button
+              onClick={handleSave}
+              className="text-green-600 hover:underline"
+            >
+              저장
+            </button>
+            <button
+              onClick={handleCancel}
+              className="text-gray-500 hover:underline"
+            >
+              취소
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={handleEditClick}
+              className="text-blue-600 hover:underline"
+            >
+              편집
+            </button>
+            <button
+              onClick={handleReroll}
+              className={`text-orange-600 hover:underline ${
+                refreshCount >= MAX_REFRESH_COUNT
+                  ? 'opacity-50 cursor-not-allowed'
+                  : ''
+              }`}
+              disabled={refreshCount >= MAX_REFRESH_COUNT}
+            >
+              새로고침
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 };

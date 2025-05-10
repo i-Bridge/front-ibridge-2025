@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+'use client'
+
+import { useEffect, useState, useCallback } from 'react';
 import { useDateStore } from '@/store/date/dateStore';
-import { Fetcher } from '@/lib/fetcher'; // Fetcher 경로 맞춰주세요.
+import { Fetcher } from '@/lib/fetcher'; 
 import { useParams } from "next/navigation";
 
 type Subject = {
@@ -24,40 +26,39 @@ export function useHomeData() {
   const [subjects, setSubjects] = useState<Subject[] | null>(null);
   const [loading, setLoading] = useState(false);
   const params = useParams();
-
   const childId = params?.childId;
-  useEffect(() => {
+
+  const fetchHomeData = useCallback(async () => {
+    if (!selectedDate || !childId) return;
+
     setLoading(true);
 
-    const fetchHomeData = async () => {
-      try {
-        const res = await Fetcher<HomeData>(`/parent/${childId}/home?date=${selectedDate}`);
-        
-        if (res && res.data) {
-          const { subjects } = res.data;
-          setSubjects(subjects);
-          cache.set(selectedDate, subjects);
+    try {
+      const res = await Fetcher<HomeData>(`/parent/${childId}/home?date=${selectedDate}`);
+      
+      if (res && res.data) {
+        const { subjects } = res.data;
+        setSubjects(subjects);
+        cache.set(selectedDate, subjects);
 
-          if (cache.size > MAX_CACHE_SIZE) {
-            const firstKey = cache.keys().next().value;
-            if (firstKey !== undefined) {
-              cache.delete(firstKey);
-            }
+        if (cache.size > MAX_CACHE_SIZE) {
+          const firstKey = cache.keys().next().value;
+          if (firstKey !== undefined) {
+            cache.delete(firstKey);
           }
         }
-      } catch (err) {
-        console.error("API 호출 오류:", err);
-        setSubjects(null);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    if (selectedDate) {
-      fetchHomeData();
+    } catch (err) {
+      console.error("API 호출 오류:", err);
+      setSubjects(null);
+    } finally {
+      setLoading(false);
     }
+  }, [selectedDate, childId]);
 
-  }, [selectedDate]);
+  useEffect(() => {
+    fetchHomeData();
+  }, [fetchHomeData]);
 
-  return { subjects, loading };
+  return { subjects, loading, refetch: fetchHomeData };
 }
