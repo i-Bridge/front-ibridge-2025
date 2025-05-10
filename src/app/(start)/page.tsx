@@ -1,18 +1,8 @@
 'use client';
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import LoginButton from '@/components/Auth/LoginButton';
 
 export default function StartPage() {
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <div className="min-h-screen flex flex-col relative">
       <main className="flex-grow">
@@ -92,8 +82,8 @@ export default function StartPage() {
             viewport={{ once: true }}
             className="text-lg text-i-darkblue leading-relaxed mb-8"
           >
-            아이의 행동 이면에는 언제나 "나를 이해해 줘!"라는 외침이 있습니다.
-            하지만 부모도 완벽할 수 없기에, 올바른 소통을 위한 도구가
+            아이의 행동 이면에는 언제나 &quot;나를 이해해 줘!&quot;라는 외침이
+            있습니다. 하지만 부모도 완벽할 수 없기에, 올바른 소통을 위한 도구가
             필요합니다. iBridge는 부모가 감정을 개입하지 않고 자녀의 속마음을
             이해할 수 있도록 도와주는 웹 플랫폼입니다.
           </motion.p>
