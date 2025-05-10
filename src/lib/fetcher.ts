@@ -20,58 +20,44 @@ export interface ApiResponse<T = undefined> {
   data?: T;
 }
 
-const encodeHeaderValue = (value: string) => {
-  return Buffer.from(value, 'utf-8').toString('base64');
-};
-
 export async function Fetcher<T = undefined>(
   url: string,
   options: FetcherOptions = {},
 ): Promise<ApiResponse<T>> {
-  let userEmail = '';
-  let userName = '';
-
   try {
-    let session;
+    let session: Session | null = null;
 
     if (isServer) {
       session = await getServerSession(authOptions);
       if (process.env.NODE_ENV === 'development') {
         console.log('✅ Server session:', session);
       }
-      userEmail = session?.user?.email ?? '';
-      userName = session?.user?.name ?? '';
     } else {
       session = await new Promise<Session | null>((resolve) => {
         const start = Date.now();
         const interval = setInterval(async () => {
           const sess = await getSession();
           if (sess || Date.now() - start > 3000) {
-            // 최대 3초만 기다림
             clearInterval(interval);
             resolve(sess ?? null);
           }
         }, 100);
       });
       console.log('👀 CSR session:', session);
-      userEmail = session?.user?.email ?? '';
-      userName = session?.user?.name ?? '';
     }
 
-    if (!userEmail) {
+    const accessToken = session?.accessToken;
+
+    if (!accessToken) {
       throw new Error('로그인이 필요한 요청입니다.');
     }
-
-    const isSignin =
-      url === '/start/signin' && (options.method ?? 'GET') === 'POST';
 
     const res = await axios({
       url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
       method: options.method ?? 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-User-Email': userEmail,
-        ...(isSignin ? { 'X-User-Name': encodeHeaderValue(userName) } : {}),
+        Authorization: `Bearer ${accessToken}`, // ✅ accessToken만 전달
         ...options.headers,
       },
       ...(options.method !== 'GET' && options.data
