@@ -57,7 +57,7 @@ export async function Fetcher<T = undefined>(
       method: options.method ?? 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`, // ✅ accessToken만 전달
+        Authorization: `Bearer ${accessToken}`,
         ...options.headers,
       },
       ...(options.method !== 'GET' && options.data
