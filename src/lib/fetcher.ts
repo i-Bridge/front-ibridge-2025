@@ -8,9 +8,9 @@ const isServer = typeof window === 'undefined';
 
 export type FetcherOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  data?: Record<string, any>;
-  params?: Record<string, string | number>;
-  headers?: Record<string, string>;
+  data?: Record<string, unknown>;
+  params?: Record<string, string | number>; //날짜 쿼리스트링으로 보냄
+  headers?: Record<string, string>; //이메일 정보
 };
 
 export interface ApiResponse<T = undefined> {
@@ -30,7 +30,7 @@ export async function Fetcher<T = undefined>(
     if (isServer) {
       session = await getServerSession(authOptions);
       if (process.env.NODE_ENV === 'development') {
-        console.log('✅ Server session:', session);
+        console.log('✅ Server session:', session);  //추후 삭제 예정
       }
     } else {
       session = await new Promise<Session | null>((resolve) => {
@@ -68,21 +68,36 @@ export async function Fetcher<T = undefined>(
 
     const responseData = res.data as ApiResponse<T>;
 
+    {/*code, error 오류 처리*/}
+
     if (responseData.code !== '200') {
-      throw new Error(
-        responseData.message || 'API 요청 중 오류가 발생했습니다.',
+      console.warn(
+        `⚠️ API 응답: 실패 [${responseData.code}]: ${responseData.message}`,
       );
+      return responseData;
     }
 
     return responseData;
+
   } catch (error: unknown) {
+
     if (axios.isAxiosError(error)) {
-      console.error('❌ axios error:', error.response?.data);
-      throw new Error(
-        error.response?.data?.message || error.message || '서버 통신 오류',
+      const status = error.response?.status;
+      const errorUrl = error.config?.url;
+      const errorMessage =
+        error.response?.data?.message || error.message || '서버 통신 오류';
+
+      console.error(
+        `❌ Axios Error [${status}] at ${errorUrl}: ${errorMessage}`,
+        {
+          response: error.response?.data,
+        },
       );
+
+      throw new Error(errorMessage);
     }
-    console.error('❌ 일반 error:', error);
-    throw new Error('서버 통신 오류');
+
+    console.error('❌ 일반 API Error:', error);
+    throw new Error('알 수 없는 API 오류가 발생했습니다.');
   }
 }
