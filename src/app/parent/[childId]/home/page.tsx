@@ -16,31 +16,24 @@ interface HomeData {
   subjects: Subject[];
 }
 
-export default async function HomePage({
-  params,
-}: {
-  params: { childId: string };
-}) {
+interface PageProps {
+  params: {
+    childId: string; 
+  };
+}
+
+export default async function HomePage({ params }: PageProps) {
   const { childId } = params;
 
   if (!childId) {
-    //꼭 오류처리할 필요는 없지만 사용자경험 위함. 나중에 오류페이지로
-    return <div>params: childid load 실패</div>;
+    return <div> 403: no childId </div>;
   }
 
-  let homeData: HomeData | undefined;
+  const res = await Fetcher<HomeData>(`/parent/${childId}/home`);
 
-  try {
-    const res = await Fetcher<HomeData>(`/parent/${childId}/home`);
-    if (!res) {
-      return <div>로딩 중...</div>;
-    }
-    console.log('💓받아온 homeData:', res);
-    homeData = res.data;
-  } catch (err) {
-    console.error('HomeData API 호출 오류:', err);
-    return <div>데이터를 불러오지 못했습니다.</div>;
-  }
+  console.log('💓받아온 homeData:', res); //추후 삭제 예정
+
+  const homeData = res.data;
 
   if (!homeData) {
     return <div>로딩 중...</div>;

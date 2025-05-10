@@ -10,37 +10,23 @@ interface ProfileData {
 }
 
 export default async function Profile() {
-  let profileData: ProfileData | null = null; // try-catch 바깥에서 선언
+  const res = await Fetcher<ProfileData>('/start/login');
 
-  try {
-    const res = await Fetcher<ProfileData>('/start/login');
-    if (!res) {
-      return <div>로딩 중...</div>; // 서버에서 데이터를 못 가져온 경우
-    }
-    console.log('받아온 profile res:', res);
+  const profileData = res.data;
 
-    // 정상적으로 데이터를 가져온 경우
-    profileData = res.data;
-  } catch (err) {
-    console.error('API 호출 중 오류 발생:', err);
-    return <div>데이터를 불러오지 못했습니다.</div>; // 오류 발생 시 표시
-  }
-
-  // profileData가 없다면 로딩 중 또는 데이터 오류를 표시
   if (!profileData) {
     return <div>로딩 중...</div>;
   }
-  // ProfileData의 accepted와 send 값에 따른 처리
+
   if (!profileData.accepted) {
-    return <div>isAccepted: false</div>;
+    return <div> 403: accepted false </div>;
   }
 
   if (!profileData.send) {
-    console.log('send 거짓:', profileData.send);
-    return <div>send: false</div>;
+    return <div> 403: send false </div>;
   }
 
-  console.log('받아온 profileData:', profileData);
+  console.log('받아온 profileData:', profileData); // 추후 삭제 예정
 
   return (
     <div className="w-full h-screen flex flex-col">

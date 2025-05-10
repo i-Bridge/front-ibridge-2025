@@ -27,40 +27,34 @@ export default function MailBox() {
   async function handleAccept(senderId: number | null) {
     if (!senderId) return;
 
-    try {
-      const res = await Fetcher('/parent/notice/accept', {
-        method: 'POST',
-        data: { parentId: senderId },
-      });
-      if (res.isSuccess) {
-        router.refresh();
-      } else {
-        console.error('수락 실패:', res.message);
-      }
-    } catch (err) {
-      console.error('수락 요청 중 오류 발생:', err);
+    const res = await Fetcher('/parent/notice/accept', {
+      method: 'POST',
+      data: { parentId: senderId },
+    });
+
+    if (res.isSuccess) {
+      router.refresh();
+    } else {
+      console.error('수락 실패:', res.message);
     }
   }
 
   async function handleDecline(senderId: number | null) {
     if (!senderId) return; // senderId 없으면 요청 안 보냄
 
-    try {
-      console.log('거절하는 parentId:', senderId);
-      const res = await Fetcher('/parent/notice/decline', {
-        method: 'POST',
-        data: { parentId: senderId }, // ✅ 이렇게 보내야 함
-      });
-      console.log('거절 요청 응답:', res); // 응답 확인
+    console.log('거절하는 parentId:', senderId);
 
-      if (res.isSuccess) {
-        // 성공했으면 다시 새로고침하거나 notice 다시 불러오기
-        router.refresh(); // ✅ 간단하게 이걸로 새로고침
-      } else {
-        console.error('거절 실패:', res.message);
-      }
-    } catch (err) {
-      console.error('거절 요청 중 오류 발생:', err);
+    const res = await Fetcher('/parent/notice/decline', {
+      method: 'POST',
+      data: { parentId: senderId },
+    });
+
+    console.log('거절 요청 응답:', res); // 추후 삭제 예정
+
+    if (res.isSuccess) {
+      router.refresh();
+    }else {
+      console.error('거절 실패:', res.message);
     }
   }
 
@@ -73,10 +67,10 @@ export default function MailBox() {
         } else {
           setNoticeData(null);
         }
-        console.log('💓받아온 NoticeData:', res);
+        console.log('💓받아온 NoticeData:', res); //추후 삭제 예정
       } catch (err) {
         console.error('요청 중 오류 발생:', err);
-        setError('요청 중 오류가 발생했습니다.');
+        setError('⚠️ 알림을 불러오는 중 오류가 발생했습니다.');
       } finally {
         setLoading(false);
       }
@@ -85,6 +79,15 @@ export default function MailBox() {
     fetchNotice();
   }, []);
 
+
+  if (loading) {
+    return <div>🔄 로딩 중입니다...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
+  
   return (
     <div className="relative inline-block text-left">
       {/* 드롭다운 버튼 */}
@@ -102,12 +105,18 @@ export default function MailBox() {
             <div className="p-4 text-sm text-gray-500">로딩 중...</div>
           ) : error ? (
             <div className="p-4 text-sm text-red-500">{error}</div>
-          ) : noticeData?.notices?.filter((mail) => !mail.isAccept).length === 0 ? (
-            <div className="p-4 text-sm text-gray-500">새로운 알림이 없습니다.</div>
+          ) : noticeData?.notices?.filter((mail) => !mail.isAccept).length ===
+            0 ? (
+            <div className="p-4 text-sm text-gray-500">
+              새로운 알림이 없습니다.
+            </div>
           ) : (
             noticeData?.notices
               .filter((mail) => !mail.isAccept)
-              .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
+              .sort(
+                (a, b) =>
+                  new Date(b.time).getTime() - new Date(a.time).getTime(),
+              )
               .slice(0, 10)
               .map((mail) => (
                 <div
@@ -120,8 +129,8 @@ export default function MailBox() {
                         mail.type === 1
                           ? 'bg-blue-100 text-blue-600'
                           : mail.type === 2
-                          ? 'bg-pink-100 text-pink-600'
-                          : 'bg-gray-100 text-gray-600'
+                            ? 'bg-pink-100 text-pink-600'
+                            : 'bg-gray-100 text-gray-600'
                       }`}
                     >
                       {mail.type === 1 ? (
@@ -132,7 +141,12 @@ export default function MailBox() {
                           viewBox="0 0 24 24"
                           stroke="currentColor"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={3}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       ) : mail.type === 2 ? (
                         <svg
@@ -170,8 +184,8 @@ export default function MailBox() {
                       {mail.type === 1
                         ? '아이가 답변을 완료했어요'
                         : mail.type === 2
-                        ? `${mail.senderName ?? '누군가'}님이 가족 가입을 요청했어요`
-                        : '서버 점검 공지'}
+                          ? `${mail.senderName ?? '누군가'}님이 가족 가입을 요청했어요`
+                          : '서버 점검 공지'}
                     </span>
                   </div>
 
@@ -184,11 +198,11 @@ export default function MailBox() {
                         수락
                       </button>
                       <button
-                  onClick={() => handleDecline(mail.senderId)}
-                  className="text-xs border border-red-500 text-red-500 rounded px-2 py-1 hover:bg-red-50"
-                >
-                  거절
-                </button>
+                        onClick={() => handleDecline(mail.senderId)}
+                        className="text-xs border border-red-500 text-red-500 rounded px-2 py-1 hover:bg-red-50"
+                      >
+                        거절
+                      </button>
                     </div>
                   )}
                 </div>

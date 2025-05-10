@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import LogoutButton from '@/components/Auth/LogoutButton';
 
-type ChildProfileListProps = {
+type MypageDataProps = {
   childId: string;
   mypageData: MyPageData;
   userName: string;
@@ -22,7 +22,7 @@ export default function Mypage({
   mypageData,
   userName,
   userEmail,
-}: ChildProfileListProps) {
+}: MypageDataProps) {
   return (
     <div>
       <div className="flex items-center p-4 border-b ">
@@ -56,7 +56,7 @@ export default function Mypage({
       {/* 현재 위치한 페이지의 자식 표시되게 */}
       <div className="border-t p-4">
       <div className="grid grid-cols-4 gap-4">
-        {mypageData.children.map((child: any) => {
+        {mypageData.children.map((child:{ id: number; name: string }) => {
           const isSelected = String(child.id) === childId;
 
           return (
