@@ -9,6 +9,7 @@ import { Fetcher } from '@/lib/fetcher';
 interface ParentInfo {
   parentId: number;
   parentName: string;
+  parentGender: 0 | 1; // 0: 남성, 1: 여성
 }
 
 interface ChildInfo {
@@ -36,53 +37,39 @@ const ChildCard = ({ name, image }: { name: string; image: string }) => (
   </div>
 );
 
-const ParentCard = ({
-  parent1Name,
-  parent1Image,
-  parent2Name,
-  parent2Image,
+const ParentsCard = ({
+  parents,
   onInvite,
 }: {
-  parent1Name: string;
-  parent1Image: string;
-  parent2Name: string | null;
-  parent2Image: string | null;
+  parents: ParentInfo[];
   onInvite: () => void;
 }) => {
   return (
-    <div className="flex justify-between items-center w-80 bg-white p-4 rounded-lg shadow-md border">
-      <div className="flex flex-col items-center">
-        <Image
-          src={parent1Image}
-          alt={parent1Name}
-          width={50}
-          height={50}
-          className="rounded-full"
-        />
-        <p className="text-sm font-semibold">{parent1Name}</p>
-      </div>
 
-      <div className="flex flex-col items-center">
-        {parent2Name ? (
-          <>
-            <Image
-              src={parent2Image ?? '/images/girl.svg' } // 여기 디폴트 사진 넣어주세요
-              alt={parent2Name?? ' '}
-              width={50}
-              height={50}
-              className="rounded-full"
-            />
-            <p className="text-sm font-semibold">{parent2Name}</p>
-          </>
-        ) : (
-          <button
-            onClick={onInvite}
-            className="py-2 px-4 bg-purple-300 text-white font-semibold rounded-md hover:bg-purple-400 text-sm"
-          >
-            + 배우자 초대
-          </button>
-        )}
-      </div>
+    <div className="flex justify-center gap-6 flex-wrap items-center w-auto bg-white p-4 rounded-lg shadow-md border">
+      {parents.map((parent) => (
+        <div key={parent.parentId} className="flex flex-col items-center">
+          <Image
+            src={
+              parent.parentGender === 0 ? '/images/boy.svg' : '/images/girl.svg'
+            }
+            alt={parent.parentName}
+            width={50}
+            height={50}
+            className="rounded-full"
+          />
+          <p className="text-sm font-semibold">{parent.parentName}</p>
+        </div>
+      ))}
+      {parents.length < 2 && (
+        <button
+          onClick={onInvite}
+          className="py-2 px-4 bg-purple-300 text-white font-semibold rounded-md hover:bg-purple-400 text-sm"
+        >
+          + 배우자 초대
+        </button>
+      )}
+
     </div>
   );
 };
@@ -142,20 +129,13 @@ export default function FamilyTree() {
 
   const renderTree = () => {
     if (!familyInfo) return null;
-    const [parent1, parent2] = familyInfo.parents;
     return (
       <Tree
         lineWidth={'2px'}
         lineColor={'#034892'}
         lineBorderRadius={'10px'}
         label={
-          <ParentCard
-            parent1Name={parent1?.parentName ?? '부모1'}
-            parent1Image={'/images/boy.svg'}
-            parent2Name={parent2?.parentName ?? null}
-            parent2Image={parent2 ? '/images/girl.svg' : null}
-            onInvite={handleInvite}
-          />
+          <ParentsCard parents={familyInfo.parents} onInvite={handleInvite} />
         }
       >
         {familyInfo.children.map((child) => (
@@ -222,6 +202,7 @@ export default function FamilyTree() {
           </>
         )}
       </motion.div>
+
       {renderTree()}
 
       {inviteModal && (
