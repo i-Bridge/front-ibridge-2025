@@ -22,11 +22,12 @@ export default function VideoRecorder() {
 
   const startRecording = async () => {
     if (mediaRecorderRef.current) {
-      console.warn('이미 녹화 중입니다.');
+      console.warn('⚠️ 이미 녹화 중입니다.');
       return;
     }
 
     try {
+      console.log('🎬 녹화 시작 요청됨');
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
@@ -49,6 +50,7 @@ export default function VideoRecorder() {
       };
 
       recorder.onstop = async () => {
+        console.log('🛑 녹화 종료됨 → 영상 업로드 시작');
         const blob = new Blob(chunks, { type: 'video/webm' });
         await uploadToS3(blob);
         mediaStream.getTracks().forEach((track) => track.stop());
@@ -57,26 +59,30 @@ export default function VideoRecorder() {
       mediaRecorderRef.current = recorder;
       recorder.start();
       setIsRecording(true);
+      console.log('✅ 녹화가 시작되었습니다.');
 
       setTimeout(() => {
         if (!isThumbnailCaptured) {
+          console.log('📸 3초 경과 → 썸네일 캡처 시도');
           captureAndUploadThumbnail();
           setIsThumbnailCaptured(true);
         }
       }, 3000);
     } catch (err) {
-      console.error('녹화 시작 실패:', err);
+      console.error('❌ 녹화 시작 실패:', err);
     }
   };
 
   const stopRecording = () => {
     mediaRecorderRef.current?.stop();
     setIsRecording(false);
+    console.log('🛑 녹화 중지 요청됨');
   };
 
   const captureAndUploadThumbnail = async () => {
     if (!videoRef.current || !canvasRef.current) return;
 
+    console.log('🖼 썸네일 캡처 중...');
     const canvas = canvasRef.current;
     const video = videoRef.current;
     canvas.width = video.videoWidth;
@@ -86,8 +92,12 @@ export default function VideoRecorder() {
     ctx?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
     canvas.toBlob(async (blob) => {
-      if (!blob) return;
+      if (!blob) {
+        console.error('❌ 썸네일 Blob 생성 실패');
+        return;
+      }
 
+      console.log('☁️ Presigned URL 요청 중 (썸네일)');
       const url = await getPresignedUrl();
       if (!url) return;
 
@@ -102,12 +112,13 @@ export default function VideoRecorder() {
 
         setUploadedThumbnailUrl(url);
       } catch (err) {
-        console.error('썸네일 업로드 실패:', err);
+        console.error('❌ 썸네일 업로드 실패:', err);
       }
     }, 'image/jpeg');
   };
 
   const uploadToS3 = async (blob: Blob) => {
+    console.log('☁️ Presigned URL 요청 중 (영상)');
     const url = await getPresignedUrl();
     if (!url) return;
 
@@ -117,21 +128,19 @@ export default function VideoRecorder() {
         body: blob,
       });
 
-      if (!res.ok) {
-        throw new Error('영상 S3 업로드 실패');
-      }
-
+      if (!res.ok) throw new Error('영상 S3 업로드 실패');
       console.log('✅ 영상 업로드 완료:', url);
+
       setUploadedVideoUrl(url);
     } catch (err) {
-      console.error('🎥 영상 업로드 실패:', err);
+      console.error('❌ 영상 업로드 실패:', err);
     }
   };
 
-  // 영상과 썸네일 업로드가 모두 끝나면 백엔드에 전송
   useEffect(() => {
     const sendToBackend = async () => {
       if (uploadedVideoUrl && uploadedThumbnailUrl && !isRecording) {
+        console.log('🚀 영상 & 썸네일 업로드 완료 → GPT 질문 요청 시작');
         const aiResponse = await postAnswer({
           isFinished: false,
           video: uploadedVideoUrl,
@@ -139,8 +148,10 @@ export default function VideoRecorder() {
         });
 
         if (aiResponse) {
-          console.log('🤖 GPT 응답:', aiResponse);
-          // TODO: aiResponse로 다음 질문 표시 or TTS 연결
+          console.log('🤖 GPT 응답 성공:', aiResponse);
+          // TODO: aiResponse → message나 TTS로 출력
+        } else {
+          console.warn('⚠️ GPT 응답 실패');
         }
       }
     };
