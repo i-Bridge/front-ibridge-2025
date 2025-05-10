@@ -1,11 +1,37 @@
 import { AuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import NaverProvider from 'next-auth/providers/naver';
-import { JWT } from 'next-auth/jwt'; // 🔥 너가 확장한 JWT 타입
+import { JWT } from 'next-auth/jwt';
 
-// ✅ access_token 만료 시 refresh_token으로 새로 갱신하는 함수
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
+    if (token.provider === 'naver') {
+      // ✅ Naver refresh 요청
+      const res = await fetch('https://nid.naver.com/oauth2.0/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: token.refreshToken!,
+          client_id: process.env.NAVER_CLIENT_ID!,
+          client_secret: process.env.NAVER_CLIENT_SECRET!,
+        }),
+      });
+
+      const refreshed = await res.json();
+
+      if (!res.ok || refreshed.error) throw refreshed;
+
+      return {
+        ...token,
+        accessToken: refreshed.access_token,
+        accessTokenExpires:
+          Math.floor(Date.now() / 1000) + (refreshed.expires_in ?? 3600),
+        refreshToken: refreshed.refresh_token ?? token.refreshToken,
+      };
+    }
+
+    // ✅ Google 기본 처리
     const res = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -75,6 +101,7 @@ export const authOptions: AuthOptions = {
             (typeof account.expires_in === 'number'
               ? account.expires_in
               : 3600),
+          provider: account.provider,
         };
       }
 
@@ -93,6 +120,7 @@ export const authOptions: AuthOptions = {
     async session({ session, token }) {
       session.accessToken = token.accessToken;
       session.error = token.error;
+      session.provider = token.provider;
       return session;
     },
   },

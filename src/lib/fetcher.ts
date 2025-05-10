@@ -30,7 +30,7 @@ export async function Fetcher<T = undefined>(
     if (isServer) {
       session = await getServerSession(authOptions);
       if (process.env.NODE_ENV === 'development') {
-        console.log('✅ Server session:', session);  //추후 삭제 예정
+        console.log('✅ Server session:', session); //추후 삭제 예정
       }
     } else {
       session = await new Promise<Session | null>((resolve) => {
@@ -47,6 +47,7 @@ export async function Fetcher<T = undefined>(
     }
 
     const accessToken = session?.accessToken;
+    const provider = session?.provider;
 
     if (!accessToken) {
       throw new Error('로그인이 필요한 요청입니다.');
@@ -58,6 +59,7 @@ export async function Fetcher<T = undefined>(
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
+        Provider: provider, // ✅ 추가
         ...options.headers,
       },
       ...(options.method !== 'GET' && options.data
@@ -68,7 +70,9 @@ export async function Fetcher<T = undefined>(
 
     const responseData = res.data as ApiResponse<T>;
 
-    {/*code, error 오류 처리*/}
+    {
+      /*code, error 오류 처리*/
+    }
 
     if (responseData.code !== '200') {
       console.warn(
@@ -78,9 +82,7 @@ export async function Fetcher<T = undefined>(
     }
 
     return responseData;
-
   } catch (error: unknown) {
-
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
       const errorUrl = error.config?.url;
