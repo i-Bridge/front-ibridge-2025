@@ -52,7 +52,7 @@ export default function VideoRecorder() {
       recorder.onstop = async () => {
         console.log('🛑 녹화 종료됨 → 영상 업로드 시작');
         const blob = new Blob(chunks, { type: 'video/webm' });
-        await uploadToS3(blob);
+        await uploadToS3(blob, 'video');
         mediaStream.getTracks().forEach((track) => track.stop());
       };
 
@@ -98,11 +98,8 @@ export default function VideoRecorder() {
       }
 
       console.log('☁️ Presigned URL 요청 중 (썸네일)');
-      const url = await getPresignedUrl();
+      const url = await getPresignedUrl('thumbnail');
       if (!url) return;
-
-      console.log('📦 썸네일 blob size:', blob.size);
-      console.log('📤 업로드 대상 URL:', url);
 
       try {
         const res = await fetch(url, {
@@ -111,26 +108,23 @@ export default function VideoRecorder() {
         });
 
         if (!res.ok) {
-          const errorText = await res.text(); // 🧠 AWS 오류 메시지 확인
+          const errorText = await res.text();
           console.error('❌ 썸네일 S3 업로드 실패 본문:', errorText);
           throw new Error('썸네일 S3 업로드 실패');
         }
 
-        console.log('✅ 썸네일 업로드 완료:', url);
-        setUploadedThumbnailUrl(url);
+        console.log('✅ 썸네일 업로드 완료');
+        setUploadedThumbnailUrl(url.split('?')[0]);
       } catch (err) {
         console.error('❌ 썸네일 업로드 실패:', err);
       }
     }, 'image/jpeg');
   };
 
-  const uploadToS3 = async (blob: Blob) => {
-    console.log('☁️ Presigned URL 요청 중 (영상)');
-    const url = await getPresignedUrl();
+  const uploadToS3 = async (blob: Blob, type: 'video') => {
+    console.log(`☁️ Presigned URL 요청 중 (${type})`);
+    const url = await getPresignedUrl(type);
     if (!url) return;
-
-    console.log('📦 영상 blob size:', blob.size);
-    console.log('📤 업로드 대상 URL:', url);
 
     try {
       const res = await fetch(url, {
@@ -139,15 +133,15 @@ export default function VideoRecorder() {
       });
 
       if (!res.ok) {
-        const errorText = await res.text(); // 🧠 AWS 오류 메시지 확인
-        console.error('❌ 영상 S3 업로드 실패 본문:', errorText);
-        throw new Error('영상 S3 업로드 실패');
+        const errorText = await res.text();
+        console.error(`❌ ${type} S3 업로드 실패 본문:`, errorText);
+        throw new Error(`${type} S3 업로드 실패`);
       }
 
-      console.log('✅ 영상 업로드 완료:', url);
-      setUploadedVideoUrl(url);
+      console.log(`✅ ${type} 업로드 완료`);
+      setUploadedVideoUrl(url.split('?')[0]);
     } catch (err) {
-      console.error('❌ 영상 업로드 실패:', err);
+      console.error(`❌ ${type} 업로드 실패:`, err);
     }
   };
 
@@ -163,7 +157,6 @@ export default function VideoRecorder() {
 
         if (aiResponse) {
           console.log('🤖 GPT 응답 성공:', aiResponse);
-          // TODO: aiResponse → message나 TTS로 출력
         } else {
           console.warn('⚠️ GPT 응답 실패');
         }
