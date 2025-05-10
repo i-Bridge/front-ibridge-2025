@@ -41,11 +41,15 @@ export default function LoginButton() {
   const sendUserDataToBackend = async () => {
     setStatus('checking');
     try {
+      const encodedName = session?.user?.name
+        ? Buffer.from(session.user.name, 'utf-8').toString('base64')
+        : '';
+
       const signinRes = await Fetcher<{ first: boolean }>('/start/signin', {
         method: 'POST',
         data: {
-          name: session?.user?.name,
           email: session?.user?.email,
+          name: encodedName, // ✅ 인코딩된 name만 전달
         },
       });
 
