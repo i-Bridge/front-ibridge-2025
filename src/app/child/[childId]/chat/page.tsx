@@ -124,6 +124,7 @@ export default function ReplyPage() {
           </>
         ) : (
           <VideoRecorder
+            subjectId={completedSteps + 1} // ✅ 여기에 subjectId 전달
             onAIResponse={(ai: string) => {
               setNextQuestion(ai);
               fakeTTSPlayback();

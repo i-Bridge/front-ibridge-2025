@@ -2,7 +2,6 @@
 
 import { useRef, useState, useEffect } from 'react';
 import { usePresignedUrl } from '@/hooks/s3/usePresignedUrl';
-import { useAnswerAI } from '@/hooks/chat/useAnswerAI';
 import { useParams } from 'next/navigation';
 
 export default function VideoRecorder({
@@ -15,26 +14,22 @@ export default function VideoRecorder({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
 
   const [isRecording, setIsRecording] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isThumbnailCaptured, setIsThumbnailCaptured] = useState(false);
-  const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
-  const [uploadedThumbnailUrl, setUploadedThumbnailUrl] = useState<
-    string | null
-  >(null);
   const [recognizedText, setRecognizedText] = useState('');
 
-  const { getPresignedUrl } = usePresignedUrl();
-  const { postAnswer } = useAnswerAI();
+  const [answerId, setAnswerId] = useState<number | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+
   const { childId } = useParams();
+  const { getPresignedUrl } = usePresignedUrl();
 
   const startRecording = async () => {
-    if (mediaRecorderRef.current) {
-      console.warn('⚠️ 이미 녹화 중입니다.');
-      return;
-    }
+    if (mediaRecorderRef.current) return;
 
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -43,9 +38,10 @@ export default function VideoRecorder({
       });
       setStream(mediaStream);
       setIsThumbnailCaptured(false);
-      setUploadedVideoUrl(null);
-      setUploadedThumbnailUrl(null);
       setRecognizedText('');
+      setAnswerId(null);
+      setVideoUrl(null);
+      setThumbnailUrl(null);
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -61,7 +57,14 @@ export default function VideoRecorder({
 
       recorder.onstop = async () => {
         const blob = new Blob(chunks, { type: 'video/webm' });
-        await uploadToS3(blob, 'video');
+
+        // 👉 presigned URL 요청 및 업로드
+        if (!answerId) return;
+        const presigned = await getPresignedUrl('video', answerId);
+        if (!presigned) return;
+        await fetch(presigned, { method: 'PUT', body: blob });
+        setVideoUrl(presigned.split('?')[0]);
+
         mediaStream.getTracks().forEach((track) => track.stop());
         stopSTT();
       };
@@ -78,7 +81,7 @@ export default function VideoRecorder({
         }
       }, 3000);
     } catch (err) {
-      console.error('❌ 녹화 시작 실패:', err);
+      console.error('녹화 실패:', err);
     }
   };
 
@@ -89,7 +92,8 @@ export default function VideoRecorder({
 
   const startSTT = () => {
     const SpeechRecognition =
-      window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert('이 브라우저는 음성 인식을 지원하지 않습니다.');
       return;
@@ -100,7 +104,7 @@ export default function VideoRecorder({
     recognition.interimResults = true;
     recognition.continuous = true;
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: any) => {
       let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         finalTranscript += event.results[i][0].transcript;
@@ -108,8 +112,8 @@ export default function VideoRecorder({
       setRecognizedText(finalTranscript);
     };
 
-    recognition.onerror = (e) => {
-      console.error('🎤 음성 인식 오류:', e);
+    recognition.onerror = (e: any) => {
+      console.error('음성 인식 오류:', e);
     };
 
     recognitionRef.current = recognition;
@@ -121,7 +125,7 @@ export default function VideoRecorder({
   };
 
   const captureAndUploadThumbnail = async () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    if (!videoRef.current || !canvasRef.current || !answerId) return;
 
     const canvas = canvasRef.current;
     const video = videoRef.current;
@@ -133,43 +137,52 @@ export default function VideoRecorder({
 
     canvas.toBlob(async (blob) => {
       if (!blob) return;
-      const url = await getPresignedUrl('thumbnail');
-      if (!url) return;
-      const res = await fetch(url, { method: 'PUT', body: blob });
-      if (res.ok) setUploadedThumbnailUrl(url.split('?')[0]);
+      const presigned = await getPresignedUrl('image', answerId);
+      if (!presigned) return;
+      await fetch(presigned, { method: 'PUT', body: blob });
+      setThumbnailUrl(presigned.split('?')[0]);
     }, 'image/jpeg');
   };
 
-  const uploadToS3 = async (blob: Blob, type: 'video') => {
-    const url = await getPresignedUrl(type);
-    if (!url) return;
-    const res = await fetch(url, { method: 'PUT', body: blob });
-    if (res.ok) setUploadedVideoUrl(url.split('?')[0]);
-  };
-
   useEffect(() => {
-    const sendToBackend = async () => {
+    const sendAnswer = async () => {
       if (
-        uploadedVideoUrl &&
-        uploadedThumbnailUrl &&
+        !answerId &&
+        recognizedText.trim().length > 0 &&
         !isRecording &&
-        recognizedText &&
         childId
       ) {
-        const aiResponse = await postAnswer(
-          {
-            subjectId: subjectId,
-            text: recognizedText,
-          },
-          childId as string,
-        );
-
-        if (aiResponse) onAIResponse(aiResponse);
+        const res = await fetch(`/child/${childId}/answer`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subjectId, text: recognizedText }),
+        });
+        const json = await res.json();
+        if (json?.data?.id) {
+          setAnswerId(json.data.id);
+          onAIResponse(json.data.ai);
+        }
       }
     };
+    sendAnswer();
+  }, [recognizedText, isRecording]);
 
-    sendToBackend();
-  }, [uploadedVideoUrl, uploadedThumbnailUrl, isRecording]);
+  useEffect(() => {
+    const notifyUploadComplete = async () => {
+      if (videoUrl && thumbnailUrl && answerId && childId) {
+        await fetch(`/child/${childId}/uploaded`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: answerId,
+            video: videoUrl,
+            image: thumbnailUrl,
+          }),
+        });
+      }
+    };
+    notifyUploadComplete();
+  }, [videoUrl, thumbnailUrl, answerId]);
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -183,7 +196,6 @@ export default function VideoRecorder({
         <button
           onClick={startRecording}
           className="px-6 py-3 bg-green-500 text-white rounded-lg"
-          disabled={isRecording}
         >
           녹화 시작
         </button>

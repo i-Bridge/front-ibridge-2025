@@ -3,27 +3,36 @@
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 
-type UploadType = 'video' | 'thumbnail';
+type UploadType = 'video' | 'image';
 
 export const usePresignedUrl = () => {
   const { childId } = useParams();
 
-  const getPresignedUrl = async (type: UploadType): Promise<string | null> => {
+  /**
+   * @param type - 'video' 또는 'image' (썸네일)
+   * @param id - 답변 등록 시 받은 id
+   */
+  const getPresignedUrl = async (
+    type: UploadType,
+    id: number,
+  ): Promise<string | null> => {
     if (!childId) {
       console.error('❌ childId 없음');
       return null;
     }
 
-    const endpoint =
-      type === 'video'
-        ? `/child/${childId}/getURL/video`
-        : `/child/${childId}/getURL/image`;
-
     try {
-      const { data, isSuccess } = await Fetcher<{ url: string }>(endpoint, {
-        method: 'GET',
-        skipAuthHeader: true,
-      });
+      const { data, isSuccess } = await Fetcher<{ url: string }>(
+        `/child/${childId}/getURL`,
+        {
+          method: 'POST',
+          data: {
+            type,
+            id,
+          },
+          skipAuthHeader: true,
+        },
+      );
 
       if (!isSuccess || !data?.url) {
         console.error('❌ presigned URL 응답 실패:', data);
