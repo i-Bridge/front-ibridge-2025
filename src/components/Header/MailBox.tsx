@@ -9,12 +9,34 @@ interface Notice {
   type: 1 | 2 | 3;
   senderId: number | null;
   senderName: string | null;
-  isAccept: boolean;
+  accept: boolean;
   time: string;
 }
 
 interface NoticeData {
   notices: Notice[];
+}
+
+// ✅ 공통 fetch 함수로 분리
+async function fetchNoticeData(
+  setNoticeData: (data: NoticeData | null) => void,
+  setError: (msg: string | null) => void,
+  setLoading?: (loading: boolean) => void
+) {
+  try {
+    const res = await Fetcher<NoticeData>('/parent/notice');
+    if (res && res.data) {
+      setNoticeData(res.data);
+    } else {
+      setNoticeData(null);
+    }
+    console.log('💓받아온 NoticeData:', res); //추후 삭제 예정
+  } catch (err) {
+    console.error('요청 중 오류 발생:', err);
+    setError('⚠️ 알림을 불러오는 중 오류가 발생했습니다.');
+  } finally {
+    if (setLoading) setLoading(false);
+  }
 }
 
 export default function MailBox() {
@@ -33,14 +55,16 @@ export default function MailBox() {
     });
 
     if (res.isSuccess) {
+      console.log('수락 성공:', res.message);
       router.refresh();
+      await fetchNoticeData(setNoticeData, setError); // ✅ 다시 불러오기
     } else {
       console.error('수락 실패:', res.message);
     }
   }
 
   async function handleDecline(senderId: number | null) {
-    if (!senderId) return; // senderId 없으면 요청 안 보냄
+    if (!senderId) return;
 
     console.log('거절하는 parentId:', senderId);
 
@@ -49,36 +73,17 @@ export default function MailBox() {
       data: { parentId: senderId },
     });
 
-    console.log('거절 요청 응답:', res); // 추후 삭제 예정
-
     if (res.isSuccess) {
+      await fetchNoticeData(setNoticeData, setError); // ✅ 다시 불러오기
       router.refresh();
-    }else {
+    } else {
       console.error('거절 실패:', res.message);
     }
   }
 
   useEffect(() => {
-    async function fetchNotice() {
-      try {
-        const res = await Fetcher<NoticeData>('/parent/notice');
-        if (res && res.data) {
-          setNoticeData(res.data);
-        } else {
-          setNoticeData(null);
-        }
-        console.log('💓받아온 NoticeData:', res); //추후 삭제 예정
-      } catch (err) {
-        console.error('요청 중 오류 발생:', err);
-        setError('⚠️ 알림을 불러오는 중 오류가 발생했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchNotice();
+    fetchNoticeData(setNoticeData, setError, setLoading);
   }, []);
-
 
   if (loading) {
     return <div>🔄 로딩 중입니다...</div>;
@@ -87,20 +92,34 @@ export default function MailBox() {
   if (error) {
     return <div className="text-red-500">{error}</div>;
   }
-  
+
   return (
     <div className="relative inline-block text-left">
       {/* 드롭다운 버튼 */}
-      <button
-        onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-2 px-3 py-2"
+          <button
+      onClick={() => setOpen((prev) => !prev)}
+      className="flex items-center gap-2 "
+    >
+      {/* SVG 아이콘을 직접 넣은 부분 */}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth="1.5"
+        stroke="currentColor"
+        className="w-10 h-10  p-1 mt-1"
       >
-        <span className="text-xl">📬</span>
-      </button>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H6.911a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661Z"
+        />
+      </svg>
+    </button>
 
       {/* 드롭다운 내용 */}
       {open && (
-        <div className="absolute z-10 mt-2 w-96 right-0 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto divide-y">
+        <div className="absolute z-[-1] mt-2 w-96 right-0 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto divide-y">
           {loading ? (
             <div className="p-4 text-sm text-gray-500">로딩 중...</div>
           ) : error ? (
