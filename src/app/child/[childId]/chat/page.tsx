@@ -16,6 +16,7 @@ export default function ReplyPage() {
   const [message, setMessage] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
+  const [nextQuestion, setNextQuestion] = useState<string | null>(null);
   const fullText = '이 질문에 대해 어떻게 생각하나요?';
 
   // 타이핑 효과
@@ -91,7 +92,7 @@ export default function ReplyPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-xl font-semibold">{displayText}</p>
+          <p className="text-xl font-semibold">{nextQuestion || displayText}</p>
         </motion.div>
       )}
 
@@ -103,7 +104,7 @@ export default function ReplyPage() {
               onClick={() => {
                 setIsQuestionVisible(true);
                 setMessage(fullText);
-                fakeTTSPlayback(); // 나중에 실제 TTS 재생으로 대체
+                fakeTTSPlayback();
               }}
               className="w-64 px-8 py-6 text-lg bg-green-500 text-white rounded-lg shadow-lg"
             >
@@ -114,7 +115,7 @@ export default function ReplyPage() {
                 setIsQuestionVisible(true);
                 setMessage('얘기해봐!');
                 setDisplayText('얘기해봐!');
-                fakeTTSPlayback(); // 나중에 실제 TTS 재생으로 대체
+                fakeTTSPlayback();
               }}
               className="w-64 px-8 py-6 text-lg bg-blue-500 text-white rounded-lg shadow-lg"
             >
@@ -122,7 +123,12 @@ export default function ReplyPage() {
             </button>
           </>
         ) : (
-          <VideoRecorder />
+          <VideoRecorder
+            onAIResponse={(ai: string) => {
+              setNextQuestion(ai);
+              fakeTTSPlayback();
+            }}
+          />
         )}
       </div>
 
@@ -142,6 +148,7 @@ export default function ReplyPage() {
             onClick={() => {
               setIsQuestionVisible(false);
               setDisplayText('');
+              setNextQuestion(null);
             }}
             className="px-6 py-4 bg-red-500 text-white text-lg rounded-lg"
           >
