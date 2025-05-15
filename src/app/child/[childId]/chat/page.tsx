@@ -1,14 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useReplyStepsStore } from '@/store/child/replyStepStore';
 import VideoRecorder from '@/components/Recorder/VideoRecorder';
 import { motion } from 'framer-motion';
 
 export default function ReplyPage() {
   const { completedSteps, completeStep } = useReplyStepsStore();
-  const router = useRouter();
 
   const [displayText, setDisplayText] = useState('');
   const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -17,9 +15,9 @@ export default function ReplyPage() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
   const [nextQuestion, setNextQuestion] = useState<string | null>(null);
+  const [lastAIResponse, setLastAIResponse] = useState<string | null>(null);
   const fullText = '이 질문에 대해 어떻게 생각하나요?';
 
-  // 타이핑 효과
   useEffect(() => {
     if (!isQuestionVisible || message !== fullText) return;
 
@@ -38,7 +36,6 @@ export default function ReplyPage() {
     return () => clearInterval(interval);
   }, [isQuestionVisible, message]);
 
-  // 말하는 중 입 애니메이션
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isSpeaking) {
@@ -55,15 +52,17 @@ export default function ReplyPage() {
     setIsImageLoaded(true);
   };
 
-  const handleComplete = () => {
-    completeStep();
-    router.push('/child/video');
-  };
-
-  // TTS 테스트용 (3초 동안 입 애니메이션)
   const fakeTTSPlayback = () => {
     setIsSpeaking(true);
     setTimeout(() => setIsSpeaking(false), 3000);
+  };
+
+  const handleNextStep = () => {
+    completeStep();
+    setMessage('');
+    setDisplayText('');
+    setNextQuestion(lastAIResponse ?? null);
+    setLastAIResponse(null);
   };
 
   return (
@@ -124,26 +123,26 @@ export default function ReplyPage() {
           </>
         ) : (
           <VideoRecorder
-            subjectId={completedSteps + 1} // ✅ 여기에 subjectId 전달
+            subjectId={completedSteps + 1}
             onAIResponse={(ai: string) => {
-              setNextQuestion(ai);
+              setLastAIResponse(ai);
               fakeTTSPlayback();
             }}
           />
         )}
       </div>
 
-      {/* 진행 상황 및 완료 버튼 */}
+      {/* 진행 상황 및 다음 질문 버튼 */}
       {isQuestionVisible && (
         <div className="absolute bottom-20 flex flex-col items-center gap-6">
           <p className="text-xl font-semibold">
             현재 단계: {completedSteps + 1} / 5
           </p>
           <button
-            onClick={handleComplete}
+            onClick={handleNextStep}
             className="px-6 py-4 bg-blue-500 text-white text-lg rounded-lg"
           >
-            완료
+            다음 질문
           </button>
           <button
             onClick={() => {
