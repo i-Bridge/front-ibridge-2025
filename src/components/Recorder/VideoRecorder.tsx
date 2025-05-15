@@ -32,6 +32,7 @@ export default function VideoRecorder({
     if (mediaRecorderRef.current) return;
 
     try {
+      console.log('🎬 녹화 시작 요청됨');
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
@@ -56,6 +57,7 @@ export default function VideoRecorder({
       };
 
       recorder.onstop = async () => {
+        console.log('🛑 녹화 종료됨 → 영상 업로드 시작');
         const blob = new Blob(chunks, { type: 'video/webm' });
         await uploadToS3(blob, 'video');
         mediaStream.getTracks().forEach((track) => track.stop());
@@ -69,6 +71,7 @@ export default function VideoRecorder({
 
       setTimeout(() => {
         if (!isThumbnailCaptured) {
+          console.log('📸 3초 경과 → 썸네일 캡처 시도');
           captureAndUploadThumbnail();
           setIsThumbnailCaptured(true);
         }
@@ -79,11 +82,13 @@ export default function VideoRecorder({
   };
 
   const stopRecording = () => {
+    console.log('🛑 녹화 중지 요청됨');
     mediaRecorderRef.current?.stop();
     setIsRecording(false);
   };
 
   const startSTT = () => {
+    console.log('🎤 음성 인식 시작');
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
@@ -102,6 +107,7 @@ export default function VideoRecorder({
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         finalTranscript += event.results[i][0].transcript;
       }
+      console.log('📝 인식된 텍스트:', finalTranscript);
       setRecognizedText(finalTranscript);
     };
 
@@ -114,12 +120,14 @@ export default function VideoRecorder({
   };
 
   const stopSTT = () => {
+    console.log('🛑 음성 인식 중단');
     recognitionRef.current?.stop();
   };
 
   const captureAndUploadThumbnail = async () => {
     if (!videoRef.current || !canvasRef.current) return;
 
+    console.log('🖼 썸네일 캡처 중...');
     const canvas = canvasRef.current;
     const video = videoRef.current;
     canvas.width = video.videoWidth;
@@ -131,6 +139,7 @@ export default function VideoRecorder({
     canvas.toBlob(async (blob) => {
       if (!blob || !answerId) return;
 
+      console.log('☁️ 썸네일 Presigned URL 요청');
       const { data } = await Fetcher<{ url: string }>(
         `/child/${childId}/getURL`,
         {
@@ -140,16 +149,26 @@ export default function VideoRecorder({
         },
       );
 
-      if (!data?.url) return;
+      if (!data?.url) {
+        console.error('❌ 썸네일 Presigned URL 획득 실패');
+        return;
+      }
 
       const res = await fetch(data.url, { method: 'PUT', body: blob });
-      if (res.ok) setUploadedThumbnailUrl(data.url.split('?')[0]);
+      if (res.ok) {
+        const s3Url = data.url.split('?')[0];
+        console.log('✅ 썸네일 S3 업로드 완료:', s3Url);
+        setUploadedThumbnailUrl(s3Url);
+      } else {
+        console.error('❌ 썸네일 S3 업로드 실패');
+      }
     }, 'image/jpeg');
   };
 
   const uploadToS3 = async (blob: Blob, type: 'video') => {
     if (!answerId) return;
 
+    console.log('☁️ 영상 Presigned URL 요청');
     const { data } = await Fetcher<{ url: string }>(
       `/child/${childId}/getURL`,
       {
@@ -159,10 +178,19 @@ export default function VideoRecorder({
       },
     );
 
-    if (!data?.url) return;
+    if (!data?.url) {
+      console.error('❌ 영상 Presigned URL 획득 실패');
+      return;
+    }
 
     const res = await fetch(data.url, { method: 'PUT', body: blob });
-    if (res.ok) setUploadedVideoUrl(data.url.split('?')[0]);
+    if (res.ok) {
+      const s3Url = data.url.split('?')[0];
+      console.log('✅ 영상 S3 업로드 완료:', s3Url);
+      setUploadedVideoUrl(s3Url);
+    } else {
+      console.error('❌ 영상 S3 업로드 실패');
+    }
   };
 
   useEffect(() => {
@@ -175,6 +203,7 @@ export default function VideoRecorder({
         childId &&
         subjectId
       ) {
+        console.log('📤 텍스트 응답 전송 중...');
         const { data, isSuccess } = await Fetcher<{
           id: number;
           ai: string;
@@ -184,11 +213,11 @@ export default function VideoRecorder({
         });
 
         if (isSuccess && data) {
+          console.log('✅ 텍스트 응답 저장 완료. answerId:', data.id);
           setAnswerId(data.id);
           onAIResponse(data.ai);
 
-          // 업로드 완료 알림 전송
-          await Fetcher(`/child/${childId}/uploaded`, {
+          const uploadRes = await Fetcher(`/child/${childId}/uploaded`, {
             method: 'POST',
             data: {
               id: data.id,
@@ -196,6 +225,12 @@ export default function VideoRecorder({
               image: uploadedThumbnailUrl,
             },
           });
+
+          if (uploadRes.isSuccess) {
+            console.log('✅ 백엔드에 업로드 완료 알림 전송 성공');
+          } else {
+            console.warn('⚠️ 업로드 완료 알림 실패');
+          }
         }
       }
     };
