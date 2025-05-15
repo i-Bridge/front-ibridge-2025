@@ -1,8 +1,8 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { usePresignedUrl } from '@/hooks/s3/usePresignedUrl';
 import { useParams } from 'next/navigation';
+import { Fetcher } from '@/lib/fetcher';
 
 export default function VideoRecorder({
   subjectId,
@@ -19,14 +19,14 @@ export default function VideoRecorder({
   const [isRecording, setIsRecording] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isThumbnailCaptured, setIsThumbnailCaptured] = useState(false);
+  const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
+  const [uploadedThumbnailUrl, setUploadedThumbnailUrl] = useState<
+    string | null
+  >(null);
   const [recognizedText, setRecognizedText] = useState('');
-
   const [answerId, setAnswerId] = useState<number | null>(null);
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
 
   const { childId } = useParams();
-  const { getPresignedUrl } = usePresignedUrl();
 
   const startRecording = async () => {
     if (mediaRecorderRef.current) return;
@@ -38,10 +38,10 @@ export default function VideoRecorder({
       });
       setStream(mediaStream);
       setIsThumbnailCaptured(false);
+      setUploadedVideoUrl(null);
+      setUploadedThumbnailUrl(null);
       setRecognizedText('');
       setAnswerId(null);
-      setVideoUrl(null);
-      setThumbnailUrl(null);
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -57,14 +57,7 @@ export default function VideoRecorder({
 
       recorder.onstop = async () => {
         const blob = new Blob(chunks, { type: 'video/webm' });
-
-        // 👉 presigned URL 요청 및 업로드
-        if (!answerId) return;
-        const presigned = await getPresignedUrl('video', answerId);
-        if (!presigned) return;
-        await fetch(presigned, { method: 'PUT', body: blob });
-        setVideoUrl(presigned.split('?')[0]);
-
+        await uploadToS3(blob, 'video');
         mediaStream.getTracks().forEach((track) => track.stop());
         stopSTT();
       };
@@ -81,7 +74,7 @@ export default function VideoRecorder({
         }
       }, 3000);
     } catch (err) {
-      console.error('녹화 실패:', err);
+      console.error('❌ 녹화 시작 실패:', err);
     }
   };
 
@@ -113,7 +106,7 @@ export default function VideoRecorder({
     };
 
     recognition.onerror = (e: any) => {
-      console.error('음성 인식 오류:', e);
+      console.error('🎤 음성 인식 오류:', e);
     };
 
     recognitionRef.current = recognition;
@@ -125,7 +118,7 @@ export default function VideoRecorder({
   };
 
   const captureAndUploadThumbnail = async () => {
-    if (!videoRef.current || !canvasRef.current || !answerId) return;
+    if (!videoRef.current || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
     const video = videoRef.current;
@@ -136,53 +129,79 @@ export default function VideoRecorder({
     ctx?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
     canvas.toBlob(async (blob) => {
-      if (!blob) return;
-      const presigned = await getPresignedUrl('image', answerId);
-      if (!presigned) return;
-      await fetch(presigned, { method: 'PUT', body: blob });
-      setThumbnailUrl(presigned.split('?')[0]);
+      if (!blob || !answerId) return;
+
+      const { data } = await Fetcher<{ url: string }>(
+        `/child/${childId}/getURL`,
+        {
+          method: 'POST',
+          data: { type: 'image', id: answerId },
+          skipAuthHeader: true,
+        },
+      );
+
+      if (!data?.url) return;
+
+      const res = await fetch(data.url, { method: 'PUT', body: blob });
+      if (res.ok) setUploadedThumbnailUrl(data.url.split('?')[0]);
     }, 'image/jpeg');
   };
 
+  const uploadToS3 = async (blob: Blob, type: 'video') => {
+    if (!answerId) return;
+
+    const { data } = await Fetcher<{ url: string }>(
+      `/child/${childId}/getURL`,
+      {
+        method: 'POST',
+        data: { type: 'video', id: answerId },
+        skipAuthHeader: true,
+      },
+    );
+
+    if (!data?.url) return;
+
+    const res = await fetch(data.url, { method: 'PUT', body: blob });
+    if (res.ok) setUploadedVideoUrl(data.url.split('?')[0]);
+  };
+
   useEffect(() => {
-    const sendAnswer = async () => {
+    const sendToBackend = async () => {
       if (
-        !answerId &&
-        recognizedText.trim().length > 0 &&
+        uploadedVideoUrl &&
+        uploadedThumbnailUrl &&
         !isRecording &&
-        childId
+        recognizedText &&
+        childId &&
+        subjectId
       ) {
-        const res = await fetch(`/child/${childId}/answer`, {
+        const { data, isSuccess } = await Fetcher<{
+          id: number;
+          ai: string;
+        }>(`/child/${childId}/answer`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subjectId, text: recognizedText }),
+          data: { subjectId, text: recognizedText },
         });
-        const json = await res.json();
-        if (json?.data?.id) {
-          setAnswerId(json.data.id);
-          onAIResponse(json.data.ai);
+
+        if (isSuccess && data) {
+          setAnswerId(data.id);
+          onAIResponse(data.ai);
+
+          // 업로드 완료 알림 전송
+          await Fetcher(`/child/${childId}/uploaded`, {
+            method: 'POST',
+            data: {
+              id: data.id,
+              video: uploadedVideoUrl,
+              image: uploadedThumbnailUrl,
+            },
+          });
         }
       }
     };
-    sendAnswer();
-  }, [recognizedText, isRecording]);
 
-  useEffect(() => {
-    const notifyUploadComplete = async () => {
-      if (videoUrl && thumbnailUrl && answerId && childId) {
-        await fetch(`/child/${childId}/uploaded`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: answerId,
-            video: videoUrl,
-            image: thumbnailUrl,
-          }),
-        });
-      }
-    };
-    notifyUploadComplete();
-  }, [videoUrl, thumbnailUrl, answerId]);
+    sendToBackend();
+  }, [uploadedVideoUrl, uploadedThumbnailUrl, isRecording]);
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -196,6 +215,7 @@ export default function VideoRecorder({
         <button
           onClick={startRecording}
           className="px-6 py-3 bg-green-500 text-white rounded-lg"
+          disabled={isRecording}
         >
           녹화 시작
         </button>
