@@ -203,7 +203,10 @@ export default function VideoRecorder({
         childId &&
         subjectId
       ) {
-        console.log('📤 텍스트 응답 전송 중...');
+        console.log('📤 백엔드로 전송 시작');
+        console.log('📝 전송할 텍스트:', recognizedText);
+        console.log('🎯 subjectId:', subjectId);
+
         const { data, isSuccess } = await Fetcher<{
           id: number;
           ai: string;
@@ -211,12 +214,12 @@ export default function VideoRecorder({
           method: 'POST',
           data: { subjectId, text: recognizedText },
         });
-
+        console.log('📥 /answer API 응답:', { isSuccess, data });
         if (isSuccess && data) {
           console.log('✅ 텍스트 응답 저장 완료. answerId:', data.id);
           setAnswerId(data.id);
           onAIResponse(data.ai);
-
+          console.log('📤 S3 업로드 완료 알림 전송 시작');
           const uploadRes = await Fetcher(`/child/${childId}/uploaded`, {
             method: 'POST',
             data: {
