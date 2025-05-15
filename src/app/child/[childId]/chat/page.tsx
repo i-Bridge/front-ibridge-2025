@@ -46,15 +46,16 @@ export default function ReplyPage() {
     if (!isQuestionVisible || message !== homeQuestion) return;
 
     let index = 0;
-    setDisplayText('');
+    let currentText = '';
 
     const interval = setInterval(() => {
-      setDisplayText((prev) => {
-        const nextText = prev + homeQuestion[index];
+      if (index < homeQuestion.length) {
+        currentText += homeQuestion[index];
+        setDisplayText(currentText);
         index++;
-        if (index >= homeQuestion.length) clearInterval(interval);
-        return nextText;
-      });
+      } else {
+        clearInterval(interval);
+      }
     }, 100);
 
     return () => clearInterval(interval);
