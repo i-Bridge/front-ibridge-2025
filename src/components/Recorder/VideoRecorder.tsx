@@ -7,9 +7,11 @@ import { Fetcher } from '@/lib/fetcher';
 export default function VideoRecorder({
   subjectId,
   onAIResponse,
+  onFinished,
 }: {
   subjectId: number;
   onAIResponse: (message: string) => void;
+  onFinished: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -62,6 +64,7 @@ export default function VideoRecorder({
         await uploadToS3(blob, 'video');
         mediaStream.getTracks().forEach((track) => track.stop());
         stopSTT();
+        onFinished(); // ✅ 녹화 완료 알림
       };
 
       mediaRecorderRef.current = recorder;
@@ -219,8 +222,8 @@ export default function VideoRecorder({
           console.log('✅ 텍스트 응답 저장 완료. answerId:', data.id);
           setAnswerId(data.id);
           onAIResponse(data.ai);
-          console.log('📤 S3 업로드 완료 알림 전송 시작');
-          const uploadRes = await Fetcher(`/child/${childId}/uploaded`, {
+
+          await Fetcher(`/child/${childId}/uploaded`, {
             method: 'POST',
             data: {
               id: data.id,
@@ -228,12 +231,6 @@ export default function VideoRecorder({
               image: uploadedThumbnailUrl,
             },
           });
-
-          if (uploadRes.isSuccess) {
-            console.log('✅ 백엔드에 업로드 완료 알림 전송 성공');
-          } else {
-            console.warn('⚠️ 업로드 완료 알림 실패');
-          }
         }
       }
     };

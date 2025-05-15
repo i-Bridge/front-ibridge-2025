@@ -21,6 +21,7 @@ export default function ReplyPage() {
   const [lastAIResponse, setLastAIResponse] = useState<string | null>(null);
   const [homeQuestion, setHomeQuestion] = useState('');
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isRecordingFinished, setIsRecordingFinished] = useState(false); // ✅ 추가
 
   // ✅ 첫 질문 불러오기
   useEffect(() => {
@@ -76,9 +77,22 @@ export default function ReplyPage() {
 
   const handleImageLoad = () => setIsImageLoaded(true);
 
-  const fakeTTSPlayback = () => {
+  // ✅ TTS 기능
+  const speak = (text: string) => {
+    if (!text || typeof window === 'undefined') return;
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ko-KR';
+    utterance.pitch = 1.4;
+    utterance.rate = 0.8;
+
     setIsSpeaking(true);
-    setTimeout(() => setIsSpeaking(false), 3000);
+    utterance.onend = () => {
+      setIsSpeaking(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
   };
 
   const handleNextStep = () => {
@@ -86,7 +100,9 @@ export default function ReplyPage() {
     setMessage('');
     setDisplayText('');
     setNextQuestion(lastAIResponse ?? null);
+    if (lastAIResponse) speak(lastAIResponse);
     setLastAIResponse(null);
+    setIsRecordingFinished(false); // ✅ 초기화
   };
 
   return (
@@ -128,7 +144,7 @@ export default function ReplyPage() {
                 onClick={() => {
                   setIsQuestionVisible(true);
                   setMessage(homeQuestion);
-                  fakeTTSPlayback();
+                  speak(homeQuestion); // ✅ 읽기
                 }}
                 className="w-64 px-8 py-6 text-lg bg-green-500 text-white rounded-lg shadow-lg"
               >
@@ -140,7 +156,7 @@ export default function ReplyPage() {
                 setIsQuestionVisible(true);
                 setMessage('얘기해봐!');
                 setDisplayText('얘기해봐!');
-                fakeTTSPlayback();
+                speak('얘기해봐!');
               }}
               className="w-64 px-8 py-6 text-lg bg-blue-500 text-white rounded-lg shadow-lg"
             >
@@ -152,14 +168,17 @@ export default function ReplyPage() {
             subjectId={completedSteps + 1}
             onAIResponse={(ai: string) => {
               setLastAIResponse(ai);
-              fakeTTSPlayback();
+              speak(ai); // ✅ AI 응답도 읽기
+            }}
+            onFinished={() => {
+              setIsRecordingFinished(true); // ✅ 녹화 완료 시점
             }}
           />
         )}
       </div>
 
-      {/* 다음 질문 버튼 (답변 완료 시에만 노출) */}
-      {isQuestionVisible && lastAIResponse && (
+      {/* 다음 질문 버튼 (녹화 완료 후 표시) */}
+      {isQuestionVisible && isRecordingFinished && (
         <div className="absolute bottom-20 flex flex-col items-center gap-6">
           <p className="text-xl font-semibold">
             현재 단계: {completedSteps + 1} / 5
@@ -175,6 +194,8 @@ export default function ReplyPage() {
               setIsQuestionVisible(false);
               setDisplayText('');
               setNextQuestion(null);
+              setIsRecordingFinished(false); // ✅ 초기화
+              window.speechSynthesis.cancel();
             }}
             className="px-6 py-4 bg-red-500 text-white text-lg rounded-lg"
           >
