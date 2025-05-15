@@ -45,30 +45,29 @@ const ParentsCard = ({
   onInvite: () => void;
 }) => {
   return (
-
-
-      <div className="flex flex-col items-center">
-        {parent2Name ? (
-          <>
-            <Image
-              src={parent2Image } // 여기 디폴트 사진 넣어주세요
-              alt={parent2Name?? ' '}
-              width={50}
-              height={50}
-              className="rounded-full"
-            />
-            <p className="text-sm font-semibold">{parent2Name}</p>
-          </>
-        ) : (
-          <button
-            onClick={onInvite}
-            className="py-2 px-4 bg-purple-300 text-white font-semibold rounded-md hover:bg-purple-400 text-sm"
-          >
-            + 배우자 초대
-          </button>
-        )}
-      </div>
-
+    <div className="flex justify-center gap-6 flex-wrap items-center w-auto bg-white p-4 rounded-lg shadow-md border">
+      {parents.map((parent) => (
+        <div key={parent.parentId} className="flex flex-col items-center">
+          <Image
+            src={
+              parent.parentGender === 0 ? '/images/boy.svg' : '/images/girl.svg'
+            }
+            alt={parent.parentName}
+            width={50}
+            height={50}
+            className="rounded-full"
+          />
+          <p className="text-sm font-semibold">{parent.parentName}</p>
+        </div>
+      ))}
+      {parents.length < 2 && (
+        <button
+          onClick={onInvite}
+          className="py-2 px-4 bg-purple-300 text-white font-semibold rounded-md hover:bg-purple-400 text-sm"
+        >
+          + 배우자 초대
+        </button>
+      )}
     </div>
   );
 };
