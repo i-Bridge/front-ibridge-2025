@@ -1,4 +1,3 @@
-'use client';
 import { useSetupStore } from '@/store/setup/setupStore';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -9,7 +8,7 @@ const Step2 = () => {
     { name: string; gender: number; birth: string }[]
   >([]);
 
-  const { nextChild, currentChildIndex, childrenCount, familyName } = useSetupStore();
+  const { nextChild, currentChildIndex, childrenCount, familyName, setStep } = useSetupStore();
   const router = useRouter();
 
   const [name, setName] = useState('');
@@ -37,7 +36,7 @@ const Step2 = () => {
       try {
         const res = await Fetcher('/start/signup/new', {
           method: 'POST',
-          data: { familyName,children: updatedChildren },
+          data: { familyName, children: updatedChildren },
         });
         console.log('서버 전송:', res);
         router.push('/profile');
@@ -49,13 +48,13 @@ const Step2 = () => {
     }
   };
 
-  return (
-    <div className="w-full flex flex-col gap-4">
-      <h2 className="text-center">
-        자녀 정보 입력 ({currentChildIndex + 1}/{childrenCount})
-      </h2>
+  const handlePrevious = () => {
+    setStep(1); // step 1로 돌아가기
+  };
 
-      <div className="flex justify-between items-center">
+  return (
+    <div className="w-full flex flex-col gap-4 ">
+      <div className="flex justify-between items-center px-4 py-8">
         <span>이름</span>
         <input
           type="text"
@@ -101,12 +100,21 @@ const Step2 = () => {
         />
       </div>
 
-      <button
-        onClick={handleNext}
-        className="bg-blue-500 text-white px-4 py-2 mt-4 self-end"
-      >
-        {currentChildIndex + 1 === childrenCount ? '완료' : '다음'}
-      </button>
+      <div className="flex justify-between gap-4 mt-4">
+        <button
+          onClick={handlePrevious}
+          className="bg-gray-500 text-white px-4 py-2"
+        >
+          이전
+        </button>
+
+        <button
+          onClick={handleNext}
+          className="bg-blue-500 text-white px-4 py-2"
+        >
+          {currentChildIndex + 1 === childrenCount ? '완료' : '다음'}
+        </button>
+      </div>
     </div>
   );
 };

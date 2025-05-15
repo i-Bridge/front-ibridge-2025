@@ -6,6 +6,8 @@ import Weekly from '@/components/Home/weekly';
 import SubjectList from '@/components/Question/SubjectList';
 import SubjectDetailPanel from '@/components/Question/SubjectDetailPanel';
 
+
+
 interface Subject {
   subjectId: number;
   subjectTitle: string;
@@ -16,13 +18,7 @@ interface HomeData {
   subjects: Subject[];
 }
 
-interface PageProps {
-  params: {
-    childId: string; 
-  };
-}
-
-export default async function HomePage({ params }: PageProps) {
+export default async function HomePage({ params }: { params: { childId: string } }) {
   const { childId } = params;
 
   if (!childId) {
@@ -30,8 +26,6 @@ export default async function HomePage({ params }: PageProps) {
   }
 
   const res = await Fetcher<HomeData>(`/parent/${childId}/home`);
-
-  console.log('💓받아온 homeData:', res); //추후 삭제 예정
 
   const homeData = res.data;
 
@@ -42,9 +36,13 @@ export default async function HomePage({ params }: PageProps) {
   return (
     <div>
       {/* 헤더에 알림 개수 정보 전달 필요 */}
-      <HomeHeader childId={childId} />
-      <div className="flex flex-col justify-center items-center w-full pt-3">
+      <div className="flex flex-col space-y-14">
+        
+        <HomeHeader childId={childId} />
         <AiComment />
+      </div>
+      <div className="flex flex-col justify-center items-center w-full pt-3">
+        
         <div className="pt-4">
           <MonthSelector />
           <Weekly />

@@ -12,8 +12,8 @@ interface MyPageData {
   name: string;
   familyName: string;
   children: {
-    id: number;
-    name: string;
+    childId: string;
+    childName: string;
   }[];
 }
 
@@ -51,37 +51,38 @@ export default function Mypage({
         </div>
       </div>
 
-
       {/* 자식 프로필 리스트 */}
       {/* 현재 위치한 페이지의 자식 표시되게 */}
       <div className="border-t p-4">
-      <div className="grid grid-cols-4 gap-4">
-        {mypageData.children.map((child:{ id: number; name: string }) => {
-          const isSelected = String(child.id) === childId;
+        <div className="grid grid-cols-4 gap-4">
+          {mypageData.children.map(
+            (child: { childId: string; childName: string }) => {
+              const isSelected = String(child.childId) === childId;
 
-          return (
-            <Link
-              key={child.id}
-              href={`/parent/${child.id}/home`}
-              className="flex flex-col items-center"
-            >
-              <div
-                className={`w-16 h-16 rounded-full flex items-center justify-center text-sm font-medium ${
-                  isSelected
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-600'
-                }`}
-              >
-                {child.name}
-              </div>
-            </Link>
-          );
-        })}
+              return (
+                <Link
+                  key={child.childId}
+                  href={`/parent/${child.childId}/home`}
+                  className="flex flex-col items-center"
+                >
+                  <div
+                    className={`w-16 h-16 rounded-full flex items-center justify-center text-sm font-medium ${
+                      isSelected
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-200 text-gray-600'
+                    }`}
+                  >
+                    {child.childName}
+                  </div>
+                </Link>
+              );
+            },
+          )}
+        </div>
+        <p className="font-light text-xs text-gray-400 mt-2">
+          원하시는 자녀 페이지를 선택하세요
+        </p>
       </div>
-      <p className="font-light text-xs text-gray-400 mt-2">
-        원하시는 자녀 페이지를 선택하세요
-      </p>
-    </div>
 
       {/* 가족 정보 수정 */}
       <ul className=" border-t">

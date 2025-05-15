@@ -8,8 +8,8 @@ interface MyPageData {
   name: string;
   familyName: string;
   children: {
-    id: number;
-    name: string;
+    childId: string;
+    childName: string;
   }[];
 }
 
