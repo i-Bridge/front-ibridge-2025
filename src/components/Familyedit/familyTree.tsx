@@ -66,7 +66,7 @@ const ParentCard = ({
         {parent2Name ? (
           <>
             <Image
-              src={parent2Image ?? '/images/girl.svg' } // 여기 디폴트 사진 넣어주세요
+              src={parent2Image } // 여기 디폴트 사진 넣어주세요
               alt={parent2Name?? ' '}
               width={50}
               height={50}
