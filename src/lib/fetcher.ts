@@ -9,10 +9,9 @@ const isServer = typeof window === 'undefined';
 export type FetcherOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   data?: Record<string, unknown>;
-  params?: Record<string, string | number>; //날짜 쿼리스트링으로 보냄
-  headers?: Record<string, string>; 
-  skipAuthHeader?: boolean; // ✅ 추가: 인증 헤더 제외 여부
-
+  params?: Record<string, string | number>;
+  headers?: Record<string, string>;
+  skipAuthHeader?: boolean;
 };
 
 export interface ApiResponse<T = undefined> {
@@ -31,20 +30,9 @@ export async function Fetcher<T = undefined>(
 
     if (isServer) {
       session = await getServerSession(authOptions);
-      if (process.env.NODE_ENV === 'development') {
-
-      }
     } else {
-      session = await new Promise<Session | null>((resolve) => {
-        const start = Date.now();
-        const interval = setInterval(async () => {
-          const sess = await getSession();
-          if (sess || Date.now() - start > 3000) {
-            clearInterval(interval);
-            resolve(sess ?? null);
-          }
-        }, 100);
-      });
+      // ✅ setInterval polling 제거, 1회 호출만
+      session = await getSession();
     }
 
     const accessToken = session?.accessToken;
@@ -55,13 +43,25 @@ export async function Fetcher<T = undefined>(
       ...(options.headers || {}),
     };
 
-    // ✅ 인증 헤더를 제외하지 않는 경우에만 설정
     if (!options.skipAuthHeader) {
       if (!accessToken) {
         throw new Error('로그인이 필요한 요청입니다.');
       }
       baseHeaders['Authorization'] = `Bearer ${accessToken}`;
       baseHeaders['Provider'] = provider || '';
+    }
+
+    // ✅ 개발환경 로그 출력
+    if (process.env.NODE_ENV === 'development') {
+      console.log(
+        '🌐 [Fetcher] 요청 URL:',
+        `${process.env.NEXT_PUBLIC_API_URL}${url}`,
+      );
+      console.log('🛠 [Fetcher] 요청 메서드:', options.method ?? 'GET');
+      console.log('📦 [Fetcher] 요청 데이터:', options.data);
+      console.log('🔍 [Fetcher] 요청 파라미터:', options.params);
+      console.log('🧾 [Fetcher] 요청 헤더:', baseHeaders);
+      console.log('🔑 [Fetcher] 세션:', session);
     }
 
     const res = await axios({
@@ -76,11 +76,14 @@ export async function Fetcher<T = undefined>(
 
     const responseData = res.data as ApiResponse<T>;
 
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📥 [Fetcher] 응답 데이터:', responseData);
+    }
+
     if (responseData.code !== '200') {
       console.warn(
         `⚠️ API 응답: 실패 [${responseData.code}]: ${responseData.message}`,
       );
-      return responseData;
     }
 
     return responseData;
@@ -97,9 +100,9 @@ export async function Fetcher<T = undefined>(
           response: error.response?.data,
         },
       );
-
     }
 
     console.error('❌ 일반 API Error:', error);
+    throw error;
   }
 }
