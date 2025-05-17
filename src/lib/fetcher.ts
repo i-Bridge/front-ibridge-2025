@@ -9,10 +9,9 @@ const isServer = typeof window === 'undefined';
 export type FetcherOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   data?: Record<string, unknown>;
-  params?: Record<string, string | number>; //날짜 쿼리스트링으로 보냄
-  headers?: Record<string, string>; 
-  skipAuthHeader?: boolean; // ✅ 추가: 인증 헤더 제외 여부
-
+  params?: Record<string, string | number>;
+  headers?: Record<string, string>;
+  skipAuthHeader?: boolean;
 };
 
 export interface ApiResponse<T = undefined> {
@@ -31,9 +30,6 @@ export async function Fetcher<T = undefined>(
 
     if (isServer) {
       session = await getServerSession(authOptions);
-      if (process.env.NODE_ENV === 'development') {
-
-      }
     } else {
       session = await new Promise<Session | null>((resolve) => {
         const start = Date.now();
@@ -55,7 +51,6 @@ export async function Fetcher<T = undefined>(
       ...(options.headers || {}),
     };
 
-    // ✅ 인증 헤더를 제외하지 않는 경우에만 설정
     if (!options.skipAuthHeader) {
       if (!accessToken) {
         throw new Error('로그인이 필요한 요청입니다.');
@@ -80,7 +75,6 @@ export async function Fetcher<T = undefined>(
       console.warn(
         `⚠️ API 응답: 실패 [${responseData.code}]: ${responseData.message}`,
       );
-      return responseData;
     }
 
     return responseData;
@@ -97,9 +91,9 @@ export async function Fetcher<T = undefined>(
           response: error.response?.data,
         },
       );
-
     }
 
     console.error('❌ 일반 API Error:', error);
+    throw error; // ✅ 반드시 throw로 끝내야 타입 오류 없음
   }
 }
