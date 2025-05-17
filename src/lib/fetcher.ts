@@ -9,9 +9,10 @@ const isServer = typeof window === 'undefined';
 export type FetcherOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   data?: Record<string, unknown>;
-  params?: Record<string, string | number>;
-  headers?: Record<string, string>;
+  params?: Record<string, string | number>; //날짜 쿼리스트링으로 보냄
+  headers?: Record<string, string>; 
   skipAuthHeader?: boolean; // ✅ 추가: 인증 헤더 제외 여부
+
 };
 
 export interface ApiResponse<T = undefined> {
@@ -31,7 +32,7 @@ export async function Fetcher<T = undefined>(
     if (isServer) {
       session = await getServerSession(authOptions);
       if (process.env.NODE_ENV === 'development') {
-        console.log('✅ Server session:', session); // 추후 삭제 예정
+
       }
     } else {
       session = await new Promise<Session | null>((resolve) => {
@@ -44,7 +45,6 @@ export async function Fetcher<T = undefined>(
           }
         }, 100);
       });
-      console.log('👀 CSR session:', session);
     }
 
     const accessToken = session?.accessToken;
@@ -98,10 +98,8 @@ export async function Fetcher<T = undefined>(
         },
       );
 
-      throw new Error(errorMessage);
     }
 
     console.error('❌ 일반 API Error:', error);
-    throw new Error('알 수 없는 API 오류가 발생했습니다.');
   }
 }

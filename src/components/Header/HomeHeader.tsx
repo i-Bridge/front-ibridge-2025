@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { Fetcher } from '@/lib/fetcher';
@@ -11,11 +10,12 @@ type HeaderProps = {
 };
 
 interface MyPageData {
+  noticeExist: boolean;
   name: string;
   familyName: string;
   children: {
-    id: number;
-    name: string;
+    childId: string;
+    childName: string;
   }[];
 }
 
@@ -26,7 +26,7 @@ export default async function HomeHeader({ childId }: HeaderProps) {
   let mypageData: MyPageData | undefined = undefined;
 
   try {
-    const res = await Fetcher<MyPageData>('/start/login');
+    const res = await Fetcher<MyPageData>('/parent/mypage');
     mypageData = res.data;
   } catch (err) {
     console.error('API 호출 중 오류 발생:', err);
@@ -37,19 +37,24 @@ export default async function HomeHeader({ childId }: HeaderProps) {
     return <div>로딩 중...</div>;
   }
 
-  console.log(typeof childId);
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-i-ivory bg-opacity-95 z-50 shadow-sm">
       <nav className="max-w-7xl mx-auto px-8 py-1 flex justify-between items-center">
         <Link href={`/parent/${childId}/home`}>
-          <Image
+          <img
             src="/images/logo.svg"
             alt="Logo"
             className="w-24 h-auto transition-transform duration-300 hover:scale-105"
           />
         </Link>
-        <div className="absolute right-48 top-1"><MailBox/></div>
+        <div className="flex flex-row space-x-3">
+          <div className="relative">
+            <MailBox />
+            {mypageData.noticeExist && (
+              <div className="absolute top-2 right-0 w-3 h-3 z-10 bg-green-400 rounded-full border-2 border-white" />
+            )}
+          </div>
         
         <DropMotionMypage
           childId={childId}
@@ -57,6 +62,7 @@ export default async function HomeHeader({ childId }: HeaderProps) {
           userName={userName}
           userEmail={userEmail}
         />
+        </div>
       </nav>
     </header>
   );

@@ -45,7 +45,6 @@ const ParentsCard = ({
   onInvite: () => void;
 }) => {
   return (
-
     <div className="flex justify-center gap-6 flex-wrap items-center w-auto bg-white p-4 rounded-lg shadow-md border">
       {parents.map((parent) => (
         <div key={parent.parentId} className="flex flex-col items-center">
@@ -69,7 +68,6 @@ const ParentsCard = ({
           + 배우자 초대
         </button>
       )}
-
     </div>
   );
 };

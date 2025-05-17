@@ -18,7 +18,9 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
         }),
       });
 
-      const refreshed = await res.json();
+      const raw = await res.text();
+      console.log('🔁 Naver refresh 응답:', raw);
+      const refreshed = JSON.parse(raw);
 
       if (!res.ok || refreshed.error) throw refreshed;
 
@@ -27,11 +29,11 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
         accessToken: refreshed.access_token,
         accessTokenExpires:
           Math.floor(Date.now() / 1000) + (refreshed.expires_in ?? 3600),
-        refreshToken: refreshed.refresh_token ?? token.refreshToken,
+        refreshToken: refreshed.refresh_token, // ✅ 무조건 교체
       };
     }
 
-    // ✅ Google 기본 처리
+    // ✅ Google refresh 요청
     const res = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -44,6 +46,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     });
 
     const refreshedTokens = await res.json();
+    console.log('🔁 Google refresh 응답:', refreshedTokens);
 
     if (!res.ok) throw refreshedTokens;
 
@@ -82,7 +85,7 @@ export const authOptions: AuthOptions = {
         url: 'https://nid.naver.com/oauth2.0/authorize',
         params: {
           response_type: 'code',
-          scope: 'name',
+          scope: 'name email', // ✅ 반드시 email 포함
         },
       },
     }),
