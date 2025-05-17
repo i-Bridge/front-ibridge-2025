@@ -31,16 +31,8 @@ export async function Fetcher<T = undefined>(
     if (isServer) {
       session = await getServerSession(authOptions);
     } else {
-      session = await new Promise<Session | null>((resolve) => {
-        const start = Date.now();
-        const interval = setInterval(async () => {
-          const sess = await getSession();
-          if (sess || Date.now() - start > 3000) {
-            clearInterval(interval);
-            resolve(sess ?? null);
-          }
-        }, 100);
-      });
+      // ✅ setInterval polling 제거, 1회 호출만
+      session = await getSession();
     }
 
     const accessToken = session?.accessToken;
