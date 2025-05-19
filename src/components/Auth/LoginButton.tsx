@@ -10,13 +10,12 @@ export default function LoginButton() {
   const { data: session } = useSession();
   const router = useRouter();
   const [status, setStatus] = useState<
-    'idle' | 'checking' | 'firstLogin' | 'waiting' | 'enterFamilyName' | 'done'
+    'idle' | 'checking' | 'firstLogin' | 'waiting' | 'enterFamilyName'
   >('idle');
   const [familyName, setFamilyName] = useState('');
   const [loading, setLoading] = useState(false);
   const [familyError, setFamilyError] = useState<string | null>(null);
 
-  // 🔐 Refresh 실패 대응
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') {
       alert('로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
@@ -24,19 +23,10 @@ export default function LoginButton() {
     }
   }, [session?.error]);
 
-  // ✅ 로그인 후 유저 정보 백엔드 전송
   useEffect(() => {
     if (!session?.user || !session?.accessToken || status !== 'idle') return;
-
     sendUserDataToBackend();
   }, [session, status]);
-
-  // 🐞 디버깅용 accessToken 로그 (선택)
-  useEffect(() => {
-    if (session?.accessToken) {
-      console.log('🔐 accessToken:', session.accessToken);
-    }
-  }, [session?.accessToken]);
 
   const sendUserDataToBackend = async () => {
     setStatus('checking');
@@ -49,7 +39,7 @@ export default function LoginButton() {
         method: 'POST',
         data: {
           email: session?.user?.email,
-          name: encodedName, // ✅ 인코딩된 name만 전달
+          name: encodedName,
         },
       });
 
@@ -72,11 +62,7 @@ export default function LoginButton() {
       if (loginData?.accepted) {
         router.push('/profile');
       } else {
-        if (loginData?.send) {
-          setStatus('waiting');
-        } else {
-          setStatus('firstLogin');
-        }
+        setStatus(loginData?.send ? 'waiting' : 'firstLogin');
       }
     } catch (error) {
       console.error('❌ 사용자 정보 전송 실패:', error);
@@ -114,6 +100,16 @@ export default function LoginButton() {
   if (session) {
     return (
       <>
+        {status === 'checking' && (
+          <div className="flex flex-col items-center mt-8">
+            {/* Tailwind 기본 스피너 */}
+            <div className="animate-spin h-10 w-10 border-4 border-i-pink border-t-transparent rounded-full" />
+            <p className="text-gray-500 text-sm mt-4">
+              프로필로 이동 중입니다...
+            </p>
+          </div>
+        )}
+
         <p>{session.user?.name}님 반가워요!</p>
 
         {status === 'firstLogin' && (

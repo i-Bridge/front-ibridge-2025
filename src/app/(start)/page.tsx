@@ -1,8 +1,31 @@
 'use client';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useSession } from 'next-auth/react';
+import { Fetcher } from '@/lib/fetcher';
 import LoginButton from '@/components/Auth/LoginButton';
 
 export default function StartPage() {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAccepted = async () => {
+      if (session?.accessToken) {
+        try {
+          const result = await Fetcher<{ accepted: boolean }>('/start/login');
+          if (result?.data?.accepted) {
+            router.replace('/profile');
+          }
+        } catch (e) {
+          // 첫 로그인 유저는 여기서 에러 발생할 수 있음 → 무시하고 LoginButton 진행
+        }
+      }
+    };
+
+    checkAccepted();
+  }, [session]);
   return (
     <div className="min-h-screen flex flex-col relative">
       <main className="flex-grow">

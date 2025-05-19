@@ -12,6 +12,7 @@ export type FetcherOptions = {
   params?: Record<string, string | number>;
   headers?: Record<string, string>;
   skipAuthHeader?: boolean;
+  session?: Session;
 };
 
 export interface ApiResponse<T = undefined> {
@@ -28,11 +29,12 @@ export async function Fetcher<T = undefined>(
   try {
     let session: Session | null = null;
 
-    if (isServer) {
-      session = await getServerSession(authOptions);
-    } else {
-      // ✅ setInterval polling 제거, 1회 호출만
-      session = await getSession();
+    if (!session) {
+      if (isServer) {
+        session = await getServerSession(authOptions);
+      } else {
+        session = await getSession();
+      }
     }
 
     const accessToken = session?.accessToken;
