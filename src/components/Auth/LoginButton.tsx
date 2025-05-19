@@ -100,6 +100,16 @@ export default function LoginButton() {
   if (session) {
     return (
       <>
+        {status === 'checking' && (
+          <div className="flex flex-col items-center mt-8">
+            {/* Tailwind 기본 스피너 */}
+            <div className="animate-spin h-10 w-10 border-4 border-i-pink border-t-transparent rounded-full" />
+            <p className="text-gray-500 text-sm mt-4">
+              프로필로 이동 중입니다...
+            </p>
+          </div>
+        )}
+
         <p>{session.user?.name}님 반가워요!</p>
 
         {status === 'firstLogin' && (
