@@ -31,9 +31,9 @@ const ProgressBar = () => {
         
           자녀 등록({currentChildIndex +1 }/{childrenCount})
         </h1>
-        <div className="w-full bg-gray-300 h-2 rounded-full overflow-hidden">
+        <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
           <div
-            className="h-full bg-blue-500 transition-all"
+            className="h-full bg-i- transition-all"
             style={{ width: `${progress}%` }}
           ></div>
         </div>
