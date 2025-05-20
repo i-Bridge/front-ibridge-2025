@@ -1,7 +1,7 @@
 'use client';
-// Step1: 가족 정보 입력 및 자식 수 등록
+// Step1: 가족 정보 입력 및 자녀 수 등록
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Fetcher } from '@/lib/fetcher';
 import { useSetupStore } from '@/store/setup/setupStore';
 
@@ -9,17 +9,32 @@ interface DupFamilyNameData {
   exist: boolean;
 }
 
-export default function Step1() {
+const Step1 = () => {
+  {/* */}
+
+  {/* 로컬 상태 관리 */}
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [familyName, setFamilyName] = useState<string>('');
-  const [isNameChecked, setIsNameChecked] = useState<boolean>(false);
+  const [familyName, setFamilyName] = useState<string>(''); 
+  const [isNameChecked, setIsNameChecked] = useState<boolean>(false); 
+  const [numberOfChildren, setNumberOfChildren] = useState<number>(0);
+  
+  {/* 스토어 저장 관리 */}
   const {
     setChildrenCount,
     setStep,
-    setFamilyName: storeSetFamilyName,
+    setFamilyName: storeSetFamilyName,//스토어로 저장
+    familyName: storeFamilyName, //스토어의 정보
+    childrenCount: storeChildrenCount,
   } = useSetupStore();
 
+  {/* 스토어 값 로드해서 초기화 설정 */}
+  useEffect(() => {
+    setFamilyName(storeFamilyName);
+    setNumberOfChildren(storeChildrenCount);
+  }, [storeFamilyName, storeChildrenCount]);
+
+  {/* 중복 체크 버튼 클릭 handle */}
   const handleCheckName = async () => {
     if (!familyName) {
       setError('가족 이름을 입력해 주세요.');
@@ -39,7 +54,7 @@ export default function Step1() {
         setIsNameChecked(false);
       } else {
         setIsNameChecked(true);
-        storeSetFamilyName(familyName);
+        storeSetFamilyName(familyName); // 중복 없을 때 스토어에 저장
       }
     } catch (err) {
       console.error('중복 확인 중 오류 발생:', err);
@@ -50,23 +65,34 @@ export default function Step1() {
     }
   };
 
+  {/* Step2로 이동 */}
   const handleNext = () => {
     if (!isNameChecked) {
       setError('가족 이름을 먼저 확인해주세요.');
       return;
     }
-
-    const inputElement = document.getElementById(
-      'childrenCount',
-    ) as HTMLInputElement;
-
-    const count = parseInt(inputElement.value, 10) || 0;
-    setChildrenCount(count);
-    setStep(2); //step2: 자식 정보 설정 스텝
+    if (numberOfChildren <= 0) {
+    setError('자녀 수는 1명 이상이어야 합니다.');
+    return;
+  }
+    
+    //자식 수 정보 저장 후 다음 단계로 
+    setChildrenCount(numberOfChildren);
+    setStep(2); 
   };
 
   return (
-    <div className="w-full flex flex-col gap-4 text-base px-4 py-8">
+    <div className="w-full flex flex-col gap-3 text-base px-4 py-3">
+      
+       <div className="h-[20px] mb-1 ">
+        {error ? (
+          <p className="text-red-500 whitespace-nowrap">{error}</p>
+        ) : isNameChecked ? (
+          <p className="text-green-500 whitespace-nowrap">
+            등록 가능한 가족 이름입니다.
+          </p>
+        ) : null}
+      </div>
       <div className="flex justify-between items-center whitespace-nowrap ">
         <span className="min-w-[80px]">가족 이름</span>
         <div className="flex items-center gap-2">
@@ -93,17 +119,9 @@ export default function Step1() {
         </div>
       </div>
 
-      <div className="h-[16px]">
-        {error ? (
-          <p className="text-red-500 whitespace-nowrap">{error}</p>
-        ) : isNameChecked ? (
-          <p className="text-green-500 whitespace-nowrap">
-            등록 가능한 가족 이름입니다.
-          </p>
-        ) : null}
-      </div>
+      
 
-      <div className="flex justify-between items-center whitespace-nowrap">
+      <div className="flex justify-between items-center whitespace-nowrap mb-4">
         <span className="min-w-[80px]">자녀 수</span>
         <input
           id="childrenCount"
@@ -111,16 +129,19 @@ export default function Step1() {
           min="0"
           max="10"
           className="border p-1 w-[60px]"
+          value={numberOfChildren}
+          onChange={(e) => setNumberOfChildren(Number(e.target.value))}
         />
       </div>
 
       <button
         onClick={handleNext}
         className="bg-blue-500 text-white px-4 py-2 mt-4 self-end whitespace-nowrap"
-        disabled={!isNameChecked}
       >
         다음
       </button>
     </div>
   );
 }
+
+export default Step1;

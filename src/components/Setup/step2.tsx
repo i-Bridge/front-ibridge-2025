@@ -1,60 +1,112 @@
+'use client';
+
 import { useSetupStore } from '@/store/setup/setupStore';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Fetcher } from '@/lib/fetcher';
 
 const Step2 = () => {
-  const [childrenInfo, setChildrenInfo] = useState<
-    { name: string; gender: number; birth: string }[]
-  >([]);
-
-  const { nextChild, currentChildIndex, childrenCount, familyName, setStep } = useSetupStore();
   const router = useRouter();
 
-  const [name, setName] = useState('');
-  const [birth, setBirthdate] = useState('');
-  const [gender, setGender] = useState<number | null>(null);
+  const {
+    nextChild,
+    currentChildIndex,
+    childrenCount,
+    familyName,
+    childrenInfo,
+    setStep,
+    setCurrentChildIndex,
+    updateChildInfo,
+  } = useSetupStore();
+
+  const [error, setError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const currentChild = childrenInfo[currentChildIndex] || { name: '', gender: null, birth: '' };
+
+  const [name, setName] = useState(currentChild.name);
+  const [gender, setGender] = useState<number | null>(currentChild.gender);
+  const [birth, setBirthdate] = useState(currentChild.birth);
 
   useEffect(() => {
-    setName('');
-    setBirthdate('');
-    setGender(null);
-  }, [currentChildIndex]);
+    setName(childrenInfo[currentChildIndex]?.name || '');
+    setGender(childrenInfo[currentChildIndex]?.gender ?? null);
+    setBirthdate(childrenInfo[currentChildIndex]?.birth || '');
+    setError(null);
+  }, [currentChildIndex, childrenInfo]);
 
   const handleNext = async () => {
-    if (gender === null) {
-      alert('성별을 선택해주세요.');
+    if (!name.trim()) {
+      setError('이름을 입력해주세요.');
       return;
     }
 
-    // 현재 자녀 정보 저장
-    const updatedChildren = [...childrenInfo, { name, gender, birth }];
-    setChildrenInfo(updatedChildren);
+    if (gender === null) {
+      setError('성별을 선택해주세요.');
+      return;
+    }
+
+    if (!birth) {
+      setError('생년월일을 입력해주세요.');
+      return;
+    }
+
+    setError(null);
+
+    // 현재 자식 정보 스토어에 저장
+    updateChildInfo(currentChildIndex, { name, gender, birth });
+
+    const finalChildrenList = [...childrenInfo];
+    finalChildrenList[currentChildIndex] = { name, gender, birth };
 
     if (currentChildIndex + 1 >= childrenCount) {
-      // 마지막 자녀면 → API 호출
+      // 마지막 자식까지 입력한 경우 서버로 전송
       try {
         const res = await Fetcher('/start/signup/new', {
           method: 'POST',
-          data: { familyName, children: updatedChildren },
+          data: {
+            familyName,
+            children: finalChildrenList,
+          },
         });
         console.log('서버 전송:', res);
-        router.push('/profile');
+        setIsSuccess(true);
       } catch (error) {
         console.error('자녀 정보 저장 실패:', error);
+        setError('자녀 정보 저장 중 문제가 발생했습니다.');
+        setIsSuccess(false);  // 실패한 경우
       }
     } else {
+      // 다음 자식 입력으로 이동
       nextChild();
     }
   };
 
   const handlePrevious = () => {
-    setStep(1); // step 1로 돌아가기
+    updateChildInfo(currentChildIndex, { name, gender: gender ?? 0, birth });
+    if (currentChildIndex === 0) {
+      setStep(1);
+    } else {
+      setCurrentChildIndex(currentChildIndex - 1);
+    }
   };
 
+  // 성공적으로 데이터를 저장했을 경우 1초 뒤에 profile 페이지로 이동
+  useEffect(() => {
+    if (isSuccess) {
+      alert("dklfs");
+      setTimeout(() => {
+        router.push('/profile');
+      }, 10000);  // 1초 뒤에 페이지 이동
+    }
+  }, [isSuccess, router]);
+
   return (
-    <div className="w-full flex flex-col gap-4 ">
-      <div className="flex justify-between items-center px-4 py-8">
+    <div className="w-full flex flex-col gap-3 px-4 py-3">
+      <div className="h-[20px] mb-1 ">
+        {error && <p className="text-red-500 whitespace-nowrap">{error}</p>}
+      </div>
+
+      <div className="flex justify-between items-center">
         <span>이름</span>
         <input
           type="text"
@@ -90,7 +142,7 @@ const Step2 = () => {
         </div>
       </div>
 
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-4">
         <span>생년월일</span>
         <input
           type="date"
