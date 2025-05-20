@@ -11,17 +11,14 @@ export default function ReplyPage() {
   const { completedSteps, completeStep } = useReplyStepsStore();
   const { childId } = useParams();
 
+  const [question, setQuestion] = useState(''); // ✅ 하나로 통일
   const [displayText, setDisplayText] = useState('');
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isQuestionVisible, setIsQuestionVisible] = useState(false);
-  const [message, setMessage] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
-  const [nextQuestion, setNextQuestion] = useState<string | null>(null);
-  const [lastAIResponse, setLastAIResponse] = useState<string | null>(null);
-  const [homeQuestion, setHomeQuestion] = useState('');
   const [isCompleted, setIsCompleted] = useState(false);
-  const [isRecordingFinished, setIsRecordingFinished] = useState(false); // ✅ 추가
+  const [isRecordingFinished, setIsRecordingFinished] = useState(false);
 
   // ✅ 첫 질문 불러오기
   useEffect(() => {
@@ -34,7 +31,7 @@ export default function ReplyPage() {
       }>(`/child/${childId}/home`, { method: 'GET' });
 
       if (isSuccess && data) {
-        setHomeQuestion(data.question);
+        setQuestion(data.question); // ✅ question 하나로 통일
         setIsCompleted(data.isCompleted);
       }
     };
@@ -42,25 +39,25 @@ export default function ReplyPage() {
     fetchHomeData();
   }, [childId]);
 
-  // ✅ 타이핑 효과
+  // ✅ 타이핑 애니메이션
   useEffect(() => {
-    if (!isQuestionVisible || !message) return;
+    if (!isQuestionVisible || !question) return;
 
     let index = 0;
     let currentText = '';
 
     const interval = setInterval(() => {
-      if (index < homeQuestion.length) {
-        currentText += homeQuestion[index];
+      if (index < question.length) {
+        currentText += question[index];
         setDisplayText(currentText);
         index++;
       } else {
         clearInterval(interval);
       }
     }, 100);
-
+    console.log('💬 말풍선에 출력할 전체 질문:', question);
     return () => clearInterval(interval);
-  }, [isQuestionVisible, message, homeQuestion]);
+  }, [isQuestionVisible, question]);
 
   // ✅ 입 움직임 애니메이션
   useEffect(() => {
@@ -75,7 +72,7 @@ export default function ReplyPage() {
     return () => clearInterval(interval);
   }, [isSpeaking]);
 
-  // ✅ 이미지가 캐시에 있을 때도 로드되도록 보장
+  // ✅ 캐시 대비 이미지 사전 로드
   useEffect(() => {
     const img = new Image();
     img.src = '/images/characterDefault.png';
@@ -84,7 +81,6 @@ export default function ReplyPage() {
 
   const handleImageLoad = () => setIsImageLoaded(true);
 
-  // ✅ TTS 기능
   const speak = (text: string) => {
     if (!text || typeof window === 'undefined') return;
 
@@ -104,17 +100,14 @@ export default function ReplyPage() {
 
   const handleNextStep = () => {
     completeStep();
-    setMessage(lastAIResponse ?? '');
     setDisplayText('');
-    setNextQuestion(lastAIResponse ?? null);
-    if (lastAIResponse) speak(lastAIResponse);
-    setLastAIResponse(null);
-    setIsRecordingFinished(false); // ✅ 초기화
+    setIsRecordingFinished(false);
+    speak(question); // ✅ 이미 setQuestion으로 바뀌어 있음
   };
 
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-amber-100">
-      {/* 캐릭터 */}
+      {/* 캐릭터 이미지 */}
       <motion.img
         src={
           mouthOpen
@@ -138,11 +131,11 @@ export default function ReplyPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-xl font-semibold">{nextQuestion || displayText}</p>
+          <p className="text-xl font-semibold">{displayText}</p>
         </motion.div>
       )}
 
-      {/* 질문 시작 버튼들 */}
+      {/* 버튼 영역 */}
       <div className="ml-32 flex flex-col gap-8 text-center">
         {!isQuestionVisible ? (
           <>
@@ -150,8 +143,8 @@ export default function ReplyPage() {
               <button
                 onClick={() => {
                   setIsQuestionVisible(true);
-                  setMessage(homeQuestion);
-                  speak(homeQuestion); // ✅ 읽기
+                  setDisplayText('');
+                  speak(question);
                 }}
                 className="w-64 px-8 py-6 text-lg bg-green-500 text-white rounded-lg shadow-lg"
               >
@@ -161,8 +154,8 @@ export default function ReplyPage() {
             <button
               onClick={() => {
                 setIsQuestionVisible(true);
-                setMessage('얘기해봐!');
-                setDisplayText('얘기해봐!');
+                setQuestion('얘기해봐!');
+                setDisplayText('');
                 speak('얘기해봐!');
               }}
               className="w-64 px-8 py-6 text-lg bg-blue-500 text-white rounded-lg shadow-lg"
@@ -174,17 +167,19 @@ export default function ReplyPage() {
           <VideoRecorder
             subjectId={completedSteps + 1}
             onAIResponse={(ai: string) => {
-              setLastAIResponse(ai);
-              speak(ai); // ✅ AI 응답도 읽기
+              console.log('✅ 백엔드에서 받은 ai 응답:', ai);
+              setQuestion(ai); // ✅ 다음 질문 덮어쓰기
+              setDisplayText(''); // 타이핑 초기화
+              speak(ai); // TTS 재생
             }}
             onFinished={() => {
-              setIsRecordingFinished(true); // ✅ 녹화 완료 시점
+              setIsRecordingFinished(true); // 녹화 완료
             }}
           />
         )}
       </div>
 
-      {/* 다음 질문 버튼 (녹화 완료 후 표시) */}
+      {/* 다음 질문 버튼 */}
       {isQuestionVisible && isRecordingFinished && (
         <div className="absolute bottom-20 flex flex-col items-center gap-6">
           <p className="text-xl font-semibold">
@@ -200,8 +195,7 @@ export default function ReplyPage() {
             onClick={() => {
               setIsQuestionVisible(false);
               setDisplayText('');
-              setNextQuestion(null);
-              setIsRecordingFinished(false); // ✅ 초기화
+              setIsRecordingFinished(false);
               window.speechSynthesis.cancel();
             }}
             className="px-6 py-4 bg-red-500 text-white text-lg rounded-lg"
