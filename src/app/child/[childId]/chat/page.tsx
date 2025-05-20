@@ -44,7 +44,7 @@ export default function ReplyPage() {
 
   // ✅ 타이핑 효과
   useEffect(() => {
-    if (!isQuestionVisible || message !== homeQuestion) return;
+    if (!isQuestionVisible || !message) return;
 
     let index = 0;
     let currentText = '';
@@ -75,6 +75,13 @@ export default function ReplyPage() {
     return () => clearInterval(interval);
   }, [isSpeaking]);
 
+  // ✅ 이미지가 캐시에 있을 때도 로드되도록 보장
+  useEffect(() => {
+    const img = new Image();
+    img.src = '/images/characterDefault.png';
+    img.onload = () => setIsImageLoaded(true);
+  }, []);
+
   const handleImageLoad = () => setIsImageLoaded(true);
 
   // ✅ TTS 기능
@@ -97,7 +104,7 @@ export default function ReplyPage() {
 
   const handleNextStep = () => {
     completeStep();
-    setMessage('');
+    setMessage(lastAIResponse ?? '');
     setDisplayText('');
     setNextQuestion(lastAIResponse ?? null);
     if (lastAIResponse) speak(lastAIResponse);
