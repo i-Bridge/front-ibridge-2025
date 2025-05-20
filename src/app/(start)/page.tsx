@@ -26,11 +26,12 @@ export default function StartPage() {
 
     checkAccepted();
   }, [session]);
+
   return (
     <div className="min-h-screen flex flex-col relative">
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="bg-i-ivory py-24 px-6">
+        <section className="bg-i-ivory py-24 px-6 relative">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div className="flex-1">
               <motion.h2
@@ -38,18 +39,18 @@ export default function StartPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 viewport={{ once: true }}
-                className="text-6xl text-i-darkblue font-bold mb-4"
+                className="text-5xl text-i-darkblue font-bold mb-4"
               >
-                Welcome to iBridge
+                아이의 진심, 당신의 귀로 전해지도록
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7 }}
                 viewport={{ once: true }}
-                className="text-xl text-i-darkblue mb-4"
+                className="text-base text-i-pink font-semibold mb-4"
               >
-                감정은 행동이 아닌, 말로 표현될 수 있어야 합니다.
+                소통이 필요한 가정을 위한, AI 기반 부모와 아이 소통 플랫폼
               </motion.p>
               <motion.p
                 initial={{ opacity: 0, y: 50 }}
@@ -79,11 +80,32 @@ export default function StartPage() {
             >
               <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px]">
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-i-lightpurple to-i-pink"></div>
-                <div className="space-y-3">
+                <div className="space-y-3 text-center">
+                  <h3 className="text-lg noto-light text-i-darkblue">
+                    시작하려면 로그인하세요
+                  </h3>
                   <LoginButton />
                 </div>
               </div>
             </motion.div>
+          </div>
+
+          {/* Scroll Indicator */}
+          <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5} // ✔ 굵기 조절 (기존 1.5 → 2.5로 Bold 느낌)
+              stroke="currentColor"
+              className="w-8 h-8 text-gray-500" // ✔ 크기 키움 (w-6 h-6 → w-10 h-10)
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
+              />
+            </svg>
           </div>
         </section>
 
@@ -112,26 +134,66 @@ export default function StartPage() {
           </motion.p>
         </section>
 
-        {/* Long Scroll Dummy Section */}
-        <section className="max-w-5xl mx-auto px-16 mb-32">
-          <div className="space-y-20">
-            {[...Array(8)].map((_, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <p className="text-lg text-i-darkblue">
-                  감정 이해와 소통의 다리를 놓는 iBridge — 더 나은 가족 관계를
-                  위한 여정을 함께해요. (섹션 {index + 1})
-                </p>
-              </motion.div>
-            ))}
+        {/* Features Section */}
+        <section className="max-w-6xl mx-auto px-6 py-24 text-center">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-3xl md:text-4xl font-bold text-i-darkblue mb-12"
+          >
+            가족을 이해하는 새로운 방법, iBridge
+          </motion.h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              viewport={{ once: true }}
+              className="bg-white p-6 rounded-xl shadow-md text-left"
+            >
+              <h3 className="text-xl font-semibold text-i-darkblue mb-2">
+                감정 중심의 대화 설계
+              </h3>
+              <p className="text-blue-900">
+                아이의 감정을 기반으로 설계된 질문으로, 더 깊은 생각을
+                이끌어냅니다.
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="bg-white p-6 rounded-xl shadow-md text-left"
+            >
+              <h3 className="text-xl font-semibold text-i-darkblue mb-2">
+                부모를 위한 인사이트
+              </h3>
+              <p className="text-blue-900">
+                감정 해석 없이 자녀의 답변을 이해하고, 적절한 반응을 도와주는
+                분석 결과 제공.
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="bg-white p-6 rounded-xl shadow-md text-left"
+            >
+              <h3 className="text-xl font-semibold text-i-darkblue mb-2">
+                쉽고 직관적인 사용 경험
+              </h3>
+              <p className="text-blue-900">
+                누구나 이해하기 쉬운 UI/UX로, 기술에 익숙하지 않아도 걱정 없이
+                사용 가능.
+              </p>
+            </motion.div>
           </div>
         </section>
-
         {/* Parent and Child Service Sections */}
         <div className="w-full mx-auto px-8 mb-16">
           <div className="flex justify-between gap-12">

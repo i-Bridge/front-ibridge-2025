@@ -114,13 +114,13 @@ export default function LoginButton() {
 
         {status === 'firstLogin' && (
           <div className="mt-4 p-4 border rounded-xl shadow-sm bg-white max-w-md">
-            <p className="text-lg font-semibold mb-4 text-gray-800">
-              🧩 기존 가족이 있나요?
+            <p className="text-lg noto-bold mb-4 text-gray-800">
+              👨‍👩‍👧‍👦 기존 가족이 있나요?
             </p>
             <div className="flex gap-4">
               <button
                 onClick={() => setStatus('enterFamilyName')}
-                className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                className="px-6 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition"
               >
                 O
               </button>
