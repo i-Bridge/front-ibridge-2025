@@ -6,7 +6,7 @@ const ProgressBar = () => {
 
   // ✅ 전체 단계 수: step1(1) + step2(자식 수)
   const totalSteps = childrenCount;
-  const progress = ((currentChildIndex ) / totalSteps) * 100;
+  const progress = ((currentChildIndex +1) / totalSteps) * 100;
 
   if (step === 1) {
     return (
@@ -29,7 +29,7 @@ const ProgressBar = () => {
         
         <h1 className="text-black text-sm text-center mb-2">
         
-          자녀 등록({currentChildIndex }/{childrenCount})
+          자녀 등록({currentChildIndex +1 }/{childrenCount})
         </h1>
         <div className="w-full bg-gray-300 h-2 rounded-full overflow-hidden">
           <div
