@@ -1,6 +1,7 @@
 'use client';
 
 import { signOut } from 'next-auth/react';
+import { ReactNode } from 'react';
 
 export const handleLogout = async () => {
   sessionStorage.clear();
@@ -8,13 +9,18 @@ export const handleLogout = async () => {
   await signOut({ callbackUrl: '/' });
 };
 
-export default function LogoutButton() {
+interface LogoutButtonProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export default function LogoutButton({
+  children,
+  className = '',
+}: LogoutButtonProps) {
   return (
-    <button
-      onClick={handleLogout}
-      className="w-full py-2 px-4  bg-i-lightpurple text-white font-semibold rounded-lg  shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-i-pink focus:ring-opacity-75"
-    >
-      로그아웃
+    <button onClick={handleLogout} className={className}>
+      {children}
     </button>
   );
 }

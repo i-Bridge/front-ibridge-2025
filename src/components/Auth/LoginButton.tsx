@@ -110,23 +110,21 @@ export default function LoginButton() {
           </div>
         )}
 
-        <p>{session.user?.name}님 반가워요!</p>
+        <p className=" mb-4 text-gray-600">{session.user?.name}님 반가워요!</p>
 
         {status === 'firstLogin' && (
-          <div className="mt-4 p-4 border rounded-xl shadow-sm bg-white max-w-md">
-            <p className="text-lg font-semibold mb-4 text-gray-800">
-              🧩 기존 가족이 있나요?
-            </p>
+          <div className="mt-4 p-4 max-w-md">
+            <p className="mb-4 text-gray-900">👨‍👩‍👧‍👦 기존 가족이 있나요?</p>
             <div className="flex gap-4">
               <button
                 onClick={() => setStatus('enterFamilyName')}
-                className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+                className="w-12 h-10 border border-green-500 text-green-500 rounded-lg hover:bg-green-50 transition text-center"
               >
                 O
               </button>
               <button
                 onClick={() => router.push('/setup')}
-                className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                className="w-12 h-10 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 transition text-center"
               >
                 X
               </button>
@@ -172,7 +170,10 @@ export default function LoginButton() {
           </div>
         )}
 
-        <LogoutButton />
+        <LogoutButton className="px-6 py-2 border border-orange-400 text-orange-400 rounded-lg hover:bg-orange-50 ">
+          {' '}
+          로그아웃{' '}
+        </LogoutButton>
       </>
     );
   }
