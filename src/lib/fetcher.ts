@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { Session } from 'next-auth';
 import { getServerSession } from 'next-auth';
-import { getSession } from 'next-auth/react';
 import { authOptions } from '@/lib/auth';
 
 const isServer = typeof window === 'undefined';
@@ -22,6 +21,12 @@ export interface ApiResponse<T = undefined> {
   data?: T;
 }
 
+async function getFreshSession(): Promise<Session | null> {
+  const res = await fetch('/api/auth/session');
+  if (!res.ok) return null;
+  return res.json();
+}
+
 export async function Fetcher<T = undefined>(
   url: string,
   options: FetcherOptions = {},
@@ -33,7 +38,7 @@ export async function Fetcher<T = undefined>(
       if (isServer) {
         session = await getServerSession(authOptions);
       } else {
-        session = await getSession();
+        session = await getFreshSession();
       }
     }
 

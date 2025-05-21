@@ -263,7 +263,7 @@ export default function ChildrenForm() {
                   {!isEditing ? (
                     <button
                       onClick={() => handleEdit(child.childId)}
-                      className="py-1 px-4 bg-yellow-500 text-white font-semibold rounded-md hover:bg-yellow-600 text-sm"
+                      className="py-1 px-4 bg-orange-400 text-white font-semibold rounded-md hover:bg-orange-500 text-sm"
                     >
                       수정
                     </button>
@@ -290,7 +290,7 @@ export default function ChildrenForm() {
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
         <button
           onClick={handleAddChild}
-          className="py-2 px-6 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600 text-sm"
+          className="py-2 px-6 bg-orange-400 text-white font-semibold rounded-md hover:bg-orange-300 text-sm"
         >
           + 자녀 추가
         </button>
