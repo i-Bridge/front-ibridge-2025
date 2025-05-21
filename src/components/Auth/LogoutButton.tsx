@@ -14,10 +14,12 @@ interface LogoutButtonProps {
   className?: string;
 }
 
+
 export default function LogoutButton({
   children,
   className = '',
 }: LogoutButtonProps) {
+
   return (
     <button onClick={handleLogout} className={className}>
       {children}

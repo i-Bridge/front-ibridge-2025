@@ -68,7 +68,7 @@ export default function Mypage({
                   <div
                     className={`w-16 h-16 rounded-full flex items-center justify-center text-sm font-medium ${
                       isSelected
-                        ? 'bg-blue-500 text-white'
+                        ? 'bg-i-lightorange text-white'
                         : 'bg-gray-200 text-gray-600'
                     }`}
                   >
@@ -88,7 +88,7 @@ export default function Mypage({
       <ul className=" border-t">
         <Link href={`/parent/${childId}/familyedit`}>
           <li>
-            <button className="block w-full px-4 py-2 text-sm font-semibold text-left hover:bg-gray-100">
+            <button className="block w-full px-4 py-2 text-sm  text-left hover:bg-gray-100">
               가족 정보 수정하기
             </button>
           </li>
@@ -99,13 +99,16 @@ export default function Mypage({
       <div className="border-t">
         <Link
           href="/profile"
-          className="block w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-100"
+          className="block w-full px-4 py-2 text-sm text-left text-red-500 hover:bg-gray-100"
         >
           나가기
         </Link>
 
+        <LogoutButton className="block w-full px-4 py-2 text-sm text-left text-gray-900 hover:bg-gray-100">
+          로그아웃
+        </LogoutButton>
+
         {/* 로그아웃 버튼 ui 수정하기 */}
-        <LogoutButton />
       </div>
     </div>
   );

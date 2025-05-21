@@ -90,27 +90,29 @@ export default function Weekly() {
               year === todayYear && month === todayMonth && day === todayDay; // 오늘 날짜 체크
 
             return (
-              <button
-                key={day}
-                className="w-11 h-11 flex items-center justify-center rounded-[20px]"
-                onClick={() => handleClick(day)}
-              >
-                <span
-                  className={`w-full h-full flex items-center justify-center rounded-[20px] shadow-md
-                    
-                     
-                      ${
-                        isToday
-                          ? 'bg-i-orange  text-black font-bold today'
-                          : isSelected
-                            ? ' bg-i-lightpurple border-4 border-i-orange text-black selected'
-                            : 'bg-i-lightpurple text-black'
-                      }`}
-                >
-                  {day}
-                </span>
-              </button>
-            );
+  <button
+    key={day}
+    className="w-11 h-11 flex items-center justify-center rounded-[20px]"
+    onClick={() => handleClick(day)}
+  >
+    <span
+      className={`w-full h-full flex items-center justify-center rounded-[20px]
+        transition-shadow duration-200
+        ${
+          isToday
+            ? 'bg-i-lightorange text-white  today'
+            : isSelected
+              ? 'border-4 border-orange-400 text-black selected'
+              : 'text-black hover:bg-gray-100'
+        }
+        
+      `}
+    >
+      {day}
+    </span>
+  </button>
+);
+
           })}
         </div>
       </div>
