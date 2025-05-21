@@ -6,7 +6,7 @@
 
 :root {
   --font-noto: 'Noto Sans KR', sans-serif;
-  --background: theme('colors.i-ivory');
+  --background: #ffffff;
   --foreground: theme('colors.i-black');
 }
 

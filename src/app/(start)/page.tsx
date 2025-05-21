@@ -31,7 +31,7 @@ export default function StartPage() {
     <div className="min-h-screen flex flex-col relative">
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="bg-i-ivory py-24 px-6 relative">
+        <section className="bg-orange-100 py-24 px-6 relative">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div className="flex-1">
               <motion.h2
@@ -39,7 +39,7 @@ export default function StartPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 viewport={{ once: true }}
-                className="text-5xl text-i-darkblue font-bold mb-4"
+                className="text-5xl text-gray-900 font-bold mb-4"
               >
                 아이의 진심, 당신의 귀로 전해지도록
               </motion.h2>
@@ -57,16 +57,16 @@ export default function StartPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.9 }}
                 viewport={{ once: true }}
-                className="text-lg text-i-darkblue mb-8"
+                className="text-lg text-gray-900 mb-8"
               >
                 iBridge는 부모가 아이의 진짜 마음을 이해할 수 있도록 돕는, 감정
                 분석 기반의 소통 플랫폼입니다.
               </motion.p>
               <div className="flex gap-4">
-                <div className="bg-i-lightpurple text-blue-900 px-4 py-1 rounded-full text-sm">
+                <div className="bg-i-lightpurple text-gray-900 px-4 py-1 rounded-full text-sm">
                   2026
                 </div>
-                <div className="bg-i-lightgrey text-blue-900 px-4 py-1 rounded-md text-sm">
+                <div className="bg-i-lightgrey text-gray-900 px-4 py-1 rounded-md text-sm">
                   Team i-Bridge
                 </div>
               </div>
@@ -79,9 +79,9 @@ export default function StartPage() {
               className="w-80"
             >
               <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px]">
-                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-i-lightpurple to-i-pink"></div>
+                <div className="absolute inset-x-0 top-0 h-1 bg-orange-400"></div>
                 <div className="space-y-3 text-center">
-                  <h3 className="text-lg noto-light text-i-darkblue">
+                  <h3 className="text-lg noto-light text-gray-900">
                     시작하려면 로그인하세요
                   </h3>
                   <LoginButton />
@@ -116,7 +116,7 @@ export default function StartPage() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-bold text-i-darkblue mb-8"
+            className="text-3xl md:text-4xl font-bold text-black mb-8"
           >
             부모와 자녀, 감정의 다리를 잇다 — iBridge
           </motion.h1>
