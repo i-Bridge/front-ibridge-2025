@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSubjectStore } from '@/store/question/subjectStore';
 import { useHomeData } from '@/hooks/home/useHomeData';
 import SubjectDetailPanel from './SubjectDetailPanel';
-import SubjectTitleWithActions from './SubjectTitleWithActions';
+import SubjectTitleWithActions from './SubjectTitleEdit';
 
 type Subject = {
   subjectId: number;
@@ -28,6 +28,7 @@ const SubjectList = ({ initialSubjects }: Props) => {
   // 3. fetchedSubjects가 변경되면 subjects 상태 업데이트
   useEffect(() => {
     if (fetchedSubjects) {
+      console.log('fetchedSubject');
       setSubjects(fetchedSubjects);
     }
   }, [fetchedSubjects]);
@@ -43,19 +44,29 @@ const SubjectList = ({ initialSubjects }: Props) => {
   return (
     <div className="space-y-2">
       {loading ? (
-        <div className="text-gray-500">불러오는 중...</div>
+        <div className="text-gray-500">불러오는 중...</div> //로딩 컴포넌트로 수정
       ) : (
         subjects.map((subject) => (
           <div
             key={subject.subjectId}
-            onClick={() => handleClick(subject.subjectId)}
-            className={`p-4 rounded-lg cursor-pointer transition-all ${
+            onClick={() => {
+              if (subject.answer) {
+                handleClick(subject.subjectId);
+              }
+            }}
+            className={`p-4 rounded-lg transition-all ${
               selectedSubjectId === subject.subjectId
                 ? 'bg-blue-100'
-                : 'bg-white hover:bg-gray-50'
+                : subject.answer
+                  ? 'bg-white hover:bg-gray-50'
+                  : 'bg-white'
+            } ${
+              subject.answer
+                ? 'cursor-pointer'
+                : ' '
             }`}
           >
-            <div className="font-semibold">
+            <div className="noto-light">
               {subject.answer ? (
                 <div>{subject.subjectTitle}</div>
               ) : (
@@ -65,9 +76,8 @@ const SubjectList = ({ initialSubjects }: Props) => {
                 />
               )}
             </div>
-            {selectedSubjectId === subject.subjectId && (
+            {subject.answer && selectedSubjectId === subject.subjectId && (
               <div className="mt-2">
-                {/* 장점: 필요할 때만 렌더링 함 */}
                 <SubjectDetailPanel />
               </div>
             )}
