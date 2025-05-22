@@ -116,7 +116,7 @@ export default function StartPage() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-bold text-black mb-8"
+            className="text-3xl md:text-4xl font-bold text-gray-900 mb-8"
           >
             부모와 자녀, 감정의 다리를 잇다 — iBridge
           </motion.h1>
@@ -125,7 +125,7 @@ export default function StartPage() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
             viewport={{ once: true }}
-            className="text-lg text-i-darkblue leading-relaxed mb-8"
+            className="text-lg text-gray-900 leading-relaxed mb-8"
           >
             아이의 행동 이면에는 언제나 &quot;나를 이해해 줘!&quot;라는 외침이
             있습니다. 하지만 부모도 완벽할 수 없기에, 올바른 소통을 위한 도구가
@@ -141,7 +141,7 @@ export default function StartPage() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-bold text-i-darkblue mb-12"
+            className="text-3xl md:text-4xl font-bold text-gray-900 mb-12"
           >
             가족을 이해하는 새로운 방법, iBridge
           </motion.h2>
@@ -154,10 +154,10 @@ export default function StartPage() {
               viewport={{ once: true }}
               className="bg-white p-6 rounded-xl shadow-md text-left"
             >
-              <h3 className="text-xl font-semibold text-i-darkblue mb-2">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 감정 중심의 대화 설계
               </h3>
-              <p className="text-blue-900">
+              <p className=" text-gray-900">
                 아이의 감정을 기반으로 설계된 질문으로, 더 깊은 생각을
                 이끌어냅니다.
               </p>
@@ -169,7 +169,7 @@ export default function StartPage() {
               viewport={{ once: true }}
               className="bg-white p-6 rounded-xl shadow-md text-left"
             >
-              <h3 className="text-xl font-semibold text-i-darkblue mb-2">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 부모를 위한 인사이트
               </h3>
               <p className="text-blue-900">
@@ -184,10 +184,10 @@ export default function StartPage() {
               viewport={{ once: true }}
               className="bg-white p-6 rounded-xl shadow-md text-left"
             >
-              <h3 className="text-xl font-semibold text-i-darkblue mb-2">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 쉽고 직관적인 사용 경험
               </h3>
-              <p className="text-blue-900">
+              <p className=" text-gray-900">
                 누구나 이해하기 쉬운 UI/UX로, 기술에 익숙하지 않아도 걱정 없이
                 사용 가능.
               </p>
@@ -204,10 +204,10 @@ export default function StartPage() {
               viewport={{ once: true }}
               className="w-full sm:w-[45%] bg-white p-6 rounded-lg shadow-md border border-gray-200"
             >
-              <h2 className="text-4xl text-i-darkblue font-bold mb-8">
+              <h2 className="text-4xl text-gray-900 font-bold mb-8">
                 For Parent
               </h2>
-              <p className="text-blue-900 leading-relaxed mb-8">
+              <p className=" text-gray-900 leading-relaxed mb-8">
                 감정적인 해석을 최소화하고, 자녀의 생각을 보다 명확히 이해할 수
                 있도록 돕는 인사이트 제공 서비스.
               </p>
@@ -220,10 +220,10 @@ export default function StartPage() {
               viewport={{ once: true }}
               className="w-full sm:w-[45%] bg-white p-6 rounded-lg shadow-md border border-gray-200"
             >
-              <h2 className="text-4xl text-i-darkblue font-bold mb-8">
+              <h2 className="text-4xl text-gray-900 font-bold mb-8">
                 For Child
               </h2>
-              <p className="text-blue-900 leading-relaxed mb-8">
+              <p className=" text-gray-900 leading-relaxed mb-8">
                 귀여운 캐릭터와의 대화를 통해 자연스럽게 감정을 표현하고, 자신을
                 이해받는 경험을 쌓을 수 있는 공간.
               </p>
