@@ -170,7 +170,7 @@ export default function LoginButton() {
           </div>
         )}
 
-        <LogoutButton className="px-6 py-2 border border-orange-400 text-orange-400 rounded-lg hover:bg-orange-50 ">
+        <LogoutButton className="px-6 py-2  text-red-600 rounded-lg hover:bg-gray-100 ">
           {' '}
           로그아웃{' '}
         </LogoutButton>
