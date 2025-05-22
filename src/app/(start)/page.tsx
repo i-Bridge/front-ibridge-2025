@@ -26,12 +26,11 @@ export default function StartPage() {
 
     checkAccepted();
   }, [session]);
-
   return (
     <div className="min-h-screen flex flex-col relative">
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="bg-orange-100 py-24 px-6 relative">
+        <section className="bg-i-ivory py-24 px-6">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div className="flex-1">
               <motion.h2
@@ -39,34 +38,34 @@ export default function StartPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 viewport={{ once: true }}
-                className="text-5xl text-gray-900 font-bold mb-4"
+                className="text-6xl text-i-darkblue font-bold mb-4"
               >
-                아이의 진심, 당신의 귀로 전해지도록
+                Welcome to iBridge
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7 }}
                 viewport={{ once: true }}
-                className="text-base text-i-pink font-semibold mb-4"
+                className="text-xl text-i-darkblue mb-4"
               >
-                소통이 필요한 가정을 위한, AI 기반 부모와 아이 소통 플랫폼
+                감정은 행동이 아닌, 말로 표현될 수 있어야 합니다.
               </motion.p>
               <motion.p
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.9 }}
                 viewport={{ once: true }}
-                className="text-lg text-gray-900 mb-8"
+                className="text-lg text-i-darkblue mb-8"
               >
                 iBridge는 부모가 아이의 진짜 마음을 이해할 수 있도록 돕는, 감정
                 분석 기반의 소통 플랫폼입니다.
               </motion.p>
               <div className="flex gap-4">
-                <div className="bg-i-lightpurple text-gray-900 px-4 py-1 rounded-full text-sm">
+                <div className="bg-i-lightpurple text-blue-900 px-4 py-1 rounded-full text-sm">
                   2026
                 </div>
-                <div className="bg-i-lightgrey text-gray-900 px-4 py-1 rounded-md text-sm">
+                <div className="bg-i-lightgrey text-blue-900 px-4 py-1 rounded-md text-sm">
                   Team i-Bridge
                 </div>
               </div>
@@ -78,34 +77,13 @@ export default function StartPage() {
               viewport={{ once: true }}
               className="w-80"
             >
-              <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px]">
-                <div className="absolute inset-x-0 top-0 h-1 bg-orange-400"></div>
-                <div className="space-y-3 text-center">
-                  <h3 className="text-lg noto-light text-gray-900">
-                    시작하려면 로그인하세요
-                  </h3>
+              <div className="bg-white py-6 rounded-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px]">
+                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-i-lightorange to-i-orange"></div>
+                <div className="space-y-3">
                   <LoginButton />
                 </div>
               </div>
             </motion.div>
-          </div>
-
-          {/* Scroll Indicator */}
-          <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5} // ✔ 굵기 조절 (기존 1.5 → 2.5로 Bold 느낌)
-              stroke="currentColor"
-              className="w-8 h-8 text-gray-500" // ✔ 크기 키움 (w-6 h-6 → w-10 h-10)
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
-              />
-            </svg>
           </div>
         </section>
 
@@ -133,7 +111,7 @@ export default function StartPage() {
             이해할 수 있도록 도와주는 웹 플랫폼입니다.
           </motion.p>
         </section>
-
+        
         {/* Features Section */}
         <section className="max-w-6xl mx-auto px-6 py-24 text-center">
           <motion.h2
@@ -194,6 +172,7 @@ export default function StartPage() {
             </motion.div>
           </div>
         </section>
+
         {/* Parent and Child Service Sections */}
         <div className="w-full mx-auto px-8 mb-16">
           <div className="flex justify-between gap-12">

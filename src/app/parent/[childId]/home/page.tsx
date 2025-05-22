@@ -4,7 +4,6 @@ import AiComment from '@/components/Home/aiComment';
 import MonthSelector from '@/components/Home/monthSelector';
 import Weekly from '@/components/Home/weekly';
 import SubjectList from '@/components/Question/SubjectList';
-import SubjectDetailPanel from '@/components/Question/SubjectDetailPanel';
 
 
 
@@ -47,7 +46,7 @@ export default async function HomePage({ params }: { params: { childId: string }
           <MonthSelector />
           <Weekly />
           <SubjectList initialSubjects={homeData.subjects} />
-          <SubjectDetailPanel />
+        
         </div>
       </div>
     </div>
