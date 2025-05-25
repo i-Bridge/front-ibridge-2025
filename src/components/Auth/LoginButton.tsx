@@ -90,9 +90,9 @@ export default function LoginButton() {
       }
       setFamilySuccess('✅ 수락 요청 메일을 보냈습니다.');
       setFamilyName('');
-      setTimeout(() => {
+      
         setStatus('waiting');
-      }, 2000);
+      
     } catch (err) {
       console.error('❌ 가족 이름 등록 실패:', err);
       alert('오류가 발생했습니다.');
