@@ -21,7 +21,11 @@ const Step2 = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
-  const currentChild = childrenInfo[currentChildIndex] || { name: '', gender: null, birth: '' };
+  const currentChild = childrenInfo[currentChildIndex] || {
+    name: '',
+    gender: null,
+    birth: '',
+  };
 
   const [name, setName] = useState(currentChild.name);
   const [gender, setGender] = useState<number | null>(currentChild.gender);
@@ -73,7 +77,7 @@ const Step2 = () => {
       } catch (error) {
         console.error('자녀 정보 저장 실패:', error);
         setError('자녀 정보 저장 중 문제가 발생했습니다.');
-        setIsSuccess(false);  // 실패한 경우
+        setIsSuccess(false); // 실패한 경우
       }
     } else {
       // 다음 자식 입력으로 이동
@@ -93,10 +97,10 @@ const Step2 = () => {
   // 성공적으로 데이터를 저장했을 경우 1초 뒤에 profile 페이지로 이동
   useEffect(() => {
     if (isSuccess) {
-      alert("dklfs");
+      alert('dklfs');
       setTimeout(() => {
         router.push('/profile');
-      }, 10000);  // 1초 뒤에 페이지 이동
+      }, 10000); // 1초 뒤에 페이지 이동
     }
   }, [isSuccess, router]);
 
@@ -162,9 +166,32 @@ const Step2 = () => {
 
         <button
           onClick={handleNext}
-          className="bg-blue-500 text-white px-4 py-2"
+          className={`px-4 py-2 flex items-center justify-center transition
+    ${
+      currentChildIndex + 1 === childrenCount
+        ? 'bg-orange-400 hover:bg-orange-300 text-white rounded-xl'
+        : 'text-gray-900 hover:text-gray-400'
+    }
+  `}
         >
-          {currentChildIndex + 1 === childrenCount ? '완료' : '다음'}
+          {currentChildIndex + 1 === childrenCount ? (
+            '완료'
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+              />
+            </svg>
+          )}
         </button>
       </div>
     </div>
