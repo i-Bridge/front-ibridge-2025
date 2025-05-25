@@ -11,27 +11,24 @@ export default function ReplyPage() {
   const { completedSteps, completeStep } = useReplyStepsStore();
   const { childId } = useParams();
 
-  const [question, setQuestion] = useState(''); // ✅ 하나로 통일
-  const [displayText, setDisplayText] = useState('');
+  const [question, setQuestion] = useState(''); // 질문 텍스트 보관
+  const [displayText, setDisplayText] = useState(''); // 타이핑 애니메이션용 텍스트
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isQuestionVisible, setIsQuestionVisible] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isRecordingFinished, setIsRecordingFinished] = useState(false);
+  const [subjectId, setSubjectId] = useState<number | null>(null);
 
-  // ✅ 첫 질문 불러오기
   useEffect(() => {
     if (!childId) return;
 
     const fetchHomeData = async () => {
       const { data, isSuccess } = await Fetcher<{
-        question: string;
         isCompleted: boolean;
       }>(`/child/${childId}/home`, { method: 'GET' });
-
       if (isSuccess && data) {
-        setQuestion(data.question); // ✅ question 하나로 통일
         setIsCompleted(data.isCompleted);
       }
     };
@@ -102,7 +99,7 @@ export default function ReplyPage() {
     completeStep();
     setDisplayText('');
     setIsRecordingFinished(false);
-    speak(question); // ✅ 이미 setQuestion으로 바뀌어 있음
+    speak(question);
   };
 
   return (
@@ -141,22 +138,48 @@ export default function ReplyPage() {
           <>
             {!isCompleted && (
               <button
-                onClick={() => {
+                onClick={async () => {
                   setIsQuestionVisible(true);
                   setDisplayText('');
-                  speak(question);
+
+                  // ✅ /predesigned API 호출
+                  const { data, isSuccess } = await Fetcher<{
+                    subjectId: number;
+                    question: string;
+                  }>(`/child/${childId}/predesigned`, {
+                    method: 'GET',
+                  });
+
+                  if (isSuccess && data) {
+                    setQuestion(data.question); // ✅ 질문 저장
+                    setSubjectId(data.subjectId); // ✅ 녹화용 subjectId 저장 (위에서 상태 만들어야 함)
+                    speak(data.question); // ✅ 음성 읽기
+                  } else {
+                    console.error('❌ 사전 질문 불러오기 실패');
+                  }
                 }}
                 className="w-64 px-8 py-6 text-lg bg-green-500 text-white rounded-lg shadow-lg"
               >
                 질문에 응답할래
               </button>
             )}
+
             <button
-              onClick={() => {
+              onClick={async () => {
                 setIsQuestionVisible(true);
-                setQuestion('얘기해봐!');
                 setDisplayText('');
-                speak('얘기해봐!');
+
+                const { data, isSuccess } = await Fetcher<{
+                  subjectId: number;
+                }>(`/child/${childId}/new`, { method: 'GET' });
+
+                if (isSuccess && data) {
+                  setSubjectId(data.subjectId);
+                  setQuestion('얘기해봐!');
+                  speak('얘기해봐!');
+                } else {
+                  console.error('❌ 새 질문(subjectId) 발급 실패');
+                }
               }}
               className="w-64 px-8 py-6 text-lg bg-blue-500 text-white rounded-lg shadow-lg"
             >
@@ -165,7 +188,7 @@ export default function ReplyPage() {
           </>
         ) : (
           <VideoRecorder
-            subjectId={completedSteps + 1}
+            subjectId={subjectId}
             onAIResponse={(ai: string) => {
               console.log('✅ 백엔드에서 받은 ai 응답:', ai);
               setQuestion(ai); // ✅ 다음 질문 덮어쓰기

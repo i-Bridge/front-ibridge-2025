@@ -9,7 +9,7 @@ export default function VideoRecorder({
   onAIResponse,
   onFinished,
 }: {
-  subjectId: number;
+  subjectId: number | null;
   onAIResponse: (message: string) => void;
   onFinished: () => void;
 }) {
@@ -64,7 +64,7 @@ export default function VideoRecorder({
         await uploadToS3(blob, 'video');
         mediaStream.getTracks().forEach((track) => track.stop());
         stopSTT();
-        onFinished(); // ✅ 녹화 완료 알림
+        onFinished();
       };
 
       mediaRecorderRef.current = recorder;
@@ -128,7 +128,7 @@ export default function VideoRecorder({
   };
 
   const captureAndUploadThumbnail = async () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    if (!videoRef.current || !canvasRef.current || !subjectId) return;
 
     console.log('🖼 썸네일 캡처 중...');
     const canvas = canvasRef.current;
@@ -140,14 +140,14 @@ export default function VideoRecorder({
     ctx?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
     canvas.toBlob(async (blob) => {
-      if (!blob || !answerId) return;
+      if (!blob) return;
 
       console.log('☁️ 썸네일 Presigned URL 요청');
       const { data } = await Fetcher<{ url: string }>(
         `/child/${childId}/getURL`,
         {
           method: 'POST',
-          data: { type: 'image', id: answerId },
+          data: { type: 'image', subjectId },
           skipAuthHeader: true,
         },
       );
@@ -169,14 +169,14 @@ export default function VideoRecorder({
   };
 
   const uploadToS3 = async (blob: Blob, type: 'video') => {
-    if (!answerId) return;
+    if (!subjectId) return;
 
     console.log('☁️ 영상 Presigned URL 요청');
     const { data } = await Fetcher<{ url: string }>(
       `/child/${childId}/getURL`,
       {
         method: 'POST',
-        data: { type: 'video', id: answerId },
+        data: { type: 'video', subjectId },
         skipAuthHeader: true,
       },
     );
@@ -226,7 +226,7 @@ export default function VideoRecorder({
           await Fetcher(`/child/${childId}/uploaded`, {
             method: 'POST',
             data: {
-              id: data.id,
+              subjectId,
               video: uploadedVideoUrl,
               image: uploadedThumbnailUrl,
             },
