@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Fetcher } from '@/lib/fetcher';
 import { Child } from '@/types';
 
+
 interface ProfileData {
   accepted: boolean;
   send: boolean;
@@ -19,14 +20,12 @@ export default async function Profile() {
   }
 
   if (!profileData.accepted) {
-    return <div> 403: accepted false </div>;
+    return <div>  accepted false </div>;
   }
 
   if (!profileData.send) {
-    return <div> 403: send false </div>;
+    return <div>  send false </div>;
   }
-
-  console.log('받아온 profileData:', profileData); // 추후 삭제 예정
 
   return (
     <div className="w-full h-screen flex flex-col ">
@@ -35,6 +34,7 @@ export default async function Profile() {
         <p>
           <strong>🏠 </strong> {profileData.familyName}
           <strong> 🏠</strong>
+
         </p>
       </div>
 
@@ -43,7 +43,7 @@ export default async function Profile() {
         {profileData.children.map((child) => (
           <div key={child.id} className="flex flex-col items-center ">
             <Link href={`/parent/${child.id}/home`}>
-              <div className="text-center break-words text-xl w-24 h-24  bg-i-lightgreen/70 rounded-full  hover:shadow-md hover:bg-i-lightgreen cursor-pointer flex items-center justify-center text-white">
+              <div className="text-center break-words text-xl w-28 h-28  bg-i-lightgreen rounded-full  hover:shadow-md hover:bg-i-lightgreen/70 cursor-pointer flex items-center justify-center text-white">
                 {child.name}
               </div>
               
@@ -55,14 +55,14 @@ export default async function Profile() {
         ))}
       </div>
 
-      {/*<ul className=" border-t "></ul>*/}
+
 
       {/* 자식 계정 프로필 */}
       <div className="flex justify-center items-center flex-wrap gap-8 p-8  bg-orange-100 ">
         {profileData.children.map((child) => (
           <div key={child.id} className="flex flex-col items-center">
             <Link href={`/child/${child.id}/home`}>
-              <div className="text-2xl w-32 h-32 bg-i-lightorange/70 rounded-full hover:shadow-md hover:bg-i-lightorange cursor-pointer flex items-center justify-center text-white  text-center break-words">
+              <div className="text-2xl w-28 h-28 bg-i-lightorange rounded-full hover:shadow-md hover:bg-i-lightorange/70 cursor-pointer flex items-center justify-center text-white  text-center break-words">
                 {child.name}
               </div>
             </Link>
