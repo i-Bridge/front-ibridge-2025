@@ -111,7 +111,7 @@ export default function StartPage() {
             이해할 수 있도록 도와주는 웹 플랫폼입니다.
           </motion.p>
         </section>
-        
+
         {/* Features Section */}
         <section className="max-w-6xl mx-auto px-6 py-24 text-center">
           <motion.h2

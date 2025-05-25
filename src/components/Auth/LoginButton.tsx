@@ -14,6 +14,7 @@ export default function LoginButton() {
   >('idle');
   const [familyName, setFamilyName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [familySuccess, setFamilySuccess] = useState<string | null>(null);
   const [familyError, setFamilyError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -75,6 +76,7 @@ export default function LoginButton() {
 
     setLoading(true);
     setFamilyError(null);
+    setFamilySuccess(null);
 
     try {
       const res = await Fetcher<{ exist: boolean }>('/start/signup/exist', {
@@ -83,12 +85,14 @@ export default function LoginButton() {
       });
 
       if (!res?.data?.exist) {
-        setFamilyError('❗ 존재하지 않는 가족 이름입니다. 다시 입력하세요.');
+        setFamilyError('❗ 존재하지 않는 가족 이름입니다.');
         return;
       }
-
+      setFamilySuccess('✅ 수락 요청 메일을 보냈습니다.');
       setFamilyName('');
-      setStatus('waiting');
+      
+        setStatus('waiting');
+      
     } catch (err) {
       console.error('❌ 가족 이름 등록 실패:', err);
       alert('오류가 발생했습니다.');
@@ -100,22 +104,21 @@ export default function LoginButton() {
   if (session) {
     return (
       <>
+        <p className="mb-4 text-gray-600 flex text-center ">
+          {session.user?.name}님 반가워요!
+        </p>
         {status === 'checking' && (
-          <div className="flex flex-col items-center mt-8">
+          <div className="flex flex-col items-center  justify-center mt-16 bg-gray-100 rounded-xl h-32">
             {/* Tailwind 기본 스피너 */}
-            <div className="animate-spin h-10 w-10 border-4 border-i-pink border-t-transparent rounded-full" />
-            <p className="text-gray-500 text-sm mt-4">
-              프로필로 이동 중입니다...
-            </p>
+            <div className="animate-spin h-10 w-10 border-4 border-orange-400 border-t-transparent rounded-full" />
+            <p className="text-gray-500 text-sm mt-4">계정 확인 중입니다 ...</p>
           </div>
         )}
 
-        <p className=" mb-4 text-gray-600">{session.user?.name}님 반가워요!</p>
-
         {status === 'firstLogin' && (
-          <div className="mt-4 p-4 max-w-md">
-            <p className="mb-4 text-gray-900">👨‍👩‍👧‍👦 기존 가족이 있나요?</p>
-            <div className="flex gap-4">
+          <div className="flex flex-col justify-center mt-4 p-4 max-w-md bg-gray-100 rounded-xl  font-semibold h-32">
+            <p className="mb-4 text-gray-900 ">👨‍👩‍👧‍👦 기존 가족이 있나요?</p>
+            <div className="flex item-center gap-4 justify-center">
               <button
                 onClick={() => setStatus('enterFamilyName')}
                 className="w-12 h-10 border border-green-500 text-green-500 rounded-lg hover:bg-green-50 transition text-center"
@@ -133,11 +136,11 @@ export default function LoginButton() {
         )}
 
         {status === 'enterFamilyName' && (
-          <div className="mt-4 p-4 border rounded-xl shadow-sm bg-white w-full max-w-sm">
-            <p className="text-lg font-semibold mb-2 text-gray-800">
+          <div className="flex flex-col  mt-4 p-4 max-w-md bg-gray-100 rounded-xl h-32">
+            <p className=" font-semibold mb-4 text-gray-800">
               👨‍👩‍👧 가족 이름을 입력해주세요:
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-sm">
               <input
                 type="text"
                 placeholder="가족 이름"
@@ -153,24 +156,40 @@ export default function LoginButton() {
               />
               <button
                 onClick={handleSubmitFamily}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition whitespace-nowrap"
+                className="px-2 py-2 bg-orange-400 text-white rounded-xl hover:bg-orange-200 transition whitespace-nowrap"
               >
-                확인
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-5 h-5 text-green-600"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m4.5 12.75 6 6 9-13.5"
+                  />
+                </svg>
               </button>
             </div>
             {familyError && (
-              <p className="mt-2 text-sm text-red-500">{familyError}</p>
+              <p className="mt-2 text-sm text-red-600">{familyError}</p>
+            )}
+            {familySuccess && (
+              <p className="mt-2 text-sm text-green-600">{familySuccess}</p>
             )}
           </div>
         )}
 
         {status === 'waiting' && (
-          <div className="mt-4 p-4 border rounded-xl shadow-sm bg-yellow-50 text-gray-800">
-            <p>⏳ 수락 요청 중입니다...</p>
+          <div className="mt-4 p-4 border rounded-xl shadow-sm bg-yellow-50 text-gray-800 h-32">
+            <p>⏳수락을 기다리고 있습니다...</p>
           </div>
         )}
 
-        <LogoutButton className="px-6 py-2  text-red-600 rounded-lg hover:bg-gray-100 ">
+        <LogoutButton className=" text-red-600 rounded-lg hover:text-red-300 ">
           {' '}
           로그아웃{' '}
         </LogoutButton>

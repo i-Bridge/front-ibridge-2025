@@ -10,31 +10,41 @@ interface DupFamilyNameData {
 }
 
 const Step1 = () => {
-  {/* */}
+  {
+    /* */
+  }
 
-  {/* 로컬 상태 관리 */}
+  {
+    /* 로컬 상태 관리 */
+  }
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [familyName, setFamilyName] = useState<string>(''); 
-  const [isNameChecked, setIsNameChecked] = useState<boolean>(false); 
+  const [familyName, setFamilyName] = useState<string>('');
+  const [isNameChecked, setIsNameChecked] = useState<boolean>(false);
   const [numberOfChildren, setNumberOfChildren] = useState<number>(0);
-  
-  {/* 스토어 저장 관리 */}
+
+  {
+    /* 스토어 저장 관리 */
+  }
   const {
     setChildrenCount,
     setStep,
-    setFamilyName: storeSetFamilyName,//스토어로 저장
+    setFamilyName: storeSetFamilyName, //스토어로 저장
     familyName: storeFamilyName, //스토어의 정보
     childrenCount: storeChildrenCount,
   } = useSetupStore();
 
-  {/* 스토어 값 로드해서 초기화 설정 */}
+  {
+    /* 스토어 값 로드해서 초기화 설정 */
+  }
   useEffect(() => {
     setFamilyName(storeFamilyName);
     setNumberOfChildren(storeChildrenCount);
   }, [storeFamilyName, storeChildrenCount]);
 
-  {/* 중복 체크 버튼 클릭 handle */}
+  {
+    /* 중복 체크 버튼 클릭 handle */
+  }
   const handleCheckName = async () => {
     if (!familyName) {
       setError('가족 이름을 입력해 주세요.');
@@ -65,26 +75,27 @@ const Step1 = () => {
     }
   };
 
-  {/* Step2로 이동 */}
+  {
+    /* Step2로 이동 */
+  }
   const handleNext = () => {
     if (!isNameChecked) {
       setError('가족 이름을 먼저 확인해주세요.');
       return;
     }
     if (numberOfChildren <= 0) {
-    setError('자녀 수는 1명 이상이어야 합니다.');
-    return;
-  }
-    
-    //자식 수 정보 저장 후 다음 단계로 
+      setError('자녀 수는 1명 이상이어야 합니다.');
+      return;
+    }
+
+    //자식 수 정보 저장 후 다음 단계로
     setChildrenCount(numberOfChildren);
-    setStep(2); 
+    setStep(2);
   };
 
   return (
     <div className="w-full flex flex-col gap-3 text-base px-4 py-3">
-      
-       <div className="h-[20px] mb-1 ">
+      <div className="h-[20px] mb-1 text-sm">
         {error ? (
           <p className="text-red-500 whitespace-nowrap">{error}</p>
         ) : isNameChecked ? (
@@ -112,23 +123,31 @@ const Step1 = () => {
           <button
             onClick={handleCheckName}
             disabled={loading}
-            className="bg-green-500 text-white px-2 py-1 text-xs disabled:opacity-50 whitespace-nowrap"
+            className="bg-i-lightgreen text-white px-2 py-1 text-xs disabled:opacity-50 whitespace-nowrap rounded-xl"
           >
             {loading ? '확인 중...' : '중복 확인'}
           </button>
         </div>
       </div>
 
-      
-
       <div className="flex justify-between items-center whitespace-nowrap mb-4">
         <span className="min-w-[80px]">자녀 수</span>
+        {/*항상 위아래 화살표 모양 보이게 */}
+        <style jsx>{`
+          input[type='number']::-webkit-inner-spin-button {
+            opacity: 1;
+            display: block;
+          }
+          input[type='number'] {
+            -moz-appearance: textfield;
+          }
+        `}</style>
         <input
           id="childrenCount"
           type="number"
           min="0"
           max="10"
-          className="border p-1 w-[60px]"
+          className="border p-1 w-[50px]"
           value={numberOfChildren}
           onChange={(e) => setNumberOfChildren(Number(e.target.value))}
         />
@@ -136,12 +155,25 @@ const Step1 = () => {
 
       <button
         onClick={handleNext}
-        className="bg-blue-500 text-white px-4 py-2 mt-4 self-end whitespace-nowrap"
+        className=" text-gray-900  py-2 mt-4 self-end whitespace-nowrap hover:text-gray-400"
       >
-        다음
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          className="size-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+          />
+        </svg>
       </button>
     </div>
   );
-}
+};
 
 export default Step1;
