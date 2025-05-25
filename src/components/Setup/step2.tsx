@@ -105,9 +105,9 @@ const Step2 = () => {
   }, [isSuccess, router]);
 
   return (
-    <div className="w-full flex flex-col gap-3 px-4 py-3">
+    <div className="w-full flex flex-col gap-3 px-4 py-2 ">
       <div className="h-[20px] mb-1 ">
-        {error && <p className="text-red-500 whitespace-nowrap">{error}</p>}
+        {error && <p className="text-red-500 whitespace-nowrap text-sm">{error}</p>}
       </div>
 
       <div className="flex justify-between items-center">
@@ -159,18 +159,21 @@ const Step2 = () => {
       <div className="flex justify-between gap-4 mt-4">
         <button
           onClick={handlePrevious}
-          className="bg-gray-500 text-white px-4 py-2"
+          className="text-gray-900  px-2 py-2"
         >
-          이전
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+</svg>
+
         </button>
 
         <button
           onClick={handleNext}
-          className={`px-4 py-2 flex items-center justify-center transition
+          className={` py-2 flex items-center justify-center transition
     ${
       currentChildIndex + 1 === childrenCount
-        ? 'bg-orange-400 hover:bg-orange-300 text-white rounded-xl'
-        : 'text-gray-900 hover:text-gray-400'
+        ? 'bg-orange-400 hover:bg-orange-300 text-white rounded-xl px-4'
+        : 'text-gray-900 hover:text-gray-400 px-2'
     }
   `}
         >
