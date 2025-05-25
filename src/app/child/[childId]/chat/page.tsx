@@ -1,14 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useReplyStepsStore } from '@/store/child/replyStepStore';
 import VideoRecorder from '@/components/Recorder/VideoRecorder';
 import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 
 export default function ReplyPage() {
-  const { completedSteps, completeStep } = useReplyStepsStore();
   const { childId } = useParams();
 
   const [question, setQuestion] = useState('');
@@ -192,7 +190,6 @@ export default function ReplyPage() {
                 setQuestion(ai);
                 setDisplayText('');
                 speak(ai);
-                completeStep(); // ✅ 자동 진행
                 setIsRecordingFinished(false); // ✅ 자동 초기화
               }}
               onFinished={() => {
@@ -206,9 +203,6 @@ export default function ReplyPage() {
 
       {isQuestionVisible && isRecordingFinished && (
         <div className="absolute bottom-20 flex flex-col items-center gap-6">
-          <p className="text-xl font-semibold">
-            현재 단계: {completedSteps + 1} / 5
-          </p>
           {/* ✅ 질문 다시 듣기 버튼만 유지 */}
           <button
             onClick={() => {

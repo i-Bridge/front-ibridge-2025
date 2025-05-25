@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 
@@ -66,6 +66,7 @@ export default function VideoRecorder({
         mediaStream.getTracks().forEach((track) => track.stop());
         stopSTT();
         mediaRecorderRef.current = null;
+        await sendToBackend(); // ✅ API 전송
         onFinished();
       };
 
@@ -77,11 +78,11 @@ export default function VideoRecorder({
 
       setTimeout(() => {
         if (!isThumbnailCaptured) {
-          console.log('📸 3초 경과 → 썸네일 캡처 시도');
+          console.log('📸 1초 경과 → 썸네일 캡처 시도');
           captureAndUploadThumbnail();
           setIsThumbnailCaptured(true);
         }
-      }, 3000);
+      }, 1000);
     } catch (err) {
       console.error('❌ 녹화 시작 실패:', err);
     }
@@ -199,46 +200,37 @@ export default function VideoRecorder({
     }
   };
 
-  useEffect(() => {
-    const sendToBackend = async () => {
-      if (
-        uploadedVideoUrl &&
-        uploadedThumbnailUrl &&
-        !isRecording &&
-        recognizedText &&
-        subjectId
-      ) {
-        console.log('📤 /answer 및 /uploaded API 요청 시작');
-        const { data, isSuccess } = await Fetcher<{ id: number; ai: string }>(
-          `/child/${childId}/answer`,
-          {
-            method: 'POST',
-            data: { subjectId, text: recognizedText },
+  const sendToBackend = async () => {
+    if (
+      uploadedVideoUrl &&
+      uploadedThumbnailUrl &&
+      recognizedText &&
+      subjectId
+    ) {
+      const { data, isSuccess } = await Fetcher<{
+        id: number;
+        ai: string;
+      }>(`/child/${childId}/answer`, {
+        method: 'POST',
+        data: { subjectId, text: recognizedText },
+      });
+
+      if (isSuccess && data) {
+        console.log('✅ /answer 응답:', data);
+        setAnswerId(data.id);
+        onAIResponse(data.ai);
+
+        await Fetcher(`/child/${childId}/uploaded`, {
+          method: 'POST',
+          data: {
+            subjectId,
+            video: uploadedVideoUrl,
+            image: uploadedThumbnailUrl,
           },
-        );
-
-        if (isSuccess && data) {
-          console.log('✅ /answer 응답:', data);
-          setAnswerId(data.id);
-          onAIResponse(data.ai);
-
-          const uploaded = await Fetcher(`/child/${childId}/uploaded`, {
-            method: 'POST',
-            data: {
-              subjectId,
-              video: uploadedVideoUrl,
-              image: uploadedThumbnailUrl,
-            },
-          });
-          console.log('✅ /uploaded 응답:', uploaded);
-        } else {
-          console.error('❌ /answer API 실패');
-        }
+        });
       }
-    };
-
-    sendToBackend();
-  }, [uploadedVideoUrl, uploadedThumbnailUrl, isRecording]);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center gap-4">
