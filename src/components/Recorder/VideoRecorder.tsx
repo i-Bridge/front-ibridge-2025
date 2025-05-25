@@ -61,6 +61,8 @@ export default function VideoRecorder({
       recorder.onstop = async () => {
         console.log('🛑 녹화 종료됨 → 영상 업로드 시작');
         const blob = new Blob(chunks, { type: 'video/webm' });
+        console.log('🎯 getURL 요청 직전 subjectId:', subjectId);
+
         await uploadToS3(blob, 'video');
         mediaStream.getTracks().forEach((track) => track.stop());
         stopSTT();
@@ -157,6 +159,7 @@ export default function VideoRecorder({
         return;
       }
 
+      console.log('📤 썸네일 S3 업로드 시작');
       const res = await fetch(data.url, { method: 'PUT', body: blob });
       if (res.ok) {
         const s3Url = data.url.split('?')[0];
@@ -169,7 +172,15 @@ export default function VideoRecorder({
   };
 
   const uploadToS3 = async (blob: Blob, type: 'video') => {
-    if (!subjectId) return;
+    console.log('🚀 uploadToS3 시작', { subjectId, blob });
+    console.log('📤 getURL 요청 데이터:', {
+      type,
+      subjectId,
+    });
+    if (!subjectId || typeof subjectId !== 'number') {
+      console.error('❌ 유효하지 않은 subjectId:', subjectId);
+      return;
+    }
 
     console.log('☁️ 영상 Presigned URL 요청');
     const { data } = await Fetcher<{ url: string }>(
@@ -186,6 +197,7 @@ export default function VideoRecorder({
       return;
     }
 
+    console.log('📤 영상 S3 업로드 시작');
     const res = await fetch(data.url, { method: 'PUT', body: blob });
     if (res.ok) {
       const s3Url = data.url.split('?')[0];
@@ -206,7 +218,7 @@ export default function VideoRecorder({
         childId &&
         subjectId
       ) {
-        console.log('📤 백엔드로 전송 시작');
+        console.log('📤 백엔드로 텍스트 및 업로드 알림 전송 시작');
         console.log('📝 전송할 텍스트:', recognizedText);
         console.log('🎯 subjectId:', subjectId);
 
@@ -219,11 +231,10 @@ export default function VideoRecorder({
         });
         console.log('📥 /answer API 응답:', { isSuccess, data });
         if (isSuccess && data) {
-          console.log('✅ 텍스트 응답 저장 완료. answerId:', data.id);
           setAnswerId(data.id);
           onAIResponse(data.ai);
 
-          await Fetcher(`/child/${childId}/uploaded`, {
+          const uploaded = await Fetcher(`/child/${childId}/uploaded`, {
             method: 'POST',
             data: {
               subjectId,
@@ -231,6 +242,7 @@ export default function VideoRecorder({
               image: uploadedThumbnailUrl,
             },
           });
+          console.log('📬 /uploaded API 응답:', uploaded);
         }
       }
     };

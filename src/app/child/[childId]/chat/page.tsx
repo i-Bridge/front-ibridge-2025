@@ -11,8 +11,8 @@ export default function ReplyPage() {
   const { completedSteps, completeStep } = useReplyStepsStore();
   const { childId } = useParams();
 
-  const [question, setQuestion] = useState(''); // 질문 텍스트 보관
-  const [displayText, setDisplayText] = useState(''); // 타이핑 애니메이션용 텍스트
+  const [question, setQuestion] = useState('');
+  const [displayText, setDisplayText] = useState('');
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isQuestionVisible, setIsQuestionVisible] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -25,18 +25,22 @@ export default function ReplyPage() {
     if (!childId) return;
 
     const fetchHomeData = async () => {
-      const { data, isSuccess } = await Fetcher<{
-        isCompleted: boolean;
-      }>(`/child/${childId}/home`, { method: 'GET' });
+      console.log('📥 /home API 호출');
+      const { data, isSuccess } = await Fetcher<{ isCompleted: boolean }>(
+        `/child/${childId}/home`,
+        { method: 'GET' },
+      );
       if (isSuccess && data) {
+        console.log('✅ /home 응답:', data);
         setIsCompleted(data.isCompleted);
+      } else {
+        console.error('❌ /home API 실패');
       }
     };
 
     fetchHomeData();
   }, [childId]);
 
-  // ✅ 타이핑 애니메이션
   useEffect(() => {
     if (!isQuestionVisible || !question) return;
 
@@ -52,11 +56,10 @@ export default function ReplyPage() {
         clearInterval(interval);
       }
     }, 100);
-    console.log('💬 말풍선에 출력할 전체 질문:', question);
+    console.log('💬 말풍선 질문 타이핑 시작:', question);
     return () => clearInterval(interval);
   }, [isQuestionVisible, question]);
 
-  // ✅ 입 움직임 애니메이션
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isSpeaking) {
@@ -69,7 +72,6 @@ export default function ReplyPage() {
     return () => clearInterval(interval);
   }, [isSpeaking]);
 
-  // ✅ 캐시 대비 이미지 사전 로드
   useEffect(() => {
     const img = new Image();
     img.src = '/images/characterDefault.png';
@@ -96,6 +98,7 @@ export default function ReplyPage() {
   };
 
   const handleNextStep = () => {
+    console.log('➡️ 다음 질문으로 이동');
     completeStep();
     setDisplayText('');
     setIsRecordingFinished(false);
@@ -103,8 +106,7 @@ export default function ReplyPage() {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen relative p-6 bg-amber-100">
-      {/* 캐릭터 이미지 */}
+    <div className="flex items-center justify-center h-screen relative p-6 bg-violet-100">
       <motion.img
         src={
           mouthOpen
@@ -120,7 +122,6 @@ export default function ReplyPage() {
         transition={{ duration: 0.3 }}
       />
 
-      {/* 말풍선 */}
       {isQuestionVisible && (
         <motion.div
           className="ml-16 w-96 min-h-32 bg-white p-6 rounded-lg shadow-sm border-2 border-i-orange"
@@ -132,7 +133,6 @@ export default function ReplyPage() {
         </motion.div>
       )}
 
-      {/* 버튼 영역 */}
       <div className="ml-32 flex flex-col gap-8 text-center">
         {!isQuestionVisible ? (
           <>
@@ -141,8 +141,10 @@ export default function ReplyPage() {
                 onClick={async () => {
                   setIsQuestionVisible(true);
                   setDisplayText('');
+                  console.log(
+                    '🟢 질문에 응답할래 버튼 클릭 → /predesigned 호출',
+                  );
 
-                  // ✅ /predesigned API 호출
                   const { data, isSuccess } = await Fetcher<{
                     subjectId: number;
                     question: string;
@@ -151,11 +153,12 @@ export default function ReplyPage() {
                   });
 
                   if (isSuccess && data) {
-                    setQuestion(data.question); // ✅ 질문 저장
-                    setSubjectId(data.subjectId); // ✅ 녹화용 subjectId 저장 (위에서 상태 만들어야 함)
-                    speak(data.question); // ✅ 음성 읽기
+                    console.log('✅ /predesigned 응답:', data);
+                    setQuestion(data.question);
+                    setSubjectId(data.subjectId);
+                    speak(data.question);
                   } else {
-                    console.error('❌ 사전 질문 불러오기 실패');
+                    console.error('❌ /predesigned API 실패');
                   }
                 }}
                 className="w-64 px-8 py-6 text-lg bg-green-500 text-white rounded-lg shadow-lg"
@@ -168,17 +171,19 @@ export default function ReplyPage() {
               onClick={async () => {
                 setIsQuestionVisible(true);
                 setDisplayText('');
+                console.log('🟦 나 하고 싶은 말이 있어 버튼 클릭 → /new 호출');
 
                 const { data, isSuccess } = await Fetcher<{
                   subjectId: number;
                 }>(`/child/${childId}/new`, { method: 'GET' });
 
                 if (isSuccess && data) {
+                  console.log('✅ /new 응답:', data);
                   setSubjectId(data.subjectId);
                   setQuestion('얘기해봐!');
                   speak('얘기해봐!');
                 } else {
-                  console.error('❌ 새 질문(subjectId) 발급 실패');
+                  console.error('❌ /new API 실패');
                 }
               }}
               className="w-64 px-8 py-6 text-lg bg-blue-500 text-white rounded-lg shadow-lg"
@@ -187,22 +192,24 @@ export default function ReplyPage() {
             </button>
           </>
         ) : (
-          <VideoRecorder
-            subjectId={subjectId}
-            onAIResponse={(ai: string) => {
-              console.log('✅ 백엔드에서 받은 ai 응답:', ai);
-              setQuestion(ai); // ✅ 다음 질문 덮어쓰기
-              setDisplayText(''); // 타이핑 초기화
-              speak(ai); // TTS 재생
-            }}
-            onFinished={() => {
-              setIsRecordingFinished(true); // 녹화 완료
-            }}
-          />
+          subjectId !== null && (
+            <VideoRecorder
+              subjectId={subjectId}
+              onAIResponse={(ai: string) => {
+                console.log('✅ 백엔드에서 받은 ai 응답:', ai);
+                setQuestion(ai);
+                setDisplayText('');
+                speak(ai);
+              }}
+              onFinished={() => {
+                console.log('✅ 녹화 완료됨');
+                setIsRecordingFinished(true);
+              }}
+            />
+          )
         )}
       </div>
 
-      {/* 다음 질문 버튼 */}
       {isQuestionVisible && isRecordingFinished && (
         <div className="absolute bottom-20 flex flex-col items-center gap-6">
           <p className="text-xl font-semibold">
@@ -210,20 +217,27 @@ export default function ReplyPage() {
           </p>
           <button
             onClick={handleNextStep}
-            className="px-6 py-4 bg-blue-500 text-white text-lg rounded-lg"
+            className="px-6 py-4 bg-orange-400 text-white text-lg rounded-lg"
           >
             다음 질문
           </button>
           <button
             onClick={() => {
+              console.log('🔙 뒤로가기 클릭됨');
               setIsQuestionVisible(false);
               setDisplayText('');
               setIsRecordingFinished(false);
+              setQuestion('');
+              setSubjectId(null);
               window.speechSynthesis.cancel();
             }}
-            className="px-6 py-4 bg-red-500 text-white text-lg rounded-lg"
+            className="w-16 h-16 bg-white rounded-lg flex items-center justify-center"
           >
-            뒤로가기
+            <img
+              src="/images/home.png"
+              alt="홈으로 가기"
+              className="w-12 h-12"
+            />
           </button>
         </div>
       )}
