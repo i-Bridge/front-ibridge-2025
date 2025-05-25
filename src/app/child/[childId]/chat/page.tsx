@@ -97,14 +97,6 @@ export default function ReplyPage() {
     window.speechSynthesis.speak(utterance);
   };
 
-  const handleNextStep = () => {
-    console.log('➡️ 다음 질문으로 이동');
-    completeStep();
-    setDisplayText('');
-    setIsRecordingFinished(false);
-    speak(question);
-  };
-
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-violet-100">
       <motion.img
@@ -200,6 +192,8 @@ export default function ReplyPage() {
                 setQuestion(ai);
                 setDisplayText('');
                 speak(ai);
+                completeStep(); // ✅ 자동 진행
+                setIsRecordingFinished(false); // ✅ 자동 초기화
               }}
               onFinished={() => {
                 console.log('✅ 녹화 완료됨');
@@ -215,11 +209,15 @@ export default function ReplyPage() {
           <p className="text-xl font-semibold">
             현재 단계: {completedSteps + 1} / 5
           </p>
+          {/* ✅ 질문 다시 듣기 버튼만 유지 */}
           <button
-            onClick={handleNextStep}
+            onClick={() => {
+              console.log('🔁 질문 다시 듣기 클릭됨');
+              speak(question);
+            }}
             className="px-6 py-4 bg-orange-400 text-white text-lg rounded-lg"
           >
-            다음 질문
+            질문 다시 듣기
           </button>
           <button
             onClick={() => {

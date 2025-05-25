@@ -34,16 +34,15 @@ export default function VideoRecorder({
     if (mediaRecorderRef.current) return;
 
     try {
-      console.log('🎬 녹화 시작 요청됨');
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       });
       setStream(mediaStream);
-      setIsThumbnailCaptured(false);
+      setRecognizedText('');
       setUploadedVideoUrl(null);
       setUploadedThumbnailUrl(null);
-      setRecognizedText('');
+      setIsThumbnailCaptured(false);
       setAnswerId(null);
 
       if (videoRef.current) {
@@ -59,14 +58,12 @@ export default function VideoRecorder({
       };
 
       recorder.onstop = async () => {
-        console.log('🛑 녹화 종료됨 → 영상 업로드 시작');
         const blob = new Blob(chunks, { type: 'video/webm' });
-        console.log('🎯 getURL 요청 직전 subjectId:', subjectId);
-
         await uploadToS3(blob, 'video');
         mediaStream.getTracks().forEach((track) => track.stop());
         stopSTT();
-        onFinished();
+        mediaRecorderRef.current = null; // ✅ 녹화 종료 후 초기화
+        onFinished(); // 녹화 완료 알림
       };
 
       mediaRecorderRef.current = recorder;
@@ -76,7 +73,6 @@ export default function VideoRecorder({
 
       setTimeout(() => {
         if (!isThumbnailCaptured) {
-          console.log('📸 3초 경과 → 썸네일 캡처 시도');
           captureAndUploadThumbnail();
           setIsThumbnailCaptured(true);
         }
@@ -87,13 +83,11 @@ export default function VideoRecorder({
   };
 
   const stopRecording = () => {
-    console.log('🛑 녹화 중지 요청됨');
     mediaRecorderRef.current?.stop();
     setIsRecording(false);
   };
 
   const startSTT = () => {
-    console.log('🎤 음성 인식 시작');
     const SpeechRecognition =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
@@ -112,7 +106,6 @@ export default function VideoRecorder({
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         finalTranscript += event.results[i][0].transcript;
       }
-      console.log('📝 인식된 텍스트:', finalTranscript);
       setRecognizedText(finalTranscript);
     };
 
@@ -125,14 +118,12 @@ export default function VideoRecorder({
   };
 
   const stopSTT = () => {
-    console.log('🛑 음성 인식 중단');
     recognitionRef.current?.stop();
   };
 
   const captureAndUploadThumbnail = async () => {
     if (!videoRef.current || !canvasRef.current || !subjectId) return;
 
-    console.log('🖼 썸네일 캡처 중...');
     const canvas = canvasRef.current;
     const video = videoRef.current;
     canvas.width = video.videoWidth;
@@ -144,7 +135,6 @@ export default function VideoRecorder({
     canvas.toBlob(async (blob) => {
       if (!blob) return;
 
-      console.log('☁️ 썸네일 Presigned URL 요청');
       const { data } = await Fetcher<{ url: string }>(
         `/child/${childId}/getURL`,
         {
@@ -154,57 +144,34 @@ export default function VideoRecorder({
         },
       );
 
-      if (!data?.url) {
-        console.error('❌ 썸네일 Presigned URL 획득 실패');
-        return;
-      }
+      if (!data?.url) return;
 
-      console.log('📤 썸네일 S3 업로드 시작');
       const res = await fetch(data.url, { method: 'PUT', body: blob });
       if (res.ok) {
         const s3Url = data.url.split('?')[0];
-        console.log('✅ 썸네일 S3 업로드 완료:', s3Url);
         setUploadedThumbnailUrl(s3Url);
-      } else {
-        console.error('❌ 썸네일 S3 업로드 실패');
       }
     }, 'image/jpeg');
   };
 
   const uploadToS3 = async (blob: Blob, type: 'video') => {
-    console.log('🚀 uploadToS3 시작', { subjectId, blob });
-    console.log('📤 getURL 요청 데이터:', {
-      type,
-      subjectId,
-    });
-    if (!subjectId || typeof subjectId !== 'number') {
-      console.error('❌ 유효하지 않은 subjectId:', subjectId);
-      return;
-    }
+    if (!subjectId) return;
 
-    console.log('☁️ 영상 Presigned URL 요청');
     const { data } = await Fetcher<{ url: string }>(
       `/child/${childId}/getURL`,
       {
         method: 'POST',
-        data: { type: 'video', subjectId },
+        data: { type, subjectId },
         skipAuthHeader: true,
       },
     );
 
-    if (!data?.url) {
-      console.error('❌ 영상 Presigned URL 획득 실패');
-      return;
-    }
+    if (!data?.url) return;
 
-    console.log('📤 영상 S3 업로드 시작');
     const res = await fetch(data.url, { method: 'PUT', body: blob });
     if (res.ok) {
       const s3Url = data.url.split('?')[0];
-      console.log('✅ 영상 S3 업로드 완료:', s3Url);
       setUploadedVideoUrl(s3Url);
-    } else {
-      console.error('❌ 영상 S3 업로드 실패');
     }
   };
 
@@ -215,26 +182,21 @@ export default function VideoRecorder({
         uploadedThumbnailUrl &&
         !isRecording &&
         recognizedText &&
-        childId &&
         subjectId
       ) {
-        console.log('📤 백엔드로 텍스트 및 업로드 알림 전송 시작');
-        console.log('📝 전송할 텍스트:', recognizedText);
-        console.log('🎯 subjectId:', subjectId);
+        const { data, isSuccess } = await Fetcher<{ id: number; ai: string }>(
+          `/child/${childId}/answer`,
+          {
+            method: 'POST',
+            data: { subjectId, text: recognizedText },
+          },
+        );
 
-        const { data, isSuccess } = await Fetcher<{
-          id: number;
-          ai: string;
-        }>(`/child/${childId}/answer`, {
-          method: 'POST',
-          data: { subjectId, text: recognizedText },
-        });
-        console.log('📥 /answer API 응답:', { isSuccess, data });
         if (isSuccess && data) {
           setAnswerId(data.id);
-          onAIResponse(data.ai);
+          onAIResponse(data.ai); // AI 응답 전달
 
-          const uploaded = await Fetcher(`/child/${childId}/uploaded`, {
+          await Fetcher(`/child/${childId}/uploaded`, {
             method: 'POST',
             data: {
               subjectId,
@@ -242,7 +204,6 @@ export default function VideoRecorder({
               image: uploadedThumbnailUrl,
             },
           });
-          console.log('📬 /uploaded API 응답:', uploaded);
         }
       }
     };
@@ -262,7 +223,6 @@ export default function VideoRecorder({
         <button
           onClick={startRecording}
           className="px-6 py-3 bg-green-500 text-white rounded-lg"
-          disabled={isRecording}
         >
           녹화 시작
         </button>
