@@ -39,7 +39,7 @@ export default function VideoRecorder({
       ) {
         console.log('📤 /answer 요청 시작');
         const { data, isSuccess } = await Fetcher<{
-          id: number;
+          finished: boolean;
           ai: string;
         }>(`/child/${childId}/answer`, {
           method: 'POST',
@@ -48,9 +48,8 @@ export default function VideoRecorder({
 
         if (isSuccess && data) {
           console.log('✅ /answer 응답:', data);
-          onAIResponse(data.ai);
 
-          const uploaded = await Fetcher(`/child/${childId}/uploaded`, {
+          await Fetcher(`/child/${childId}/uploaded`, {
             method: 'POST',
             data: {
               subjectId,
@@ -58,13 +57,26 @@ export default function VideoRecorder({
               image: uploadedThumbnailUrl,
             },
           });
-          console.log('📬 /uploaded 응답:', uploaded);
+
+          if (data.finished) {
+            console.log('🏁 모든 질문 완료됨');
+            const finalMessage = '수고했어요! 오늘의 대화를 마쳤어요.';
+            onAIResponse(finalMessage);
+            const utterance = new SpeechSynthesisUtterance(finalMessage);
+            utterance.lang = 'ko-KR';
+            utterance.pitch = 1.4;
+            utterance.rate = 0.8;
+            window.speechSynthesis.speak(utterance);
+            return;
+          }
+
+          onAIResponse(data.ai);
           onFinished();
         } else {
           console.error('❌ /answer 실패');
         }
       } else {
-        console.log('⛔ sendToBackend 조건 불충족:', {
+        console.warn('⛔ sendToBackend 조건 불충족:', {
           uploadedVideoUrl,
           uploadedThumbnailUrl,
           recognizedText,
@@ -119,7 +131,6 @@ export default function VideoRecorder({
       startSTT();
 
       setTimeout(() => {
-        console.log('📸 1초 경과 → 썸네일 캡처 시도');
         captureAndUploadThumbnail();
       }, 1000);
     } catch (err) {
