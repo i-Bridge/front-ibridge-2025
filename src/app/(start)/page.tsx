@@ -77,7 +77,7 @@ export default function StartPage() {
               viewport={{ once: true }}
               className="w-80"
             >
-              <div className="bg-white py-6 rounded-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px]">
+              <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px]">
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-i-lightorange to-i-orange"></div>
                 <div className="space-y-3">
                   <LoginButton />
