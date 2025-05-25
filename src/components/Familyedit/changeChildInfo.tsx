@@ -119,6 +119,7 @@ export default function ChildrenForm() {
           );
 
           setEditMode((prev) => prev.filter((id) => id !== -1));
+          window.location.reload();
         }
       } else {
         await Fetcher(`/parent/mypage/edit/${child.childId}`, {
@@ -143,7 +144,8 @@ export default function ChildrenForm() {
       }
 
       setEditedChildren((prev) => {
-        const { [child.childId ?? -1]: removed, ...rest } = prev;
+        const rest = { ...prev };
+        delete rest[child.childId ?? -1];
         return rest;
       });
     } catch (error) {
@@ -166,6 +168,7 @@ export default function ChildrenForm() {
           children: prev.children.filter((c) => c !== child),
         };
       });
+      window.location.reload();
     } catch (error) {
       console.error('삭제 실패:', error);
     }
@@ -182,9 +185,8 @@ export default function ChildrenForm() {
   if (!familyInfo) return <p>가족 정보가 없습니다.</p>;
 
   return (
-    <div className="relative pt-8">
-      <p className="text-2xl font-semibold py-10">자녀 정보 수정하기</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-16">
+    <div className="relative  flex flex-col items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
         {familyInfo.children.map((child, index) => {
           const id = child.childId ?? -1;
           const isEditing = child.isNew || editMode.includes(id);
@@ -315,10 +317,10 @@ export default function ChildrenForm() {
           );
         })}
       </div>
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+      <div className=" py-10">
         <button
           onClick={handleAddChild}
-          className="py-2 px-6 bg-orange-400 text-white font-semibold rounded-md hover:bg-orange-300 text-sm"
+          className="py-2 px-3 bg-orange-400 text-white font-semibold rounded-md hover:bg-orange-300 text-sm"
         >
           + 자녀 추가
         </button>
