@@ -20,7 +20,6 @@ export default function VideoRecorder({
 
   const [isRecording, setIsRecording] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [isThumbnailCaptured, setIsThumbnailCaptured] = useState(false);
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
   const [uploadedThumbnailUrl, setUploadedThumbnailUrl] = useState<
     string | null
@@ -90,7 +89,6 @@ export default function VideoRecorder({
       setRecognizedText('');
       setUploadedVideoUrl(null);
       setUploadedThumbnailUrl(null);
-      setIsThumbnailCaptured(false);
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -121,11 +119,8 @@ export default function VideoRecorder({
       startSTT();
 
       setTimeout(() => {
-        if (!isThumbnailCaptured) {
-          console.log('📸 1초 경과 → 썸네일 캡처 시도');
-          captureAndUploadThumbnail();
-          setIsThumbnailCaptured(true);
-        }
+        console.log('📸 1초 경과 → 썸네일 캡처 시도');
+        captureAndUploadThumbnail();
       }, 1000);
     } catch (err) {
       console.error('❌ 녹화 시작 실패:', err);
