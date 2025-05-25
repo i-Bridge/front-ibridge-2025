@@ -85,13 +85,7 @@ export default function MailBox() {
     fetchNoticeData(setNoticeData, setError, setLoading);
   }, []);
 
-  if (loading) {
-    return <div>🔄 로딩 중입니다...</div>;
-  }
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
 
   return (
     <div className="relative inline-block text-left">

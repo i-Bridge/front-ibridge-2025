@@ -88,7 +88,7 @@ export default function Mypage({
       <ul className=" border-t">
         <Link href={`/parent/${childId}/familyedit`}>
           <li>
-            <button className="block w-full px-4 py-2 text-sm  text-left hover:bg-gray-100">
+            <button className="block w-full px-4 py-2 text-sm  text-gray-900 text-left hover:bg-gray-100">
               가족 정보 수정하기
             </button>
           </li>
