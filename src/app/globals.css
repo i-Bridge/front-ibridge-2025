@@ -38,6 +38,10 @@ body {
   font-weight: 900;
 }
 
+html {
+  overflow-y: scroll;
+}
+
 /* 스크롤바 숨기기 (웹킷 기반 브라우저) */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
