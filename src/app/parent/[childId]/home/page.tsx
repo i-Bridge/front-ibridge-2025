@@ -41,13 +41,13 @@ export default async function HomePage({ params }: { params: { childId: string }
         <AiComment />
       </div>
       <div className="flex flex-col justify-center items-center w-full pt-3">
-        
         <div className="pt-4">
           <MonthSelector />
           <Weekly />
-          <SubjectList initialSubjects={homeData.subjects} />
-        
         </div>
+      </div>
+      <div className="px-8">
+        <SubjectList initialSubjects={homeData.subjects} />
       </div>
     </div>
   );

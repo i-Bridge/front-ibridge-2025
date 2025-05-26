@@ -1,10 +1,11 @@
 'use client';
-
+import { useSubjectStore } from '@/store/question/subjectStore';
 import { useDateStore } from '@/store/date/dateStore';
 import { useEffect, useRef } from 'react';
 
 export default function Weekly() {
   const { selectedDate, setSelectedDate } = useDateStore();
+  const { setSelectedSubjectId, setSelectedQuestionId} = useSubjectStore();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [year, month, selectedDay] = selectedDate.split('-').map(Number);
@@ -23,6 +24,8 @@ export default function Weekly() {
   };
 
   useEffect(() => {
+     setSelectedSubjectId(null);
+     setSelectedQuestionId(null);
     // 선택한 날짜가 변경될 때, 버튼을 가운데로 스크롤
     const selectedButton = containerRef.current?.querySelector('.selected');
     if (selectedButton) {

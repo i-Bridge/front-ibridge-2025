@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
-import { useSubjectStore } from "@/store/question/subjectStore";
+import { useSubjectStore } from '@/store/question/subjectStore';
 
 interface Question {
   questionId: number;
   text: string;
   video: string;
+  image: string;
   answer: string;
 }
 
@@ -17,20 +18,24 @@ export default function QuestionList({ questions }: Props) {
   const { selectedQuestionId, setSelectedQuestionId } = useSubjectStore();
 
   return (
-    <div className="space-y-2">
-      {questions.map((q) => (
+    <div className="space-y-2 ml-16">
+      <div className='bg-gray-100 rounded-xl px-2'>
+      {questions.map((q, index) => (
         <div
           key={q.questionId}
           onClick={() => setSelectedQuestionId(q.questionId)}
-          className={`cursor-pointer border p-2 rounded-md ${
-            selectedQuestionId === q.questionId ? "bg-yellow-100" : ""
+          className={`cursor-pointer p-2 hover:font-semibold  ${
+            selectedQuestionId === q.questionId
+              ? ' '
+              : ''
           }`}
         >
-          {/* 번호 추가: q1, q2 형태로 표시 */}
-          <span className="font-semibold">q{q.questionId}. </span>
+          <span className="font-semibold">q{index + 1}. </span>
           {q.text}
         </div>
       ))}
+</div>
+      
     </div>
   );
 }
