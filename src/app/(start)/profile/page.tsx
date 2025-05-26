@@ -51,7 +51,7 @@ export default async function Profile() {
       <div className="flex justify-center items-center flex-wrap gap-8 p-8 ml-32">
         {profileData.children.map((child) => (
           <div key={child.id} className="flex flex-col items-center">
-            <Link href={`/child/${child.id}/home`}>
+            <Link href={`/child/${child.id}/chat`}>
               <div className="w-32 h-32 bg-i-lightpurple rounded-full hover:ring-4 hover:ring-blue-300 cursor-pointer flex items-center justify-center text-white">
                 {child.name}
               </div>
