@@ -96,6 +96,7 @@ export const useSubjectData = () => {
   }, [selectedSubjectId, selectedDate]);
 
   return {
+    subject,
     questions,
     loading,
   };

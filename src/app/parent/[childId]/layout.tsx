@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className="flex flex-col min-h-screen">
         <main className="flex-grow">{children}</main>
-        <footer className="bg-gray-200 text-white text-center py-8">
+        <footer className="bg-gray-200 text-white text-center py-10">
           ⓒ 2025 i-Bridge.   All rights reserved.
         </footer>
       </body>
