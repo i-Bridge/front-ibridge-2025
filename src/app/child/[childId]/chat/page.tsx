@@ -77,6 +77,30 @@ export default function ReplyPage() {
     img.onload = () => setIsImageLoaded(true);
   }, []);
 
+  // 강제 종료 처리
+  useEffect(() => {
+    const handleUnload = () => {
+      if (subjectId && childId) {
+        const payload = JSON.stringify({ subjectId });
+        const blob = new Blob([payload], { type: 'application/json' });
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/child/${childId}/finished`;
+
+        const result = navigator.sendBeacon(url, blob);
+
+        if (result) {
+          console.log('📡 sendBeacon 전송됨: subjectId =', subjectId);
+        } else {
+          console.warn('⚠️ sendBeacon 실패 (fallback 필요할 수도 있음)');
+        }
+      } else {
+        console.log('⚠️ sendBeacon 조건 불충족:', { subjectId, childId });
+      }
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, [subjectId, childId]);
+
   const handleImageLoad = () => setIsImageLoaded(true);
 
   const speak = (text: string) => {
