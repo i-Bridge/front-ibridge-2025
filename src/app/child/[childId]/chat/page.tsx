@@ -15,7 +15,7 @@ export default function ReplyPage() {
   const [isQuestionVisible, setIsQuestionVisible] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
+  const [isCompleted, setIsCompleted] = useState<boolean | null>(null);
   const [isRecordingFinished, setIsRecordingFinished] = useState(false);
   const [subjectId, setSubjectId] = useState<number | null>(null);
 
@@ -24,15 +24,16 @@ export default function ReplyPage() {
 
     const fetchHomeData = async () => {
       console.log('📥 /home API 호출');
-      const { data, isSuccess } = await Fetcher<{ isCompleted: boolean }>(
+      const { data, isSuccess } = await Fetcher<{ completed: boolean }>(
         `/child/${childId}/home`,
         { method: 'GET' },
       );
       if (isSuccess && data) {
         console.log('✅ /home 응답:', data);
-        setIsCompleted(data.isCompleted);
+        setIsCompleted(data.completed);
       } else {
         console.error('❌ /home API 실패');
+        setIsCompleted(false);
       }
     };
 
@@ -124,7 +125,7 @@ export default function ReplyPage() {
       )}
 
       <div className="ml-32 flex flex-col gap-8 text-center">
-        {!isQuestionVisible ? (
+        {isCompleted !== null && !isQuestionVisible ? (
           <>
             {!isCompleted && (
               <button
@@ -190,7 +191,7 @@ export default function ReplyPage() {
                 setQuestion(ai);
                 setDisplayText('');
                 speak(ai);
-                setIsRecordingFinished(false); // ✅ 자동 초기화
+                setIsRecordingFinished(false);
               }}
               onFinished={() => {
                 console.log('✅ 녹화 완료됨');
@@ -203,7 +204,6 @@ export default function ReplyPage() {
 
       {isQuestionVisible && isRecordingFinished && (
         <div className="absolute bottom-20 flex flex-col items-center gap-6">
-          {/* ✅ 질문 다시 듣기 버튼만 유지 */}
           <button
             onClick={() => {
               console.log('🔁 질문 다시 듣기 클릭됨');
