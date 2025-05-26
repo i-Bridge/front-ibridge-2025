@@ -280,6 +280,19 @@ export default function VideoRecorder({
           녹화 종료
         </button>
       )}
+      <div className="flex flex-col gap-2 items-center">
+        <label className="text-sm text-gray-500">🧪 테스트용 키보드 입력</label>
+        <input
+          type="text"
+          value={recognizedText}
+          onChange={(e) => {
+            setRecognizedText(e.target.value);
+            console.log('⌨️ 키보드 입력 텍스트:', e.target.value);
+          }}
+          className="w-80 px-4 py-2 border rounded"
+          placeholder="텍스트를 입력해보세요"
+        />
+      </div>
     </div>
   );
 }
