@@ -78,13 +78,6 @@ export default function VideoRecorder({
         } else {
           console.error('❌ /answer 실패');
         }
-      } else {
-        console.warn('⛔ sendToBackend 조건 불충족:', {
-          uploadedVideoUrl,
-          uploadedThumbnailUrl,
-          recognizedText,
-          subjectId,
-        });
       }
     };
 

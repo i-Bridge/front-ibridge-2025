@@ -139,11 +139,21 @@ export default function ReplyPage() {
       />
 
       {isFinalMessage ? (
-        <div className="absolute bottom-32 bg-white p-6 rounded-lg shadow-md border-2 border-i-orange">
-          <p className="text-xl font-semibold">
-            수고했어요! 오늘의 대화를 마쳤어요.
-          </p>
-        </div>
+        <button
+          onClick={() => {
+            console.log('🔙 뒤로가기 클릭됨');
+            setIsQuestionVisible(false);
+            setDisplayText('');
+            setIsRecordingFinished(false);
+            setQuestion('');
+            setSubjectId(null);
+            setIsFinalMessage(false);
+            window.speechSynthesis.cancel();
+          }}
+          className="w-16 h-16 bg-white rounded-lg flex items-center justify-center"
+        >
+          <img src="/images/home.png" alt="홈으로 가기" className="w-12 h-12" />
+        </button>
       ) : (
         <>
           {isQuestionVisible && (
@@ -223,6 +233,10 @@ export default function ReplyPage() {
                   subjectId={subjectId}
                   onAIResponse={(ai: string) => {
                     console.log('✅ 백엔드에서 받은 ai 응답:', ai);
+                    if (ai === '수고했어! 내일 또 만나~') {
+                      setIsFinalMessage(true);
+                      setIsQuestionVisible(false);
+                    }
                     setQuestion(ai);
                     setDisplayText(ai);
                     speak(ai);
