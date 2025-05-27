@@ -131,7 +131,13 @@ export default function ReplyPage() {
           setQuestion('');
           setSubjectId(null);
         }}
-        className="fixed top-12 left-12 z-50 bg-white p-4 rounded-full shadow-lg hover:scale-105 transition-transform"
+        className="fixed top-12 left-12 z-50 p-4 pl-8 hover:scale-105 transition-transform bg-cover bg-center"
+        style={{
+          backgroundImage: "url('/images/homeBtnBg.png')",
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+        }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +145,7 @@ export default function ReplyPage() {
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="currentColor"
-          className="w-8 h-8 text-gray-950"
+          className="w-8 h-8 text-gray-900 drop-shadow"
         >
           <path
             strokeLinecap="round"
@@ -173,25 +179,41 @@ export default function ReplyPage() {
           {isQuestionVisible && (
             <>
               <motion.div
-                className="ml-16 w-96 min-h-32 bg-white p-6 rounded-lg shadow-sm border-2 border-i-orange"
+                className="ml-16 w-96 min-h-64 p-6 bg-contain bg-center bg-no-repeat flex flex-col items-center justify-between gap-4"
+                style={{
+                  backgroundImage: "url('/images/speechBubbleBg.png')",
+                }}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
               >
-                <p className="text-xl font-semibold">{displayText}</p>
-              </motion.div>
+                <p className="text-xl font-semibold text-gray-900 text-center">
+                  {displayText}
+                </p>
 
-              <div className="absolute bottom-20 flex flex-col items-center gap-6">
                 <button
                   onClick={() => {
                     console.log('🔁 질문 다시 듣기 클릭됨');
                     speak(question);
                   }}
-                  className="px-6 py-4 bg-orange-400 text-white text-lg rounded-lg"
+                  className="p-3 bg-orange-400 text-white rounded-full shadow-sm hover:scale-105 transition-transform"
                 >
-                  질문 다시 듣기
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                    />
+                  </svg>
                 </button>
-              </div>
+              </motion.div>
             </>
           )}
 
