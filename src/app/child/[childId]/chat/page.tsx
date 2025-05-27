@@ -122,6 +122,33 @@ export default function ReplyPage() {
 
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-amber-100">
+      <button
+        onClick={() => {
+          console.log('🏠 홈으로 가기 클릭됨');
+          setIsFinalMessage(false);
+          setIsQuestionVisible(false);
+          setDisplayText('');
+          setQuestion('');
+          setSubjectId(null);
+        }}
+        className="fixed top-12 left-12 z-50 bg-white p-4 rounded-full shadow-lg hover:scale-105 transition-transform"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="currentColor"
+          className="w-8 h-8 text-gray-950"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+          />
+        </svg>
+      </button>
+
       <motion.img
         src={
           mouthOpen
@@ -138,28 +165,9 @@ export default function ReplyPage() {
       />
 
       {isFinalMessage ? (
-        <>
-          <div className="absolute bottom-32 bg-white p-6 rounded-lg shadow-md border-2 border-i-orange">
-            <p className="text-xl font-semibold">{displayText}</p>
-          </div>
-          <button
-            onClick={() => {
-              console.log('🏠 홈으로 가기 클릭됨');
-              setIsFinalMessage(false);
-              setIsQuestionVisible(false);
-              setDisplayText('');
-              setQuestion('');
-              setSubjectId(null);
-            }}
-            className="absolute bottom-16 px-4 py-2 shadow-md"
-          >
-            <img
-              src="/images/home.png"
-              alt="홈으로 가기"
-              className="w-14 h-14"
-            />
-          </button>
-        </>
+        <div className="absolute bottom-32 bg-white p-6 rounded-lg shadow-md border-2 border-i-orange">
+          <p className="text-xl font-semibold">{displayText}</p>
+        </div>
       ) : (
         <>
           {isQuestionVisible && (
@@ -182,24 +190,6 @@ export default function ReplyPage() {
                   className="px-6 py-4 bg-orange-400 text-white text-lg rounded-lg"
                 >
                   질문 다시 듣기
-                </button>
-                <button
-                  onClick={() => {
-                    console.log('🔙 뒤로가기 클릭됨');
-                    setIsQuestionVisible(false);
-                    setDisplayText('');
-                    setQuestion('');
-                    setSubjectId(null);
-                    setIsFinalMessage(false);
-                    window.speechSynthesis.cancel();
-                  }}
-                  className="w-16 h-16 "
-                >
-                  <img
-                    src="/images/home.png"
-                    alt="홈으로 가기"
-                    className="w-14 h-14"
-                  />
                 </button>
               </div>
             </>

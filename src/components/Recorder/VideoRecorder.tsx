@@ -253,24 +253,39 @@ export default function VideoRecorder({
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <video ref={videoRef} className="w-80 h-60 bg-black rounded" />
+    <div className="flex flex-col items-center gap-4 bg-white rounded-xl shadow-lg p-6">
+      <video ref={videoRef} className="w-80 h-60 bg-black rounded shadow-sm" />
       <canvas ref={canvasRef} className="hidden" />
-      <div className="text-gray-700 w-80 p-2 bg-white rounded shadow-sm text-sm">
+
+      <div className="text-gray-700 w-80 p-2 bg-red-100 rounded shadow-sm text-sm">
         <strong>📝 인식된 텍스트:</strong>{' '}
         {recognizedText || '말을 해보세요...'}
       </div>
+
       {!isRecording ? (
         <button
           onClick={startRecording}
-          className="px-6 py-3 bg-green-500 text-white rounded-lg"
+          className="p-4 bg-i-lightgreen text-white rounded-full shadow-sm hover:scale-105 transition-transform"
         >
-          녹화 시작
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"
+            />
+          </svg>
         </button>
       ) : (
         <button
           onClick={stopRecording}
-          className="px-6 py-3 bg-red-500 text-white rounded-lg"
+          className="px-6 py-3 bg-red-500 text-white rounded-lg shadow hover:scale-105 transition-transform"
         >
           녹화 종료
         </button>
