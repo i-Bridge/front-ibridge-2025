@@ -139,21 +139,25 @@ export default function ReplyPage() {
       />
 
       {isFinalMessage ? (
-        <button
-          onClick={() => {
-            console.log('🔙 뒤로가기 클릭됨');
-            setIsQuestionVisible(false);
-            setDisplayText('');
-            setIsRecordingFinished(false);
-            setQuestion('');
-            setSubjectId(null);
-            setIsFinalMessage(false);
-            window.speechSynthesis.cancel();
-          }}
-          className="w-16 h-16 bg-white rounded-lg flex items-center justify-center"
-        >
-          <img src="/images/home.png" alt="홈으로 가기" className="w-12 h-12" />
-        </button>
+        <>
+          <div className="absolute bottom-32 bg-white p-6 rounded-lg shadow-md border-2 border-i-orange">
+            <p className="text-xl font-semibold">{displayText}</p>
+          </div>
+          <button
+            onClick={() => {
+              console.log('🏠 홈으로 가기 클릭됨');
+              setIsFinalMessage(false);
+              setIsQuestionVisible(false);
+              setDisplayText('');
+              setQuestion('');
+              setSubjectId(null);
+              setIsRecordingFinished(false);
+            }}
+            className="absolute bottom-16 bg-white border border-gray-300 px-4 py-2 rounded-lg shadow-md hover:bg-gray-50"
+          >
+            홈으로 가기
+          </button>
+        </>
       ) : (
         <>
           {isQuestionVisible && (
