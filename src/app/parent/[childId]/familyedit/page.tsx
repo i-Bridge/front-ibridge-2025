@@ -51,6 +51,9 @@ const { childId } = params;
       </div>
       <p className="text-2xl font-semibold py-10 ">자녀 정보 수정하기</p>
       <ChildrenForm />
+       <footer className="bg-gray-200 text-white text-center py-10">
+          ⓒ 2025 i-Bridge.   All rights reserved.
+        </footer>
     </div>
   );
 }

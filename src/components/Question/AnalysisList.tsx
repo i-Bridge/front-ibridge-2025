@@ -70,10 +70,10 @@ export default function AnalysisList() {
       <>
         {questions.map((q, idx) => (
           <div key={q.questionId} className="mb-4">
-            <h4 className="font-semibold mb-2">
-              q{idx + 1}: {q.text}
+            <h4 className=" mb-2 text-gray-600 text-sm">
+              Q{idx + 1}: {q.text}
             </h4>
-            <p className="text-gray-700 mb-4">답변: {q.answer}</p>
+            <p className="text-gray-700 mb-4 font-semibold">답변: {q.answer}</p>
             <div className="relative">{renderVideoOrThumbnail(q)}</div>
             <div className='border-t mt-4'></div>
           </div>
@@ -94,7 +94,7 @@ export default function AnalysisList() {
       content = (
         <>
           <p className="text-gray-700 ">답변: {selectedQuestion.answer}</p>
-          <div className="relative mt-4">
+          <div className="relative mt-4 ">
             {renderVideoOrThumbnail(selectedQuestion)}
           </div>
         </>
@@ -104,27 +104,23 @@ export default function AnalysisList() {
 
   return (
     <div>
-      <div className="mt-16 pt-4 mr-12 mb-20 relative">
+      <div className=" mt-8 pt-4 mr-12 mb-20 relative ">
         {selectedQuestionId !== null ? (
-          <div className="">
-            {selectedQuestion && (
-              <h3 className="absolute -top-6 left-0 py-3 text-sm font-light text-gray-600 ">
-                {selectedQuestion.text}
-              </h3>
-            )}
+          <div className="border-t">
+           
             <button
               onClick={() => setSelectedQuestionId(null)}
-              className="absolute -top-4 right-8 px-1 py-0 text-sm text-white bg-gray-200 rounded-xl hover:bg-gray-100"
+              className="absolute  -top-3 right-8 px-1 py-0 text-sm text-white bg-orange-400 rounded-xl hover:bg-orange-200"
             >
               전체보기
             </button>
           </div>
         ):(
           <h3 className="absolute -top-6 left-0 py-3 text-sm font-light text-gray-600 ">
-               {subject?.subjectTitle}
+               
               </h3>
         )}
-        <div className="border-t ">
+        <div className=" ">
           <div className="mt-3 ">{content}</div>
         </div>
       </div>

@@ -50,10 +50,10 @@ const SubjectList = ({ initialSubjects }: Props) => {
   };
 
   return (
-    <div className="relative overflow-x-hidden w-[80%] mx-auto flex justify-center min-h-[600px]">
+    <div className="relative overflow-x-hidden w-[80%] mx-auto flex justify-center min-h-[600px]  ">
       {/* 왼쪽 영역 - Subject List + Detail */}
       <div
-        className={`w-1/2 flex flex-col justify-start pr-4 z-10 
+        className={`w-1/2 flex flex-col justify-start  z-10 
           ${animating ? 'animate-slide-in-right ' : 'animate-slide-in-left'}
           transition-transform  ease-in-out 
         `}
@@ -78,12 +78,13 @@ const SubjectList = ({ initialSubjects }: Props) => {
                       handleClick(subject.subjectId);
                     }
                   }}
-                  className={`p-2 rounded-lg transition-all text-lg bg-white 
-                    ${selectedSubjectId === subject.subjectId
-                      ? 'text-i-lightgreen font-semibold'
-                      : subject.answer
-                        ? 'hover:font-semibold'
-                        : ''
+                  className={`p-2 mt-4 rounded-lg transition-all  bg-orange-50
+                    ${
+                      selectedSubjectId === subject.subjectId
+                        ? ' font-semibold'
+                        : subject.answer
+                          ? 'hover:font-semibold'
+                          : ''
                     } 
                     ${subject.answer ? 'cursor-pointer' : ''}`}
                 >
@@ -107,14 +108,19 @@ const SubjectList = ({ initialSubjects }: Props) => {
         </div>
       </div>
 
-      {/* 오른쪽 영역 - Analysis (조건부 렌더링 + 슬라이드) */}
       {selectedSubjectId && (
         <div
-          className={`w-1/2 pl-4 z-10 animate-slide-in-right
-            transition-transform duration-300 ease-in-out`}
+          className={`flex items-stretch animate-slide-in-right
+      transition-transform duration-300 ease-in-out`}
         >
-          <div className="relative bg-white">
-            <AnalysisList />
+          {/* 세로 구분선 */}
+          <div className="w-px bg-gray-300 mx-1" />
+
+          {/* 오른쪽 패널 */}
+          <div className=" pl-16 z-10">
+            <div className="relative bg-white  overflow-auto">
+              <AnalysisList />
+            </div>
           </div>
         </div>
       )}
