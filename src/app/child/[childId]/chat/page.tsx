@@ -16,7 +16,6 @@ export default function ReplyPage() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
   const [isCompleted, setIsCompleted] = useState<boolean | null>(null);
-  const [isRecordingFinished, setIsRecordingFinished] = useState(false);
   const [subjectId, setSubjectId] = useState<number | null>(null);
   const [isFinalMessage, setIsFinalMessage] = useState(false);
 
@@ -151,7 +150,6 @@ export default function ReplyPage() {
               setDisplayText('');
               setQuestion('');
               setSubjectId(null);
-              setIsRecordingFinished(false);
             }}
             className="absolute bottom-16 bg-white border border-gray-300 px-4 py-2 rounded-lg shadow-md hover:bg-gray-50"
           >
@@ -161,14 +159,47 @@ export default function ReplyPage() {
       ) : (
         <>
           {isQuestionVisible && (
-            <motion.div
-              className="ml-16 w-96 min-h-32 bg-white p-6 rounded-lg shadow-sm border-2 border-i-orange"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              <p className="text-xl font-semibold">{displayText}</p>
-            </motion.div>
+            <>
+              <motion.div
+                className="ml-16 w-96 min-h-32 bg-white p-6 rounded-lg shadow-sm border-2 border-i-orange"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <p className="text-xl font-semibold">{displayText}</p>
+              </motion.div>
+
+              <div className="absolute bottom-20 flex flex-col items-center gap-6">
+                <button
+                  onClick={() => {
+                    console.log('🔁 질문 다시 듣기 클릭됨');
+                    speak(question);
+                  }}
+                  className="px-6 py-4 bg-orange-400 text-white text-lg rounded-lg"
+                >
+                  질문 다시 듣기
+                </button>
+                <button
+                  onClick={() => {
+                    console.log('🔙 뒤로가기 클릭됨');
+                    setIsQuestionVisible(false);
+                    setDisplayText('');
+
+                    setQuestion('');
+                    setSubjectId(null);
+                    setIsFinalMessage(false);
+                    window.speechSynthesis.cancel();
+                  }}
+                  className="w-16 h-16 bg-white rounded-lg flex items-center justify-center"
+                >
+                  <img
+                    src="/images/home.png"
+                    alt="홈으로 가기"
+                    className="w-12 h-12"
+                  />
+                </button>
+              </div>
+            </>
           )}
 
           <div className="ml-32 flex flex-col gap-8 text-center">
@@ -244,11 +275,9 @@ export default function ReplyPage() {
                     setQuestion(ai);
                     setDisplayText(ai);
                     speak(ai);
-                    setIsRecordingFinished(false);
                   }}
                   onFinished={() => {
                     console.log('✅ 녹화 완료됨');
-                    setIsRecordingFinished(true);
                   }}
                   onConversationFinished={() => {
                     setIsFinalMessage(true);
@@ -258,39 +287,6 @@ export default function ReplyPage() {
               )
             )}
           </div>
-
-          {isQuestionVisible && isRecordingFinished && (
-            <div className="absolute bottom-20 flex flex-col items-center gap-6">
-              <button
-                onClick={() => {
-                  console.log('🔁 질문 다시 듣기 클릭됨');
-                  speak(question);
-                }}
-                className="px-6 py-4 bg-orange-400 text-white text-lg rounded-lg"
-              >
-                질문 다시 듣기
-              </button>
-              <button
-                onClick={() => {
-                  console.log('🔙 뒤로가기 클릭됨');
-                  setIsQuestionVisible(false);
-                  setDisplayText('');
-                  setIsRecordingFinished(false);
-                  setQuestion('');
-                  setSubjectId(null);
-                  setIsFinalMessage(false);
-                  window.speechSynthesis.cancel();
-                }}
-                className="w-16 h-16 bg-white rounded-lg flex items-center justify-center"
-              >
-                <img
-                  src="/images/home.png"
-                  alt="홈으로 가기"
-                  className="w-12 h-12"
-                />
-              </button>
-            </div>
-          )}
         </>
       )}
     </div>
