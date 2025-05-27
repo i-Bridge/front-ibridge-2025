@@ -21,11 +21,11 @@ const mockupData = [
     return (
      
       <div className="w-full bg-i-ivory py-14 ">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto text-md">
           {/*윗줄*/}
           <div className="flex justify-start gap-4 mb-4">
             {mockupData.slice(0, 2).map((text, index) => (
-              <div key={index} className="bg-white p-4 rounded-xl shadow-md w-max flex items-center">
+              <div key={index} className="bg-white  p-4 rounded-xl shadow-md w-max flex items-center">
                 <span className="mr-2 text-2xl">{emojiData[index]}</span>
                 {text}
               </div>
@@ -35,7 +35,7 @@ const mockupData = [
           <div className="flex justify-start gap-4">
             {mockupData.slice(2).map((text, index) => (
               <div key={index} className="bg-white p-4 rounded-xl shadow-md w-max flex items-center">
-                <span className="mr-2 text-2xl">{emojiData[index + 2]}</span>
+                <span className="mr-2 ">{emojiData[index + 2]}</span>
                 {text}
               </div>
             ))}
