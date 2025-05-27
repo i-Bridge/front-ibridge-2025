@@ -49,6 +49,9 @@ export default async function HomePage({ params }: { params: { childId: string }
       <div className="px-8">
         <SubjectList initialSubjects={homeData.subjects} />
       </div>
+       <footer className="bg-gray-200 text-white text-center py-10">
+          ⓒ 2025 i-Bridge.   All rights reserved.
+        </footer>
     </div>
   );
 }
