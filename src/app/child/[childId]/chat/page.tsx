@@ -121,7 +121,7 @@ export default function ReplyPage() {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen relative p-6 bg-violet-100">
+    <div className="flex items-center justify-center h-screen relative p-6 bg-amber-100">
       <motion.img
         src={
           mouthOpen
@@ -151,9 +151,13 @@ export default function ReplyPage() {
               setQuestion('');
               setSubjectId(null);
             }}
-            className="absolute bottom-16 bg-white border border-gray-300 px-4 py-2 rounded-lg shadow-md hover:bg-gray-50"
+            className="absolute bottom-16 px-4 py-2 shadow-md"
           >
-            홈으로 가기
+            <img
+              src="/images/home.png"
+              alt="홈으로 가기"
+              className="w-14 h-14"
+            />
           </button>
         </>
       ) : (
@@ -184,18 +188,17 @@ export default function ReplyPage() {
                     console.log('🔙 뒤로가기 클릭됨');
                     setIsQuestionVisible(false);
                     setDisplayText('');
-
                     setQuestion('');
                     setSubjectId(null);
                     setIsFinalMessage(false);
                     window.speechSynthesis.cancel();
                   }}
-                  className="w-16 h-16 bg-white rounded-lg flex items-center justify-center"
+                  className="w-16 h-16 "
                 >
                   <img
                     src="/images/home.png"
                     alt="홈으로 가기"
-                    className="w-12 h-12"
+                    className="w-14 h-14"
                   />
                 </button>
               </div>
