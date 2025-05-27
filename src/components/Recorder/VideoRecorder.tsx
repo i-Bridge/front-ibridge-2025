@@ -7,11 +7,13 @@ import { Fetcher } from '@/lib/fetcher';
 export default function VideoRecorder({
   subjectId,
   onAIResponse,
-  onFinished,
+  onFinished, //녹화가 종료됨
+  onConversationFinished, //한 주제에 대한 대화가 종료됨
 }: {
   subjectId: number | null;
   onAIResponse: (message: string) => void;
   onFinished: () => void;
+  onConversationFinished: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -59,13 +61,15 @@ export default function VideoRecorder({
 
           if (data.finished) {
             console.log('🏁 모든 질문 완료됨');
-            const finalMessage = '수고했어요! 오늘의 대화를 마쳤어요.';
+            const finalMessage = '수고했어! 내일 또 만나~';
             onAIResponse(finalMessage);
             const utterance = new SpeechSynthesisUtterance(finalMessage);
             utterance.lang = 'ko-KR';
             utterance.pitch = 1.4;
             utterance.rate = 0.8;
             window.speechSynthesis.speak(utterance);
+
+            onConversationFinished();
             return;
           }
 
