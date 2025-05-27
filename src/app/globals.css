@@ -38,6 +38,42 @@ body {
   font-weight: 900;
 }
 
+@layer utilities {
+  .animate-slide-in-right {
+    animation: slide-in-right 0.5s ease-out forwards;
+  }
+  .animate-slide-in-left {
+    animation: slide-in-left 0.4s ease-out forwards;
+  }
+
+  @keyframes slide-in-right {
+    0% {
+      opacity: 0;
+      transform: translateX(30%);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-in-left {
+    0% {
+      opacity: 0;
+      transform: translateX(-30%);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
+html {
+  overflow-y: scroll;
+  
+}
+
 /* 스크롤바 숨기기 (웹킷 기반 브라우저) */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;

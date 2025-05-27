@@ -13,7 +13,7 @@ interface Props {
 
 const MAX_REFRESH_COUNT = 2;
 
-const SubjectTitleWithActions = ({ subjectId, subjectTitle }: Props) => {
+const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
   const { childId } = useParams();
   const { selectedDate } = useDateStore();
   const { refetch } = useHomeData();
@@ -78,7 +78,7 @@ const SubjectTitleWithActions = ({ subjectId, subjectTitle }: Props) => {
       const subjectdata = res.data;
 
       if (!subjectdata) {
-        return <div>로딩 중...</div>;
+        return <div>subjectdata 로딩 중...</div>;
       }
       if (res?.isSuccess) {
         const newTitle = subjectdata.subjectTitle;
@@ -105,7 +105,7 @@ const SubjectTitleWithActions = ({ subjectId, subjectTitle }: Props) => {
           onChange={(e) => setInputValue(e.target.value)}
         />
       ) : (
-        <span className="font-semibold">{title}</span>
+        <span className="">{title}</span>
       )}
 
       <div className="flex gap-2">
@@ -224,4 +224,4 @@ const SubjectTitleWithActions = ({ subjectId, subjectTitle }: Props) => {
   );
 };
 
-export default SubjectTitleWithActions;
+export default SubjectTitleEdit;

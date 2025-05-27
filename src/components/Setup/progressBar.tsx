@@ -11,14 +11,11 @@ const ProgressBar = () => {
   if (step === 1) {
     return (
       <div>
-        <h1 className="text-black text-sm text-center mb-2">
+        <h1 className="text-gray-900 text-md text-center mb-2 font-semibold">
           가족 등록
         </h1>
-        <div className="w-full bg-gray-300 h-2 rounded-full ">
-          <div
-            className="h-full bg-green-200 transition-all"
-            style={{ width: `100%` }}
-          ></div>
+        <div className="w-full h-2 ">
+         
         </div>
       </div>
     );
@@ -27,13 +24,13 @@ const ProgressBar = () => {
     return (
       <div>
         
-        <h1 className="text-black text-sm text-center mb-2">
+        <h1 className="text-gray-900 text-md text-center mb-2 font-semibold">
         
           자녀 등록({currentChildIndex +1 }/{childrenCount})
         </h1>
-        <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+        <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden ">
           <div
-            className="h-full bg-i- transition-all"
+            className="h-full bg-i-lightgreen transition-all"
             style={{ width: `${progress}%` }}
           ></div>
         </div>

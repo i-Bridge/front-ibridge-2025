@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useSubjectStore } from '@/store/question/subjectStore';
 import { useHomeData } from '@/hooks/home/useHomeData';
 import SubjectDetailPanel from './SubjectDetailPanel';
-import SubjectTitleWithActions from './SubjectTitleEdit';
+import SubjectTitleEdit from './SubjectTitleEdit';
+import AnalysisList from './AnalysisList';
 
 type Subject = {
   subjectId: number;
@@ -13,76 +14,109 @@ type Subject = {
 };
 
 type Props = {
-  initialSubjects: Subject[]; // SSR로 받은 초기 subject 리스트
+  initialSubjects: Subject[];
 };
 
 const SubjectList = ({ initialSubjects }: Props) => {
   const { selectedSubjectId, setSelectedSubjectId } = useSubjectStore();
-
-  // 1. 날짜가 바뀌면 데이터를 받아오기 위한 훅 호출 (처음에는 빈 리스트로 시작)
   const { subjects: fetchedSubjects, loading } = useHomeData();
-
-  // 2. 초기 데이터와 fetchedSubjects를 조합하여 사용
   const [subjects, setSubjects] = useState<Subject[]>(initialSubjects);
 
-  // 3. fetchedSubjects가 변경되면 subjects 상태 업데이트
+  const [showPanels, setShowPanels] = useState(false);
+  const [animating, setAnimating] = useState(false);
+
   useEffect(() => {
     if (fetchedSubjects) {
-      console.log('fetchedSubject');
       setSubjects(fetchedSubjects);
     }
   }, [fetchedSubjects]);
 
-  const handleClick = (subjectId: number) => {
-    if (selectedSubjectId === subjectId) {
-      setSelectedSubjectId(null); // 토글 닫기
+  useEffect(() => {
+    if (selectedSubjectId) {
+      setShowPanels(true);
+      setAnimating(true);
     } else {
-      setSelectedSubjectId(subjectId);
+      setAnimating(true);
+      // 패널 닫을 때는 애니메이션 후 DOM 제거
+      setTimeout(() => {
+        setShowPanels(false);
+        setAnimating(false);
+      }, 0); // duration과 맞추기
     }
+  }, [selectedSubjectId]);
+
+  const handleClick = (subjectId: number) => {
+    setSelectedSubjectId(selectedSubjectId === subjectId ? null : subjectId);
   };
 
   return (
-    <div className="space-y-2">
-      {loading ? (
-        <div className="text-gray-500">불러오는 중...</div> //로딩 컴포넌트로 수정
-      ) : (
-        subjects.map((subject) => (
-          <div
-            key={subject.subjectId}
-            onClick={() => {
-              if (subject.answer) {
-                handleClick(subject.subjectId);
-              }
-            }}
-            className={`p-4 rounded-lg transition-all ${
-              selectedSubjectId === subject.subjectId
-                ? 'bg-blue-100'
-                : subject.answer
-                  ? 'bg-white hover:bg-gray-50'
-                  : 'bg-white'
-            } ${
-              subject.answer
-                ? 'cursor-pointer'
-                : ' '
-            }`}
-          >
-            <div className="noto-light">
-              {subject.answer ? (
-                <div>{subject.subjectTitle}</div>
-              ) : (
-                <SubjectTitleWithActions
-                  subjectId={subject.subjectId}
-                  subjectTitle={subject.subjectTitle}
-                />
-              )}
+    <div className="relative overflow-x-hidden w-[80%] mx-auto flex justify-center min-h-[600px]">
+      {/* 왼쪽 영역 - Subject List + Detail */}
+      <div
+        className={`w-1/2 flex flex-col justify-start pr-4 z-10 
+          ${animating ? 'animate-slide-in-right ' : 'animate-slide-in-left'}
+          transition-transform  ease-in-out 
+        `}
+      >
+        <div className="w-full max-w-2xl space-y-2 px-4 mb-10 mt-2">
+          {loading ? (
+            <div className="flex items-center justify-center space-x-2 mt-4">
+              <span className="w-2 h-2 bg-gray-200 rounded-full animate-bounce [animation-delay:-0.3s]" />
+              <span className="w-2 h-2 bg-gray-200 rounded-full animate-bounce [animation-delay:-0.15s]" />
+              <span className="w-2 h-2 bg-gray-200 rounded-full animate-bounce" />
             </div>
-            {subject.answer && selectedSubjectId === subject.subjectId && (
-              <div className="mt-2">
-                <SubjectDetailPanel />
+          ) : subjects.length === 0 ? (
+            <div className="text-center text-gray-500 mt-3 text-sm">
+              질문이 없습니다.
+            </div>
+          ) : (
+            subjects.map((subject) => (
+              <div key={subject.subjectId}>
+                <div
+                  onClick={() => {
+                    if (subject.answer) {
+                      handleClick(subject.subjectId);
+                    }
+                  }}
+                  className={`p-2 rounded-lg transition-all text-lg bg-white 
+                    ${selectedSubjectId === subject.subjectId
+                      ? 'text-i-lightgreen font-semibold'
+                      : subject.answer
+                        ? 'hover:font-semibold'
+                        : ''
+                    } 
+                    ${subject.answer ? 'cursor-pointer' : ''}`}
+                >
+                  {subject.answer ? (
+                    <div>{subject.subjectTitle}</div>
+                  ) : (
+                    <SubjectTitleEdit
+                      subjectId={subject.subjectId}
+                      subjectTitle={subject.subjectTitle}
+                    />
+                  )}
+                </div>
+                {subject.answer && selectedSubjectId === subject.subjectId && (
+                  <div className="mt-2">
+                    <SubjectDetailPanel />
+                  </div>
+                )}
               </div>
-            )}
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* 오른쪽 영역 - Analysis (조건부 렌더링 + 슬라이드) */}
+      {selectedSubjectId && (
+        <div
+          className={`w-1/2 pl-4 z-10 animate-slide-in-right
+            transition-transform duration-300 ease-in-out`}
+        >
+          <div className="relative bg-white">
+            <AnalysisList />
           </div>
-        ))
+        </div>
       )}
     </div>
   );

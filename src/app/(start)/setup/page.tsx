@@ -6,7 +6,7 @@ import ProgressBar from '../../../components/Setup/progressBar';
 
 export default function SetUpPage() {
   return (
-    <div className="w-full h-screen flex justify-center items-center">
+    <div className="w-full h-screen flex justify-center items-center bg-orange-100">
   <div
     className="bg-white p-6 rounded-lg shadow-sm border border-gray-200  relative overflow-visible origin-center"
     style={{
@@ -15,7 +15,7 @@ export default function SetUpPage() {
       transformOrigin: 'center',
     }}
   >
-    <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-i-lightpurple to-i-pink"></div>
+    <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-orange-300 to-orange-400"></div>
     <ProgressBar />
     <div className="flex-1 flex flex-col justify-center items-center space-y-3 mt-4">
       <Setup />
