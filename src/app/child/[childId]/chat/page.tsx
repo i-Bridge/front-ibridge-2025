@@ -165,7 +165,7 @@ export default function ReplyPage() {
         width={500}
         height={500}
         onLoad={handleImageLoad}
-        className={`transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
+        className={`relative bottom-[-50px] transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
         animate={{ scale: isSpeaking ? 1.03 : 1 }}
         transition={{ duration: 0.3 }}
       />
@@ -178,7 +178,7 @@ export default function ReplyPage() {
         <>
           {isQuestionVisible && (
             <>
-              <div className="relative ml-16 w-[460px] h-[280px]">
+              <div className="relative w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
                 {/* 애니메이션 포함된 말풍선 박스 */}
                 <motion.div
                   className="relative w-full h-full"
