@@ -9,13 +9,23 @@ import LoginButton from '@/components/Auth/LoginButton';
 const imageNames = ['i_green', 'B', 'r', 'i', 'd', 'g', 'e'];
 
 const imagePositions = [
-  { xStart: -160, xEnd: -120, yStart: 100, yEnd: 150 },
-  { xStart: -80, xEnd: -40, yStart: -20, yEnd: 150 },
-  { xStart: 0, xEnd: 40, yStart: 60, yEnd: 150 },
-  { xStart: 80, xEnd: 120, yStart: 0, yEnd: 150 },
-  { xStart: 160, xEnd: 200, yStart: 40, yEnd: 150 },
-  { xStart: 240, xEnd: 280, yStart: 120, yEnd: 150 },
-  { xStart: 320, xEnd: 360, yStart: -10, yEnd: 150 },
+  { xStart: 60, xEnd: 100, yStart: 150, yEnd: 90 }, //i
+  { xStart: 160, xEnd: 170, yStart: -20, yEnd: 90 }, //B
+  { xStart: 230, xEnd: 305, yStart: 110, yEnd: 90 },  //r
+  { xStart: 320, xEnd: 400, yStart: 0, yEnd: 90 },   //i
+  { xStart: 400, xEnd: 450, yStart: 40, yEnd: 90 },  //d
+  { xStart: 490, xEnd: 560, yStart: 170, yEnd: 120 }, //g
+  { xStart: 630, xEnd: 660, yStart: -10, yEnd: 90 }, //e
+];
+
+const imageSizes = [
+  { width: 60, height: 160 },
+  { width: 140, height: 200 },
+  { width: 100, height: 120 },
+  { width: 60, height: 160 },
+  { width: 140, height: 180 },
+  { width: 160, height: 160 },
+  { width: 190, height: 120 },
 ];
 
 export default function StartPage() {
@@ -26,80 +36,6 @@ export default function StartPage() {
 
   const [transforms, setTransforms] = useState<{ x: number; y: number }[]>([]);
 
-  const x0 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[0].xStart, imagePositions[0].xEnd],
-  );
-  const x1 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[1].xStart, imagePositions[1].xEnd],
-  );
-  const x2 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[2].xStart, imagePositions[2].xEnd],
-  );
-  const x3 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[3].xStart, imagePositions[3].xEnd],
-  );
-  const x4 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[4].xStart, imagePositions[4].xEnd],
-  );
-  const x5 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[5].xStart, imagePositions[5].xEnd],
-  );
-  const x6 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[6].xStart, imagePositions[6].xEnd],
-  );
-
-  const y0 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[0].yStart, imagePositions[0].yEnd],
-  );
-  const y1 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[1].yStart, imagePositions[1].yEnd],
-  );
-  const y2 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[2].yStart, imagePositions[2].yEnd],
-  );
-  const y3 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[3].yStart, imagePositions[3].yEnd],
-  );
-  const y4 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[4].yStart, imagePositions[4].yEnd],
-  );
-  const y5 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[5].yStart, imagePositions[5].yEnd],
-  );
-  const y6 = useTransform(
-    scrollY,
-    [0, 1000],
-    [imagePositions[6].yStart, imagePositions[6].yEnd],
-  );
-
-  const xTransforms = [x0, x1, x2, x3, x4, x5, x6];
-  const yTransforms = [y0, y1, y2, y3, y4, y5, y6];
 
   useEffect(() => {
     const calculateTransforms = () => {
@@ -139,63 +75,90 @@ export default function StartPage() {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen flex flex-col relative overflow-hidden"
+      className="min-h-screen flex flex-col relative  overflow-hidden"
     >
-      {/* 상단 이미지 애니메이션 패널 */}
-      <div className="top-1/4 left-2/3 transform -translate-x-1/3 -translate-y-1/2 relative">
-        {imageNames.map((name, idx) => (
-          <motion.img
-            key={idx}
-            src={`/images/${name}.png`}
-            alt={`img-${idx}`}
-            initial={{
-              x: imagePositions[idx].xStart,
-              y: imagePositions[idx].yStart,
-            }}
-            animate={{
-              x: imagePositions[idx].xEnd,
-              y: imagePositions[idx].yEnd,
-            }}
-            transition={{ type: 'spring', stiffness: 50 }}
-            className="absolute w-[100px] h-[100px] z-10 object-contain" // 크기 키움
-          />
-        ))}
-      </div>
+      <div className="bg-orange-100 ">
 
-      <main className="flex-grow">
-        {/* Hero Section */}
-        <section className="bg-i-ivory py-24 px-6">
-          <div className="max-w-7xl mx-auto flex justify-between items-center mt-24">
-            <div className="flex-1">
-              <h2 className="text-2xl text-i-darkblue font-bold mb-4">
-                Welcome to
-              </h2>
-              <p className="text-xl text-i-darkblue mb-4">
-                감정은 행동이 아닌, 말로 표현될 수 있어야 합니다.
-              </p>
-              <p className="text-lg text-i-darkblue mb-8">
-                iBridge는 부모가 아이의 진짜 마음을 이해할 수 있도록 돕는, 감정
-                분석 기반의 소통 플랫폼입니다.
-              </p>
-              <div className="flex gap-4">
-                <div className="bg-i-lightpurple text-blue-900 px-4 py-1 rounded-full text-sm">
-                  2026
-                </div>
-                <div className="bg-i-lightgrey text-blue-900 px-4 py-1 rounded-md text-sm">
-                  Team i-Bridge
-                </div>
-              </div>
-            </div>
-            <div className="w-80">
-              <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px]">
-                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-i-lightorange to-i-orange"></div>
-                <div className="space-y-3">
-                  <LoginButton />
-                </div>
-              </div>
+        <div className="flex gap-1 mb-4 absolute right-24 top-8">
+          <div className="bg-orange-300  px-4 py-1 rounded-full text-sm">
+            2026
+          </div>
+          <div className="bg-i-lightgrey  px-4 py-1 rounded-md text-sm">
+            Team i-Bridge
+          </div>
+        </div>
+    <div className="mr-40 mt-8">
+<div className="flex gap-4 mb-4 ">
+          
+        </div>
+        </div>
+        
+
+        
+    {/* ✅ 1. 위쪽: 로고 + 로그인 버튼 영역 */}
+    <section className="w-full  px-16 mt-36 mb-8 ml-250">
+      <div className="max-w-7xl mx-auto flex justify-between items-center ml-20 ">
+          {/* 상단 이미지 애니메이션 패널 */}
+    <div className=" mt-[-24]">
+      {imageNames.map((name, idx) => (
+        <motion.img
+  key={idx}
+  src={`/images/${name}.png`}
+  alt={`img-${idx}`}
+  initial={{
+    x: imagePositions[idx].xStart,
+    y: imagePositions[idx].yStart - imageSizes[idx].height,
+    opacity: 0, // ⬅ 초기에는 투명
+  }}
+  animate={{
+    x: imagePositions[idx].xEnd,
+    y: imagePositions[idx].yEnd - imageSizes[idx].height,
+    opacity: 1, // ⬅ 애니메이션 도착 시 나타남
+  }}
+  transition={{
+    type: 'spring',
+    stiffness: 50,
+    damping: 12,
+    opacity: { duration: 1.2 }, // ⬅ opacity 변화는 좀 더 부드럽게
+  }}
+  className="absolute z-10 object-contain"
+  style={{
+    width: `${imageSizes[idx].width}px`,
+    height: `${imageSizes[idx].height}px`,
+  }}
+/>
+
+      ))}
+    </div>
+        {/* 오른쪽: 로그인 박스 */}
+        <div className="w-80  ">
+          <div className="bg-white  p-6 rounded-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px]">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-i-lightorange to-i-orange"></div>
+            <div className="space-y-3 ">
+              <LoginButton />
             </div>
           </div>
-        </section>
+        </div>
+      </div>
+    </section>
+
+    {/* ✅ 2. 아래쪽: 텍스트 소개 섹션 */}
+    <section className="flex-1 px-6 pb-5 ml-[-120]">
+      <div className="max-w-4xl mx-auto text-gray-600">
+        <h2 className="text-xl  font-bold mb-4">
+          Welcome to i-Bridge
+        </h2>
+        <p className="text-md  mb-1">
+          감정은 행동이 아닌, 말로 표현될 수 있어야 합니다.
+        </p>
+        <p className="text-sm  mb-8">
+          iBridge는 부모가 아이의 진짜 마음을 이해할 수 있도록 돕는, 감정
+          분석 기반의 소통 플랫폼입니다.
+        </p>
+        
+      </div>
+    </section>
+    </div>
 
         {/* Intro Text Section */}
         <section className="max-w-5xl mx-auto px-16 mt-12 mb-32 relative text-center">
@@ -307,7 +270,7 @@ export default function StartPage() {
             </motion.div>
           </div>
         </div>
-      </main>
+      
     </div>
   );
 }

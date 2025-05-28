@@ -199,7 +199,7 @@ export default function LoginButton() {
 
   return (
     <>
-      <h3 className="text-i-darkblue font-semibold mb-4 text-lg text-center">
+      <h3 className="text-gray-900 font-semibold mb-4 text-lg text-center">
         소셜 로그인
       </h3>
       <p className="text-gray-500 text-sm text-center mb-4">

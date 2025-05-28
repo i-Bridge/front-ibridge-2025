@@ -82,10 +82,12 @@ html {
 /* 스크롤바 커스텀 스타일 */
 .scrollbar-custom::-webkit-scrollbar {
   height: 8px; /* 가로 스크롤바 높이 */
+  background: theme('colors.i-lightgray');
 }
 
 .scrollbar-custom::-webkit-scrollbar-track {
   border-radius: 10px;
+  
 }
 
 .scrollbar-custom::-webkit-scrollbar-thumb {
