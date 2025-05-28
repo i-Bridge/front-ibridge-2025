@@ -90,9 +90,8 @@ export default function LoginButton() {
       }
       setFamilySuccess('✅ 수락 요청 메일을 보냈습니다.');
       setFamilyName('');
-      
-        setStatus('waiting');
-      
+
+      setStatus('waiting');
     } catch (err) {
       console.error('❌ 가족 이름 등록 실패:', err);
       alert('오류가 발생했습니다.');
@@ -138,7 +137,7 @@ export default function LoginButton() {
         {status === 'enterFamilyName' && (
           <div className="flex flex-col  mt-4 p-4 max-w-md bg-gray-100 rounded-xl h-32">
             <p className=" font-semibold mb-4 text-gray-800">
-              👨‍👩‍👧 가족 이름을 입력해주세요:
+              👨‍👩‍👧 가족 이름을 입력해주세요
             </p>
             <div className="flex items-center gap-2 text-sm">
               <input
@@ -156,7 +155,7 @@ export default function LoginButton() {
               />
               <button
                 onClick={handleSubmitFamily}
-                className="px-2 py-2 bg-orange-400 text-white rounded-xl hover:bg-orange-200 transition whitespace-nowrap"
+                className="px-2 py-2 bg-orange-400 text-white rounded-xl shadow-sm hover:scale-105 transition-transform"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -164,7 +163,7 @@ export default function LoginButton() {
                   viewBox="0 0 24 24"
                   strokeWidth="1.5"
                   stroke="currentColor"
-                  className="w-5 h-5 text-green-600"
+                  className="w-5 h-5"
                 >
                   <path
                     strokeLinecap="round"
@@ -184,8 +183,8 @@ export default function LoginButton() {
         )}
 
         {status === 'waiting' && (
-          <div className="mt-4 p-4 border rounded-xl shadow-sm bg-yellow-50 text-gray-800 h-32">
-            <p>⏳수락을 기다리고 있습니다...</p>
+          <div className="mt-4 p-4 border rounded-xl shadow-sm bg-gray-100 text-gray-800 h-32 flex justify-center items-center">
+            <p className="text-center">⏳수락을 기다리고 있습니다...</p>
           </div>
         )}
 

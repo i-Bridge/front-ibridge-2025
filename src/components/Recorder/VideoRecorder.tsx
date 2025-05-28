@@ -254,7 +254,7 @@ export default function VideoRecorder({
 
   return (
     <div
-      className="flex flex-col items-center min-w-[300px] max-w-[400px] gap-4 p-10 pr-14 bg-contain bg-center bg-no-repeat"
+      className="flex flex-col items-center min-w-[300px] max-w-[400px] gap-4 p-10 pr-14 bg-contain bg-center bg-no-repeat "
       style={{
         backgroundImage: `url('/images/영상박스_점선.png')`,
       }}
