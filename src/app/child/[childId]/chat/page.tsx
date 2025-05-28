@@ -270,9 +270,17 @@ export default function ReplyPage() {
                         console.error('❌ /predesigned API 실패');
                       }
                     }}
-                    className="w-64 px-8 py-6 text-lg bg-white text-gray-950 rounded-full shadow-sm"
+                    className="w-72 h-28 relative hover:scale-105 transition-transform"
+                    style={{
+                      backgroundImage: "url('/images/대화박스_분홍.png')",
+                      backgroundRepeat: 'no-repeat',
+                      backgroundSize: 'contain',
+                      backgroundPosition: 'center',
+                    }}
                   >
-                    질문에 응답할래
+                    <span className="absolute inset-0 flex items-center justify-center text-lg text-gray-800 mt-2 mr-2">
+                      질문에 응답할래
+                    </span>
                   </button>
                 )}
 
@@ -297,9 +305,17 @@ export default function ReplyPage() {
                       console.error('❌ /new API 실패');
                     }
                   }}
-                  className="w-64 px-8 py-6 text-lg bg-white text-gray-950 rounded-full shadow-sm"
+                  className="w-72 h-28 relative hover:scale-105 transition-transform"
+                  style={{
+                    backgroundImage: "url('/images/대화박스_연두.png')",
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: 'contain',
+                    backgroundPosition: 'center',
+                  }}
                 >
-                  나 하고 싶은 말이 있어
+                  <span className="absolute inset-0 flex items-center justify-center text-lg text-gray-800 mt-2 mr-2">
+                    하고 싶은 말이 있어
+                  </span>
                 </button>
               </>
             ) : (
