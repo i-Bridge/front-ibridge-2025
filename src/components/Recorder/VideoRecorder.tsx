@@ -7,11 +7,13 @@ import { Fetcher } from '@/lib/fetcher';
 export default function VideoRecorder({
   subjectId,
   onAIResponse,
-  onFinished,
+  onFinished, //녹화가 종료됨
+  onConversationFinished, //한 주제에 대한 대화가 종료됨
 }: {
-  subjectId: number;
+  subjectId: number | null;
   onAIResponse: (message: string) => void;
   onFinished: () => void;
+  onConversationFinished: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -19,16 +21,68 @@ export default function VideoRecorder({
   const recognitionRef = useRef<any>(null);
 
   const [isRecording, setIsRecording] = useState(false);
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const [isThumbnailCaptured, setIsThumbnailCaptured] = useState(false);
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
   const [uploadedThumbnailUrl, setUploadedThumbnailUrl] = useState<
     string | null
   >(null);
   const [recognizedText, setRecognizedText] = useState('');
-  const [answerId, setAnswerId] = useState<number | null>(null);
 
   const { childId } = useParams();
+
+  useEffect(() => {
+    const sendToBackend = async () => {
+      if (
+        uploadedVideoUrl &&
+        uploadedThumbnailUrl &&
+        recognizedText &&
+        subjectId &&
+        childId
+      ) {
+        console.log('📤 /answer 요청 시작');
+        const { data, isSuccess } = await Fetcher<{
+          finished: boolean;
+          ai: string;
+        }>(`/child/${childId}/answer`, {
+          method: 'POST',
+          data: { subjectId, text: recognizedText },
+        });
+
+        if (isSuccess && data) {
+          console.log('✅ /answer 응답:', data);
+
+          await Fetcher(`/child/${childId}/uploaded`, {
+            method: 'POST',
+            data: {
+              subjectId,
+              video: uploadedVideoUrl,
+              image: uploadedThumbnailUrl,
+            },
+          });
+
+          if (data.finished) {
+            console.log('🏁 모든 질문 완료됨');
+            const finalMessage = '수고했어! 내일 또 만나~';
+            onAIResponse(finalMessage);
+            const utterance = new SpeechSynthesisUtterance(finalMessage);
+            utterance.lang = 'ko-KR';
+            utterance.pitch = 1.4;
+            utterance.rate = 0.8;
+            window.speechSynthesis.speak(utterance);
+
+            onConversationFinished();
+            return;
+          }
+
+          onAIResponse(data.ai);
+          onFinished();
+        } else {
+          console.error('❌ /answer 실패');
+        }
+      }
+    };
+
+    sendToBackend();
+  }, [uploadedVideoUrl, uploadedThumbnailUrl, recognizedText]);
 
   const startRecording = async () => {
     if (mediaRecorderRef.current) return;
@@ -39,12 +93,9 @@ export default function VideoRecorder({
         video: true,
         audio: true,
       });
-      setStream(mediaStream);
-      setIsThumbnailCaptured(false);
+      setRecognizedText('');
       setUploadedVideoUrl(null);
       setUploadedThumbnailUrl(null);
-      setRecognizedText('');
-      setAnswerId(null);
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -59,33 +110,31 @@ export default function VideoRecorder({
       };
 
       recorder.onstop = async () => {
-        console.log('🛑 녹화 종료됨 → 영상 업로드 시작');
+        console.log('🛑 녹화 종료됨');
         const blob = new Blob(chunks, { type: 'video/webm' });
+        console.log('📦 영상 Blob 생성 완료, 업로드 시작');
         await uploadToS3(blob, 'video');
         mediaStream.getTracks().forEach((track) => track.stop());
         stopSTT();
-        onFinished(); // ✅ 녹화 완료 알림
+        mediaRecorderRef.current = null;
       };
 
       mediaRecorderRef.current = recorder;
       recorder.start();
+      console.log('🔴 녹화 시작됨');
       setIsRecording(true);
       startSTT();
 
       setTimeout(() => {
-        if (!isThumbnailCaptured) {
-          console.log('📸 3초 경과 → 썸네일 캡처 시도');
-          captureAndUploadThumbnail();
-          setIsThumbnailCaptured(true);
-        }
-      }, 3000);
+        captureAndUploadThumbnail();
+      }, 1000);
     } catch (err) {
       console.error('❌ 녹화 시작 실패:', err);
     }
   };
 
   const stopRecording = () => {
-    console.log('🛑 녹화 중지 요청됨');
+    console.log('🛑 녹화 종료 버튼 클릭됨');
     mediaRecorderRef.current?.stop();
     setIsRecording(false);
   };
@@ -123,12 +172,19 @@ export default function VideoRecorder({
   };
 
   const stopSTT = () => {
-    console.log('🛑 음성 인식 중단');
     recognitionRef.current?.stop();
+    console.log('🛑 음성 인식 종료');
   };
 
   const captureAndUploadThumbnail = async () => {
-    if (!videoRef.current || !canvasRef.current) return;
+    if (!videoRef.current || !canvasRef.current || !subjectId) {
+      console.warn('⚠️ 썸네일 캡처 불가: video/canvas/subjectId 부족', {
+        video: !!videoRef.current,
+        canvas: !!canvasRef.current,
+        subjectId,
+      });
+      return;
+    }
 
     console.log('🖼 썸네일 캡처 중...');
     const canvas = canvasRef.current;
@@ -140,20 +196,20 @@ export default function VideoRecorder({
     ctx?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
     canvas.toBlob(async (blob) => {
-      if (!blob || !answerId) return;
+      if (!blob) return;
 
       console.log('☁️ 썸네일 Presigned URL 요청');
       const { data } = await Fetcher<{ url: string }>(
         `/child/${childId}/getURL`,
         {
           method: 'POST',
-          data: { type: 'image', id: answerId },
+          data: { type: 'image', subjectId },
           skipAuthHeader: true,
         },
       );
 
       if (!data?.url) {
-        console.error('❌ 썸네일 Presigned URL 획득 실패');
+        console.error('❌ 썸네일 URL 획득 실패');
         return;
       }
 
@@ -163,103 +219,96 @@ export default function VideoRecorder({
         console.log('✅ 썸네일 S3 업로드 완료:', s3Url);
         setUploadedThumbnailUrl(s3Url);
       } else {
-        console.error('❌ 썸네일 S3 업로드 실패');
+        console.error('❌ 썸네일 업로드 실패');
       }
     }, 'image/jpeg');
   };
 
   const uploadToS3 = async (blob: Blob, type: 'video') => {
-    if (!answerId) return;
+    if (!subjectId) return;
 
-    console.log('☁️ 영상 Presigned URL 요청');
+    console.log(`☁️ ${type} Presigned URL 요청`);
     const { data } = await Fetcher<{ url: string }>(
       `/child/${childId}/getURL`,
       {
         method: 'POST',
-        data: { type: 'video', id: answerId },
+        data: { type, subjectId },
         skipAuthHeader: true,
       },
     );
 
     if (!data?.url) {
-      console.error('❌ 영상 Presigned URL 획득 실패');
+      console.error(`❌ ${type} URL 획득 실패`);
       return;
     }
 
     const res = await fetch(data.url, { method: 'PUT', body: blob });
     if (res.ok) {
       const s3Url = data.url.split('?')[0];
-      console.log('✅ 영상 S3 업로드 완료:', s3Url);
+      console.log(`✅ ${type} S3 업로드 완료:`, s3Url);
       setUploadedVideoUrl(s3Url);
     } else {
-      console.error('❌ 영상 S3 업로드 실패');
+      console.error(`❌ ${type} 업로드 실패`);
     }
   };
 
-  useEffect(() => {
-    const sendToBackend = async () => {
-      if (
-        uploadedVideoUrl &&
-        uploadedThumbnailUrl &&
-        !isRecording &&
-        recognizedText &&
-        childId &&
-        subjectId
-      ) {
-        console.log('📤 백엔드로 전송 시작');
-        console.log('📝 전송할 텍스트:', recognizedText);
-        console.log('🎯 subjectId:', subjectId);
-
-        const { data, isSuccess } = await Fetcher<{
-          id: number;
-          ai: string;
-        }>(`/child/${childId}/answer`, {
-          method: 'POST',
-          data: { subjectId, text: recognizedText },
-        });
-        console.log('📥 /answer API 응답:', { isSuccess, data });
-        if (isSuccess && data) {
-          console.log('✅ 텍스트 응답 저장 완료. answerId:', data.id);
-          setAnswerId(data.id);
-          onAIResponse(data.ai);
-
-          await Fetcher(`/child/${childId}/uploaded`, {
-            method: 'POST',
-            data: {
-              id: data.id,
-              video: uploadedVideoUrl,
-              image: uploadedThumbnailUrl,
-            },
-          });
-        }
-      }
-    };
-
-    sendToBackend();
-  }, [uploadedVideoUrl, uploadedThumbnailUrl, isRecording]);
-
   return (
-    <div className="flex flex-col items-center gap-4">
-      <video ref={videoRef} className="w-80 h-60 bg-black rounded" />
+    <div
+      className="flex flex-col items-center min-w-[300px] max-w-[400px] gap-4 p-10 pr-14 bg-contain bg-center bg-no-repeat"
+      style={{
+        backgroundImage: `url('/images/영상박스.png')`,
+      }}
+    >
+      <video
+        ref={videoRef}
+        className="w-80 h-60 bg-black rounded shadow-sm mt-4"
+      />
       <canvas ref={canvasRef} className="hidden" />
-      <div className="text-gray-700 w-80 p-2 bg-white rounded shadow-sm text-sm">
-        <strong>📝 인식된 텍스트:</strong>{' '}
-        {recognizedText || '말을 해보세요...'}
+
+      <div className="text-gray-700 w-80 p-2 bg-orange-200 rounded shadow-sm text-sm">
+        <strong>🎙️인식된 텍스트:</strong>{' '}
+        {recognizedText || '버튼을 눌러 시작...'}
       </div>
+
       {!isRecording ? (
         <button
           onClick={startRecording}
-          className="px-6 py-3 bg-green-500 text-white rounded-lg"
-          disabled={isRecording}
+          className="p-4 bg-i-lightgreen text-white rounded-full shadow-sm hover:scale-105 transition-transform"
         >
-          녹화 시작
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"
+            />
+          </svg>
         </button>
       ) : (
         <button
           onClick={stopRecording}
-          className="px-6 py-3 bg-red-500 text-white rounded-lg"
+          className="p-4 bg-i-orange text-white rounded-full shadow-sm hover:scale-105 transition-transform"
         >
-          녹화 종료
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z"
+            />
+          </svg>
         </button>
       )}
     </div>
