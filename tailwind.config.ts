@@ -10,9 +10,9 @@ export default {
     extend: {
       colors: {
         'i-orange': '#FF662D',
-        'i-skyblue': '#B6D7A8 ',
-        'i-mint':'#C4E1C5',
-        'i-lightorange':'#F4A259 ',
+        'i-skyblue': '#57b5ce',
+        'i-mint': '#C4E1C5',
+        'i-lightorange': '#F4A259 ',
         'i-yellow': '#FDD504',
         'i-ivory': '#FFedd5',
         'i-lightgreen': '#b2e04d',
@@ -21,10 +21,10 @@ export default {
         'i-darkblue': '#034892',
         'i-lightgray': '#D9D9D9',
         'i-black': '#202123',
-        'i-white':'#FFFFF',
+        'i-white': '#FFFFF',
       },
       fontFamily: {
-        noto: 'var(--font-noto)', 
+        noto: 'var(--font-noto)',
       },
     },
   },

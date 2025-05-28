@@ -266,8 +266,8 @@ export default function VideoRecorder({
       <canvas ref={canvasRef} className="hidden" />
 
       <div className="text-gray-700 w-80 p-2 bg-red-100 rounded shadow-sm text-sm">
-        <strong>📝 인식된 텍스트:</strong>{' '}
-        {recognizedText || '말을 해보세요...'}
+        <strong>🎙️인식된 텍스트:</strong>{' '}
+        {recognizedText || '버튼을 눌러 시작...'}
       </div>
 
       {!isRecording ? (
