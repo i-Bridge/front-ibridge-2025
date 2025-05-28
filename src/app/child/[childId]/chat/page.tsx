@@ -121,7 +121,7 @@ export default function ReplyPage() {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen relative p-6 bg-amber-100">
+    <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
       <button
         onClick={() => {
           console.log('🏠 홈으로 가기 클릭됨');
@@ -131,7 +131,13 @@ export default function ReplyPage() {
           setQuestion('');
           setSubjectId(null);
         }}
-        className="fixed top-12 left-12 z-50 bg-white p-4 rounded-full shadow-lg hover:scale-105 transition-transform"
+        className="fixed top-12 left-12 z-50 p-4 pl-8 hover:scale-105 transition-transform bg-cover bg-center"
+        style={{
+          backgroundImage: "url('/images/homeBtnBg.png')",
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'contain',
+          backgroundPosition: 'center',
+        }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +145,7 @@ export default function ReplyPage() {
           viewBox="0 0 24 24"
           strokeWidth="1.5"
           stroke="currentColor"
-          className="w-8 h-8 text-gray-950"
+          className="w-6 h-6 mr-1 mt-2 text-gray-600 drop-shadow"
         >
           <path
             strokeLinecap="round"
@@ -159,40 +165,81 @@ export default function ReplyPage() {
         width={500}
         height={500}
         onLoad={handleImageLoad}
-        className={`transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
+        className={`relative bottom-[-50px] transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
         animate={{ scale: isSpeaking ? 1.03 : 1 }}
         transition={{ duration: 0.3 }}
       />
 
       {isFinalMessage ? (
-        <div className="absolute bottom-32 bg-white p-6 rounded-lg shadow-md border-2 border-i-orange">
-          <p className="text-xl font-semibold">{displayText}</p>
+        <div className="relative w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
+          <motion.div
+            className="relative w-full h-full"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <img
+              src="/images/speechBubbleBg.png"
+              alt="말풍선 배경"
+              className="absolute inset-0 w-full h-full object-contain"
+            />
+            <div className="relative z-10 flex flex-col items-center justify-center gap-4 h-full p-6">
+              <p className="text-xl text-gray-900 text-center break-words whitespace-pre-wrap px-10 leading-relaxed">
+                {displayText}
+              </p>
+            </div>
+          </motion.div>
         </div>
       ) : (
         <>
           {isQuestionVisible && (
-            <>
+            <div className="relative w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
               <motion.div
-                className="ml-16 w-96 min-h-32 bg-white p-6 rounded-lg shadow-sm border-2 border-i-orange"
+                className="relative w-full h-full"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
               >
-                <p className="text-xl font-semibold">{displayText}</p>
-              </motion.div>
+                <img
+                  src="/images/speechBubbleBg.png"
+                  alt="말풍선 배경"
+                  className="absolute inset-0 w-full h-full object-contain"
+                />
+                <div className="relative z-10 flex flex-col items-center justify-center gap-4 h-full p-6">
+                  <p className="text-xl text-gray-900 text-center break-words whitespace-pre-wrap px-10 leading-relaxed">
+                    {displayText}
+                  </p>
 
-              <div className="absolute bottom-20 flex flex-col items-center gap-6">
-                <button
-                  onClick={() => {
-                    console.log('🔁 질문 다시 듣기 클릭됨');
-                    speak(question);
-                  }}
-                  className="px-6 py-4 bg-orange-400 text-white text-lg rounded-lg"
-                >
-                  질문 다시 듣기
-                </button>
-              </div>
-            </>
+                  <button
+                    onClick={() => {
+                      console.log('🔁 질문 다시 듣기 클릭됨');
+                      speak(question);
+                    }}
+                    className="absolute right-6 top-1/2 -translate-y-1/2 transition-transform hover:scale-110"
+                    style={{
+                      background: 'transparent',
+                      padding: 0,
+                      border: 'none',
+                    }}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-6 h-6 text-orange-400"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </motion.div>
+            </div>
           )}
 
           <div className="ml-32 flex flex-col gap-8 text-center">
@@ -223,7 +270,7 @@ export default function ReplyPage() {
                         console.error('❌ /predesigned API 실패');
                       }
                     }}
-                    className="w-64 px-8 py-6 text-lg bg-green-500 text-white rounded-lg shadow-lg"
+                    className="w-64 px-8 py-6 text-lg bg-white text-gray-950 rounded-full shadow-sm"
                   >
                     질문에 응답할래
                   </button>
@@ -250,7 +297,7 @@ export default function ReplyPage() {
                       console.error('❌ /new API 실패');
                     }
                   }}
-                  className="w-64 px-8 py-6 text-lg bg-blue-500 text-white rounded-lg shadow-lg"
+                  className="w-64 px-8 py-6 text-lg bg-white text-gray-950 rounded-full shadow-sm"
                 >
                   나 하고 싶은 말이 있어
                 </button>

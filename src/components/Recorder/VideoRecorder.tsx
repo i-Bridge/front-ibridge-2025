@@ -253,13 +253,21 @@ export default function VideoRecorder({
   };
 
   return (
-    <div className="flex flex-col items-center gap-4 bg-white rounded-xl shadow-lg p-6">
-      <video ref={videoRef} className="w-80 h-60 bg-black rounded shadow-sm" />
+    <div
+      className="flex flex-col items-center min-w-[300px] max-w-[400px] gap-4 p-10 pr-14 bg-contain bg-center bg-no-repeat"
+      style={{
+        backgroundImage: `url('/images/영상박스.png')`,
+      }}
+    >
+      <video
+        ref={videoRef}
+        className="w-80 h-60 bg-black rounded shadow-sm mt-4"
+      />
       <canvas ref={canvasRef} className="hidden" />
 
-      <div className="text-gray-700 w-80 p-2 bg-red-100 rounded shadow-sm text-sm">
-        <strong>📝 인식된 텍스트:</strong>{' '}
-        {recognizedText || '말을 해보세요...'}
+      <div className="text-gray-700 w-80 p-2 bg-orange-200 rounded shadow-sm text-sm">
+        <strong>🎙️인식된 텍스트:</strong>{' '}
+        {recognizedText || '버튼을 눌러 시작...'}
       </div>
 
       {!isRecording ? (
@@ -285,9 +293,22 @@ export default function VideoRecorder({
       ) : (
         <button
           onClick={stopRecording}
-          className="px-6 py-3 bg-red-500 text-white rounded-lg shadow hover:scale-105 transition-transform"
+          className="p-4 bg-i-orange text-white rounded-full shadow-sm hover:scale-105 transition-transform"
         >
-          녹화 종료
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z"
+            />
+          </svg>
         </button>
       )}
     </div>
