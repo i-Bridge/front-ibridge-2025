@@ -265,7 +265,7 @@ export default function VideoRecorder({
       />
       <canvas ref={canvasRef} className="hidden" />
 
-      <div className="text-gray-700 w-80 p-2 bg-red-100 rounded shadow-sm text-sm">
+      <div className="text-gray-700 w-80 p-2 bg-orange-200 rounded shadow-sm text-sm">
         <strong>🎙️인식된 텍스트:</strong>{' '}
         {recognizedText || '버튼을 눌러 시작...'}
       </div>
@@ -293,13 +293,13 @@ export default function VideoRecorder({
       ) : (
         <button
           onClick={stopRecording}
-          className="p-4 bg-red-300 text-white rounded-full shadow-sm hover:scale-105 transition-transform"
+          className="p-4 bg-i-orange text-white rounded-full shadow-sm hover:scale-105 transition-transform"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
-            stroke-width="1.5"
+            strokeWidth="1.5"
             stroke="currentColor"
             className="w-6 h-6"
           >

@@ -133,7 +133,7 @@ export default function ReplyPage() {
         }}
         className="fixed top-12 left-12 z-50 p-4 pl-8 hover:scale-105 transition-transform bg-cover bg-center"
         style={{
-          backgroundImage: "url('/images/homeBtnBg.png')", // 버튼 배경
+          backgroundImage: "url('/images/homeBtnBg.png')",
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'contain',
           backgroundPosition: 'center',
@@ -177,59 +177,53 @@ export default function ReplyPage() {
       ) : (
         <>
           {isQuestionVisible && (
-            <>
-              <div className="relative w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
-                {/* 애니메이션 포함된 말풍선 박스 */}
-                <motion.div
-                  className="relative w-full h-full"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  {/* 배경 이미지 */}
-                  <img
-                    src="/images/speechBubbleBg.png"
-                    alt="말풍선 배경"
-                    className="absolute inset-0 w-full h-full object-contain"
-                  />
+            <div className="relative w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
+              <motion.div
+                className="relative w-full h-full"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <img
+                  src="/images/speechBubbleBg.png"
+                  alt="말풍선 배경"
+                  className="absolute inset-0 w-full h-full object-contain"
+                />
+                <div className="relative z-10 flex flex-col items-center justify-center gap-4 h-full p-6">
+                  <p className="text-xl text-gray-900 text-center break-words whitespace-pre-wrap px-10 leading-relaxed">
+                    {displayText}
+                  </p>
 
-                  {/* 내용 */}
-                  <div className="relative z-10 flex flex-col items-center justify-center gap-4 h-full p-6">
-                    <p className="text-xl font-semibold text-gray-900 text-center">
-                      {displayText}
-                    </p>
-
-                    <button
-                      onClick={() => {
-                        console.log('🔁 질문 다시 듣기 클릭됨');
-                        speak(question);
-                      }}
-                      className="absolute right-8 top-1/2 -translate-y-1/2 transition-transform hover:scale-110"
-                      style={{
-                        background: 'transparent',
-                        padding: 0,
-                        border: 'none',
-                      }}
+                  <button
+                    onClick={() => {
+                      console.log('🔁 질문 다시 듣기 클릭됨');
+                      speak(question);
+                    }}
+                    className="absolute right-6 top-1/2 -translate-y-1/2 transition-transform hover:scale-110"
+                    style={{
+                      background: 'transparent',
+                      padding: 0,
+                      border: 'none',
+                    }}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-6 h-6 text-orange-400"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-6 h-6 text-orange-400"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </motion.div>
-              </div>
-            </>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </motion.div>
+            </div>
           )}
 
           <div className="ml-32 flex flex-col gap-8 text-center">
