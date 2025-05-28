@@ -58,19 +58,6 @@ export async function Fetcher<T = undefined>(
       baseHeaders['Provider'] = provider || '';
     }
 
-    // ✅ 개발환경 로그 출력
-    if (process.env.NODE_ENV === 'development') {
-      console.log(
-        '🌐 [Fetcher] 요청 URL:',
-        `${process.env.NEXT_PUBLIC_API_URL}${url}`,
-      );
-      console.log('🛠 [Fetcher] 요청 메서드:', options.method ?? 'GET');
-      console.log('📦 [Fetcher] 요청 데이터:', options.data);
-      console.log('🔍 [Fetcher] 요청 파라미터:', options.params);
-      console.log('🧾 [Fetcher] 요청 헤더:', baseHeaders);
-      console.log('🔑 [Fetcher] 세션:', session);
-    }
-
     const res = await axios({
       url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
       method: options.method ?? 'GET',
@@ -82,10 +69,6 @@ export async function Fetcher<T = undefined>(
     });
 
     const responseData = res.data as ApiResponse<T>;
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('📥 [Fetcher] 응답 데이터:', responseData);
-    }
 
     if (responseData.code !== '200') {
       console.warn(
