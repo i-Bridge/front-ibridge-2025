@@ -171,8 +171,24 @@ export default function ReplyPage() {
       />
 
       {isFinalMessage ? (
-        <div className="absolute bottom-32 bg-white p-6 rounded-lg shadow-md border-2 border-i-orange">
-          <p className="text-xl font-semibold">{displayText}</p>
+        <div className="relative w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
+          <motion.div
+            className="relative w-full h-full"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <img
+              src="/images/speechBubbleBg.png"
+              alt="말풍선 배경"
+              className="absolute inset-0 w-full h-full object-contain"
+            />
+            <div className="relative z-10 flex flex-col items-center justify-center gap-4 h-full p-6">
+              <p className="text-xl text-gray-900 text-center break-words whitespace-pre-wrap px-10 leading-relaxed">
+                {displayText}
+              </p>
+            </div>
+          </motion.div>
         </div>
       ) : (
         <>
@@ -254,7 +270,7 @@ export default function ReplyPage() {
                         console.error('❌ /predesigned API 실패');
                       }
                     }}
-                    className="w-64 px-8 py-6 text-lg bg-green-500 text-white rounded-lg shadow-lg"
+                    className="w-64 px-8 py-6 text-lg bg-white text-gray-950 rounded-full shadow-sm"
                   >
                     질문에 응답할래
                   </button>
@@ -281,7 +297,7 @@ export default function ReplyPage() {
                       console.error('❌ /new API 실패');
                     }
                   }}
-                  className="w-64 px-8 py-6 text-lg bg-blue-500 text-white rounded-lg shadow-lg"
+                  className="w-64 px-8 py-6 text-lg bg-white text-gray-950 rounded-full shadow-sm"
                 >
                   나 하고 싶은 말이 있어
                 </button>
