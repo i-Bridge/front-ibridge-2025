@@ -91,7 +91,7 @@ export default function VideoRecorder({
       console.log('🎬 녹화 시작 요청됨');
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: true,
-        audio: true,
+        audio: false,
       });
       setRecognizedText('');
       setUploadedVideoUrl(null);
