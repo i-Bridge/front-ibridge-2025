@@ -5,6 +5,7 @@ import VideoRecorder from '@/components/Recorder/VideoRecorder';
 import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
+import Image from 'next/image';
 
 export default function ReplyPage() {
   const { childId } = useParams();
@@ -71,10 +72,16 @@ export default function ReplyPage() {
     return () => clearInterval(interval);
   }, [isSpeaking]);
 
+  // 이미지 preload 처리 → 두 이미지 모두 선로드
   useEffect(() => {
-    const img = new Image();
-    img.src = '/images/characterDefault.png';
-    img.onload = () => setIsImageLoaded(true);
+    const preloadImages = [
+      '/images/characterDefault.png',
+      '/images/characterTalking.png',
+    ];
+    preloadImages.forEach((src) => {
+      const img = new window.Image();
+      img.src = src;
+    });
   }, []);
 
   // 강제 종료 처리
@@ -101,8 +108,6 @@ export default function ReplyPage() {
     return () => window.removeEventListener('beforeunload', handleUnload);
   }, [subjectId, childId]);
 
-  const handleImageLoad = () => setIsImageLoaded(true);
-
   const speak = (text: string) => {
     if (!text || typeof window === 'undefined') return;
 
@@ -122,6 +127,7 @@ export default function ReplyPage() {
 
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
+      {/* 홈 버튼 */}
       <button
         onClick={() => {
           console.log('🏠 홈으로 가기 클릭됨');
@@ -155,22 +161,28 @@ export default function ReplyPage() {
         </svg>
       </button>
 
-      <motion.img
-        src={
-          mouthOpen
-            ? '/images/characterTalking.png'
-            : '/images/characterDefault.png'
-        }
-        alt="캐릭터"
-        width={500}
-        height={500}
-        onLoad={handleImageLoad}
+      {/* 캐릭터 이미지 */}
+      <motion.div
         className={`relative bottom-[-50px] transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
         animate={{ scale: isSpeaking ? 1.03 : 1 }}
         transition={{ duration: 0.3 }}
-      />
+      >
+        <Image
+          src={
+            mouthOpen
+              ? '/images/characterTalking.png'
+              : '/images/characterDefault.png'
+          }
+          alt="캐릭터"
+          width={500}
+          height={500}
+          priority
+          onLoadingComplete={() => setIsImageLoaded(true)}
+        />
+      </motion.div>
 
-      {isFinalMessage ? (
+      {/* 말풍선 */}
+      {isFinalMessage || isQuestionVisible ? (
         <div className="relative w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
           <motion.div
             className="relative w-full h-full"
@@ -178,173 +190,149 @@ export default function ReplyPage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <img
+            <Image
               src="/images/speechBubbleBg.png"
               alt="말풍선 배경"
-              className="absolute inset-0 w-full h-full object-contain"
+              fill
+              className="object-contain"
+              priority
             />
             <div className="relative z-10 flex flex-col items-center justify-center gap-4 h-full p-6">
               <p className="text-xl text-gray-900 text-center break-words whitespace-pre-wrap px-10 leading-relaxed">
                 {displayText}
               </p>
+              {isQuestionVisible && (
+                <button
+                  onClick={() => {
+                    console.log('🔁 질문 다시 듣기 클릭됨');
+                    speak(question);
+                  }}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 transition-transform hover:scale-110"
+                  style={{
+                    background: 'transparent',
+                    padding: 0,
+                    border: 'none',
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-6 h-6 text-orange-400"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+                    />
+                  </svg>
+                </button>
+              )}
             </div>
           </motion.div>
         </div>
-      ) : (
-        <>
-          {isQuestionVisible && (
-            <div className="relative w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
-              <motion.div
-                className="relative w-full h-full"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
+      ) : null}
+
+      {/* 하단 버튼 or 녹화기 */}
+      <div className="ml-32 flex flex-col gap-8 text-center">
+        {isCompleted !== null && !isQuestionVisible ? (
+          <>
+            {!isCompleted && (
+              <button
+                onClick={async () => {
+                  setIsQuestionVisible(true);
+                  setDisplayText('');
+                  console.log(
+                    '🟢 질문에 응답할래 버튼 클릭 → /predesigned 호출',
+                  );
+
+                  const { data, isSuccess } = await Fetcher<{
+                    subjectId: number;
+                    question: string;
+                  }>(`/child/${childId}/predesigned`, { method: 'GET' });
+
+                  if (isSuccess && data) {
+                    console.log('✅ /predesigned 응답:', data);
+                    setQuestion(data.question);
+                    setSubjectId(data.subjectId);
+                    speak(data.question);
+                  } else {
+                    console.error('❌ /predesigned API 실패');
+                  }
+                }}
+                className="w-72 h-28 relative hover:scale-105 transition-transform"
+                style={{
+                  backgroundImage: "url('/images/대화박스_분홍.png')",
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: 'contain',
+                  backgroundPosition: 'center',
+                }}
               >
-                <img
-                  src="/images/speechBubbleBg.png"
-                  alt="말풍선 배경"
-                  className="absolute inset-0 w-full h-full object-contain"
-                />
-                <div className="relative z-10 flex flex-col items-center justify-center gap-4 h-full p-6">
-                  <p className="text-xl text-gray-900 text-center break-words whitespace-pre-wrap px-10 leading-relaxed">
-                    {displayText}
-                  </p>
-
-                  <button
-                    onClick={() => {
-                      console.log('🔁 질문 다시 듣기 클릭됨');
-                      speak(question);
-                    }}
-                    className="absolute right-6 top-1/2 -translate-y-1/2 transition-transform hover:scale-110"
-                    style={{
-                      background: 'transparent',
-                      padding: 0,
-                      border: 'none',
-                    }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      className="w-6 h-6 text-orange-400"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </motion.div>
-            </div>
-          )}
-
-          <div className="ml-32 flex flex-col gap-8 text-center">
-            {isCompleted !== null && !isQuestionVisible ? (
-              <>
-                {!isCompleted && (
-                  <button
-                    onClick={async () => {
-                      setIsQuestionVisible(true);
-                      setDisplayText('');
-                      console.log(
-                        '🟢 질문에 응답할래 버튼 클릭 → /predesigned 호출',
-                      );
-
-                      const { data, isSuccess } = await Fetcher<{
-                        subjectId: number;
-                        question: string;
-                      }>(`/child/${childId}/predesigned`, {
-                        method: 'GET',
-                      });
-
-                      if (isSuccess && data) {
-                        console.log('✅ /predesigned 응답:', data);
-                        setQuestion(data.question);
-                        setSubjectId(data.subjectId);
-                        speak(data.question);
-                      } else {
-                        console.error('❌ /predesigned API 실패');
-                      }
-                    }}
-                    className="w-72 h-28 relative hover:scale-105 transition-transform"
-                    style={{
-                      backgroundImage: "url('/images/대화박스_분홍.png')",
-                      backgroundRepeat: 'no-repeat',
-                      backgroundSize: 'contain',
-                      backgroundPosition: 'center',
-                    }}
-                  >
-                    <span className="absolute inset-0 flex items-center justify-center text-lg text-gray-800 mt-2 mr-2">
-                      질문에 응답할래
-                    </span>
-                  </button>
-                )}
-
-                <button
-                  onClick={async () => {
-                    setIsQuestionVisible(true);
-                    setDisplayText('');
-                    console.log(
-                      '🟦 나 하고 싶은 말이 있어 버튼 클릭 → /new 호출',
-                    );
-
-                    const { data, isSuccess } = await Fetcher<{
-                      subjectId: number;
-                    }>(`/child/${childId}/new`, { method: 'GET' });
-
-                    if (isSuccess && data) {
-                      console.log('✅ /new 응답:', data);
-                      setSubjectId(data.subjectId);
-                      setQuestion('얘기해봐!');
-                      speak('얘기해봐!');
-                    } else {
-                      console.error('❌ /new API 실패');
-                    }
-                  }}
-                  className="w-72 h-28 relative hover:scale-105 transition-transform"
-                  style={{
-                    backgroundImage: "url('/images/대화박스_연두.png')",
-                    backgroundRepeat: 'no-repeat',
-                    backgroundSize: 'contain',
-                    backgroundPosition: 'center',
-                  }}
-                >
-                  <span className="absolute inset-0 flex items-center justify-center text-lg text-gray-800 mt-2 mr-2">
-                    하고 싶은 말이 있어
-                  </span>
-                </button>
-              </>
-            ) : (
-              subjectId !== null && (
-                <VideoRecorder
-                  subjectId={subjectId}
-                  onAIResponse={(ai: string) => {
-                    console.log('✅ 백엔드에서 받은 ai 응답:', ai);
-                    if (ai === '수고했어! 내일 또 만나~') {
-                      setIsFinalMessage(true);
-                      setIsQuestionVisible(false);
-                    }
-                    setQuestion(ai);
-                    setDisplayText(ai);
-                    speak(ai);
-                  }}
-                  onFinished={() => {
-                    console.log('✅ 녹화 완료됨');
-                  }}
-                  onConversationFinished={() => {
-                    setIsFinalMessage(true);
-                    setIsQuestionVisible(false);
-                  }}
-                />
-              )
+                <span className="absolute inset-0 flex items-center justify-center text-lg text-gray-800 mt-2 mr-2">
+                  질문에 응답할래
+                </span>
+              </button>
             )}
-          </div>
-        </>
-      )}
+
+            <button
+              onClick={async () => {
+                setIsQuestionVisible(true);
+                setDisplayText('');
+                console.log('🟦 나 하고 싶은 말이 있어 버튼 클릭 → /new 호출');
+
+                const { data, isSuccess } = await Fetcher<{
+                  subjectId: number;
+                }>(`/child/${childId}/new`, { method: 'GET' });
+
+                if (isSuccess && data) {
+                  console.log('✅ /new 응답:', data);
+                  setSubjectId(data.subjectId);
+                  setQuestion('얘기해봐!');
+                  speak('얘기해봐!');
+                } else {
+                  console.error('❌ /new API 실패');
+                }
+              }}
+              className="w-72 h-28 relative hover:scale-105 transition-transform"
+              style={{
+                backgroundImage: "url('/images/대화박스_연두.png')",
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: 'contain',
+                backgroundPosition: 'center',
+              }}
+            >
+              <span className="absolute inset-0 flex items-center justify-center text-lg text-gray-800 mt-2 mr-2">
+                하고 싶은 말이 있어
+              </span>
+            </button>
+          </>
+        ) : (
+          subjectId !== null && (
+            <VideoRecorder
+              subjectId={subjectId}
+              onAIResponse={(ai: string) => {
+                console.log('✅ 백엔드에서 받은 ai 응답:', ai);
+                if (ai === '수고했어! 내일 또 만나~') {
+                  setIsFinalMessage(true);
+                  setIsQuestionVisible(false);
+                }
+                setQuestion(ai);
+                setDisplayText(ai);
+                speak(ai);
+              }}
+              onFinished={() => {
+                console.log('✅ 녹화 완료됨');
+              }}
+              onConversationFinished={() => {
+                setIsFinalMessage(true);
+                setIsQuestionVisible(false);
+              }}
+            />
+          )
+        )}
+      </div>
     </div>
   );
 }
