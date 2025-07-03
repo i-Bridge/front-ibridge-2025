@@ -4,6 +4,7 @@ import AiComment from '@/components/Home/aiComment';
 import MonthSelector from '@/components/Home/monthSelector';
 import Weekly from '@/components/Home/weekly';
 import SubjectList from '@/components/Question/SubjectList';
+import { ChildPageParams } from '@/types/page-props';
 
 interface Subject {
   subjectId: number;
@@ -15,12 +16,14 @@ interface HomeData {
   subjects: Subject[];
 }
 
-export default async function HomePage({
-  params,
-}: {
-  params: { childId: string };
-}) {
-  const { childId } = params;
+
+export default async function HomePage({ params }: ChildPageParams) {
+  // params가 Promise이므로, await를 사용해 값을 추출
+  const { childId } = await params;
+
+  if (!childId) {
+    return <div> 자녀 정보 없음 </div>;
+  }
 
   const res = await Fetcher<HomeData>(`/parent/${childId}/home`);
 

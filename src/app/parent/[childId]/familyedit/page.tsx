@@ -3,6 +3,8 @@ import EditPageHeader from '@/components/Familyedit/EditHeader';
 import FamilyTree from '@/components/Familyedit/familyTree';
 import FamilyName from '@/components/Familyedit/editFamilyName';
 import ChildrenForm from '@/components/Familyedit/changeChildInfo';
+import { ChildPageParams } from '@/types/page-props';
+
 
 interface ParentInfo {
   parentId: number;
@@ -24,11 +26,9 @@ interface FamilyData {
 
 export default async function ChildrenSettingsPage({
   params,
-}: {
-  params: { childId: string };
-}) {
-  const { childId } = params;
-
+}: ChildPageParams) {
+  // params가 Promise이므로, await를 사용해 값을 추출
+  const { childId } = await params;
   {
     /* error page needed */
   }
