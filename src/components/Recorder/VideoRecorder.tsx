@@ -149,7 +149,7 @@ export default function VideoRecorder({
       return;
     }
 
-    const recognition = new SpeechRecognition();
+    const recognition: SpeechRecognition = new SpeechRecognition();
     recognition.lang = 'ko-KR';
     recognition.interimResults = true;
     recognition.continuous = true;
