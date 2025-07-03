@@ -3,7 +3,7 @@ import EditPageHeader from '@/components/Familyedit/EditHeader';
 import FamilyTree from '@/components/Familyedit/familyTree';
 import FamilyName from '@/components/Familyedit/editFamilyName';
 import ChildrenForm from '@/components/Familyedit/changeChildInfo';
-import { ChildPageParams } from '@/types/page-props';
+import { ChildPageProps } from '@/types/page-props';
 
 interface ParentInfo {
   parentId: number;
@@ -23,9 +23,7 @@ interface FamilyData {
   children: ChildInfo[];
 }
 
-export default async function ChildrenSettingsPage({
-  params,
-}: ChildPageParams) {
+export default async function ChildrenSettingsPage({ params }: ChildPageProps) {
   const { childId } = params;
 
   {
