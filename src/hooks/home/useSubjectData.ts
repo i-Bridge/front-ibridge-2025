@@ -93,7 +93,7 @@ export const useSubjectData = () => {
     };
 
     fetchSubjectData();
-  }, [selectedSubjectId, selectedDate]);
+  }, [childId,selectedSubjectId, selectedDate]);
 
   return {
     subject,

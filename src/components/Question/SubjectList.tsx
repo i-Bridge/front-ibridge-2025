@@ -108,7 +108,7 @@ const SubjectList = ({ initialSubjects }: Props) => {
         </div>
       </div>
 
-      {selectedSubjectId && (
+      {showPanels&&selectedSubjectId && (
         <div
           className={`flex items-stretch animate-slide-in-right
       transition-transform duration-300 ease-in-out`}

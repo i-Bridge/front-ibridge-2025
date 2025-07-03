@@ -1,7 +1,7 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll} from 'framer-motion';
 import { useSession } from 'next-auth/react';
 import { Fetcher } from '@/lib/fetcher';
 import LoginButton from '@/components/Auth/LoginButton';
@@ -34,7 +34,7 @@ export default function StartPage() {
   const containerRef = useRef(null);
   const { scrollY } = useScroll();
 
-  const [transforms, setTransforms] = useState<{ x: number; y: number }[]>([]);
+ const transformsRef = useRef<{ x: number; y: number }[]>([]);
 
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function StartPage() {
           return { x, y };
         },
       );
-      setTransforms(calculatedTransforms); // 상태에 변환된 x, y 값을 저장
+      transformsRef.current = calculatedTransforms; 
     };
 
     calculateTransforms(); // 처음 로드 시 변환값 계산

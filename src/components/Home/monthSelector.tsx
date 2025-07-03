@@ -3,26 +3,37 @@
 import { useState } from "react";
 import { useDateStore } from "@/store/date/dateStore";
 
+
+type Month = {
+    name: string;
+    index: number;
+    year: number;
+};
+
 const months = [
   "1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"
 ];
 
 export default function MonthSelector() {
-  const { selectedDate, setSelectedDate } = useDateStore();
+  const setSelectedDate = useDateStore((state) => state.setSelectedDate);
   const currentDate = new Date();
   const currentMonthIndex = currentDate.getMonth();
   
   // 과거 4개월 + 현재 + 미래 1개월
-  const availableMonths = Array.from({ length: 6 }, (_, i) => {
+  const availableMonths: Month[] = Array.from({ length: 6 }, (_, i) => {
     const date = new Date();
     date.setMonth(currentMonthIndex - 4 + i);
-    return { name: months[date.getMonth()], index: date.getMonth(), year: date.getFullYear() };
+    return {
+    name: months[date.getMonth()],
+    index: date.getMonth(),
+    year: date.getFullYear(),
+  };
   });
 
-  const [selectedMonth, setSelectedMonth] = useState(availableMonths[4]); // 현재 달이 기본
+  const [selectedMonth, setSelectedMonth] = useState<Month>(availableMonths[4]); // 현재 달이 기본
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleSelect = (month) => {
+  const handleSelect = (month: Month) => {
     setSelectedMonth(month);
     setSelectedDate(`${month.year}-${String(month.index + 1).padStart(2, "0")}-01`);
     setIsOpen(false);

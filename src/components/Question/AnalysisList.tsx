@@ -1,5 +1,5 @@
-'use';
 
+import Image from 'next/image';
 import { useState, useRef } from 'react';
 import { useSubjectStore } from '@/store/question/subjectStore';
 import { useSubjectData } from '@/hooks/home/useSubjectData';
@@ -14,7 +14,7 @@ interface Question {
 
 export default function AnalysisList() {
   const { selectedQuestionId, setSelectedQuestionId } = useSubjectStore();
-  const { questions, subject } = useSubjectData();
+  const { questions } = useSubjectData();
   const [playingMap, setPlayingMap] = useState<{ [key: number]: boolean }>({});
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
 
@@ -55,7 +55,13 @@ export default function AnalysisList() {
         className="relative cursor-pointer w-1/2 mx-auto"
         onClick={() => handlePlayClick(q.questionId)}
       >
-        <img src={q.image} alt="thumbnail" className="w-full h-auto" />
+        <Image
+          src={q.image}
+          alt="썸네일"
+          width={500}
+          height={300}
+          className="w-full h-auto object-cover"
+        />
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-4xl">
           ▶
         </div>
@@ -75,7 +81,7 @@ export default function AnalysisList() {
             </h4>
             <p className="text-gray-700 mb-4 font-semibold">답변: {q.answer}</p>
             <div className="relative">{renderVideoOrThumbnail(q)}</div>
-            <div className='border-t mt-4'></div>
+            <div className="border-t mt-4"></div>
           </div>
         ))}
       </>
@@ -107,7 +113,6 @@ export default function AnalysisList() {
       <div className=" mt-8 pt-4 mr-12 mb-20 relative ">
         {selectedQuestionId !== null ? (
           <div className="border-t">
-           
             <button
               onClick={() => setSelectedQuestionId(null)}
               className="absolute  -top-3 right-8 px-1 py-0 text-sm text-white bg-orange-400 rounded-xl hover:bg-orange-200"
@@ -115,10 +120,8 @@ export default function AnalysisList() {
               전체보기
             </button>
           </div>
-        ):(
-          <h3 className="absolute -top-6 left-0 py-3 text-sm font-light text-gray-600 ">
-               
-              </h3>
+        ) : (
+          <h3 className="absolute -top-6 left-0 py-3 text-sm font-light text-gray-600 "></h3>
         )}
         <div className=" ">
           <div className="mt-3 ">{content}</div>

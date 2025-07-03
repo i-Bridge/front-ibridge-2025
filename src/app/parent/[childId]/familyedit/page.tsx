@@ -30,8 +30,10 @@ interface FamilyData {
 export default async function ChildrenSettingsPage({ params }: { params: { childId: string } }) {
 const { childId } = params;
 
+  {/* error page needed */}
+
   if (!childId) {
-    return <div> 403: no childId </div>;
+    return <div> 자녀 정보 없음 </div>;
   }
 
   const res = await Fetcher<FamilyData>('/parent/mypage/edit');
@@ -39,8 +41,6 @@ const { childId } = params;
     if (!familyInfo) {
     return <div>로딩 중...</div>;
   }
-  
-
   
   return (
     <div className="flex flex-col items-center min-h-screen ">
@@ -51,9 +51,7 @@ const { childId } = params;
       </div>
       <p className="text-2xl font-semibold py-10 ">자녀 정보 수정하기</p>
       <ChildrenForm />
-       <footer className="bg-gray-200 text-white text-center py-10">
-          ⓒ 2025 i-Bridge.   All rights reserved.
-        </footer>
+       
     </div>
   );
 }
