@@ -13,7 +13,7 @@ export default function EditPageHeader({ childId }: HeaderProps) {
           <Image
             src="/images/logo.svg"
             alt="Logo"
-            width={96} 
+            width={96}
             height={0} // SVG는 비율 고정이라 0으로 두고 h-auto 스타일 유지 가능
             className="h-auto"
             priority // 로고처럼 항상 보여야 하는 건 미리 로딩

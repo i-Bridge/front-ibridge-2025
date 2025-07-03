@@ -1,10 +1,10 @@
-
 import { Fetcher } from '@/lib/fetcher';
 import EditPageHeader from '@/components/Familyedit/EditHeader';
 import FamilyTree from '@/components/Familyedit/familyTree';
 import FamilyName from '@/components/Familyedit/editFamilyName';
-
 import ChildrenForm from '@/components/Familyedit/changeChildInfo';
+import { ChildPageParams } from '@/types/page-props';
+
 interface ParentInfo {
   parentId: number;
   parentName: string;
@@ -23,35 +23,34 @@ interface FamilyData {
   children: ChildInfo[];
 }
 
+export default async function ChildrenSettingsPage({
+  params,
+}: ChildPageParams) {
+  const { childId } = params;
 
-
-
-
-export default async function ChildrenSettingsPage({ params }: { params: { childId: string } }) {
-const { childId } = params;
-
-  {/* error page needed */}
+  {
+    /* error page needed */
+  }
 
   if (!childId) {
     return <div> 자녀 정보 없음 </div>;
   }
 
   const res = await Fetcher<FamilyData>('/parent/mypage/edit');
-  const familyInfo=res.data;
-    if (!familyInfo) {
+  const familyInfo = res.data;
+  if (!familyInfo) {
     return <div>로딩 중...</div>;
   }
-  
+
   return (
     <div className="flex flex-col items-center min-h-screen ">
       <EditPageHeader childId={childId} />
       <div className="flex flex-col items-center py-10 w-full bg-red-100">
-      <FamilyName familyName={familyInfo.familyName}/> 
-      <FamilyTree familyData={familyInfo}/>
+        <FamilyName familyName={familyInfo.familyName} />
+        <FamilyTree familyData={familyInfo} />
       </div>
       <p className="text-2xl font-semibold py-10 ">자녀 정보 수정하기</p>
       <ChildrenForm />
-       
     </div>
   );
 }
