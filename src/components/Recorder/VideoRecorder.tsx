@@ -91,7 +91,7 @@ export default function VideoRecorder({
       console.log('🎬 녹화 시작 요청됨');
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: true,
-        audio: true,
+        audio: false,
       });
       setRecognizedText('');
       setUploadedVideoUrl(null);
@@ -149,7 +149,7 @@ export default function VideoRecorder({
       return;
     }
 
-    const recognition = new SpeechRecognition();
+    const recognition: SpeechRecognition = new SpeechRecognition();
     recognition.lang = 'ko-KR';
     recognition.interimResults = true;
     recognition.continuous = true;
