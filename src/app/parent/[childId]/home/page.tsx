@@ -16,6 +16,7 @@ interface HomeData {
   subjects: Subject[];
 }
 
+
 export default async function HomePage({ params }: ChildPageParams) {
   // params가 Promise이므로, await를 사용해 값을 추출
   const { childId } = await params;

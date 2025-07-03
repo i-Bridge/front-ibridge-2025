@@ -33,10 +33,6 @@ export default async function ChildrenSettingsPage({
     /* error page needed */
   }
 
-  if (!childId) {
-    return <div> 자녀 정보 없음 </div>;
-  }
-
   const res = await Fetcher<FamilyData>('/parent/mypage/edit');
   const familyInfo = res.data;
   if (!familyInfo) {
