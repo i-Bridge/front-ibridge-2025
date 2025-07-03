@@ -141,20 +141,30 @@ export default function VideoRecorder({
 
   const startSTT = () => {
     console.log('🎤 음성 인식 시작');
-    const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
+
+    const SpeechRecognitionConstructor =
+      (
+        window as typeof window & {
+          webkitSpeechRecognition: new () => SpeechRecognition;
+        }
+      ).SpeechRecognition ||
+      (
+        window as typeof window & {
+          webkitSpeechRecognition: new () => SpeechRecognition;
+        }
+      ).webkitSpeechRecognition;
+
+    if (!SpeechRecognitionConstructor) {
       alert('이 브라우저는 음성 인식을 지원하지 않습니다.');
       return;
     }
 
-    const recognition: SpeechRecognition = new SpeechRecognition();
+    const recognition: SpeechRecognition = new SpeechRecognitionConstructor();
     recognition.lang = 'ko-KR';
     recognition.interimResults = true;
     recognition.continuous = true;
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
       let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         finalTranscript += event.results[i][0].transcript;
@@ -163,7 +173,7 @@ export default function VideoRecorder({
       setRecognizedText(finalTranscript);
     };
 
-    recognition.onerror = (e: any) => {
+    recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
       console.error('🎤 음성 인식 오류:', e);
     };
 
