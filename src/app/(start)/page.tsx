@@ -63,9 +63,7 @@ export default function StartPage() {
           if (result?.data?.accepted) {
             router.replace('/profile');
           }
-        } catch (_e) {
-          // 첫 로그인 유저는 여기서 에러 발생할 수 있음 → 무시하고 LoginButton 진행
-        }
+        } catch {}
       }
     };
 

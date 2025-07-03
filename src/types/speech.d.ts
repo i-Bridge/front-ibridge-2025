@@ -1,8 +1,3 @@
-declare interface Window {
-  webkitSpeechRecognition: typeof SpeechRecognition;
-  SpeechRecognition: typeof SpeechRecognition;
-}
-
 interface SpeechRecognition extends EventTarget {
   lang: string;
   continuous: boolean;
@@ -16,11 +11,6 @@ interface SpeechRecognition extends EventTarget {
 interface SpeechRecognitionEvent extends Event {
   resultIndex: number;
   results: SpeechRecognitionResultList;
-}
-
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string;
-  message: string;
 }
 
 interface SpeechRecognitionResultList {
@@ -37,4 +27,14 @@ interface SpeechRecognitionResult {
 interface SpeechRecognitionAlternative {
   transcript: string;
   confidence: number;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+  message: string;
+}
+
+interface Window {
+  webkitSpeechRecognition: typeof SpeechRecognition;
+  SpeechRecognition: new () => SpeechRecognition;
 }
