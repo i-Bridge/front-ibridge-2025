@@ -21,7 +21,7 @@ export default async function HomePage({ params }: { params: { childId: string }
   const { childId } = params;
 
   if (!childId) {
-    return <div> 403: no childId </div>;
+    return <div> 자녀 정보 없음 </div>;
   }
 
   const res = await Fetcher<HomeData>(`/parent/${childId}/home`);

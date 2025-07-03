@@ -118,14 +118,14 @@ export default function MailBox() {
             <div className="p-4 text-sm text-gray-500">로딩 중...</div>
           ) : error ? (
             <div className="p-4 text-sm text-red-500">{error}</div>
-          ) : noticeData?.notices?.filter((mail) => !mail.isAccept).length ===
+          ) : noticeData?.notices?.filter((mail) => !mail.accept).length ===
             0 ? (
             <div className="p-4 text-sm text-gray-500">
               새로운 알림이 없습니다.
             </div>
           ) : (
             noticeData?.notices
-              .filter((mail) => !mail.isAccept)
+              .filter((mail) => !mail.accept)
               .sort(
                 (a, b) =>
                   new Date(b.time).getTime() - new Date(a.time).getTime(),

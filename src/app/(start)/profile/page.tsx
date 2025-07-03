@@ -14,16 +14,20 @@ export default async function Profile() {
 
   const profileData = res.data;
 
+  {/* error page needed */}
+
   if (!profileData) {
     return <div>로딩 중...</div>;
   }
 
-  if (!profileData.accepted) {
-    return <div> accepted false </div>;
-  }
 
   if (!profileData.send) {
-    return <div> send false </div>;
+    return <div> 가족이 등록되지 않았습니다.</div>;
+    
+  }
+
+  if (profileData.send &&!profileData.accepted) {
+    return <div> 가족 요청이 수락되지 않았습니다. </div>;
   }
 
   return (

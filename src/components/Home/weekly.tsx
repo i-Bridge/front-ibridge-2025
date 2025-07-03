@@ -26,6 +26,7 @@ export default function Weekly() {
   useEffect(() => {
      setSelectedSubjectId(null);
      setSelectedQuestionId(null);
+
     // 선택한 날짜가 변경될 때, 버튼을 가운데로 스크롤
     const selectedButton = containerRef.current?.querySelector('.selected');
     if (selectedButton) {
@@ -45,7 +46,7 @@ export default function Weekly() {
         });
       }
     }
-  }, [selectedDate]);
+  }, [selectedDate, setSelectedSubjectId, setSelectedQuestionId]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (containerRef.current) {
