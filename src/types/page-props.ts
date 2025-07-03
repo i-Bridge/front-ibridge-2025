@@ -1,5 +1,3 @@
 export interface ChildPageParams {
-  params: {
-    childId: string;
-  };
+  params: Promise<{ childId: string }>;
 }

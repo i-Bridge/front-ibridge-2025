@@ -17,7 +17,8 @@ interface HomeData {
 }
 
 export default async function HomePage({ params }: ChildPageParams) {
-  const { childId } = params;
+  // params가 Promise이므로, await를 사용해 값을 추출
+  const { childId } = await params;
 
   if (!childId) {
     return <div> 자녀 정보 없음 </div>;
