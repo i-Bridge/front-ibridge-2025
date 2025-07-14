@@ -21,6 +21,15 @@ export default function ReplyPage() {
   const [isFinalMessage, setIsFinalMessage] = useState(false);
 
   useEffect(() => {
+    return () => {
+      console.log('🛑 ReplyPage 언마운트 → 캐릭터 상태 초기화 및 음성 중지');
+      setIsSpeaking(false);
+      setMouthOpen(false);
+      window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!childId) return;
 
     const fetchHomeData = async () => {
@@ -136,6 +145,9 @@ export default function ReplyPage() {
           setDisplayText('');
           setQuestion('');
           setSubjectId(null);
+          setIsSpeaking(false);
+          setMouthOpen(false);
+          window.speechSynthesis.cancel();
         }}
         className="fixed top-12 left-12 z-50 p-4 pl-8 hover:scale-105 transition-transform bg-cover bg-center"
         style={{

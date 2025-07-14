@@ -79,6 +79,10 @@ export default function VideoRecorder({
           console.error('❌ /answer 실패');
         }
       }
+      return () => {
+        console.log('🛑 VideoRecorder 언마운트 → 음성 중지');
+        window.speechSynthesis.cancel();
+      };
     };
 
     sendToBackend();
