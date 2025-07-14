@@ -5,6 +5,7 @@ import { Fetcher } from '@/lib/fetcher';
 import { useEffect, useState } from 'react';
 import LogoutButton from './LogoutButton';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function LoginButton() {
   const { data: session } = useSession();
@@ -14,12 +15,10 @@ export default function LoginButton() {
   >('idle');
   const [familyName, setFamilyName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [familySuccess, setFamilySuccess] = useState<string | null>(null);
-  const [familyError, setFamilyError] = useState<string | null>(null);
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') {
-      alert('로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
+      toast.error('로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
       router.push('/');
     }
   }, [session?.error]);
@@ -46,7 +45,7 @@ export default function LoginButton() {
 
       const first = signinRes?.data?.first;
       if (first) {
-        alert('회원가입되었습니다. 처음 만나서 반가워요.');
+        toast.success('회원가입되었습니다. 처음 만나서 반가워요 😊');
         setStatus('firstLogin');
         return;
       }
@@ -67,16 +66,18 @@ export default function LoginButton() {
       }
     } catch (error) {
       console.error('❌ 사용자 정보 전송 실패:', error);
+      toast.error('로그인 중 오류가 발생했습니다.');
     }
   };
 
   const handleSubmitFamily = async () => {
-    if (!familyName) return alert('가족 이름을 입력해주세요!');
+    if (!familyName) {
+      toast.error('가족 이름을 입력해주세요!');
+      return;
+    }
     if (loading) return;
 
     setLoading(true);
-    setFamilyError(null);
-    setFamilySuccess(null);
 
     try {
       const res = await Fetcher<{ exist: boolean }>('/start/signup/exist', {
@@ -85,16 +86,16 @@ export default function LoginButton() {
       });
 
       if (!res?.data?.exist) {
-        setFamilyError('❗ 존재하지 않는 가족 이름입니다.');
+        toast.error('존재하지 않는 가족 이름입니다.');
         return;
       }
-      setFamilySuccess('✅ 수락 요청 메일을 보냈습니다.');
-      setFamilyName('');
 
+      toast.success('수락 요청 메일을 보냈습니다.');
+      setFamilyName('');
       setStatus('waiting');
     } catch (err) {
       console.error('❌ 가족 이름 등록 실패:', err);
-      alert('오류가 발생했습니다.');
+      toast.error('가족 이름 등록 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -146,7 +147,6 @@ export default function LoginButton() {
                 value={familyName}
                 onChange={(e) => {
                   setFamilyName(e.target.value);
-                  setFamilyError(null);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSubmitFamily();
@@ -173,12 +173,6 @@ export default function LoginButton() {
                 </svg>
               </button>
             </div>
-            {familyError && (
-              <p className="mt-2 text-sm text-red-600">{familyError}</p>
-            )}
-            {familySuccess && (
-              <p className="mt-2 text-sm text-green-600">{familySuccess}</p>
-            )}
           </div>
         )}
 
