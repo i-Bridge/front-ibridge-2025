@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, useScroll} from 'framer-motion';
+import { motion, useScroll } from 'framer-motion';
 import { useSession } from 'next-auth/react';
 import { Fetcher } from '@/lib/fetcher';
 import LoginButton from '@/components/Auth/LoginButton';
@@ -19,7 +19,7 @@ const imagePositions = [
 ];
 
 const imageSizes = [
-  { width: 60, height: 160 },
+  { width: [60%], height: 160 },
   { width: 140, height: 200 },
   { width: 100, height: 120 },
   { width: 60, height: 160 },
@@ -34,7 +34,7 @@ export default function StartPage() {
   const containerRef = useRef(null);
   const { scrollY } = useScroll();
 
- const transformsRef = useRef<{ x: number; y: number }[]>([]);
+  const transformsRef = useRef<{ x: number; y: number }[]>([]);
 
   useEffect(() => {
     const calculateTransforms = () => {
@@ -46,7 +46,7 @@ export default function StartPage() {
           return { x, y };
         },
       );
-      transformsRef.current = calculatedTransforms; 
+      transformsRef.current = calculatedTransforms;
     };
 
     calculateTransforms(); // 처음 로드 시 변환값 계산
@@ -89,9 +89,12 @@ export default function StartPage() {
 
         {/* ✅ 1. 위쪽: 로고 + 로그인 버튼 영역 */}
         <section className="w-full  px-16 mt-36 mb-8 ml-250">
-          <div className="max-w-7xl mx-auto flex justify-between items-center ml-20 ">
+          <div className="max-w-7xl mx-auto flex justify-between items-center ml-1">
             {/* 상단 이미지 애니메이션 패널 */}
-            <div className=" mt-[-24]">
+            <div
+              className="relative mt-[-16] w-full "
+              ref={containerRef}
+            >
               {imageNames.map((name, idx) => (
                 <motion.img
                   key={idx}
@@ -100,18 +103,18 @@ export default function StartPage() {
                   initial={{
                     x: imagePositions[idx].xStart,
                     y: imagePositions[idx].yStart - imageSizes[idx].height,
-                    opacity: 0, // ⬅ 초기에는 투명
+                    opacity: 0,
                   }}
                   animate={{
                     x: imagePositions[idx].xEnd,
                     y: imagePositions[idx].yEnd - imageSizes[idx].height,
-                    opacity: 1, // ⬅ 애니메이션 도착 시 나타남
+                    opacity: 1,
                   }}
                   transition={{
                     type: 'spring',
                     stiffness: 50,
                     damping: 12,
-                    opacity: { duration: 1.2 }, // ⬅ opacity 변화는 좀 더 부드럽게
+                    opacity: { duration: 1.2 },
                   }}
                   className="absolute z-10 object-contain"
                   style={{
@@ -121,6 +124,7 @@ export default function StartPage() {
                 />
               ))}
             </div>
+
             {/* 오른쪽: 로그인 박스 */}
             <div className="w-80  ">
               <div className="bg-white  p-6 rounded-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px]">
