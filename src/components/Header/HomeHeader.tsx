@@ -29,6 +29,8 @@ export default async function HomeHeader({ childId }: HeaderProps) {
   try {
     const res = await Fetcher<MyPageData>('/parent/mypage');
     mypageData = res.data;
+
+    
   } catch (err) {
     console.error('API 호출 중 오류 발생:', err);
     return <div>데이터를 불러오지 못했습니다.</div>;
