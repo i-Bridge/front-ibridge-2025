@@ -19,7 +19,7 @@ const imagePositions = [
 ];
 
 const imageSizes = [
-  { width: [60%], height: 160 },
+  { width: 60, height: 160 },
   { width: 140, height: 200 },
   { width: 100, height: 120 },
   { width: 60, height: 160 },
@@ -91,10 +91,7 @@ export default function StartPage() {
         <section className="w-full  px-16 mt-36 mb-8 ml-250">
           <div className="max-w-7xl mx-auto flex justify-between items-center ml-1">
             {/* 상단 이미지 애니메이션 패널 */}
-            <div
-              className="relative mt-[-16] w-full "
-              ref={containerRef}
-            >
+            <div className="relative mt-[-16] w-full " ref={containerRef}>
               {imageNames.map((name, idx) => (
                 <motion.img
                   key={idx}
