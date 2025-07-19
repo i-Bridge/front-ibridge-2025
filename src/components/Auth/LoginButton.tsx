@@ -5,7 +5,7 @@ import { Fetcher } from '@/lib/fetcher';
 import { useEffect, useState } from 'react';
 import LogoutButton from './LogoutButton';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { showSuccess, showError, showConfirmToast } from '@/lib/toast';
 
 export default function LoginButton() {
   const { data: session } = useSession();
@@ -18,7 +18,7 @@ export default function LoginButton() {
 
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') {
-      toast.error('로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
+      showError('로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
       router.push('/');
     }
   }, [session?.error]);
@@ -45,7 +45,7 @@ export default function LoginButton() {
 
       const first = signinRes?.data?.first;
       if (first) {
-        toast.success('회원가입되었습니다. 처음 만나서 반가워요 😊');
+        showSuccess('회원가입되었습니다. 처음 만나서 반가워요 😊');
         setStatus('firstLogin');
         return;
       }
@@ -66,13 +66,13 @@ export default function LoginButton() {
       }
     } catch (error) {
       console.error('❌ 사용자 정보 전송 실패:', error);
-      toast.error('로그인 중 오류가 발생했습니다.');
+      showError('로그인 중 오류가 발생했습니다.');
     }
   };
 
   const handleSubmitFamily = async () => {
     if (!familyName) {
-      toast.error('가족 이름을 입력해주세요!');
+      showError('가족 이름을 입력해주세요!');
       return;
     }
     if (loading) return;
@@ -86,16 +86,16 @@ export default function LoginButton() {
       });
 
       if (!res?.data?.exist) {
-        toast.error('존재하지 않는 가족 이름입니다.');
+        showError('존재하지 않는 가족 이름입니다.');
         return;
       }
 
-      toast.success('수락 요청 메일을 보냈습니다.');
+      showSuccess('수락 요청 메일을 보냈습니다.');
       setFamilyName('');
       setStatus('waiting');
     } catch (err) {
       console.error('❌ 가족 이름 등록 실패:', err);
-      toast.error('가족 이름 등록 중 오류가 발생했습니다.');
+      showError('가족 이름 등록 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -182,31 +182,28 @@ export default function LoginButton() {
               ⏳ 수락을 기다리고 있습니다...
             </p>
             <button
-              onClick={async () => {
-                const confirmed = window.confirm(
-                  '가족 가입 요청을 취소하시겠습니까?',
-                );
-                if (!confirmed) return;
-
-                try {
-                  const res = await Fetcher('/start/signup/undo', {
-                    method: 'POST',
-                  });
-
-                  if (res?.isSuccess) {
-                    toast.success('가족 가입 요청이 취소되었습니다.');
-                    setStatus('firstLogin');
-                  } else {
-                    toast.error('요청 취소에 실패했습니다.');
-                  }
-                } catch (error) {
-                  console.error('❌ 요청 취소 중 오류:', error);
-                  toast.error('요청 취소 중 오류가 발생했습니다.');
-                }
-              }}
-              className="px-4 py-2 bg-white text-red-500 border border-red-300 rounded-xl hover:bg-red-50 shadow-sm transition-all duration-150 text-sm font-medium"
+              onClick={() =>
+                showConfirmToast({
+                  message: '정말 가족 가입 요청을 취소하시겠습니까?',
+                  onConfirm: async () => {
+                    try {
+                      const res = await Fetcher('/start/signup/undo', {
+                        method: 'POST',
+                      });
+                      if (res?.isSuccess) {
+                        showSuccess('가족 가입 요청이 취소되었습니다.');
+                        setStatus('firstLogin');
+                      } else {
+                        showError('요청 취소에 실패했습니다.');
+                      }
+                    } catch (err) {
+                      showError('요청 취소 중 오류가 발생했습니다.');
+                    }
+                  },
+                })
+              }
             >
-              ❌ 가족 가입 요청 취소
+              가족 가입 요청 취소
             </button>
           </div>
         )}
