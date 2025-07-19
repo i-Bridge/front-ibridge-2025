@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import { Fetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';
 
