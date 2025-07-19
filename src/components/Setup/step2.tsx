@@ -4,6 +4,7 @@ import { useSetupStore } from '@/store/setup/setupStore';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Fetcher } from '@/lib/fetcher';
+import { toast } from 'sonner';
 
 const Step2 = () => {
   const router = useRouter();
@@ -97,7 +98,7 @@ const Step2 = () => {
   // 성공적으로 데이터를 저장했을 경우 1초 뒤에 profile 페이지로 이동
   useEffect(() => {
     if (isSuccess) {
-      alert('dklfs');
+      toast.success('환영합니다😊');
       setTimeout(() => {
         router.push('/profile');
       }, 10000); // 1초 뒤에 페이지 이동
@@ -107,7 +108,9 @@ const Step2 = () => {
   return (
     <div className="w-full flex flex-col gap-3 px-4 py-2 ">
       <div className="h-[20px] mb-1 ">
-        {error && <p className="text-red-500 whitespace-nowrap text-sm">{error}</p>}
+        {error && (
+          <p className="text-red-500 whitespace-nowrap text-sm">{error}</p>
+        )}
       </div>
 
       <div className="flex justify-between items-center">
@@ -157,14 +160,21 @@ const Step2 = () => {
       </div>
 
       <div className="flex justify-between gap-4 mt-4">
-        <button
-          onClick={handlePrevious}
-          className="text-gray-900  px-2 py-2"
-        >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-</svg>
-
+        <button onClick={handlePrevious} className="text-gray-900  px-2 py-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="size-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+            />
+          </svg>
         </button>
 
         <button

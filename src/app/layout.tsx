@@ -3,6 +3,8 @@ import './globals.css';
 import { SessionProvider } from 'next-auth/react';
 import { Toaster } from 'sonner';
 
+export const dynamic = 'force-dynamic';
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
