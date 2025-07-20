@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useDateStore } from '@/store/date/dateStore';
 import { Fetcher } from '@/lib/fetcher';
 import { useHomeData } from '@/hooks/home/useHomeData';
+import { showWarning, showError } from '@/lib/toast';
 
 interface Props {
   subjectId: number;
@@ -57,7 +58,7 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
         setEditing(false);
         refetch();
       } else {
-        alert('저장 실패');
+        showError('저장 실패');
       }
     } catch (err) {
       console.error('편집 저장 실패:', err);
@@ -66,7 +67,7 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
 
   const handleReroll = async () => {
     if (refreshCount >= MAX_REFRESH_COUNT) {
-      alert('이 주제는 더 이상 새로고침할 수 없습니다!');
+      showWarning('이 주제는 더 이상 새로고침할 수 없습니다!');
       return;
     }
 

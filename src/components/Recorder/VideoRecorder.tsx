@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
+import { showError } from '@/lib/toast';
 
 export default function VideoRecorder({
   subjectId,
@@ -159,7 +160,7 @@ export default function VideoRecorder({
       ).webkitSpeechRecognition;
 
     if (!SpeechRecognitionConstructor) {
-      alert('이 브라우저는 음성 인식을 지원하지 않습니다.');
+      showError('이 브라우저는 음성 인식을 지원하지 않습니다.');
       return;
     }
 

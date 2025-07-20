@@ -154,23 +154,21 @@ export const showConfirmToast = ({
   onConfirm: () => void;
 }) => {
   toast.custom((t) => (
-    <div className="w-78 bg-white border border-gray-300 rounded-lg p-4 shadow-md">
-      <div className="text-sm text-gray-800 font-medium text-center mb-6">
-        {message}
-      </div>
-      <div className="flex justify-center gap-3 mt-1 pb-1">
+    <div className="w-72 bg-white border border-gray-300 rounded-lg px-4 py-3 shadow-md text-sm font-medium flex flex-col items-center gap-4">
+      <div className="text-gray-800 text-center">{message}</div>
+      <div className="flex justify-center gap-3">
         <button
           onClick={() => {
             toast.dismiss(t);
             onConfirm();
           }}
-          className="px-3 py-1 bg-orange-400 text-white rounded-md hover:bg-orange-500 text-sm"
+          className="px-4 py-1.5 bg-orange-400 text-white rounded-md hover:bg-orange-500 text-sm"
         >
           예
         </button>
         <button
           onClick={() => toast.dismiss(t)}
-          className="px-3 py-1 bg-gray-100 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-200 text-sm"
+          className="px-4 py-1.5 bg-gray-100 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-200 text-sm"
         >
           아니오
         </button>
