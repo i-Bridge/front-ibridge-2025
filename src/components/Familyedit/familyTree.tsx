@@ -29,7 +29,11 @@ export default function FamilyTree({ familyData }: { familyData: FamilyData }) {
         {parents.map((parent) => (
           <div key={parent.parentId} className="flex flex-col items-center">
             <Image
-              src={parent.parentGender === 0 ? '/images/boy.svg' : '/images/girl.svg'}
+              src={
+                parent.parentGender === 0
+                  ? '/images/boy.svg'
+                  : '/images/girl.svg'
+              }
               alt={parent.parentName}
               width={50}
               height={50}
@@ -62,16 +66,16 @@ export default function FamilyTree({ familyData }: { familyData: FamilyData }) {
         lineColor={'#034892'}
         lineBorderRadius={'10px'}
         label={
-         <div className="relative">
-          {/* 부모 카드 */}
-          <ParentsCard parents={familyData.parents} />
-          
-          {/* 오른쪽에 위치한 작은 컴포넌트 */}
-          <div className="absolute right-[-60px] top-1/2 transform -translate-y-1/2">
-            {/* 여기에 원하는 작은 컴포넌트 추가 */}
-            <CopyLinkButton link="https://example.com/invite/abc123" />
+          <div className="relative">
+            {/* 부모 카드 */}
+            <ParentsCard parents={familyData.parents} />
+
+            {/* 오른쪽에 위치한 작은 컴포넌트 */}
+            <div className="absolute right-[-60px] top-1/2 transform -translate-y-1/2">
+              {/* 여기에 원하는 작은 컴포넌트 추가 */}
+              <CopyLinkButton link="https://ibridge-kwu2026.vercel.app" />
+            </div>
           </div>
-        </div>
         }
       >
         {familyData.children.map((child) => (
@@ -80,7 +84,11 @@ export default function FamilyTree({ familyData }: { familyData: FamilyData }) {
             label={
               <ChildCard
                 name={child.childName}
-                image={child.childGender === 0 ? '/images/boy.svg' : '/images/girl.svg'}
+                image={
+                  child.childGender === 0
+                    ? '/images/boy.svg'
+                    : '/images/girl.svg'
+                }
               />
             }
           />
