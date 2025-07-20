@@ -83,31 +83,27 @@ const toastIcons: Record<ToastType, ReactNode> = {
 
 const toastColors: Record<
   ToastType,
-  { bg: string; text: string; border: string; hex: string }
+  { text: string; border: string; hex: string }
 > = {
   success: {
-    bg: 'bg-green-50',
     text: 'text-green-700',
     border: 'border-green-200',
 
     hex: '#f0fdf4',
   },
   error: {
-    bg: 'bg-red-50',
     text: 'text-red-700',
     border: 'border-red-200',
 
     hex: '#fef2f2',
   },
   warning: {
-    bg: 'bg-yellow-100',
     text: 'text-yellow-800',
     border: 'border-yellow-300',
 
     hex: '#fef9c3',
   },
   info: {
-    bg: 'bg-blue-50',
     text: 'text-blue-800',
     border: 'border-blue-200',
 
@@ -158,21 +154,23 @@ export const showConfirmToast = ({
   onConfirm: () => void;
 }) => {
   toast.custom((t) => (
-    <div className="w-72 bg-white border border-gray-300 rounded-lg p-4 shadow-md">
-      <p className="text-sm text-gray-800 font-medium mb-3">{message}</p>
-      <div className="flex justify-end gap-2">
+    <div className="w-78 bg-white border border-gray-300 rounded-lg p-4 shadow-md">
+      <div className="text-sm text-gray-800 font-medium text-center mb-6">
+        {message}
+      </div>
+      <div className="flex justify-center gap-3 mt-1 pb-1">
         <button
           onClick={() => {
             toast.dismiss(t);
             onConfirm();
           }}
-          className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 text-sm"
+          className="px-3 py-1 bg-orange-400 text-white rounded-md hover:bg-orange-500 text-sm"
         >
           예
         </button>
         <button
           onClick={() => toast.dismiss(t)}
-          className="px-3 py-1 bg-gray-100 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-200 text-sm"
+          className="px-3 py-1 bg-gray-100 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-200 text-sm"
         >
           아니오
         </button>
