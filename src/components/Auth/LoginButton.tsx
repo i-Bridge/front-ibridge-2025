@@ -202,8 +202,9 @@ export default function LoginButton() {
                   },
                 })
               }
+              className="px-4 py-2 bg-red-500 text-white text-sm rounded-md hover:bg-red-600 transition-colors"
             >
-              가족 가입 요청 취소
+              ❌ 가족 가입 요청 취소
             </button>
           </div>
         )}
