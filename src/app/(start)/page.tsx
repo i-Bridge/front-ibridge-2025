@@ -68,7 +68,7 @@ export default function StartPage() {
     };
 
     checkAccepted();
-  }, [session]);
+  }, [session, router]);
   return (
     <div
       ref={containerRef}
