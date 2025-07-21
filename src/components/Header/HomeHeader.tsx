@@ -59,7 +59,7 @@ export default async function HomeHeader({ childId }: HeaderProps) {
           <div className="relative">
             <MailBox />
             {mypageData.noticeExist && (
-              <div className="absolute top-2 right-0 w-3 h-3 z-10 bg-green-400 rounded-full border-2 border-white" />
+              <div className="absolute top-2 right-0 w-2 h-2 z-10 bg-orange-400 rounded-full " />
             )}
           </div>
 

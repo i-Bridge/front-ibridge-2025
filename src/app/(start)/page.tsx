@@ -1,59 +1,17 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, useScroll } from 'framer-motion';
 import { useSession } from 'next-auth/react';
+import { motion } from 'framer-motion';
 import { Fetcher } from '@/lib/fetcher';
 import LoginButton from '@/components/Auth/LoginButton';
 
-const imageNames = ['i_green', 'B', 'r', 'i', 'd', 'g', 'e'];
+import StartLogoCanvas from '@/components/Logo/StartLogoCanvas';
 
-const imagePositions = [
-  { xStart: 60, xEnd: 100, yStart: 150, yEnd: 90 }, //i
-  { xStart: 160, xEnd: 170, yStart: -20, yEnd: 90 }, //B
-  { xStart: 230, xEnd: 305, yStart: 110, yEnd: 90 }, //r
-  { xStart: 320, xEnd: 400, yStart: 0, yEnd: 90 }, //i
-  { xStart: 400, xEnd: 450, yStart: 40, yEnd: 90 }, //d
-  { xStart: 490, xEnd: 560, yStart: 170, yEnd: 120 }, //g
-  { xStart: 630, xEnd: 660, yStart: -10, yEnd: 90 }, //e
-];
-
-const imageSizes = [
-  { width: 60, height: 160 },
-  { width: 140, height: 200 },
-  { width: 100, height: 120 },
-  { width: 60, height: 160 },
-  { width: 140, height: 180 },
-  { width: 160, height: 160 },
-  { width: 190, height: 120 },
-];
 
 export default function StartPage() {
   const { data: session } = useSession();
   const router = useRouter();
-  const containerRef = useRef(null);
-  const { scrollY } = useScroll();
-
-  const transformsRef = useRef<{ x: number; y: number }[]>([]);
-
-  useEffect(() => {
-    const calculateTransforms = () => {
-      const calculatedTransforms = imagePositions.map(
-        ({ xStart, xEnd, yStart, yEnd }) => {
-          // 스크롤 값에 따라 위치 변환
-          const x = (scrollY.get() / 1000) * (xEnd - xStart) + xStart; // x 이동
-          const y = (scrollY.get() / 1000) * (yEnd - yStart) + yStart; // y 이동
-          return { x, y };
-        },
-      );
-      transformsRef.current = calculatedTransforms;
-    };
-
-    calculateTransforms(); // 처음 로드 시 변환값 계산
-    const unsubscribe = scrollY.onChange(calculateTransforms); // 스크롤 변화 시 계산
-
-    return () => unsubscribe(); // 컴포넌트 언마운트 시 정리
-  }, [scrollY]);
 
   useEffect(() => {
     const checkAccepted = async () => {
@@ -70,10 +28,7 @@ export default function StartPage() {
     checkAccepted();
   }, [session]);
   return (
-    <div
-      ref={containerRef}
-      className="min-h-screen flex flex-col relative  overflow-hidden"
-    >
+    <div className="min-h-screen flex flex-col relative  overflow-hidden">
       <div className="bg-orange-100 ">
         <div className="flex gap-1 mb-4 absolute right-24 top-8">
           <div className="bg-orange-300  px-4 py-1 rounded-full text-sm">
@@ -88,63 +43,36 @@ export default function StartPage() {
         </div>
 
         {/* ✅ 1. 위쪽: 로고 + 로그인 버튼 영역 */}
-        <section className="w-full  px-16 mt-36 mb-8 ml-250">
-          <div className="max-w-7xl mx-auto flex justify-between items-center ml-1">
-            {/* 상단 이미지 애니메이션 패널 */}
-            <div className="relative mt-[-16] w-full " ref={containerRef}>
-              {imageNames.map((name, idx) => (
-                <motion.img
-                  key={idx}
-                  src={`/images/${name}.png`}
-                  alt={`img-${idx}`}
-                  initial={{
-                    x: imagePositions[idx].xStart,
-                    y: imagePositions[idx].yStart - imageSizes[idx].height,
-                    opacity: 0,
-                  }}
-                  animate={{
-                    x: imagePositions[idx].xEnd,
-                    y: imagePositions[idx].yEnd - imageSizes[idx].height,
-                    opacity: 1,
-                  }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 50,
-                    damping: 12,
-                    opacity: { duration: 1.2 },
-                  }}
-                  className="absolute z-10 object-contain"
-                  style={{
-                    width: `${imageSizes[idx].width}px`,
-                    height: `${imageSizes[idx].height}px`,
-                  }}
-                />
-              ))}
+
+        <section className="w-full px-6 mt-28">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-12 max-w-5xl mx-auto items-center ">
+            {/* 왼쪽: 상단 이미지 애니메이션 패널 */}
+            <div className=" min-w-0">
+              <StartLogoCanvas />
+
             </div>
 
             {/* 오른쪽: 로그인 박스 */}
-            <div className="w-80  ">
-              <div className="bg-white  p-6 rounded-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px]">
+            <div className="w-full md:w-[300px] max-w-[350px] flex justify-center mx-auto ">
+              <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px] w-full">
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-i-lightorange to-i-orange"></div>
-                <div className="space-y-3 ">
+                <div className="space-y-3">
                   <LoginButton />
                 </div>
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* ✅ 2. 아래쪽: 텍스트 소개 섹션 */}
-        <section className="flex-1 px-6 pb-5 ml-[-120]">
-          <div className="max-w-4xl mx-auto text-gray-600">
-            <h2 className="text-xl  font-bold mb-4">Welcome to i-Bridge</h2>
-            <p className="text-md  mb-1">
-              감정은 행동이 아닌, 말로 표현될 수 있어야 합니다.
-            </p>
-            <p className="text-sm  mb-8">
-              iBridge는 부모가 아이의 진짜 마음을 이해할 수 있도록 돕는, 감정
-              분석 기반의 소통 플랫폼입니다.
-            </p>
+            {/* ✅ 2. 아래쪽: 텍스트 소개 섹션 */}
+            <div className="col-span-1 md:col-span-2 w-full text-left px-2 pb-5  text-gray-900">
+              <h3 className="text-xl font-bold mb-4">Welcome to i-Bridge</h3>
+              <p className="text-md  mb-1">
+                감정은 행동이 아닌, 말로 표현될 수 있어야 합니다.
+              </p>
+              <p className="text-sm  mb-8">
+                iBridge는 부모가 아이의 진짜 마음을 이해할 수 있도록 돕는, 감정
+                분석 기반의 소통 플랫폼입니다.
+              </p>
+            </div>
           </div>
         </section>
       </div>
