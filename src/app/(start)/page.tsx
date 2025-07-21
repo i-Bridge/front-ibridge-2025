@@ -5,7 +5,9 @@ import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { Fetcher } from '@/lib/fetcher';
 import LoginButton from '@/components/Auth/LoginButton';
+
 import StartLogoCanvas from '@/components/Logo/StartLogoCanvas';
+
 
 export default function StartPage() {
   const { data: session } = useSession();
@@ -41,11 +43,13 @@ export default function StartPage() {
         </div>
 
         {/* ✅ 1. 위쪽: 로고 + 로그인 버튼 영역 */}
+
         <section className="w-full px-6 mt-28">
           <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-12 max-w-5xl mx-auto items-center ">
             {/* 왼쪽: 상단 이미지 애니메이션 패널 */}
             <div className=" min-w-0">
               <StartLogoCanvas />
+
             </div>
 
             {/* 오른쪽: 로그인 박스 */}

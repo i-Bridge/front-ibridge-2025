@@ -99,9 +99,7 @@ const Step2 = () => {
   useEffect(() => {
     if (isSuccess) {
       toast.success('환영합니다😊');
-      setTimeout(() => {
-        router.push('/profile');
-      }, 10000); // 1초 뒤에 페이지 이동
+      router.push('/profile');
     }
   }, [isSuccess, router]);
 

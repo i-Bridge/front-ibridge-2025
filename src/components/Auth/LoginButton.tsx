@@ -177,8 +177,37 @@ export default function LoginButton() {
         )}
 
         {status === 'waiting' && (
-          <div className="mt-4 p-4 border rounded-xl shadow-sm bg-gray-100 text-gray-800 h-32 flex justify-center items-center">
-            <p className="text-center">⏳수락을 기다리고 있습니다...</p>
+          <div className="mt-4 px-6 py-5 border rounded-xl shadow-sm bg-gray-100 text-gray-800 flex flex-col justify-center items-center gap-4 h-36">
+            <p className="text-center text-sm font-medium text-gray-700">
+              ⏳ 수락을 기다리고 있습니다...
+            </p>
+            <button
+              onClick={async () => {
+                const confirmed = window.confirm(
+                  '가족 가입 요청을 취소하시겠습니까?',
+                );
+                if (!confirmed) return;
+
+                try {
+                  const res = await Fetcher('/start/signup/undo', {
+                    method: 'POST',
+                  });
+
+                  if (res?.isSuccess) {
+                    toast.success('가족 가입 요청이 취소되었습니다.');
+                    setStatus('firstLogin');
+                  } else {
+                    toast.error('요청 취소에 실패했습니다.');
+                  }
+                } catch (error) {
+                  console.error('❌ 요청 취소 중 오류:', error);
+                  toast.error('요청 취소 중 오류가 발생했습니다.');
+                }
+              }}
+              className="px-4 py-2 bg-white text-red-500 border border-red-300 rounded-xl hover:bg-red-50 shadow-sm transition-all duration-150 text-sm font-medium"
+            >
+              ❌ 가족 가입 요청 취소
+            </button>
           </div>
         )}
 
