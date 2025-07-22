@@ -21,14 +21,66 @@ export default function ReplyPage() {
   const [subjectId, setSubjectId] = useState<number | null>(null);
   const [isFinalMessage, setIsFinalMessage] = useState(false);
 
+  const cancelSpeech = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      window.speechSynthesis.cancel();
+    }
+  }, []);
+
+  const speak = useCallback(
+    (text: string) => {
+      if (!text || typeof window === 'undefined') return;
+
+      cancelSpeech();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ko-KR';
+      utterance.pitch = 1.4;
+      utterance.rate = 0.8;
+
+      setIsSpeaking(true);
+      utterance.onend = () => {
+        setIsSpeaking(false);
+      };
+
+      window.speechSynthesis.speak(utterance);
+    },
+    [cancelSpeech],
+  );
+
+  const handleAIResponse = useCallback(
+    (ai: string) => {
+      console.log('✅ 백엔드에서 받은 ai 응답:', ai);
+      if (ai === '수고했어! 내일 또 만나~') {
+        setIsFinalMessage(true);
+        setIsQuestionVisible(false);
+      }
+      setQuestion(ai);
+      setDisplayText(ai);
+      speak(ai);
+    },
+    [speak],
+  );
+
+  const handleGoHome = useCallback(() => {
+    console.log('🏠 홈으로 가기 클릭됨');
+    setIsFinalMessage(false);
+    setIsQuestionVisible(false);
+    setDisplayText('');
+    setQuestion('');
+    setSubjectId(null);
+    setIsSpeaking(false);
+    setMouthOpen(false);
+    cancelSpeech();
+  }, [cancelSpeech]);
+
   useEffect(() => {
     return () => {
       console.log('🛑 ReplyPage 언마운트 → 캐릭터 상태 초기화 및 음성 중지');
       setIsSpeaking(false);
       setMouthOpen(false);
-      window.speechSynthesis.cancel();
+      cancelSpeech();
     };
-  }, []);
+  }, [cancelSpeech]);
 
   useEffect(() => {
     if (!numericChildId) return;
@@ -121,58 +173,11 @@ export default function ReplyPage() {
     return () => window.removeEventListener('beforeunload', handleUnload);
   }, [subjectId, numericChildId]);
 
-  const cancelSpeech = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      window.speechSynthesis.cancel();
-    }
-  }, []);
-
-  const speak = useCallback((text: string) => {
-    if (!text || typeof window === 'undefined') return;
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ko-KR';
-    utterance.pitch = 1.4;
-    utterance.rate = 0.8;
-
-    setIsSpeaking(true);
-    utterance.onend = () => {
-      setIsSpeaking(false);
-    };
-
-    window.speechSynthesis.speak(utterance);
-  }, []);
-
-  const handleAIResponse = useCallback(
-    (ai: string) => {
-      console.log('✅ 백엔드에서 받은 ai 응답:', ai);
-      if (ai === '수고했어! 내일 또 만나~') {
-        setIsFinalMessage(true);
-        setIsQuestionVisible(false);
-      }
-      setQuestion(ai);
-      setDisplayText(ai);
-      speak(ai);
-    },
-    [speak],
-  );
-
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
       {/* 홈 버튼 */}
       <button
-        onClick={() => {
-          console.log('🏠 홈으로 가기 클릭됨');
-          setIsFinalMessage(false);
-          setIsQuestionVisible(false);
-          setDisplayText('');
-          setQuestion('');
-          setSubjectId(null);
-          setIsSpeaking(false);
-          setMouthOpen(false);
-          window.speechSynthesis.cancel();
-        }}
+        onClick={handleGoHome}
         className="fixed top-12 left-12 z-50 p-4 pl-8 hover:scale-105 transition-transform bg-cover bg-center"
         style={{
           backgroundImage: "url('/images/homeBtnBg.png')",
