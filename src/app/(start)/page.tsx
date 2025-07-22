@@ -26,7 +26,7 @@ export default function StartPage() {
     };
 
     checkAccepted();
-  }, [session]);
+  }, [session, router]);
   return (
     <div className="min-h-screen flex flex-col relative  overflow-hidden">
       <div className="bg-orange-100 ">

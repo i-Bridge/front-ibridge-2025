@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import VideoRecorder from '@/components/Recorder/VideoRecorder';
 import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
@@ -9,6 +9,7 @@ import Image from 'next/image';
 
 export default function ReplyPage() {
   const { childId } = useParams();
+  const numericChildId = useMemo(() => Number(childId), [childId]);
 
   const [question, setQuestion] = useState('');
   const [displayText, setDisplayText] = useState('');
@@ -20,22 +21,73 @@ export default function ReplyPage() {
   const [subjectId, setSubjectId] = useState<number | null>(null);
   const [isFinalMessage, setIsFinalMessage] = useState(false);
 
+  const cancelSpeech = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      window.speechSynthesis.cancel();
+    }
+  }, []);
+
+  const speak = useCallback(
+    (text: string) => {
+      if (!text || typeof window === 'undefined') return;
+
+      cancelSpeech();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ko-KR';
+      utterance.pitch = 1.4;
+      utterance.rate = 0.8;
+
+      setIsSpeaking(true);
+      utterance.onend = () => {
+        setIsSpeaking(false);
+      };
+
+      window.speechSynthesis.speak(utterance);
+    },
+    [cancelSpeech],
+  );
+
+  const handleAIResponse = useCallback(
+    (ai: string) => {
+      console.log('✅ 백엔드에서 받은 ai 응답:', ai);
+      if (ai === '수고했어! 내일 또 만나~') {
+        setIsFinalMessage(true);
+        setIsQuestionVisible(false);
+      }
+      setQuestion(ai);
+      speak(ai);
+    },
+    [speak],
+  );
+
+  const handleGoHome = useCallback(() => {
+    console.log('🏠 홈으로 가기 클릭됨');
+    setIsFinalMessage(false);
+    setIsQuestionVisible(false);
+    setDisplayText('');
+    setQuestion('');
+    setSubjectId(null);
+    setIsSpeaking(false);
+    setMouthOpen(false);
+    cancelSpeech();
+  }, [cancelSpeech]);
+
   useEffect(() => {
     return () => {
       console.log('🛑 ReplyPage 언마운트 → 캐릭터 상태 초기화 및 음성 중지');
       setIsSpeaking(false);
       setMouthOpen(false);
-      window.speechSynthesis.cancel();
+      cancelSpeech();
     };
-  }, []);
+  }, [cancelSpeech]);
 
   useEffect(() => {
-    if (!childId) return;
+    if (!numericChildId) return;
 
     const fetchHomeData = async () => {
       console.log('📥 /home API 호출');
       const { data, isSuccess } = await Fetcher<{ completed: boolean }>(
-        `/child/${childId}/home`,
+        `/child/${numericChildId}/home`,
         { method: 'GET' },
       );
       if (isSuccess && data) {
@@ -48,13 +100,14 @@ export default function ReplyPage() {
     };
 
     fetchHomeData();
-  }, [childId]);
+  }, [numericChildId]);
 
   useEffect(() => {
     if (!isQuestionVisible || !question) return;
 
     let index = 0;
     let currentText = '';
+    setDisplayText(''); // 초기화
 
     const interval = setInterval(() => {
       if (index < question.length) {
@@ -96,59 +149,33 @@ export default function ReplyPage() {
   // 강제 종료 처리
   useEffect(() => {
     const handleUnload = () => {
-      if (subjectId && childId) {
+      if (subjectId && numericChildId) {
         const payload = JSON.stringify({ subjectId });
         const blob = new Blob([payload], { type: 'application/json' });
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/child/${childId}/finished`;
-
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/child/${numericChildId}/finished`;
         const result = navigator.sendBeacon(url, blob);
-
         if (result) {
           console.log('📡 sendBeacon 전송됨: subjectId =', subjectId);
         } else {
-          console.warn('⚠️ sendBeacon 실패 (fallback 필요할 수도 있음)');
+          console.warn('⚠️ sendBeacon 실패');
         }
       } else {
-        console.log('⚠️ sendBeacon 조건 불충족:', { subjectId, childId });
+        console.log('⚠️ sendBeacon 조건 불충족:', {
+          subjectId,
+          numericChildId,
+        });
       }
     };
 
     window.addEventListener('beforeunload', handleUnload);
     return () => window.removeEventListener('beforeunload', handleUnload);
-  }, [subjectId, childId]);
-
-  const speak = (text: string) => {
-    if (!text || typeof window === 'undefined') return;
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ko-KR';
-    utterance.pitch = 1.4;
-    utterance.rate = 0.8;
-
-    setIsSpeaking(true);
-    utterance.onend = () => {
-      setIsSpeaking(false);
-    };
-
-    window.speechSynthesis.speak(utterance);
-  };
+  }, [subjectId, numericChildId]);
 
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
       {/* 홈 버튼 */}
       <button
-        onClick={() => {
-          console.log('🏠 홈으로 가기 클릭됨');
-          setIsFinalMessage(false);
-          setIsQuestionVisible(false);
-          setDisplayText('');
-          setQuestion('');
-          setSubjectId(null);
-          setIsSpeaking(false);
-          setMouthOpen(false);
-          window.speechSynthesis.cancel();
-        }}
+        onClick={handleGoHome}
         className="fixed top-12 left-12 z-50 p-4 pl-8 hover:scale-105 transition-transform bg-cover bg-center"
         style={{
           backgroundImage: "url('/images/homeBtnBg.png')",
@@ -193,8 +220,7 @@ export default function ReplyPage() {
         />
       </motion.div>
 
-      {/* 말풍선 */}
-      {isFinalMessage || isQuestionVisible ? (
+      {(isFinalMessage || isQuestionVisible) && (
         <div className="relative w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
           <motion.div
             className="relative w-full h-full"
@@ -245,7 +271,7 @@ export default function ReplyPage() {
             </div>
           </motion.div>
         </div>
-      ) : null}
+      )}
 
       {/* 하단 버튼 or 녹화기 */}
       <div className="ml-32 flex flex-col gap-8 text-center">
@@ -263,7 +289,7 @@ export default function ReplyPage() {
                   const { data, isSuccess } = await Fetcher<{
                     subjectId: number;
                     question: string;
-                  }>(`/child/${childId}/predesigned`, { method: 'GET' });
+                  }>(`/child/${numericChildId}/predesigned`, { method: 'GET' });
 
                   if (isSuccess && data) {
                     console.log('✅ /predesigned 응답:', data);
@@ -296,7 +322,7 @@ export default function ReplyPage() {
 
                 const { data, isSuccess } = await Fetcher<{
                   subjectId: number;
-                }>(`/child/${childId}/new`, { method: 'GET' });
+                }>(`/child/${numericChildId}/new`, { method: 'GET' });
 
                 if (isSuccess && data) {
                   console.log('✅ /new 응답:', data);
@@ -324,16 +350,7 @@ export default function ReplyPage() {
           subjectId !== null && (
             <VideoRecorder
               subjectId={subjectId}
-              onAIResponse={(ai: string) => {
-                console.log('✅ 백엔드에서 받은 ai 응답:', ai);
-                if (ai === '수고했어! 내일 또 만나~') {
-                  setIsFinalMessage(true);
-                  setIsQuestionVisible(false);
-                }
-                setQuestion(ai);
-                setDisplayText(ai);
-                speak(ai);
-              }}
+              onAIResponse={handleAIResponse}
               onFinished={() => {
                 console.log('✅ 녹화 완료됨');
               }}
