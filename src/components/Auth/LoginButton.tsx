@@ -2,7 +2,7 @@
 
 import { signIn, useSession } from 'next-auth/react';
 import { Fetcher } from '@/lib/fetcher';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import LogoutButton from './LogoutButton';
 import { useRouter } from 'next/navigation';
 import { showSuccess, showError, showConfirmToast } from '@/lib/toast';
@@ -15,20 +15,7 @@ export default function LoginButton() {
   >('idle');
   const [familyName, setFamilyName] = useState('');
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (session?.error === 'RefreshAccessTokenError') {
-      showError('로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
-      router.push('/');
-    }
-  }, [session?.error]);
-
-  useEffect(() => {
-    if (!session?.user || !session?.accessToken || status !== 'idle') return;
-    sendUserDataToBackend();
-  }, [session, status]);
-
-  const sendUserDataToBackend = async () => {
+  const sendUserDataToBackend = useCallback(async () => {
     setStatus('checking');
     try {
       const encodedName = session?.user?.name
@@ -68,7 +55,7 @@ export default function LoginButton() {
       console.error('❌ 사용자 정보 전송 실패:', error);
       showError('로그인 중 오류가 발생했습니다.');
     }
-  };
+  }, [session, router]);
 
   const handleSubmitFamily = async () => {
     if (!familyName) {
@@ -100,6 +87,18 @@ export default function LoginButton() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (session?.error === 'RefreshAccessTokenError') {
+      showError('로그인 세션이 만료되었습니다. 다시 로그인해주세요.');
+      router.push('/');
+    }
+  }, [session?.error, router]);
+
+  useEffect(() => {
+    if (!session?.user || !session?.accessToken || status !== 'idle') return;
+    sendUserDataToBackend();
+  }, [session, status, sendUserDataToBackend]);
 
   if (session) {
     return (
@@ -196,7 +195,7 @@ export default function LoginButton() {
                       } else {
                         showError('요청 취소에 실패했습니다.');
                       }
-                    } catch (err) {
+                    } catch {
                       showError('요청 취소 중 오류가 발생했습니다.');
                     }
                   },

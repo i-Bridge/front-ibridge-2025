@@ -87,7 +87,16 @@ export default function VideoRecorder({
     };
 
     sendToBackend();
-  }, [uploadedVideoUrl, uploadedThumbnailUrl, recognizedText, onAIResponse]);
+  }, [
+    uploadedVideoUrl,
+    uploadedThumbnailUrl,
+    recognizedText,
+    subjectId,
+    childId,
+    onAIResponse,
+    onFinished,
+    onConversationFinished,
+  ]);
 
   const startRecording = async () => {
     if (mediaRecorderRef.current) return;
