@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import VideoRecorder from '@/components/Recorder/VideoRecorder';
 import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
@@ -55,7 +55,6 @@ export default function ReplyPage() {
         setIsQuestionVisible(false);
       }
       setQuestion(ai);
-      setDisplayText(ai);
       speak(ai);
     },
     [speak],
@@ -108,6 +107,7 @@ export default function ReplyPage() {
 
     let index = 0;
     let currentText = '';
+    setDisplayText(''); // 초기화
 
     const interval = setInterval(() => {
       if (index < question.length) {
@@ -153,13 +153,11 @@ export default function ReplyPage() {
         const payload = JSON.stringify({ subjectId });
         const blob = new Blob([payload], { type: 'application/json' });
         const url = `${process.env.NEXT_PUBLIC_API_URL}/child/${numericChildId}/finished`;
-
         const result = navigator.sendBeacon(url, blob);
-
         if (result) {
           console.log('📡 sendBeacon 전송됨: subjectId =', subjectId);
         } else {
-          console.warn('⚠️ sendBeacon 실패 (fallback 필요할 수도 있음)');
+          console.warn('⚠️ sendBeacon 실패');
         }
       } else {
         console.log('⚠️ sendBeacon 조건 불충족:', {
@@ -222,8 +220,7 @@ export default function ReplyPage() {
         />
       </motion.div>
 
-      {/* 말풍선 */}
-      {isFinalMessage || isQuestionVisible ? (
+      {(isFinalMessage || isQuestionVisible) && (
         <div className="relative w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
           <motion.div
             className="relative w-full h-full"
@@ -274,7 +271,7 @@ export default function ReplyPage() {
             </div>
           </motion.div>
         </div>
-      ) : null}
+      )}
 
       {/* 하단 버튼 or 녹화기 */}
       <div className="ml-32 flex flex-col gap-8 text-center">
