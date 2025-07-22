@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo, useEffect, useState } from 'react';
 import VideoRecorder from '@/components/Recorder/VideoRecorder';
 import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
@@ -9,6 +9,7 @@ import Image from 'next/image';
 
 export default function ReplyPage() {
   const { childId } = useParams();
+  const numericChildId = useMemo(() => Number(childId), [childId]);
 
   const [question, setQuestion] = useState('');
   const [displayText, setDisplayText] = useState('');
@@ -30,12 +31,12 @@ export default function ReplyPage() {
   }, []);
 
   useEffect(() => {
-    if (!childId) return;
+    if (!numericChildId) return;
 
     const fetchHomeData = async () => {
       console.log('📥 /home API 호출');
       const { data, isSuccess } = await Fetcher<{ completed: boolean }>(
-        `/child/${childId}/home`,
+        `/child/${numericChildId}/home`,
         { method: 'GET' },
       );
       if (isSuccess && data) {
@@ -48,7 +49,7 @@ export default function ReplyPage() {
     };
 
     fetchHomeData();
-  }, [childId]);
+  }, [numericChildId]);
 
   useEffect(() => {
     if (!isQuestionVisible || !question) return;
@@ -96,10 +97,10 @@ export default function ReplyPage() {
   // 강제 종료 처리
   useEffect(() => {
     const handleUnload = () => {
-      if (subjectId && childId) {
+      if (subjectId && numericChildId) {
         const payload = JSON.stringify({ subjectId });
         const blob = new Blob([payload], { type: 'application/json' });
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/child/${childId}/finished`;
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/child/${numericChildId}/finished`;
 
         const result = navigator.sendBeacon(url, blob);
 
@@ -109,15 +110,24 @@ export default function ReplyPage() {
           console.warn('⚠️ sendBeacon 실패 (fallback 필요할 수도 있음)');
         }
       } else {
-        console.log('⚠️ sendBeacon 조건 불충족:', { subjectId, childId });
+        console.log('⚠️ sendBeacon 조건 불충족:', {
+          subjectId,
+          numericChildId,
+        });
       }
     };
 
     window.addEventListener('beforeunload', handleUnload);
     return () => window.removeEventListener('beforeunload', handleUnload);
-  }, [subjectId, childId]);
+  }, [subjectId, numericChildId]);
 
-  const speak = (text: string) => {
+  const cancelSpeech = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      window.speechSynthesis.cancel();
+    }
+  }, []);
+
+  const speak = useCallback((text: string) => {
     if (!text || typeof window === 'undefined') return;
 
     window.speechSynthesis.cancel();
@@ -132,7 +142,21 @@ export default function ReplyPage() {
     };
 
     window.speechSynthesis.speak(utterance);
-  };
+  }, []);
+
+  const handleAIResponse = useCallback(
+    (ai: string) => {
+      console.log('✅ 백엔드에서 받은 ai 응답:', ai);
+      if (ai === '수고했어! 내일 또 만나~') {
+        setIsFinalMessage(true);
+        setIsQuestionVisible(false);
+      }
+      setQuestion(ai);
+      setDisplayText(ai);
+      speak(ai);
+    },
+    [speak],
+  );
 
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
@@ -263,7 +287,7 @@ export default function ReplyPage() {
                   const { data, isSuccess } = await Fetcher<{
                     subjectId: number;
                     question: string;
-                  }>(`/child/${childId}/predesigned`, { method: 'GET' });
+                  }>(`/child/${numericChildId}/predesigned`, { method: 'GET' });
 
                   if (isSuccess && data) {
                     console.log('✅ /predesigned 응답:', data);
@@ -296,7 +320,7 @@ export default function ReplyPage() {
 
                 const { data, isSuccess } = await Fetcher<{
                   subjectId: number;
-                }>(`/child/${childId}/new`, { method: 'GET' });
+                }>(`/child/${numericChildId}/new`, { method: 'GET' });
 
                 if (isSuccess && data) {
                   console.log('✅ /new 응답:', data);
@@ -324,16 +348,7 @@ export default function ReplyPage() {
           subjectId !== null && (
             <VideoRecorder
               subjectId={subjectId}
-              onAIResponse={(ai: string) => {
-                console.log('✅ 백엔드에서 받은 ai 응답:', ai);
-                if (ai === '수고했어! 내일 또 만나~') {
-                  setIsFinalMessage(true);
-                  setIsQuestionVisible(false);
-                }
-                setQuestion(ai);
-                setDisplayText(ai);
-                speak(ai);
-              }}
+              onAIResponse={handleAIResponse}
               onFinished={() => {
                 console.log('✅ 녹화 완료됨');
               }}
