@@ -3,11 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 
 const IMAGE_NAMES = ['i_green', 'B', 'r', 'i', 'd', 'g', 'e'];
 
-
-
 // 세로 높이 지정 (가로는 자동 비율)
 const IMAGE_HEIGHTS = [105, 135, 80, 100, 110, 105, 80];
-
 
 // x 간격 설정
 const IMAGE_SPACING = [20, 70, 170, 243, 285, 368, 448];
@@ -34,7 +31,7 @@ interface ImgObj {
 export default function StartLogoCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<ImgObj[]>([]);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -74,7 +71,7 @@ export default function StartLogoCanvas() {
               });
             };
           });
-        })
+        }),
       );
       imagesRef.current = loadedImages;
       setLoaded(true);
@@ -122,7 +119,7 @@ export default function StartLogoCanvas() {
 
     animateToPosition();
 
-    return () => cancelAnimationFrame(animationRef.current!);
+    return () => cancelAnimationFrame(animationRef.current ?? 0);
   }, [loaded]);
 
   useEffect(() => {
@@ -151,12 +148,5 @@ export default function StartLogoCanvas() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [loaded]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      width={800}
-      height={250}
-      className=""
-    />
-  );
+  return <canvas ref={canvasRef} width={800} height={250} className="" />;
 }
