@@ -57,8 +57,8 @@ export default function StartPage() {
 
             {/* 오른쪽 로그인 */}
             <div className="w-full md:w-[300px] max-w-[350px] flex justify-center mx-auto">
-              <div className="bg-white p-6 rounded-bl-lg  rounded-r-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px] w-full">
-                <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-i-lightorange to-i-orange"></div>
+              <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px] w-full">
+                <div className="absolute inset-x-0 -top-[1px] -left-[1px] -right-[1px] rounded-tr-lg rounded-tl-lg h-2 bg-gradient-to-r from-i-lightorange to-i-orange"></div>
                 <div className="space-y-3">
                   <LoginButton />
                 </div>
