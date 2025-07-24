@@ -30,6 +30,7 @@ export default function StartPage() {
     <div className="min-h-screen flex flex-col overflow-hidden">
       
       <div className="bg-orange-100 pb-52">
+        
         {/* 오른쪽 상단 미니 로고 */}
         <div className="flex gap-1 mb-4 absolute right-24 top-8">
           <div className="bg-orange-300 px-4 py-1 rounded-full text-sm">
@@ -38,6 +39,11 @@ export default function StartPage() {
           <div className="bg-i-lightgrey px-4 py-1 rounded-md text-sm">
             Team i-Bridge
           </div>
+        </div>
+
+        {/* 간격 */}
+        <div className="mr-40 mt-8">
+          <div className="flex gap-4 mb-4 "></div>
         </div>
 
         {/* 소개글 + 로그인 */}
