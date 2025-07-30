@@ -65,7 +65,7 @@ export default function Weekly() {
       {/* 왼쪽 화살표 버튼 */}
       <button
         onClick={() => scroll('left')}
-        className="w-10 h-10 flex items-center justify-center rounded-full absolute left-[-40] top-[25]"
+        className="w-10 h-10 flex items-center justify-center rounded-full absolute -left-10 top-[25]"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -124,7 +124,7 @@ export default function Weekly() {
       {/* 오른쪽 화살표 버튼 */}
       <button
         onClick={() => scroll('right')}
-        className="w-10 h-10 flex items-center justify-center rounded-full text-gray-600 text-bold  absolute right-[-40] top-[27]"
+        className="w-10 h-10 flex items-center justify-center rounded-full text-gray-600 text-bold  absolute -right-10 top-[27]"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
