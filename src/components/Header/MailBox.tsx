@@ -48,7 +48,7 @@ export default function MailBox() {
   const [fetched, setFetched] = useState(false); // 버튼 이벤트 계속 발생해도 처음 한 번만 호출하게
 
   // ✅ 버튼 클릭 시 열리고, 처음 열릴 때만 fetch
-  const handleToggleOpen = async () => {
+  async function handleToggleOpen(){
     const willOpen = !open;
     setOpen(willOpen);
 
@@ -57,7 +57,13 @@ export default function MailBox() {
       await fetchNoticeData(setNoticeData, setError, setLoading);
       setFetched(true); // ✅ 이미 호출함 표시
     }
-  };
+  }
+
+    async function handleView(noticeId: number |null){
+      if(!noticeId) return;
+    
+      
+  }
 
   async function handleAccept(senderId: number | null) {
     if (!senderId) return;
@@ -202,6 +208,17 @@ export default function MailBox() {
                           : '서버 점검 공지'}
                     </span>
                   </div>
+
+                  {mail.type === 1 && (
+                    <div className="flex space-x-2 ml-2">
+                      <button
+                        onClick={() => handleView(mail.noticeId)}
+                        className="text-xs border border-blue-500 text-blue-600 rounded px-2 py-1 hover:bg-blue-50"
+                      >
+                        답변 보기
+                      </button>
+                    </div>
+                  )}
 
                   {mail.type === 2 && (
                     <div className="flex space-x-2 ml-2">
