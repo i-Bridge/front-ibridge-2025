@@ -1,6 +1,9 @@
+//childId, selectedSubjectId 달라지면 실행됨
+//하나의 subject에 대한 question 정보 호출 및 캐시 관리
+
+'use client';
 import { useEffect, useState } from 'react';
-import { useDateStore } from '@/store/date/dateStore';
-import { useSubjectStore } from '@/store/question/subjectStore';
+import { useSubjectStore } from '@/store/useSubjectStore';
 import { Fetcher } from '@/lib/fetcher';
 import { useParams } from 'next/navigation';
 
@@ -26,7 +29,6 @@ const cache = new Map<number, { subject: Subject; questions: Question[] }>();
 const MAX_CACHE_SIZE = 5;
 
 export const useSubjectData = () => {
-  const { selectedDate } = useDateStore();
   const { selectedSubjectId } = useSubjectStore();
   const [subject, setSubject] = useState<Subject | null>(null);
   const [questions, setQuestions] = useState<Question[] | null>(null);
@@ -34,10 +36,11 @@ export const useSubjectData = () => {
   const params = useParams();
   const childId = params?.childId;
 
+  // ✅ childId, selectedSubjectId 달라지면 실행됨
   useEffect(() => {
     if (!selectedSubjectId) return;
 
-    // ✅ 1. 캐시 먼저 확인
+    // ✅ 1. selectedsubjectId가 캐시에 있는지 확인
     const cached = cache.get(selectedSubjectId);
     if (cached) {
       setSubject(cached.subject);
@@ -45,13 +48,12 @@ export const useSubjectData = () => {
       return;
     }
 
-    // ✅ 2. 캐시에 없으면 API 요청
+    // ✅ 2. 캐시에 없으면 API 요청 - 하나의 subject에 대한 questions들 정보까지
     const fetchSubjectData = async () => {
       setLoading(true);
       try {
-        const dateQuery = selectedDate ? `&date=${selectedDate}` : '';
         const res = await Fetcher<SubjectsData>(
-          `/parent/${childId}/${selectedSubjectId}?${dateQuery}`,
+          `/parent/${childId}/${selectedSubjectId}`,
         );
         const subjectsData = res?.data;
         if (res?.isSuccess && subjectsData) {
@@ -93,7 +95,7 @@ export const useSubjectData = () => {
     };
 
     fetchSubjectData();
-  }, [childId,selectedSubjectId, selectedDate]);
+  }, [childId, selectedSubjectId]);
 
   return {
     subject,
