@@ -67,8 +67,8 @@ export default function VideoRecorder({
               method: 'POST',
               data: {
                 subjectId,
-                video: uploadedVideoUrl,
-                image: uploadedThumbnailUrl,
+                video: uploadedVideoUrlRef.current,
+                image: uploadedThumbnailUrlRef.current,
               },
             });
             console.log('✅ /uploaded 완료 후 대화 종료 처리');
