@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSubjectStore } from '@/store/question/subjectStore';
+import { useSubjectStore } from '@/store/useSubjectStore';
 import { useHomeData } from '@/hooks/home/useHomeData';
 import SubjectDetailPanel from './SubjectDetailPanel';
 import SubjectTitleEdit from './SubjectTitleEdit';
@@ -108,7 +108,7 @@ const SubjectList = ({ initialSubjects }: Props) => {
         </div>
       </div>
 
-      {showPanels&&selectedSubjectId && (
+      {showPanels && selectedSubjectId && (
         <div
           className={`flex items-stretch animate-slide-in-right
       transition-transform duration-300 ease-in-out`}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useSetupStore } from '@/store/setup/setupStore';
+import { useSetupStore } from '@/store/useSetupStore';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Fetcher } from '@/lib/fetcher';

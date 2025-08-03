@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useDateStore } from '@/store/date/dateStore';
+import { useDateStore } from '@/store/useDateStore';
 import { Fetcher } from '@/lib/fetcher';
 import { useHomeData } from '@/hooks/home/useHomeData';
 

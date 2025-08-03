@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Fetcher } from '@/lib/fetcher';
-import { useSetupStore } from '@/store/setup/setupStore';
+import { useSetupStore } from '@/store/useSetupStore';
 
 interface DupFamilyNameData {
   exist: boolean;

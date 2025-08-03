@@ -1,11 +1,11 @@
 'use client';
-import { useSubjectStore } from '@/store/question/subjectStore';
-import { useDateStore } from '@/store/date/dateStore';
+import { useSubjectStore } from '@/store/useSubjectStore';
+import { useDateStore } from '@/store/useDateStore';
 import { useEffect, useRef } from 'react';
 
 export default function Weekly() {
   const { selectedDate, setSelectedDate } = useDateStore();
-  const { setSelectedSubjectId, setSelectedQuestionId} = useSubjectStore();
+  const { setSelectedSubjectId, setSelectedQuestionId } = useSubjectStore();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [year, month, selectedDay] = selectedDate.split('-').map(Number);
@@ -24,8 +24,8 @@ export default function Weekly() {
   };
 
   useEffect(() => {
-     setSelectedSubjectId(null);
-     setSelectedQuestionId(null);
+    setSelectedSubjectId(null);
+    setSelectedQuestionId(null);
 
     // 선택한 날짜가 변경될 때, 버튼을 가운데로 스크롤
     const selectedButton = containerRef.current?.querySelector('.selected');
@@ -94,13 +94,13 @@ export default function Weekly() {
               year === todayYear && month === todayMonth && day === todayDay; // 오늘 날짜 체크
 
             return (
-  <button
-    key={day}
-    className="w-11 h-11 flex items-center justify-center rounded-[20px]"
-    onClick={() => handleClick(day)}
-  >
-    <span
-      className={`w-full h-full flex items-center justify-center rounded-[20px]
+              <button
+                key={day}
+                className="w-11 h-11 flex items-center justify-center rounded-[20px]"
+                onClick={() => handleClick(day)}
+              >
+                <span
+                  className={`w-full h-full flex items-center justify-center rounded-[20px]
         transition-shadow duration-200
         ${
           isToday
@@ -111,12 +111,11 @@ export default function Weekly() {
         }
         
       `}
-    >
-      {day}
-    </span>
-  </button>
-);
-
+                >
+                  {day}
+                </span>
+              </button>
+            );
           })}
         </div>
       </div>

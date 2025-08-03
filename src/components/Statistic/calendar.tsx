@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useDateStore } from '@/store/date/dateStore';
+import { useDateStore } from '@/store/useDateStore';
 
 export default function Calendar() {
   const { selectedDate, setSelectedDate } = useDateStore();
