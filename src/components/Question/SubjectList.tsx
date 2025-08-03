@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import { useHomeData } from '@/hooks/home/useHomeData';
-import SubjectDetailPanel from './SubjectDetailPanel';
+import SubjectDetailPanel from './StyledQuestionList';
 import SubjectTitleEdit from './SubjectTitleEdit';
 import AnalysisList from './AnalysisList';
 
