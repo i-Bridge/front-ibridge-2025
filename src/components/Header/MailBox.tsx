@@ -1,6 +1,6 @@
 'use client';
 
-import {  useState } from 'react';
+import { useState } from 'react';
 import { Fetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';
 
@@ -9,8 +9,9 @@ interface Notice {
   type: 1 | 2 | 3;
   senderId: number | null;
   senderName: string | null;
-  accept: boolean;
   time: string;
+  subject: number;
+  accept: boolean;
 }
 
 interface NoticeData {
@@ -48,7 +49,7 @@ export default function MailBox() {
   const [fetched, setFetched] = useState(false); // 버튼 이벤트 계속 발생해도 처음 한 번만 호출하게
 
   // ✅ 버튼 클릭 시 열리고, 처음 열릴 때만 fetch
-  async function handleToggleOpen(){
+  async function handleToggleOpen() {
     const willOpen = !open;
     setOpen(willOpen);
 
@@ -59,10 +60,29 @@ export default function MailBox() {
     }
   }
 
-    async function handleView(noticeId: number |null){
-      if(!noticeId) return;
-    
-      
+  async function handleView(
+    noticeId: number | null,
+    senderId: number | null,
+    subject: number | null,
+  ) {
+    //오류 처리
+    if (!noticeId) return;
+
+    const res = await Fetcher('/parent/notice/delete', {
+      method: 'DELETE',
+      data: { noticeId: noticeId },
+    });
+
+    if (res.isSuccess) {
+      console.log('자식 답변 확인 메일: 삭제 성공', res.message);
+      router.refresh();
+      await fetchNoticeData(setNoticeData, setError); // ✅ 다시 불러오기
+    } else {
+      console.error('자식 답변 확인 메일: 삭제 실패', res.message);
+    }
+
+    console.log('자식 id, subjectid:', senderId, ',', subject);
+    //해당 자식의 답변 열람 화면으로 이동
   }
 
   async function handleAccept(senderId: number | null) {
@@ -202,7 +222,7 @@ export default function MailBox() {
                     </div>
                     <span className="text-sm text-gray-700">
                       {mail.type === 1
-                        ? '아이가 답변을 완료했어요'
+                        ? `${mail.senderName ?? '자녀'}(이)가 답변을 완료했어요`
                         : mail.type === 2
                           ? `${mail.senderName ?? '누군가'}님이 가족 가입을 요청했어요`
                           : '서버 점검 공지'}
@@ -212,10 +232,12 @@ export default function MailBox() {
                   {mail.type === 1 && (
                     <div className="flex space-x-2 ml-2">
                       <button
-                        onClick={() => handleView(mail.noticeId)}
-                        className="text-xs border border-blue-500 text-blue-600 rounded px-2 py-1 hover:bg-blue-50"
+                        onClick={() =>
+                          handleView(mail.noticeId, mail.senderId, mail.subject)
+                        }
+                        className="text-xs border border-green-500 text-green-600 rounded px-2 py-1 hover:bg-blue-50"
                       >
-                        답변 보기
+                        답변 열람
                       </button>
                     </div>
                   )}
