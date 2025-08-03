@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 import { showError } from '@/lib/toast';
@@ -30,21 +30,16 @@ export default function VideoRecorder({
 
   const { childId } = useParams();
 
-  //useEffect 제거 후 일반 함수로 변경
-  const sendToBackend = async () => {
-    if (
-      !uploadedVideoUrl ||
-      !uploadedThumbnailUrl ||
-      !recognizedText ||
-      !subjectId ||
-      !childId
-    ) {
-      console.warn('❌ 조건 부족으로 /answer 호출 안함');
+  const sendAnswerTextOnly = async () => {
+    if (!recognizedText || !subjectId || !childId) {
+      console.log('⚠️ 조건 부족으로 /answer 호출 생략', {
+        recognizedText,
+        subjectId,
+        childId,
+      });
       return;
     }
-
-    console.log('📤 /answer 요청 시작');
-
+    console.log('✉️ 텍스트만 /answer로 전송');
     const { data, isSuccess } = await Fetcher<{
       finished: boolean;
       ai: string;
@@ -56,17 +51,7 @@ export default function VideoRecorder({
     if (isSuccess && data) {
       console.log('✅ /answer 응답:', data);
 
-      await Fetcher(`/child/${childId}/uploaded`, {
-        method: 'POST',
-        data: {
-          subjectId,
-          video: uploadedVideoUrl,
-          image: uploadedThumbnailUrl,
-        },
-      });
-
       if (data.finished) {
-        console.log('🏁 모든 질문 완료됨');
         const finalMessage = '수고했어! 내일 또 만나~';
         onAIResponse(finalMessage);
         const utterance = new SpeechSynthesisUtterance(finalMessage);
@@ -75,15 +60,38 @@ export default function VideoRecorder({
         utterance.rate = 0.8;
         window.speechSynthesis.speak(utterance);
         onConversationFinished();
-        return;
+      } else {
+        onAIResponse(data.ai);
       }
 
-      onAIResponse(data.ai);
       onFinished();
     } else {
       console.error('❌ /answer 실패');
     }
   };
+
+  useEffect(() => {
+    const uploadMetadata = async () => {
+      if (uploadedVideoUrl && uploadedThumbnailUrl) {
+        console.log('☁️ /uploaded 전송 조건 충족');
+        try {
+          await Fetcher(`/child/${childId}/uploaded`, {
+            method: 'POST',
+            data: {
+              subjectId,
+              video: uploadedVideoUrl,
+              image: uploadedThumbnailUrl,
+            },
+          });
+          console.log('✅ /uploaded 완료');
+        } catch (err) {
+          console.error('❌ /uploaded 실패', err);
+        }
+      }
+    };
+
+    uploadMetadata();
+  }, [uploadedVideoUrl, uploadedThumbnailUrl]);
 
   const startRecording = async () => {
     if (isRecording || mediaRecorderRef.current) return;
@@ -118,9 +126,6 @@ export default function VideoRecorder({
         mediaStream.getTracks().forEach((track) => track.stop());
         stopSTT();
         mediaRecorderRef.current = null;
-
-        //녹화 종료시 한번에 백엔드로 전송
-        await sendToBackend();
       };
 
       mediaRecorderRef.current = recorder;
@@ -131,7 +136,7 @@ export default function VideoRecorder({
 
       setTimeout(() => {
         captureAndUploadThumbnail();
-      }, 1000);
+      }, 500);
     } catch (err) {
       console.error('❌ 녹화 시작 실패:', err);
     }
@@ -140,7 +145,10 @@ export default function VideoRecorder({
   const stopRecording = () => {
     console.log('🛑 녹화 종료 버튼 클릭됨');
     mediaRecorderRef.current?.stop();
+    recognitionRef.current?.stop();
     setIsRecording(false);
+
+    sendAnswerTextOnly();
   };
 
   const startSTT = () => {
