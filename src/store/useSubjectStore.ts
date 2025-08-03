@@ -1,4 +1,4 @@
-// store/question/subjectStore.ts
+// 선택된 subject,question 상태 관리
 import { create } from "zustand";
 
 interface SubjectState {
