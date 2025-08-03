@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import { useHomeData } from '@/hooks/home/useHomeData';
-import SubjectDetailPanel from './StyledQuestionList';
+import StyledQuestionList from './StyledQuestionList';
 import SubjectTitleEdit from './SubjectTitleEdit';
 import AnalysisList from './AnalysisList';
 
@@ -99,7 +99,7 @@ const SubjectList = ({ initialSubjects }: Props) => {
                 </div>
                 {subject.answer && selectedSubjectId === subject.subjectId && (
                   <div className="mt-2">
-                    <SubjectDetailPanel />
+                    <StyledQuestionList />
                   </div>
                 )}
               </div>
