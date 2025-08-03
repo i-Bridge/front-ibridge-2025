@@ -50,15 +50,17 @@ export default function ReplyPage() {
   const handleAIResponse = useCallback(
     (ai: string) => {
       console.log('✅ 백엔드에서 받은 ai 응답:', ai);
-      if (ai === '수고했어! 내일 또 만나~') {
-        setIsFinalMessage(true);
-        setIsQuestionVisible(false);
-      }
       setQuestion(ai);
       speak(ai);
     },
     [speak],
   );
+
+  const handleConversationFinished = useCallback(() => {
+    console.log('🎉 대화 종료됨');
+
+    setIsFinalMessage(true);
+  }, []);
 
   const handleGoHome = useCallback(() => {
     console.log('🏠 홈으로 가기 클릭됨');
@@ -355,8 +357,7 @@ export default function ReplyPage() {
                 console.log('✅ 녹화 완료됨');
               }}
               onConversationFinished={() => {
-                setIsFinalMessage(true);
-                setIsQuestionVisible(false);
+                handleConversationFinished();
               }}
             />
           )
