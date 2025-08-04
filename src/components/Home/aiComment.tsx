@@ -34,7 +34,7 @@ const mockupData = [
 
   return (
     <div className="w-full bg-i-ivory py-14 overflow-hidden">
-      <div className="max-w-4xl mx-auto text-md space-y-6">
+      <div className="w-full mx-auto text-md space-y-6">
        {/* 윗줄 */}
 <div className="relative w-full overflow-hidden h-20">
   <div className="scroll-container scroll-slow h-full flex items-center px-2">
