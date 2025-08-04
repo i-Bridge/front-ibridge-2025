@@ -6,6 +6,8 @@ interface SubjectState {
   setSelectedSubjectId: (id: number | null) => void;
   selectedQuestionId: number | null;
   setSelectedQuestionId: (id: number | null) => void;
+  showPanels: boolean;
+  setShowPanels: (show: boolean) => void;
 }
 
 export const useSubjectStore = create<SubjectState>((set) => ({
@@ -13,4 +15,6 @@ export const useSubjectStore = create<SubjectState>((set) => ({
   setSelectedSubjectId: (id) => set({ selectedSubjectId: id, selectedQuestionId: null }),
   selectedQuestionId: null,
   setSelectedQuestionId: (id) => set({ selectedQuestionId: id }),
+  showPanels: false,
+  setShowPanels: (show) => set({ showPanels: show }),
 }));

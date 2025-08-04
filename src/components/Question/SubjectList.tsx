@@ -18,11 +18,10 @@ type Props = {
 };
 
 const SubjectList = ({ initialSubjects }: Props) => {
-  const { selectedSubjectId, setSelectedSubjectId } = useSubjectStore();
+  const { selectedSubjectId, setSelectedSubjectId, showPanels, setShowPanels } = useSubjectStore();
   const { subjects: fetchedSubjects, loading } = useHomeData();
   const [subjects, setSubjects] = useState<Subject[]>(initialSubjects);
 
-  const [showPanels, setShowPanels] = useState(false);
   const [animating, setAnimating] = useState(false);
 
   useEffect(() => {
@@ -41,9 +40,9 @@ const SubjectList = ({ initialSubjects }: Props) => {
       setTimeout(() => {
         setShowPanels(false);
         setAnimating(false);
-      }, 0); // duration과 맞추기
+      }, 300); // 애니메이션 후 DOM 제거
     }
-  }, [selectedSubjectId]);
+  }, [selectedSubjectId, setShowPanels]);
 
   const handleClick = (subjectId: number) => {
     setSelectedSubjectId(selectedSubjectId === subjectId ? null : subjectId);
