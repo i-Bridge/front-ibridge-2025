@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { Fetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useSubjectStore } from '@/store/useSubjectStore';
 
 interface Notice {
   noticeId: number;
@@ -42,11 +44,15 @@ async function fetchNoticeData(
 
 export default function MailBox() {
   const router = useRouter();
+  const params = useParams();
   const [noticeData, setNoticeData] = useState<NoticeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false); // 드롭다운 상태
   const [fetched, setFetched] = useState(false); // 버튼 이벤트 계속 발생해도 처음 한 번만 호출하게
+  const { setSelectedSubjectId,  setShowPanels } = useSubjectStore();
+
+  
 
   // ✅ 버튼 클릭 시 열리고, 처음 열릴 때만 fetch
   async function handleToggleOpen() {
@@ -65,24 +71,19 @@ export default function MailBox() {
     senderId: number | null,
     subject: number | null,
   ) {
-    //오류 처리
+    //오류 처리 제대로 필요 
     if (!noticeId) return;
+    const currentChildId = Number(params.childId);
 
-    const res = await Fetcher('/parent/notice/delete', {
-      method: 'DELETE',
-      data: { noticeId: noticeId },
-    });
+    router.refresh();
 
-    if (res.isSuccess) {
-      console.log('자식 답변 확인 메일: 삭제 성공', res.message);
-      router.refresh();
-      await fetchNoticeData(setNoticeData, setError); // ✅ 다시 불러오기
-    } else {
-      console.error('자식 답변 확인 메일: 삭제 실패', res.message);
+    if(currentChildId!==senderId){
+      //해당 자식의 답변 열람 화면으로 이동
+       router.push(`/redirect/mailToSubect?target=/parent/${senderId}/home`);
     }
-
-    console.log('자식 id, subjectid:', senderId, ',', subject);
-    //해당 자식의 답변 열람 화면으로 이동
+    
+    setSelectedSubjectId(subject);
+    setShowPanels(true);
   }
 
   async function handleAccept(senderId: number | null) {
@@ -226,6 +227,9 @@ export default function MailBox() {
                         : mail.type === 2
                           ? `${mail.senderName ?? '누군가'}님이 가족 가입을 요청했어요`
                           : '서버 점검 공지'}
+                    </span>
+                    <span className="text-sm text-gray-300">
+                     {mail.type === 1 && mail.time}
                     </span>
                   </div>
 
