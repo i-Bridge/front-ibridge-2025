@@ -25,9 +25,10 @@ export default async function HomePage({ params }: ChildPageParams) {
     return <div> 자녀 정보 없음 </div>;
   }
 
-  const res = await Fetcher<HomeData>(`/parent/${childId}/home`);
+  const homeRes = await Fetcher<HomeData>(`/parent/${childId}/home`);
 
-  const homeData = res.data;
+  const homeData = homeRes.data;
+  
 
   if (!homeData) {
     return <div>로딩 중...</div>;
@@ -43,7 +44,7 @@ export default async function HomePage({ params }: ChildPageParams) {
       <div className="flex flex-col justify-center items-center w-full pt-3">
         <div className="pt-4">
           <MonthSelector />
-          <Weekly />
+          <Weekly childId={childId}/>
         </div>
       </div>
       <div className="px-8">

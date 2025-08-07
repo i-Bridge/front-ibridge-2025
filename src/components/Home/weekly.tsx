@@ -1,12 +1,22 @@
 'use client';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import { useDateStore } from '@/store/useDateStore';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Fetcher } from '@/lib/fetcher';
 
-export default function Weekly() {
+type HeaderProps = {
+  childId: string;
+};
+
+interface ReadData {
+  month: boolean[];
+}
+
+export default function Weekly({ childId }: HeaderProps) {
   const { selectedDate, setSelectedDate } = useDateStore();
   const { setSelectedSubjectId, setSelectedQuestionId } = useSubjectStore();
   const containerRef = useRef<HTMLDivElement>(null);
+  const [readData, setReadData] = useState<ReadData | null>(null);
 
   const [year, month, selectedDay] = selectedDate.split('-').map(Number);
   const daysInMonth = new Date(year, month, 0).getDate();
@@ -47,6 +57,29 @@ export default function Weekly() {
       }
     }
   }, [selectedDate, setSelectedSubjectId, setSelectedQuestionId]);
+
+  useEffect(() => {
+    const fetchReadData = async () => {
+      if (!selectedDate || !childId) return;
+
+      const [year, month] = selectedDate.split('-').map(Number);
+
+      try {
+        const res = await Fetcher<ReadData>(
+          `/parent/${childId}/readSubjects?year=${year}&month=${month}`,
+          { method: 'GET' },
+        );
+
+        const readData = res.data;
+        console.log("res: ",readData);
+        setReadData(readData ?? null);
+      } catch (err) {
+        console.error('readSubjects 데이터 불러오기 실패:', err);
+      }
+    };
+
+    fetchReadData();
+  }, [selectedDate, childId]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (containerRef.current) {
@@ -91,7 +124,10 @@ export default function Weekly() {
             const day = index + 1;
             const isSelected = day === selectedDay;
             const isToday =
-              year === todayYear && month === todayMonth && day === todayDay; // 오늘 날짜 체크
+              year === todayYear && month === todayMonth && day === todayDay;
+
+            // 📌 readData에서 해당 날짜의 읽음 여부
+            const isRead = readData?.month?.[index]; // day - 1 = index
 
             return (
               <button
@@ -99,21 +135,26 @@ export default function Weekly() {
                 className="w-11 h-11 flex items-center justify-center rounded-[20px]"
                 onClick={() => handleClick(day)}
               >
-                <span
-                  className={`w-full h-full flex items-center justify-center rounded-[20px]
-        transition-shadow duration-200
-        ${
-          isToday
-            ? 'bg-i-lightorange text-white  today'
-            : isSelected
-              ? 'border-4 border-orange-400 text-black selected'
-              : 'text-black hover:bg-gray-100'
-        }
-        
-      `}
-                >
-                  {day}
-                </span>
+                <div className="relative w-full h-full">
+                  {/* 🔔 읽지 않은 경우에만 표시 */}
+                  {isRead && (
+                    <div className="absolute top-0 -right-2 w-2 h-2 z-10 bg-orange-400 rounded-full" />
+                  )}
+
+                  <span
+                    className={`w-full h-full flex items-center justify-center rounded-[20px]
+            transition-shadow duration-200
+            ${
+              isToday
+                ? 'bg-i-lightorange text-white today'
+                : isSelected
+                  ? 'border-4 border-orange-400 text-black selected'
+                  : 'text-black hover:bg-gray-100'
+            }`}
+                  >
+                    {day}
+                  </span>
+                </div>
               </button>
             );
           })}
