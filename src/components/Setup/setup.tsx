@@ -1,5 +1,5 @@
 'use client';
-import { useSetupStore } from '@/store/setup/setupStore';
+import { useSetupStore } from '@/store/useSetupStore';
 import Step1 from './step1';
 import Step2 from './step2';
 

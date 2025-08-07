@@ -1,16 +1,19 @@
 'use client';
 
-import {  useState } from 'react';
+import { useState } from 'react';
 import { Fetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useSubjectStore } from '@/store/useSubjectStore';
 
 interface Notice {
   noticeId: number;
   type: 1 | 2 | 3;
   senderId: number | null;
   senderName: string | null;
-  accept: boolean;
   time: string;
+  subject: number;
+  accept: boolean;
 }
 
 interface NoticeData {
@@ -41,14 +44,18 @@ async function fetchNoticeData(
 
 export default function MailBox() {
   const router = useRouter();
+  const params = useParams();
   const [noticeData, setNoticeData] = useState<NoticeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false); // 드롭다운 상태
   const [fetched, setFetched] = useState(false); // 버튼 이벤트 계속 발생해도 처음 한 번만 호출하게
+  const { setSelectedSubjectId,  setShowPanels } = useSubjectStore();
+
+  
 
   // ✅ 버튼 클릭 시 열리고, 처음 열릴 때만 fetch
-  const handleToggleOpen = async () => {
+  async function handleToggleOpen() {
     const willOpen = !open;
     setOpen(willOpen);
 
@@ -57,7 +64,27 @@ export default function MailBox() {
       await fetchNoticeData(setNoticeData, setError, setLoading);
       setFetched(true); // ✅ 이미 호출함 표시
     }
-  };
+  }
+
+  async function handleView(
+    noticeId: number | null,
+    senderId: number | null,
+    subject: number | null,
+  ) {
+    //오류 처리 제대로 필요 
+    if (!noticeId) return;
+    const currentChildId = Number(params.childId);
+
+    router.refresh();
+
+    if(currentChildId!==senderId){
+      //해당 자식의 답변 열람 화면으로 이동
+       router.push(`/redirect/mailToSubect?target=/parent/${senderId}/home`);
+    }
+    
+    setSelectedSubjectId(subject);
+    setShowPanels(true);
+  }
 
   async function handleAccept(senderId: number | null) {
     if (!senderId) return;
@@ -196,12 +223,28 @@ export default function MailBox() {
                     </div>
                     <span className="text-sm text-gray-700">
                       {mail.type === 1
-                        ? '아이가 답변을 완료했어요'
+                        ? `${mail.senderName ?? '자녀'}(이)가 답변을 완료했어요`
                         : mail.type === 2
                           ? `${mail.senderName ?? '누군가'}님이 가족 가입을 요청했어요`
                           : '서버 점검 공지'}
                     </span>
+                    <span className="text-sm text-gray-300">
+                     {mail.type === 1 && mail.time}
+                    </span>
                   </div>
+
+                  {mail.type === 1 && (
+                    <div className="flex space-x-2 ml-2">
+                      <button
+                        onClick={() =>
+                          handleView(mail.noticeId, mail.senderId, mail.subject)
+                        }
+                        className="text-xs border border-green-500 text-green-600 rounded px-2 py-1 hover:bg-blue-50"
+                      >
+                        답변 열람
+                      </button>
+                    </div>
+                  )}
 
                   {mail.type === 2 && (
                     <div className="flex space-x-2 ml-2">

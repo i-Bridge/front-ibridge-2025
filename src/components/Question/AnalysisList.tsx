@@ -1,7 +1,6 @@
-
 import Image from 'next/image';
 import { useState, useRef } from 'react';
-import { useSubjectStore } from '@/store/question/subjectStore';
+import { useSubjectStore } from '@/store/useSubjectStore';
 import { useSubjectData } from '@/hooks/home/useSubjectData';
 
 interface Question {

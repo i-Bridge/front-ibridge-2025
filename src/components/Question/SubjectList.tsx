@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSubjectStore } from '@/store/question/subjectStore';
+import { useSubjectStore } from '@/store/useSubjectStore';
 import { useHomeData } from '@/hooks/home/useHomeData';
-import SubjectDetailPanel from './SubjectDetailPanel';
+import StyledQuestionList from './StyledQuestionList';
 import SubjectTitleEdit from './SubjectTitleEdit';
 import AnalysisList from './AnalysisList';
 
@@ -18,11 +18,10 @@ type Props = {
 };
 
 const SubjectList = ({ initialSubjects }: Props) => {
-  const { selectedSubjectId, setSelectedSubjectId } = useSubjectStore();
+  const { selectedSubjectId, setSelectedSubjectId, showPanels, setShowPanels } = useSubjectStore();
   const { subjects: fetchedSubjects, loading } = useHomeData();
   const [subjects, setSubjects] = useState<Subject[]>(initialSubjects);
 
-  const [showPanels, setShowPanels] = useState(false);
   const [animating, setAnimating] = useState(false);
 
   useEffect(() => {
@@ -41,9 +40,9 @@ const SubjectList = ({ initialSubjects }: Props) => {
       setTimeout(() => {
         setShowPanels(false);
         setAnimating(false);
-      }, 0); // duration과 맞추기
+      }, 300); // 애니메이션 후 DOM 제거
     }
-  }, [selectedSubjectId]);
+  }, [selectedSubjectId, setShowPanels]);
 
   const handleClick = (subjectId: number) => {
     setSelectedSubjectId(selectedSubjectId === subjectId ? null : subjectId);
@@ -99,7 +98,7 @@ const SubjectList = ({ initialSubjects }: Props) => {
                 </div>
                 {subject.answer && selectedSubjectId === subject.subjectId && (
                   <div className="mt-2">
-                    <SubjectDetailPanel />
+                    <StyledQuestionList />
                   </div>
                 )}
               </div>
@@ -108,7 +107,7 @@ const SubjectList = ({ initialSubjects }: Props) => {
         </div>
       </div>
 
-      {showPanels&&selectedSubjectId && (
+      {showPanels && selectedSubjectId && (
         <div
           className={`flex items-stretch animate-slide-in-right
       transition-transform duration-300 ease-in-out`}

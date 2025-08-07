@@ -1,9 +1,11 @@
-'use client'
+//childId, selectedDate 달라지면 실행됨
+//해당 날짜의 subject 제목 정보 호출 및 캐시 관리
 
+'use client';
 import { useEffect, useState, useCallback } from 'react';
-import { useDateStore } from '@/store/date/dateStore';
-import { Fetcher } from '@/lib/fetcher'; 
-import { useParams } from "next/navigation";
+import { useDateStore } from '@/store/useDateStore';
+import { Fetcher } from '@/lib/fetcher';
+import { useParams } from 'next/navigation';
 
 type Subject = {
   subjectId: number;
@@ -28,14 +30,17 @@ export function useHomeData() {
   const params = useParams();
   const childId = params?.childId;
 
+  // ✅ childId, selectedDate 달라지면 실행됨
+  // ✅ 제목 편집 시 refetch 위해 useCallback으로 
   const fetchHomeData = useCallback(async () => {
     if (!selectedDate || !childId) return;
-
     setLoading(true);
 
     try {
-      const res = await Fetcher<HomeData>(`/parent/${childId}/home?date=${selectedDate}`);
-      
+      const res = await Fetcher<HomeData>(
+        `/parent/${childId}/home?date=${selectedDate}`,
+      );
+
       if (res && res.data) {
         const { subjects } = res.data;
         setSubjects(subjects);
@@ -49,12 +54,12 @@ export function useHomeData() {
         }
       }
     } catch (err) {
-      console.error("API 호출 오류:", err);
+      console.error('API 호출 오류:', err);
       setSubjects(null);
     } finally {
       setLoading(false);
     }
-  }, [selectedDate, childId]);
+  }, [childId, selectedDate]);
 
   useEffect(() => {
     fetchHomeData();

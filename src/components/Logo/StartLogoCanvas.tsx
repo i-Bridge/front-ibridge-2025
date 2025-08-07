@@ -2,14 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 const IMAGE_NAMES = ['i_green', 'B', 'r', 'i', 'd', 'g', 'e'];
-
-// 세로 높이 지정 (가로는 자동 비율)
 const IMAGE_HEIGHTS = [105, 135, 80, 100, 110, 105, 80];
-
-// x 간격 설정
 const IMAGE_SPACING = [20, 70, 170, 243, 285, 368, 448];
-
-// y 위치 설정 (기준선에 맞추지 않고 임의 지정)
 const IMAGE_Y_POSITIONS = [75, 42, 95, 75, 65, 100, 98];
 
 interface ImgObj {
@@ -33,19 +27,43 @@ export default function StartLogoCanvas() {
   const imagesRef = useRef<ImgObj[]>([]);
   const animationRef = useRef<number | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [dpr, setDpr] = useState(() => window.devicePixelRatio || 1);
 
+  const CSS_WIDTH = 800;
+  const CSS_HEIGHT = 300;
+
+  // 🔧 DPR 변경 감지 (브라우저 확대/축소 반영)
+  useEffect(() => {
+    const updateDpr = () => {
+      setDpr(window.devicePixelRatio || 1);
+    };
+    const mediaQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+    mediaQuery.addEventListener('change', updateDpr);
+
+    return () => mediaQuery.removeEventListener('change', updateDpr);
+  }, []);
+
+  // 🔧 canvas 해상도 조정
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
 
+    canvas.width = CSS_WIDTH * dpr;
+    canvas.height = CSS_HEIGHT * dpr;
+    canvas.style.width = `${CSS_WIDTH}px`;
+    canvas.style.height = `${CSS_HEIGHT}px`;
+  }, [dpr]);
+
+  // 🔧 이미지 로딩 (해상도에 맞게 이미지 선택)
+  useEffect(() => {
     const loadImages = async () => {
       const loadedImages: ImgObj[] = await Promise.all(
         IMAGE_NAMES.map((name, i) => {
           return new Promise<ImgObj>((resolve) => {
             const img = new Image();
-            img.src = `/images/${name}.png`;
+            const imageSuffix = dpr >= 3 ? '3x' : dpr >= 2 ? '2x' : '1x';
+            img.src = `/images/StartLogoAlphabets/${name}_${imageSuffix}.png`;
+
             img.onload = () => {
               const height = IMAGE_HEIGHTS[i];
               const ratio = img.naturalWidth / img.naturalHeight;
@@ -56,8 +74,8 @@ export default function StartLogoCanvas() {
 
               resolve({
                 img,
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
+                x: Math.random() * CSS_WIDTH,
+                y: Math.random() * CSS_HEIGHT,
                 baseY: targetY,
                 targetX,
                 targetY,
@@ -67,31 +85,28 @@ export default function StartLogoCanvas() {
                 height,
                 maxOffset: 20 + Math.random() * 30,
                 direction: Math.random() > 0.5 ? 1 : -1,
-                alpha: 0, // 처음엔 투명
+                alpha: 0,
               });
             };
           });
-        }),
+        })
       );
       imagesRef.current = loadedImages;
       setLoaded(true);
     };
 
     loadImages();
-  }, []);
+  }, [dpr]);
 
+  // 🔧 애니메이션
   useEffect(() => {
     if (!loaded) return;
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext('2d')!;
-
-    const animateToPosition = () => {
-      const images = imagesRef.current;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    const draw = () => {
+      ctx.clearRect(0, 0, CSS_WIDTH * dpr, CSS_HEIGHT * dpr);
       let allReached = true;
-
-      for (const img of images) {
+      for (const img of imagesRef.current) {
         const dx = img.targetX - img.x;
         const dy = img.targetY - img.y;
 
@@ -104,7 +119,15 @@ export default function StartLogoCanvas() {
 
         ctx.save();
         ctx.globalAlpha = img.alpha;
-        ctx.drawImage(img.img, img.x, img.y, img.width, img.height);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(
+          img.img,
+          img.x * dpr,
+          img.y * dpr,
+          img.width * dpr,
+          img.height * dpr
+        );
         ctx.restore();
 
         if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5 || img.alpha < 1) {
@@ -113,15 +136,15 @@ export default function StartLogoCanvas() {
       }
 
       if (!allReached) {
-        animationRef.current = requestAnimationFrame(animateToPosition);
+        animationRef.current = requestAnimationFrame(draw);
       }
     };
 
-    animateToPosition();
-
+    draw();
     return () => cancelAnimationFrame(animationRef.current ?? 0);
-  }, [loaded]);
+  }, [loaded, dpr]);
 
+  // 🔧 스크롤 반응 애니메이션
   useEffect(() => {
     const handleScroll = () => {
       const canvas = canvasRef.current;
@@ -135,18 +158,30 @@ export default function StartLogoCanvas() {
         img.y = img.baseY + offset;
       });
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, CSS_WIDTH * dpr, CSS_HEIGHT * dpr);
       imagesRef.current.forEach((img) => {
         ctx.save();
         ctx.globalAlpha = img.alpha;
-        ctx.drawImage(img.img, img.x, img.y, img.width, img.height);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(
+          img.img,
+          img.x * dpr,
+          img.y * dpr,
+          img.width * dpr,
+          img.height * dpr
+        );
         ctx.restore();
       });
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [loaded]);
+  }, [loaded, dpr]);
 
-  return <canvas ref={canvasRef} width={800} height={250} className="" />;
+  return (
+    <div>
+      <canvas ref={canvasRef} className="" />
+    </div>
+  );
 }

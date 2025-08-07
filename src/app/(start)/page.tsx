@@ -8,7 +8,6 @@ import LoginButton from '@/components/Auth/LoginButton';
 
 import StartLogoCanvas from '@/components/Logo/StartLogoCanvas';
 
-
 export default function StartPage() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -28,53 +27,58 @@ export default function StartPage() {
     checkAccepted();
   }, [session, router]);
   return (
-    <div className="min-h-screen flex flex-col relative  overflow-hidden">
-      <div className="bg-orange-100 ">
+    <div className="min-h-screen flex flex-col overflow-hidden">
+      
+      <div className="bg-orange-100 pb-52">
+        
+        {/* 오른쪽 상단 미니 로고 */}
         <div className="flex gap-1 mb-4 absolute right-24 top-8">
-          <div className="bg-orange-300  px-4 py-1 rounded-full text-sm">
+          <div className="bg-orange-300 px-4 py-1 rounded-full text-sm">
             2026
           </div>
-          <div className="bg-i-lightgrey  px-4 py-1 rounded-md text-sm">
+          <div className="bg-i-lightgrey px-4 py-1 rounded-md text-sm">
             Team i-Bridge
           </div>
         </div>
+
+        {/* 간격 */}
         <div className="mr-40 mt-8">
           <div className="flex gap-4 mb-4 "></div>
         </div>
 
-        {/* ✅ 1. 위쪽: 로고 + 로그인 버튼 영역 */}
-
+        {/* 소개글 + 로그인 */}
         <section className="w-full px-6 mt-28">
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-12 max-w-5xl mx-auto items-center ">
-            {/* 왼쪽: 상단 이미지 애니메이션 패널 */}
-            <div className=" min-w-0">
-              <StartLogoCanvas />
-
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-y-2 gap-x-12 max-w-5xl mx-auto items-center">
+            {/* 왼쪽 텍스트 */}
+            <div className="min-w-0 text-left text-gray-900">
+              <h3 className="text-xl font-bold mb-4">Welcome to i-Bridge</h3>
+              <p className="text-md mb-1">
+                감정은 행동이 아닌, 말로 표현될 수 있어야 합니다.
+              </p>
+              <p className="text-sm mb-8">
+                iBridge는 부모가 아이의 진짜 마음을 이해할 수 있도록 돕는, 사고
+                분석 기반의 소통 플랫폼입니다.
+              </p>
             </div>
 
-            {/* 오른쪽: 로그인 박스 */}
-            <div className="w-full md:w-[300px] max-w-[350px] flex justify-center mx-auto ">
+            {/* 오른쪽 로그인 */}
+            <div className="w-full md:w-[300px] max-w-[350px] flex justify-center mx-auto">
               <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 relative overflow-visible min-h-[200px] w-full">
-                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-i-lightorange to-i-orange"></div>
+                <div className="absolute inset-x-0 -top-[1px] -left-[1px] -right-[1px] rounded-tr-lg rounded-tl-lg h-2 bg-gradient-to-r from-i-lightorange to-i-orange"></div>
                 <div className="space-y-3">
                   <LoginButton />
                 </div>
               </div>
             </div>
-
-            {/* ✅ 2. 아래쪽: 텍스트 소개 섹션 */}
-            <div className="col-span-1 md:col-span-2 w-full text-left px-2 pb-5  text-gray-900">
-              <h3 className="text-xl font-bold mb-4">Welcome to i-Bridge</h3>
-              <p className="text-md  mb-1">
-                감정은 행동이 아닌, 말로 표현될 수 있어야 합니다.
-              </p>
-              <p className="text-sm  mb-8">
-                iBridge는 부모가 아이의 진짜 마음을 이해할 수 있도록 돕는, 감정
-                분석 기반의 소통 플랫폼입니다.
-              </p>
-            </div>
           </div>
         </section>
+      </div>
+
+      {/* 🔽 아래쪽: 로고 캔버스 */}
+      <div className="-mt-36 px-2 pb-10 flex justify-center">
+        <div className="max-w-[800px] w-full">
+          <StartLogoCanvas />
+        </div>
       </div>
 
       {/* Intro Text Section */}

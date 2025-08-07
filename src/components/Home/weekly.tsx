@@ -1,12 +1,22 @@
 'use client';
-import { useSubjectStore } from '@/store/question/subjectStore';
-import { useDateStore } from '@/store/date/dateStore';
-import { useEffect, useRef } from 'react';
+import { useSubjectStore } from '@/store/useSubjectStore';
+import { useDateStore } from '@/store/useDateStore';
+import { useEffect, useRef, useState } from 'react';
+import { Fetcher } from '@/lib/fetcher';
 
-export default function Weekly() {
+type HeaderProps = {
+  childId: string;
+};
+
+interface ReadData {
+  month: boolean[];
+}
+
+export default function Weekly({ childId }: HeaderProps) {
   const { selectedDate, setSelectedDate } = useDateStore();
-  const { setSelectedSubjectId, setSelectedQuestionId} = useSubjectStore();
+  const { setSelectedSubjectId, setSelectedQuestionId } = useSubjectStore();
   const containerRef = useRef<HTMLDivElement>(null);
+  const [readData, setReadData] = useState<ReadData | null>(null);
 
   const [year, month, selectedDay] = selectedDate.split('-').map(Number);
   const daysInMonth = new Date(year, month, 0).getDate();
@@ -24,8 +34,8 @@ export default function Weekly() {
   };
 
   useEffect(() => {
-     setSelectedSubjectId(null);
-     setSelectedQuestionId(null);
+    setSelectedSubjectId(null);
+    setSelectedQuestionId(null);
 
     // 선택한 날짜가 변경될 때, 버튼을 가운데로 스크롤
     const selectedButton = containerRef.current?.querySelector('.selected');
@@ -48,6 +58,29 @@ export default function Weekly() {
     }
   }, [selectedDate, setSelectedSubjectId, setSelectedQuestionId]);
 
+  useEffect(() => {
+    const fetchReadData = async () => {
+      if (!selectedDate || !childId) return;
+
+      const [year, month] = selectedDate.split('-').map(Number);
+
+      try {
+        const res = await Fetcher<ReadData>(
+          `/parent/${childId}/readSubjects?year=${year}&month=${month}`,
+          { method: 'GET' },
+        );
+
+        const readData = res.data;
+        console.log("res: ",readData);
+        setReadData(readData ?? null);
+      } catch (err) {
+        console.error('readSubjects 데이터 불러오기 실패:', err);
+      }
+    };
+
+    fetchReadData();
+  }, [selectedDate, childId]);
+
   const scroll = (direction: 'left' | 'right') => {
     if (containerRef.current) {
       const scrollAmount = 100; // 한 번에 스크롤할 양
@@ -65,7 +98,7 @@ export default function Weekly() {
       {/* 왼쪽 화살표 버튼 */}
       <button
         onClick={() => scroll('left')}
-        className="w-10 h-10 flex items-center justify-center rounded-full absolute left-[-40] top-[25]"
+        className="w-10 h-10 flex items-center justify-center rounded-full absolute -left-10 top-[25]"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -91,32 +124,39 @@ export default function Weekly() {
             const day = index + 1;
             const isSelected = day === selectedDay;
             const isToday =
-              year === todayYear && month === todayMonth && day === todayDay; // 오늘 날짜 체크
+              year === todayYear && month === todayMonth && day === todayDay;
+
+            // 📌 readData에서 해당 날짜의 읽음 여부
+            const isRead = readData?.month?.[index]; // day - 1 = index
 
             return (
-  <button
-    key={day}
-    className="w-11 h-11 flex items-center justify-center rounded-[20px]"
-    onClick={() => handleClick(day)}
-  >
-    <span
-      className={`w-full h-full flex items-center justify-center rounded-[20px]
-        transition-shadow duration-200
-        ${
-          isToday
-            ? 'bg-i-lightorange text-white  today'
-            : isSelected
-              ? 'border-4 border-orange-400 text-black selected'
-              : 'text-black hover:bg-gray-100'
-        }
-        
-      `}
-    >
-      {day}
-    </span>
-  </button>
-);
+              <button
+                key={day}
+                className="w-11 h-11 flex items-center justify-center rounded-[20px]"
+                onClick={() => handleClick(day)}
+              >
+                <div className="relative w-full h-full">
+                  {/* 🔔 읽지 않은 경우에만 표시 */}
+                  {isRead && (
+                    <div className="absolute top-0 -right-2 w-2 h-2 z-10 bg-orange-400 rounded-full" />
+                  )}
 
+                  <span
+                    className={`w-full h-full flex items-center justify-center rounded-[20px]
+            transition-shadow duration-200
+            ${
+              isToday
+                ? 'bg-i-lightorange text-white today'
+                : isSelected
+                  ? 'border-4 border-orange-400 text-black selected'
+                  : 'text-black hover:bg-gray-100'
+            }`}
+                  >
+                    {day}
+                  </span>
+                </div>
+              </button>
+            );
           })}
         </div>
       </div>
@@ -124,7 +164,7 @@ export default function Weekly() {
       {/* 오른쪽 화살표 버튼 */}
       <button
         onClick={() => scroll('right')}
-        className="w-10 h-10 flex items-center justify-center rounded-full text-gray-600 text-bold  absolute right-[-40] top-[27]"
+        className="w-10 h-10 flex items-center justify-center rounded-full text-gray-600 text-bold  absolute -right-10 top-[27]"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

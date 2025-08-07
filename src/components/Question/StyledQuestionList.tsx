@@ -1,13 +1,12 @@
 'use client';
 
-import { useSubjectStore } from '@/store/question/subjectStore';
+import { useSubjectStore } from '@/store/useSubjectStore';
 import { useSubjectData } from '@/hooks/home/useSubjectData';
 import QuestionList from './QuestionList';
 
-
-export default function SubjectDetailPanel() {
+export default function StyledQuestionList() {
   const { selectedSubjectId } = useSubjectStore();
-  const { questions, loading } = useSubjectData(); // 인자 없이 사용
+  const { questions, loading } = useSubjectData(); 
   if (loading) console.log('로딩중');
   if (!selectedSubjectId) return null;
   if (loading)
@@ -21,10 +20,7 @@ export default function SubjectDetailPanel() {
 
   return (
     <div className=" rounded-lg p-4  flex justify-between">
-      
-        <QuestionList questions={questions || []} />
-      
-      
+      <QuestionList questions={questions || []} />
     </div>
   );
 }
