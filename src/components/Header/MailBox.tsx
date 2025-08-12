@@ -5,6 +5,7 @@ import { Fetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { useSubjectStore } from '@/store/useSubjectStore';
+import emitter from '@/lib/eventBus';
 
 interface Notice {
   noticeId: number;
@@ -19,6 +20,7 @@ interface Notice {
 interface NoticeData {
   notices: Notice[];
 }
+
 
 // ✅ 공통 fetch 함수로 분리
 async function fetchNoticeData(
@@ -51,7 +53,6 @@ export default function MailBox() {
   const [open, setOpen] = useState(false); // 드롭다운 상태
   const [fetched, setFetched] = useState(false); // 버튼 이벤트 계속 발생해도 처음 한 번만 호출하게
   const { setSelectedSubjectId,  setShowPanels } = useSubjectStore();
-
   
 
   // ✅ 버튼 클릭 시 열리고, 처음 열릴 때만 fetch
@@ -70,21 +71,27 @@ export default function MailBox() {
     noticeId: number | null,
     senderId: number | null,
     subject: number | null,
+    time: string | null,
   ) {
     //오류 처리 제대로 필요 
-    if (!noticeId) return;
+    if (!noticeId || !time) return;
     const currentChildId = Number(params.childId);
+    
 
     router.refresh();
 
     if(currentChildId!==senderId){
       //해당 자식의 답변 열람 화면으로 이동
        router.push(`/redirect/mailToSubect?target=/parent/${senderId}/home`);
+    }else{
+      emitter.emit('reloadReadData')
     }
-    
+    //날짜 설정
     setSelectedSubjectId(subject);
     setShowPanels(true);
   }
+
+ 
 
   async function handleAccept(senderId: number | null) {
     if (!senderId) return;
@@ -237,7 +244,7 @@ export default function MailBox() {
                     <div className="flex space-x-2 ml-2">
                       <button
                         onClick={() =>
-                          handleView(mail.noticeId, mail.senderId, mail.subject)
+                          handleView(mail.noticeId, mail.senderId, mail.subject,mail.time)
                         }
                         className="text-xs border border-green-500 text-green-600 rounded px-2 py-1 hover:bg-blue-50"
                       >
