@@ -56,30 +56,22 @@ export default function VideoRecorder({
       onAIResponse(data.ai);
       if (data.finished) {
         // ✅ 업로드 완료될 때까지 기다렸다가 onConversationFinished 호출
-        const waitForUploadAndFinish = async () => {
-          while (!isUploadedDone) {
-            console.log('⏳ 업로드 대기 중...');
-            await new Promise((resolve) => setTimeout(resolve, 300));
-          }
 
-          try {
-            await Fetcher(`/child/${childId}/uploaded`, {
-              method: 'POST',
-              data: {
-                subjectId,
-                video: uploadedVideoUrlRef.current,
-                image: uploadedThumbnailUrlRef.current,
-              },
-            });
-            console.log('✅ /uploaded 완료 후 대화 종료 처리');
-          } catch (err) {
-            console.error('❌ /uploaded 실패', err);
-          }
+        try {
+          await Fetcher(`/child/${childId}/uploaded`, {
+            method: 'POST',
+            data: {
+              subjectId,
+              video: uploadedVideoUrlRef.current,
+              image: uploadedThumbnailUrlRef.current,
+            },
+          });
+          console.log('✅ /uploaded 완료 후 대화 종료 처리');
+        } catch (err) {
+          console.error('❌ /uploaded 실패', err);
+        }
 
-          onConversationFinished();
-        };
-
-        waitForUploadAndFinish();
+        onConversationFinished();
       }
 
       onFinished();
