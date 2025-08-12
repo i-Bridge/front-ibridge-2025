@@ -108,19 +108,6 @@ export default function ReplyPage() {
     return () => window.removeEventListener('beforeunload', handleUnload);
   }, [sendFinished]);
 
-  const handleGoHome = useCallback(() => {
-    console.log('🏠 홈으로 가기 클릭됨');
-    sendFinished();
-    setIsFinalMessage(false);
-    setIsQuestionVisible(false);
-    setDisplayText('');
-    setQuestion('');
-    setSubjectId(null);
-    setIsSpeaking(false);
-    setMouthOpen(false);
-    cancelSpeech();
-  }, [cancelSpeech]);
-
   useEffect(() => {
     return () => {
       console.log('🛑 ReplyPage 언마운트 → 캐릭터 상태 초기화 및 음성 중지');
@@ -206,33 +193,6 @@ export default function ReplyPage() {
 
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
-      {/* 홈 버튼 */}
-      <button
-        onClick={handleGoHome}
-        className="fixed top-12 left-12 z-50 p-4 pl-8 hover:scale-105 transition-transform bg-cover bg-center"
-        style={{
-          backgroundImage: "url('/images/homeBtnBg.png')",
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'contain',
-          backgroundPosition: 'center',
-        }}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          className="w-6 h-6 mr-1 mt-2 text-gray-600 drop-shadow"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
-          />
-        </svg>
-      </button>
-
       {/* 캐릭터 이미지 */}
       <motion.div
         className={`relative bottom-[-50px] transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
@@ -389,7 +349,6 @@ export default function ReplyPage() {
               }}
               onConversationFinished={() => {
                 handleConversationFinished();
-                handleGoHome();
               }}
             />
           )

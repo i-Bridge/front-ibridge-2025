@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 import { showError } from '@/lib/toast';
@@ -24,10 +24,6 @@ export default function VideoRecorder({
   const uploadedThumbnailUrlRef = useRef<string | null>(null);
 
   const [isRecording, setIsRecording] = useState(false);
-  const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(null);
-  const [uploadedThumbnailUrl, setUploadedThumbnailUrl] = useState<
-    string | null
-  >(null);
 
   const [recognizedText, setRecognizedText] = useState('');
 
@@ -77,33 +73,6 @@ export default function VideoRecorder({
     }
   };
 
-  // useEffect(() => {
-  //   const uploadMetadata = async () => {
-  //     if (uploadedVideoUrl && uploadedThumbnailUrl && subjectId) {
-  //       console.log('📦 /uploaded 요청 내용:', {
-  //         subjectId,
-  //         video: uploadedVideoUrl,
-  //         image: uploadedThumbnailUrl,
-  //       });
-  //       try {
-  //         await Fetcher(`/child/${childId}/uploaded`, {
-  //           method: 'POST',
-  //           data: {
-  //             subjectId,
-  //             video: uploadedVideoUrl,
-  //             image: uploadedThumbnailUrl,
-  //           },
-  //         });
-  //         console.log('✅ /uploaded 완료');
-  //       } catch (err) {
-  //         console.error('❌ /uploaded 실패', err);
-  //       }
-  //     }
-  //   };
-
-  //   uploadMetadata();
-  // }, [uploadedVideoUrl, uploadedThumbnailUrl, subjectId]);
-
   const startRecording = async () => {
     if (isRecording || mediaRecorderRef.current) return;
 
@@ -114,8 +83,6 @@ export default function VideoRecorder({
         audio: false,
       });
       setRecognizedText('');
-      setUploadedVideoUrl(null);
-      setUploadedThumbnailUrl(null);
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -250,7 +217,7 @@ export default function VideoRecorder({
       if (res.ok) {
         const s3Url = data.url.split('?')[0];
         console.log('✅ 썸네일 S3 업로드 완료:', s3Url);
-        setUploadedThumbnailUrl(s3Url);
+
         uploadedThumbnailUrlRef.current = s3Url;
       } else {
         console.error('❌ 썸네일 업로드 실패');
@@ -280,7 +247,7 @@ export default function VideoRecorder({
     if (res.ok) {
       const s3Url = data.url.split('?')[0];
       console.log(`✅ ${type} S3 업로드 완료:`, s3Url);
-      setUploadedVideoUrl(s3Url);
+
       uploadedVideoUrlRef.current = s3Url;
     } else {
       console.error(`❌ ${type} 업로드 실패`);
