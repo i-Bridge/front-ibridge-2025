@@ -62,9 +62,50 @@ export default function ReplyPage() {
 
   const handleConversationFinished = useCallback(() => {
     console.log('🎉 대화 종료됨');
-
     setIsFinalMessage(true);
-  }, []);
+
+    // TTS 종료 후 1초 뒤 초기화
+    if (typeof window !== 'undefined') {
+      const synth = window.speechSynthesis;
+      if (synth.speaking) {
+        // 현재 재생 중인 음성이 끝나면 실행
+        const utteranceEndHandler = () => {
+          setTimeout(() => {
+            setIsFinalMessage(false);
+            setIsQuestionVisible(false);
+            setDisplayText('');
+            setQuestion('');
+            setSubjectId(null);
+            setIsSpeaking(false);
+            setMouthOpen(false);
+            cancelSpeech();
+          }, 1000); // ✅ TTS 끝나고 1초 뒤
+          synth.removeEventListener('end', utteranceEndHandler as any);
+        };
+
+        // window.speechSynthesis는 직접 onend를 지원 안하니
+        // speaking 상태 감시
+        const checkSpeaking = setInterval(() => {
+          if (!synth.speaking) {
+            clearInterval(checkSpeaking);
+            utteranceEndHandler();
+          }
+        }, 100);
+      } else {
+        // 이미 말하고 있지 않으면 바로 1초 뒤 실행
+        setTimeout(() => {
+          setIsFinalMessage(false);
+          setIsQuestionVisible(false);
+          setDisplayText('');
+          setQuestion('');
+          setSubjectId(null);
+          setIsSpeaking(false);
+          setMouthOpen(false);
+          cancelSpeech();
+        }, 1000);
+      }
+    }
+  }, [cancelSpeech]);
 
   // 공통 전송 함수
   const sendFinished = useCallback(() => {
