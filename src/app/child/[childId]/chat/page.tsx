@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useMemo, useState } from 'react';
 import VideoRecorder from '@/components/Recorder/VideoRecorder';
 import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
@@ -10,6 +10,10 @@ import Image from 'next/image';
 export default function ReplyPage() {
   const { childId } = useParams();
   const numericChildId = useMemo(() => Number(childId), [childId]);
+  // 보조 ref (언마운트/이벤트 핸들러에서 최신값 접근용)
+  const subjectIdRef = useRef<number | null>(null);
+  const childIdRef = useRef<number | null>(null);
+  const finishedSentRef = useRef(false);
 
   const [question, setQuestion] = useState('');
   const [displayText, setDisplayText] = useState('');
@@ -62,8 +66,51 @@ export default function ReplyPage() {
     setIsFinalMessage(true);
   }, []);
 
+  // 공통 전송 함수
+  const sendFinished = useCallback(() => {
+    if (finishedSentRef.current) return;
+
+    const sid = subjectIdRef.current;
+    const cid = childIdRef.current;
+    if (!sid || !cid) return;
+
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/child/${cid}/finished`;
+    const payload = JSON.stringify({ subjectId: sid });
+
+    try {
+      const blob = new Blob([payload], { type: 'application/json' });
+      const ok = navigator.sendBeacon?.(url, blob);
+      if (ok) {
+        console.log('📡 /finished sendBeacon OK', { sid, cid });
+        finishedSentRef.current = true;
+        return;
+      }
+    } catch {}
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: payload,
+    })
+      .then(() => {
+        finishedSentRef.current = true;
+      })
+      .catch((err) => console.warn('⚠️ /finished fetch FAIL', err));
+  }, []);
+
+  // 강제 종료 + 새로고침
+  useEffect(() => {
+    const handleUnload = () => {
+      sendFinished();
+    };
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, [sendFinished]);
+
   const handleGoHome = useCallback(() => {
     console.log('🏠 홈으로 가기 클릭됨');
+    sendFinished();
     setIsFinalMessage(false);
     setIsQuestionVisible(false);
     setDisplayText('');
@@ -82,6 +129,15 @@ export default function ReplyPage() {
       cancelSpeech();
     };
   }, [cancelSpeech]);
+
+  useEffect(() => {
+    subjectIdRef.current = subjectId;
+  }, [subjectId]);
+
+  useEffect(() => {
+    const n = Number(childId);
+    childIdRef.current = Number.isFinite(n) ? n : null;
+  }, [childId]);
 
   useEffect(() => {
     if (!numericChildId) return;
@@ -147,31 +203,6 @@ export default function ReplyPage() {
       img.src = src;
     });
   }, []);
-
-  // 강제 종료 처리
-  useEffect(() => {
-    const handleUnload = () => {
-      if (subjectId && numericChildId) {
-        const payload = JSON.stringify({ subjectId });
-        const blob = new Blob([payload], { type: 'application/json' });
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/child/${numericChildId}/finished`;
-        const result = navigator.sendBeacon(url, blob);
-        if (result) {
-          console.log('📡 sendBeacon 전송됨: subjectId =', subjectId);
-        } else {
-          console.warn('⚠️ sendBeacon 실패');
-        }
-      } else {
-        console.log('⚠️ sendBeacon 조건 불충족:', {
-          subjectId,
-          numericChildId,
-        });
-      }
-    };
-
-    window.addEventListener('beforeunload', handleUnload);
-    return () => window.removeEventListener('beforeunload', handleUnload);
-  }, [subjectId, numericChildId]);
 
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
@@ -358,6 +389,7 @@ export default function ReplyPage() {
               }}
               onConversationFinished={() => {
                 handleConversationFinished();
+                handleGoHome();
               }}
             />
           )
