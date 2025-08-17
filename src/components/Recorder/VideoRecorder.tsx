@@ -20,8 +20,10 @@ export default function VideoRecorder({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const uploadedVideoUrlRef = useRef<string | null>(null);
-  const uploadedThumbnailUrlRef = useRef<string | null>(null);
+  const answerSentRef = useRef(false);
+  const pendingUploadsRef = useRef<string[]>([]);
+  // 같은 파일 URL을 중복으로 /uploaded에 보내지 않도록 막는 Set
+  const postedSetRef = useRef<Set<string>>(new Set());
 
   const [isRecording, setIsRecording] = useState(false);
 
@@ -50,26 +52,56 @@ export default function VideoRecorder({
     if (isSuccess && data) {
       console.log('✅ /answer 응답:', data);
       onAIResponse(data.ai);
-      try {
-        await Fetcher(`/child/${childId}/uploaded`, {
-          method: 'POST',
-          data: {
-            subjectId,
-            video: uploadedVideoUrlRef.current,
-            image: uploadedThumbnailUrlRef.current,
-          },
-        });
-        console.log('✅ /uploaded 완료 후 대화 종료 처리');
-      } catch (err) {
-        console.error('❌ /uploaded 실패', err);
-      }
+
       if (data.finished) {
         onConversationFinished();
       }
 
       onFinished();
+      answerSentRef.current = true;
+
+      // 대기 중인 업로드 flush
+      for (const url of pendingUploadsRef.current) {
+        await postUploaded(url);
+      }
+      pendingUploadsRef.current = [];
     } else {
       console.error('❌ /answer 실패');
+    }
+  };
+
+  // ✅ 공통: 업로드된 파일 URL을 백엔드에 즉시 알림
+  const postUploaded = async (fileUrl: string | null) => {
+    if (!fileUrl || !subjectId || !childId) {
+      console.log('⚠️ /uploaded 전송 조건 불충족', {
+        fileUrl,
+        subjectId,
+        childId,
+      });
+      return;
+    }
+
+    if (!answerSentRef.current) {
+      console.log('⏸ /answer 대기중 → 업로드 보류:', fileUrl);
+      pendingUploadsRef.current.push(fileUrl);
+      return;
+    }
+
+    if (postedSetRef.current.has(fileUrl)) {
+      console.log('🚫 중복 /uploaded 스킵 (이미 전송된 URL):', fileUrl);
+      return;
+    }
+
+    try {
+      console.log('📤 /uploaded 전송:', { subjectId, file: fileUrl });
+      await Fetcher(`/child/${childId}/uploaded`, {
+        method: 'POST',
+        data: { subjectId, file: fileUrl },
+      });
+      postedSetRef.current.add(fileUrl);
+      console.log('✅ 백엔드에 업로드 완료(/uploaded):', fileUrl);
+    } catch (err) {
+      console.error('❌ /uploaded 실패', err);
     }
   };
 
@@ -83,6 +115,10 @@ export default function VideoRecorder({
         audio: false,
       });
       setRecognizedText('');
+
+      answerSentRef.current = false;
+      pendingUploadsRef.current = [];
+      postedSetRef.current.clear(); // (중복 방지 세트도 라운드 기준으로 초기화 추천)
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -100,7 +136,7 @@ export default function VideoRecorder({
         console.log('🛑 녹화 종료됨');
         const blob = new Blob(chunks, { type: 'video/webm' });
         console.log('📦 영상 Blob 생성 완료, 업로드 시작');
-        await uploadToS3(blob, 'video');
+        await uploadVideo(blob, 'video');
         mediaStream.getTracks().forEach((track) => track.stop());
         stopSTT();
         mediaRecorderRef.current = null;
@@ -111,22 +147,23 @@ export default function VideoRecorder({
       console.log('🔴 녹화 시작됨');
       setIsRecording(true);
       startSTT();
-
-      setTimeout(() => {
-        captureAndUploadThumbnail();
-      }, 500);
     } catch (err) {
       console.error('❌ 녹화 시작 실패:', err);
     }
   };
 
-  const stopRecording = () => {
+  const stopRecording = async () => {
     console.log('🛑 녹화 종료 버튼 클릭됨');
     mediaRecorderRef.current?.stop();
     recognitionRef.current?.stop();
     setIsRecording(false);
 
-    sendAnswer();
+    try {
+      await sendAnswer();
+      await captureAndUploadThumbnail();
+    } catch (e) {
+      console.warn('⚠️ 썸네일 캡처/업로드 실패:', e);
+    }
   };
 
   const startSTT = () => {
@@ -218,14 +255,15 @@ export default function VideoRecorder({
         const s3Url = data.url.split('?')[0];
         console.log('✅ 썸네일 S3 업로드 완료:', s3Url);
 
-        uploadedThumbnailUrlRef.current = s3Url;
+        // 🔹 썸네일 업로드 후 즉시 /uploaded 전송
+        await postUploaded(s3Url);
       } else {
         console.error('❌ 썸네일 업로드 실패');
       }
     }, 'image/jpeg');
   };
 
-  const uploadToS3 = async (blob: Blob, type: 'video') => {
+  const uploadVideo = async (blob: Blob, type: 'video') => {
     if (!subjectId) return;
 
     console.log(`☁️ ${type} Presigned URL 요청`);
@@ -248,7 +286,8 @@ export default function VideoRecorder({
       const s3Url = data.url.split('?')[0];
       console.log(`✅ ${type} S3 업로드 완료:`, s3Url);
 
-      uploadedVideoUrlRef.current = s3Url;
+      // 🔹 영상 업로드 후 즉시 /uploaded 전송
+      await postUploaded(s3Url);
     } else {
       console.error(`❌ ${type} 업로드 실패`);
     }
