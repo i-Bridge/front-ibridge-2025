@@ -1,0 +1,52 @@
+export type EmotionOption = {
+  /** 백엔드에 보내는 정수 ID */
+  id: number;
+  /** 안정 키(국제화/로깅에 유용) */
+  key: 'happy' | 'sad' | 'angry' | 'surprised' | 'worried' | 'confused';
+  /** 기본 한국어 라벨 */
+  labelKo: string;
+  /** 이모지 */
+  emoji: string;
+};
+
+export type EmotionId = EmotionOption['id'];
+export type EmotionKey = EmotionOption['key'];
+
+export const EMOTIONS = [
+  { id: 1, key: 'happy', labelKo: '기쁨', emoji: '😊' },
+  { id: 2, key: 'sad', labelKo: '슬픔', emoji: '😢' },
+  { id: 3, key: 'angry', labelKo: '화남', emoji: '😠' },
+  { id: 4, key: 'surprised', labelKo: '놀람', emoji: '😮' },
+  { id: 5, key: 'worried', labelKo: '걱정', emoji: '😟' },
+  { id: 6, key: 'confused', labelKo: '혼란', emoji: '😕' },
+] as const satisfies readonly EmotionOption[];
+
+// id → option 빠른 조회
+export const EMOTION_BY_ID: Record<EmotionId, EmotionOption> = EMOTIONS.reduce(
+  (acc, e) => {
+    acc[e.id] = e;
+    return acc;
+  },
+  {} as Record<EmotionId, EmotionOption>,
+);
+
+// 타입 가드
+export const isEmotionId = (x: unknown): x is EmotionId =>
+  typeof x === 'number' && EMOTIONS.some((e) => e.id === x);
+
+//
+// API 경로(중복 문자열 제거용)
+//
+export const API = {
+  home: (childId: number) => `/child/${childId}/home`,
+  emotion: (childId: number) => `/child/${childId}/emotion`,
+} as const;
+
+//
+// 라우트 경로 헬퍼(필요 시)
+//
+export const ROUTES = {
+  talk: (childId: number | string) => `/child/${childId}/talk`,
+  talkQuestion: (childId: number | string) => `/child/${childId}/talk/question`,
+  talkFree: (childId: number | string) => `/child/${childId}/talk/free`,
+} as const;

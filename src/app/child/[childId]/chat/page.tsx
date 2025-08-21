@@ -1,51 +1,38 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useMemo, useState } from 'react';
 import VideoRecorder from '@/components/Recorder/VideoRecorder';
 import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 import Image from 'next/image';
+import { useMinimaxTTS } from '@/hooks/useMinimaxTTS';
 
 export default function ReplyPage() {
   const { childId } = useParams();
   const numericChildId = useMemo(() => Number(childId), [childId]);
 
+  // 보조 ref (언마운트/이벤트 핸들러에서 최신값 접근용)
+  const subjectIdRef = useRef<number | null>(null);
+  const childIdRef = useRef<number | null>(null);
+  const finishedSentRef = useRef(false);
+  const isSpeakingRef = useRef(false); // 🔧 MiniMax isSpeaking 추적용
+
   const [question, setQuestion] = useState('');
   const [displayText, setDisplayText] = useState('');
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isQuestionVisible, setIsQuestionVisible] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
   const [isCompleted, setIsCompleted] = useState<boolean | null>(null);
   const [subjectId, setSubjectId] = useState<number | null>(null);
   const [isFinalMessage, setIsFinalMessage] = useState(false);
 
-  const cancelSpeech = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      window.speechSynthesis.cancel();
-    }
-  }, []);
+  // 🔧 MiniMax TTS 훅 사용 (Web Speech 자동 폴백 포함)
+  const { speak, cancel, isSpeaking } = useMinimaxTTS();
 
-  const speak = useCallback(
-    (text: string) => {
-      if (!text || typeof window === 'undefined') return;
-
-      cancelSpeech();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'ko-KR';
-      utterance.pitch = 1.4;
-      utterance.rate = 0.8;
-
-      setIsSpeaking(true);
-      utterance.onend = () => {
-        setIsSpeaking(false);
-      };
-
-      window.speechSynthesis.speak(utterance);
-    },
-    [cancelSpeech],
-  );
+  useEffect(() => {
+    isSpeakingRef.current = isSpeaking;
+  }, [isSpeaking]);
 
   const handleAIResponse = useCallback(
     (ai: string) => {
@@ -56,32 +43,96 @@ export default function ReplyPage() {
     [speak],
   );
 
-  const handleConversationFinished = useCallback(() => {
-    console.log('🎉 대화 종료됨');
-
-    setIsFinalMessage(true);
-  }, []);
-
-  const handleGoHome = useCallback(() => {
-    console.log('🏠 홈으로 가기 클릭됨');
+  const resetConversationUI = useCallback(() => {
     setIsFinalMessage(false);
     setIsQuestionVisible(false);
     setDisplayText('');
     setQuestion('');
     setSubjectId(null);
-    setIsSpeaking(false);
     setMouthOpen(false);
-    cancelSpeech();
-  }, [cancelSpeech]);
+  }, []);
+
+  const handleConversationFinished = useCallback(() => {
+    console.log('🎉 대화 종료됨');
+    setIsFinalMessage(true);
+
+    // 🔧 MiniMax 오디오 재생 상태 기준으로 종료 대기 → 1초 후 초기화
+    if (isSpeakingRef.current) {
+      const watcher = setInterval(() => {
+        if (!isSpeakingRef.current) {
+          clearInterval(watcher);
+          setTimeout(() => {
+            cancel(); // 안전상 호출
+            resetConversationUI();
+          }, 1000);
+        }
+      }, 100);
+    } else {
+      setTimeout(() => {
+        cancel(); // 안전상 호출
+        resetConversationUI();
+      }, 1000);
+    }
+  }, [cancel, resetConversationUI]);
+
+  // 공통 전송 함수
+  const sendFinished = useCallback(() => {
+    if (finishedSentRef.current) return;
+
+    const sid = subjectIdRef.current;
+    const cid = childIdRef.current;
+    if (!sid || !cid) return;
+
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/child/${cid}/finished`;
+    const payload = JSON.stringify({ subjectId: sid });
+
+    try {
+      const blob = new Blob([payload], { type: 'application/json' });
+      const ok = navigator.sendBeacon?.(url, blob);
+      if (ok) {
+        console.log('📡 /finished sendBeacon OK', { sid, cid });
+        finishedSentRef.current = true;
+        return;
+      }
+    } catch {}
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: payload,
+    })
+      .then(() => {
+        finishedSentRef.current = true;
+      })
+      .catch((err) => console.warn('⚠️ /finished fetch FAIL', err));
+  }, []);
+
+  // 강제 종료 + 새로고침
+  useEffect(() => {
+    const handleUnload = () => {
+      sendFinished();
+    };
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, [sendFinished]);
 
   useEffect(() => {
     return () => {
       console.log('🛑 ReplyPage 언마운트 → 캐릭터 상태 초기화 및 음성 중지');
-      setIsSpeaking(false);
       setMouthOpen(false);
-      cancelSpeech();
+      cancel(); // 🔧 MiniMax/웹스피치 모두 중지
     };
-  }, [cancelSpeech]);
+  }, [cancel]);
+
+  useEffect(() => {
+    subjectIdRef.current = subjectId;
+  }, [subjectId]);
+
+  useEffect(() => {
+    const n = Number(childId);
+    childIdRef.current = Number.isFinite(n) ? n : null;
+  }, [childId]);
 
   useEffect(() => {
     if (!numericChildId) return;
@@ -124,6 +175,7 @@ export default function ReplyPage() {
     return () => clearInterval(interval);
   }, [isQuestionVisible, question]);
 
+  // 🔧 MiniMax 재생상태에 맞춘 입모양 토글
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isSpeaking) {
@@ -148,60 +200,8 @@ export default function ReplyPage() {
     });
   }, []);
 
-  // 강제 종료 처리
-  useEffect(() => {
-    const handleUnload = () => {
-      if (subjectId && numericChildId) {
-        const payload = JSON.stringify({ subjectId });
-        const blob = new Blob([payload], { type: 'application/json' });
-        const url = `${process.env.NEXT_PUBLIC_API_URL}/child/${numericChildId}/finished`;
-        const result = navigator.sendBeacon(url, blob);
-        if (result) {
-          console.log('📡 sendBeacon 전송됨: subjectId =', subjectId);
-        } else {
-          console.warn('⚠️ sendBeacon 실패');
-        }
-      } else {
-        console.log('⚠️ sendBeacon 조건 불충족:', {
-          subjectId,
-          numericChildId,
-        });
-      }
-    };
-
-    window.addEventListener('beforeunload', handleUnload);
-    return () => window.removeEventListener('beforeunload', handleUnload);
-  }, [subjectId, numericChildId]);
-
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
-      {/* 홈 버튼 */}
-      <button
-        onClick={handleGoHome}
-        className="fixed top-12 left-12 z-50 p-4 pl-8 hover:scale-105 transition-transform bg-cover bg-center"
-        style={{
-          backgroundImage: "url('/images/homeBtnBg.png')",
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'contain',
-          backgroundPosition: 'center',
-        }}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          className="w-6 h-6 mr-1 mt-2 text-gray-600 drop-shadow"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
-          />
-        </svg>
-      </button>
-
       {/* 캐릭터 이미지 */}
       <motion.div
         className={`relative bottom-[-50px] transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
