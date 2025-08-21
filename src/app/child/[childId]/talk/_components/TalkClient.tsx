@@ -3,21 +3,13 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { Fetcher } from '@/lib/fetcher';
+import { EMOTIONS, API, type EmotionId } from '@/lib/constants';
 
 type Props = {
-  childId: string;
+  childId: string; // URL 파라미터에서 받은 문자열
   initialCompleted: boolean;
   initialEmotionDone: boolean;
 };
-
-// 서버와 매핑된 emotion 정수값을 맞춰주세요.
-const EMOTIONS = [
-  { id: 1, label: '기쁨', emoji: '😊' },
-  { id: 2, label: '슬픔', emoji: '😢' },
-  { id: 3, label: '화남', emoji: '😠' },
-  { id: 4, label: '놀람', emoji: '😮' },
-  { id: 5, label: '걱정', emoji: '😟' },
-];
 
 export default function TalkClient({
   childId,
@@ -25,6 +17,10 @@ export default function TalkClient({
   initialEmotionDone,
 }: Props) {
   const childIdStr = useMemo(() => String(childId), [childId]);
+  const childIdNum = useMemo(() => {
+    const n = Number(childId);
+    return Number.isFinite(n) ? n : NaN;
+  }, [childId]);
 
   const [isCompleted] = useState<boolean>(initialCompleted);
   const [isEmotionDone, setIsEmotionDone] =
@@ -38,19 +34,20 @@ export default function TalkClient({
   );
 
   // 👉 이모지 버튼 클릭 시 즉시 저장
-  const submitEmotion = async (emotionId: number) => {
+  const submitEmotion = async (emotionId: EmotionId) => {
     if (submittingEmotionId !== null) return; // 중복 클릭 방지
+    if (!Number.isFinite(childIdNum)) {
+      console.warn('⚠️ 잘못된 childId:', childId);
+      return;
+    }
     try {
       setSubmittingEmotionId(emotionId);
       console.log('📝 감정 전송:', emotionId);
 
-      const { isSuccess } = await Fetcher<undefined>(
-        `/child/${childId}/emotion`,
-        {
-          method: 'POST',
-          data: { emotion: emotionId }, // ✅ FetcherOptions는 data 사용
-        },
-      );
+      const { isSuccess } = await Fetcher<undefined>(API.emotion(childIdNum), {
+        method: 'POST',
+        data: { emotion: emotionId }, // ✅ FetcherOptions는 data 사용
+      });
 
       if (isSuccess) {
         console.log('✅ 감정 저장 성공');
@@ -58,7 +55,6 @@ export default function TalkClient({
         setIsEmotionDone(true);
       } else {
         console.error('❌ 감정 저장 실패');
-        // 실패 시 다시 선택 가능
       }
     } catch (e) {
       console.error('⚠️ 감정 저장 예외:', e);
@@ -138,17 +134,14 @@ export default function TalkClient({
                 return (
                   <button
                     key={e.id}
-                    onClick={() => submitEmotion(e.id)}
+                    onClick={() => submitEmotion(e.id as EmotionId)}
                     disabled={busy}
                     className={`h-20 rounded-xl border flex flex-col items-center justify-center gap-1 transition relative
-                      ${
-                        isThisSubmitting
-                          ? 'border-orange-400 ring-2 ring-orange-200 opacity-70'
-                          : 'border-gray-200 hover:border-gray-300'
-                      } ${busy && !isThisSubmitting ? 'opacity-50' : ''}`}
+                      ${isThisSubmitting ? 'border-orange-400 ring-2 ring-orange-200 opacity-70' : 'border-gray-200 hover:border-gray-300'}
+                      ${busy && !isThisSubmitting ? 'opacity-50' : ''}`}
                   >
                     <span className="text-2xl">{e.emoji}</span>
-                    <span className="text-sm">{e.label}</span>
+                    <span className="text-sm">{e.labelKo}</span>
 
                     {/* 로딩 인디케이터 (선택된 버튼에만) */}
                     {isThisSubmitting && (
@@ -166,16 +159,14 @@ export default function TalkClient({
                 onClick={() => {
                   console.log('❌ 감정 선택 취소');
                   setEmotionModalOpen(false);
-                  // 취소 시 isEmotionDone은 여전히 false → 오늘의 질문 버튼 비활성 유지
+                  // 취소 시 isEmotionDone은 false 유지 → 오늘의 질문 버튼 비활성
                 }}
                 disabled={submittingEmotionId !== null}
-                className="
-    h-11 px-5 rounded-xl text-base  border-gray-300 bg-white text-orange-500
-    hover:bg-gray-100 active:bg-gray-200
-    focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-1
-    disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400
-    disabled:opacity-100
-  "
+                className="h-11 px-5 rounded-xl text-base font-semibold
+                           border border-gray-300 bg-white text-gray-800
+                           hover:bg-gray-100 active:bg-gray-200
+                           focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-1
+                           disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:opacity-100"
               >
                 나중에
               </button>
