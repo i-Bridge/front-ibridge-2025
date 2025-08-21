@@ -1,5 +1,5 @@
 import { Fetcher } from '@/lib/fetcher';
-import TalkClient from './_components/TalkClient';
+import TalkClient from './_components/TalkMenu';
 import { ChildPageParams } from '@/types/page-props';
 
 type HomeData = {

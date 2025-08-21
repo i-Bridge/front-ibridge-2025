@@ -218,7 +218,7 @@ export default function ReplyPage() {
           width={500}
           height={500}
           priority
-          onLoadingComplete={() => setIsImageLoaded(true)}
+          onLoad={() => setIsImageLoaded(true)}
         />
       </motion.div>
 

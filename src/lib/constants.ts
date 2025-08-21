@@ -38,8 +38,11 @@ export const isEmotionId = (x: unknown): x is EmotionId =>
 // API 경로(항상 string childId 사용)
 //
 export const API = {
-  home: (childId: string) => `/child/${childId}/home`,
+  childHome: (childId: string) => `/child/${childId}/home`,
   emotion: (childId: string) => `/child/${childId}/emotion`,
+  predesigned: (childId: string) => `/child/${childId}/predesigned`,
+  new: (childId: string) => `/child/${childId}/new`,
+  finished: (childId: string) => `/child/${childId}/finished`,
 } as const;
 
 //
