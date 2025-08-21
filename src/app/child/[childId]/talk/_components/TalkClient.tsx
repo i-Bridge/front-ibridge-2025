@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Fetcher } from '@/lib/fetcher';
-import { EMOTIONS, API, type EmotionId } from '@/lib/constants';
+import { API, ROUTES, type EmotionId } from '@/lib/constants';
+import EmotionModal from './EmotionModal';
 
 type Props = {
   childId: string;
@@ -23,34 +24,29 @@ export default function TalkClient({
   const [emotionModalOpen, setEmotionModalOpen] = useState(
     initialEmotionDone === false,
   );
-  const [submittingEmotionId, setSubmittingEmotionId] = useState<number | null>(
-    null,
-  );
 
-  // 👉 이모지 버튼 클릭 시 즉시 저장
-  const submitEmotion = async (emotionId: EmotionId) => {
-    if (submittingEmotionId !== null) return; // 중복 클릭 방지
-
+  // 👉 모달에서 호출할 저장 핸들러 (성공 여부 boolean 반환)
+  const handleSelectEmotion = async (
+    emotionId: EmotionId,
+  ): Promise<boolean> => {
+    console.log('📝 [TalkClient] 감정 전송 시작:', emotionId);
     try {
-      setSubmittingEmotionId(emotionId);
-      console.log('📝 감정 전송:', emotionId);
-
       const { isSuccess } = await Fetcher<undefined>(API.emotion(childId), {
         method: 'POST',
         data: { emotion: emotionId },
       });
 
       if (isSuccess) {
-        console.log('✅ 감정 저장 성공');
-        setEmotionModalOpen(false);
+        console.log('✅ [TalkClient] 감정 저장 성공');
         setIsEmotionDone(true);
+        return true; // 성공 → 모달 자동 닫힘
       } else {
-        console.error('❌ 감정 저장 실패');
+        console.error('❌ [TalkClient] 감정 저장 실패');
+        return false;
       }
     } catch (e) {
-      console.error('⚠️ 감정 저장 예외:', e);
-    } finally {
-      setSubmittingEmotionId(null);
+      console.error('⚠️ [TalkClient] 감정 저장 예외:', e);
+      return false;
     }
   };
 
@@ -73,7 +69,7 @@ export default function TalkClient({
           </button>
         ) : (
           <Link
-            href={`/child/${childId}/talk/question`}
+            href={ROUTES.talkQuestion(childId)}
             className={`w-72 h-20 rounded-2xl flex items-center justify-center text-xl font-bold hover:scale-105 transition-transform ${
               isEmotionDone === false
                 ? 'bg-pink-200 pointer-events-none cursor-not-allowed'
@@ -89,7 +85,7 @@ export default function TalkClient({
 
         {/* 하고싶은 말: 항상 가능 */}
         <Link
-          href={`/child/${childId}/talk/free`}
+          href={ROUTES.talkFree(childId)}
           className="w-72 h-20 rounded-2xl bg-green-300 flex items-center justify-center text-xl font-bold hover:scale-105 transition-transform"
         >
           하고싶은 말
@@ -108,66 +104,14 @@ export default function TalkClient({
       </div>
 
       {/* 감정 선택 모달 */}
-      {emotionModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-[92vw] max-w-[420px] rounded-2xl bg-white p-6 shadow-xl">
-            <h3 className="text-xl font-bold text-center mb-1">
-              오늘의 감정은?
-            </h3>
-            <p className="text-sm text-gray-500 text-center mb-4">
-              지금 느끼는 감정을 선택해 주세요.
-            </p>
-
-            <div className="grid grid-cols-3 gap-3">
-              {EMOTIONS.map((e) => {
-                const busy = submittingEmotionId !== null;
-                const isThisSubmitting = submittingEmotionId === e.id;
-                return (
-                  <button
-                    key={e.id}
-                    onClick={() => submitEmotion(e.id as EmotionId)}
-                    disabled={busy}
-                    className={`h-20 rounded-xl border flex flex-col items-center justify-center gap-1 transition relative
-                      ${isThisSubmitting ? 'border-orange-400 ring-2 ring-orange-200 opacity-70' : 'border-gray-200 hover:border-gray-300'}
-                      ${busy && !isThisSubmitting ? 'opacity-50' : ''}`}
-                  >
-                    <span className="text-2xl">{e.emoji}</span>
-                    <span className="text-sm">{e.labelKo}</span>
-
-                    {/* 로딩 인디케이터 (선택된 버튼에만) */}
-                    {isThisSubmitting && (
-                      <span className="absolute -bottom-2 text-[10px] text-orange-500">
-                        저장 중...
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-5 flex justify-end">
-              <button
-                onClick={() => {
-                  console.log('❌ 감정 선택 취소');
-                  setEmotionModalOpen(false);
-                }}
-                disabled={submittingEmotionId !== null}
-                className="h-11 px-5 rounded-xl text-base font-semibold
-                           border border-gray-300 bg-white text-gray-800
-                           hover:bg-gray-100 active:bg-gray-200
-                           focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-1
-                           disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:opacity-100"
-              >
-                나중에
-              </button>
-            </div>
-
-            <p className="mt-3 text-xs text-gray-500 text-center">
-              감정을 선택하면 바로 저장돼요.
-            </p>
-          </div>
-        </div>
-      )}
+      <EmotionModal
+        open={emotionModalOpen}
+        onClose={() => {
+          console.log('❌ [TalkClient] 모달 닫기');
+          setEmotionModalOpen(false);
+        }}
+        onSelect={handleSelectEmotion}
+      />
     </section>
   );
 }
