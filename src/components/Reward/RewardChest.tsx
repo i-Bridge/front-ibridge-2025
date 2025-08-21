@@ -1,3 +1,4 @@
+// components/reward/RewardChest.tsx
 'use client';
 
 import { useState } from 'react';
@@ -5,8 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import CoinBurst from './CoinBurst';
 
 type Props = {
-  enabled: boolean; // 10알 채워졌을 때 true
-  onClaim: () => Promise<number>; // 서버에서 코인 수령 → amount 반환
+  enabled: boolean; // 6알 채웠을 때 true
+  onClaim: () => Promise<number>; // 수령 → 송이 개수(amount) 반환 (보통 1)
 };
 
 export default function RewardChest({ enabled, onClaim }: Props) {
@@ -17,7 +18,6 @@ export default function RewardChest({ enabled, onClaim }: Props) {
 
   return (
     <div className="relative w-[220px] h-[180px] grid place-items-center">
-      {/* 오라(글로우) */}
       <AnimatePresence>
         {enabled && !opened && (
           <motion.div
@@ -35,7 +35,6 @@ export default function RewardChest({ enabled, onClaim }: Props) {
         )}
       </AnimatePresence>
 
-      {/* 상자 */}
       <motion.button
         type="button"
         disabled={!clickable}
@@ -43,11 +42,12 @@ export default function RewardChest({ enabled, onClaim }: Props) {
           if (!clickable) return;
           try {
             setClaiming(true);
-            const amount = await onClaim(); // 서버 호출
-            setOpened(true);
-            setShowBurst(true);
-            // CoinBurst 끝나면 유지/숨기기 선택 가능
-            setTimeout(() => setShowBurst(false), 900);
+            const amount = await onClaim();
+            if (amount > 0) {
+              setOpened(true);
+              setShowBurst(true); // 코인 이펙트 재활용(황금빛 파티클)
+              setTimeout(() => setShowBurst(false), 900);
+            }
           } finally {
             setClaiming(false);
           }
@@ -64,31 +64,27 @@ export default function RewardChest({ enabled, onClaim }: Props) {
             enabled && !opened ? '0 0 20px rgba(250,204,21,.5)' : undefined,
         }}
       >
-        {/* 뚜껑 */}
+        {/* 뚜껑/몸통/자물쇠 생략: 이전과 동일 */}
         <motion.div
           animate={opened ? { rotateX: 55, y: -18 } : { rotateX: 0, y: 0 }}
           transition={{ type: 'spring', stiffness: 200, damping: 16 }}
           className="absolute -top-5 left-1/2 -translate-x-1/2 w-32 h-6 rounded-md bg-yellow-400 border border-amber-600 origin-bottom"
           style={{ boxShadow: 'inset 0 -6px 0 rgba(0,0,0,.15)' }}
         />
-        {/* 몸통 */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-36 h-24 rounded-md bg-yellow-500 border border-amber-700" />
-        {/* 잠금쇠 */}
         <div className="absolute top-7 left-1/2 -translate-x-1/2 w-6 h-8 rounded-md bg-yellow-300 border border-amber-600" />
 
-        {/* 라벨 */}
         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-center">
           <div className="text-sm font-semibold">
             {opened
-              ? '보상 수령 완료!'
+              ? '🍇 한 송이 획득!'
               : enabled
                 ? '보상 상자 열기'
-                : '10알을 채워보세요'}
+                : '6알을 채워보세요'}
           </div>
           {claiming && <div className="text-xs opacity-70 mt-1">수령 중…</div>}
         </div>
 
-        {/* 코인 버스트 */}
         <AnimatePresence>{showBurst && <CoinBurst />}</AnimatePresence>
       </motion.button>
     </div>
