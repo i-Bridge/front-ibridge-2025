@@ -43,6 +43,7 @@ export const useSubjectData = () => {
     // ✅ 1. selectedsubjectId가 캐시에 있는지 확인
     const cached = cache.get(selectedSubjectId);
     if (cached) {
+       console.log("subject 캐시에 이미 있음");
       setSubject(cached.subject);
       setQuestions([...cached.questions]);
       return;
@@ -57,6 +58,7 @@ export const useSubjectData = () => {
         );
         const subjectsData = res?.data;
         if (res?.isSuccess && subjectsData) {
+          console.log("subject 호출함");
           const fetchedSubject = subjectsData.subjects;
           const fetchedQuestions = subjectsData.questions || [];
 

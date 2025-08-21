@@ -3,6 +3,7 @@ import { useSubjectStore } from '@/store/useSubjectStore';
 import { useDateStore } from '@/store/useDateStore';
 import { useEffect, useRef, useState } from 'react';
 import { Fetcher } from '@/lib/fetcher';
+import emitter from '@/lib/eventBus';
 
 type HeaderProps = {
   childId: string;
@@ -69,16 +70,27 @@ export default function Weekly({ childId }: HeaderProps) {
           `/parent/${childId}/readSubjects?year=${year}&month=${month}`,
           { method: 'GET' },
         );
-
-        const readData = res.data;
-        console.log("res: ",readData);
-        setReadData(readData ?? null);
+        console.log("res: ",res.data);
+        setReadData(res.data ?? null);
       } catch (err) {
         console.error('readSubjects 데이터 불러오기 실패:', err);
       }
     };
 
     fetchReadData();
+
+    const handler = () => {
+      
+      console.log("readData 호출함");
+      fetchReadData();
+    };
+    emitter.on('reloadReadData', handler);
+
+    // 컴포넌트 언마운트 시 이벤트 해제
+    return () => {
+      emitter.off('reloadReadData', handler);
+    };
+
   }, [selectedDate, childId]);
 
   const scroll = (direction: 'left' | 'right') => {
