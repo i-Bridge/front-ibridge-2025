@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Fetcher } from '@/lib/fetcher';
 import { EMOTIONS, API, type EmotionId } from '@/lib/constants';
 
 type Props = {
-  childId: string; // URL 파라미터에서 받은 문자열
+  childId: string;
   initialCompleted: boolean;
   initialEmotionDone: boolean;
 };
@@ -16,12 +16,6 @@ export default function TalkClient({
   initialCompleted,
   initialEmotionDone,
 }: Props) {
-  const childIdStr = useMemo(() => String(childId), [childId]);
-  const childIdNum = useMemo(() => {
-    const n = Number(childId);
-    return Number.isFinite(n) ? n : NaN;
-  }, [childId]);
-
   const [isCompleted] = useState<boolean>(initialCompleted);
   const [isEmotionDone, setIsEmotionDone] =
     useState<boolean>(initialEmotionDone);
@@ -36,17 +30,14 @@ export default function TalkClient({
   // 👉 이모지 버튼 클릭 시 즉시 저장
   const submitEmotion = async (emotionId: EmotionId) => {
     if (submittingEmotionId !== null) return; // 중복 클릭 방지
-    if (!Number.isFinite(childIdNum)) {
-      console.warn('⚠️ 잘못된 childId:', childId);
-      return;
-    }
+
     try {
       setSubmittingEmotionId(emotionId);
       console.log('📝 감정 전송:', emotionId);
 
-      const { isSuccess } = await Fetcher<undefined>(API.emotion(childIdNum), {
+      const { isSuccess } = await Fetcher<undefined>(API.emotion(childId), {
         method: 'POST',
-        data: { emotion: emotionId }, // ✅ FetcherOptions는 data 사용
+        data: { emotion: emotionId },
       });
 
       if (isSuccess) {
@@ -82,7 +73,7 @@ export default function TalkClient({
           </button>
         ) : (
           <Link
-            href={`/child/${childIdStr}/talk/question`}
+            href={`/child/${childId}/talk/question`}
             className={`w-72 h-20 rounded-2xl flex items-center justify-center text-xl font-bold hover:scale-105 transition-transform ${
               isEmotionDone === false
                 ? 'bg-pink-200 pointer-events-none cursor-not-allowed'
@@ -98,7 +89,7 @@ export default function TalkClient({
 
         {/* 하고싶은 말: 항상 가능 */}
         <Link
-          href={`/child/${childIdStr}/talk/free`}
+          href={`/child/${childId}/talk/free`}
           className="w-72 h-20 rounded-2xl bg-green-300 flex items-center justify-center text-xl font-bold hover:scale-105 transition-transform"
         >
           하고싶은 말
@@ -159,7 +150,6 @@ export default function TalkClient({
                 onClick={() => {
                   console.log('❌ 감정 선택 취소');
                   setEmotionModalOpen(false);
-                  // 취소 시 isEmotionDone은 false 유지 → 오늘의 질문 버튼 비활성
                 }}
                 disabled={submittingEmotionId !== null}
                 className="h-11 px-5 rounded-xl text-base font-semibold

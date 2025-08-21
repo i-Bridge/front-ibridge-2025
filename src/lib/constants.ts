@@ -35,18 +35,18 @@ export const isEmotionId = (x: unknown): x is EmotionId =>
   typeof x === 'number' && EMOTIONS.some((e) => e.id === x);
 
 //
-// API 경로(중복 문자열 제거용)
+// API 경로(항상 string childId 사용)
 //
 export const API = {
-  home: (childId: number) => `/child/${childId}/home`,
-  emotion: (childId: number) => `/child/${childId}/emotion`,
+  home: (childId: string) => `/child/${childId}/home`,
+  emotion: (childId: string) => `/child/${childId}/emotion`,
 } as const;
 
 //
-// 라우트 경로 헬퍼(필요 시)
+// 라우트 경로 헬퍼(항상 string childId 사용)
 //
 export const ROUTES = {
-  talk: (childId: number | string) => `/child/${childId}/talk`,
-  talkQuestion: (childId: number | string) => `/child/${childId}/talk/question`,
-  talkFree: (childId: number | string) => `/child/${childId}/talk/free`,
+  talk: (childId: string) => `/child/${childId}/talk`,
+  talkQuestion: (childId: string) => `/child/${childId}/talk/question`,
+  talkFree: (childId: string) => `/child/${childId}/talk/free`,
 } as const;
