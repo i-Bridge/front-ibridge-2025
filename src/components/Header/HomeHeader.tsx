@@ -55,7 +55,7 @@ export default async function HomeHeader({ childId }: HeaderProps) {
         </Link>
         <div className="flex flex-row space-x-3">
           <div className="relative">
-            <Link href={`/parent/${childId}/home`}>
+            <Link href={`/parent/${childId}/statistics`}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

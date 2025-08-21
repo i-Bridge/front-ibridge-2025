@@ -1,12 +1,12 @@
 'use client';
 
 import { useSubjectStore } from '@/store/useSubjectStore';
-import { useSubjectData } from '@/hooks/home/useSubjectData';
+import { useSubjectData } from '@/hooks/parentHome/useSubjectData';
 import QuestionList from './QuestionList';
 
 export default function StyledQuestionList() {
   const { selectedSubjectId } = useSubjectStore();
-  const { questions, loading } = useSubjectData(); 
+  const { questions, loading } = useSubjectData();
   if (loading) console.log('로딩중');
   if (!selectedSubjectId) return null;
   if (loading)

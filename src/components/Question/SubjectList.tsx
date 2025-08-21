@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSubjectStore } from '@/store/useSubjectStore';
-import { useHomeData } from '@/hooks/home/useHomeData';
+import { useHomeData } from '@/hooks/parentHome/useHomeData';
 import StyledQuestionList from './StyledQuestionList';
 import SubjectTitleEdit from './SubjectTitleEdit';
 import AnalysisList from './AnalysisList';
@@ -18,7 +18,8 @@ type Props = {
 };
 
 const SubjectList = ({ initialSubjects }: Props) => {
-  const { selectedSubjectId, setSelectedSubjectId, showPanels, setShowPanels } = useSubjectStore();
+  const { selectedSubjectId, setSelectedSubjectId, showPanels, setShowPanels } =
+    useSubjectStore();
   const { subjects: fetchedSubjects, loading } = useHomeData();
   const [subjects, setSubjects] = useState<Subject[]>(initialSubjects);
 
