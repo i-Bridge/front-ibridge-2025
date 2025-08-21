@@ -6,50 +6,33 @@ import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 import Image from 'next/image';
+import { useMinimaxTTS } from '@/hooks/useMinimaxTTS';
 
 export default function ReplyPage() {
   const { childId } = useParams();
   const numericChildId = useMemo(() => Number(childId), [childId]);
+
   // 보조 ref (언마운트/이벤트 핸들러에서 최신값 접근용)
   const subjectIdRef = useRef<number | null>(null);
   const childIdRef = useRef<number | null>(null);
   const finishedSentRef = useRef(false);
+  const isSpeakingRef = useRef(false); // 🔧 MiniMax isSpeaking 추적용
 
   const [question, setQuestion] = useState('');
   const [displayText, setDisplayText] = useState('');
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isQuestionVisible, setIsQuestionVisible] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
   const [isCompleted, setIsCompleted] = useState<boolean | null>(null);
   const [subjectId, setSubjectId] = useState<number | null>(null);
   const [isFinalMessage, setIsFinalMessage] = useState(false);
 
-  const cancelSpeech = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      window.speechSynthesis.cancel();
-    }
-  }, []);
+  // 🔧 MiniMax TTS 훅 사용 (Web Speech 자동 폴백 포함)
+  const { speak, cancel, isSpeaking } = useMinimaxTTS();
 
-  const speak = useCallback(
-    (text: string) => {
-      if (!text || typeof window === 'undefined') return;
-
-      cancelSpeech();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'ko-KR';
-      utterance.pitch = 1.4;
-      utterance.rate = 0.8;
-
-      setIsSpeaking(true);
-      utterance.onend = () => {
-        setIsSpeaking(false);
-      };
-
-      window.speechSynthesis.speak(utterance);
-    },
-    [cancelSpeech],
-  );
+  useEffect(() => {
+    isSpeakingRef.current = isSpeaking;
+  }, [isSpeaking]);
 
   const handleAIResponse = useCallback(
     (ai: string) => {
@@ -60,52 +43,37 @@ export default function ReplyPage() {
     [speak],
   );
 
+  const resetConversationUI = useCallback(() => {
+    setIsFinalMessage(false);
+    setIsQuestionVisible(false);
+    setDisplayText('');
+    setQuestion('');
+    setSubjectId(null);
+    setMouthOpen(false);
+  }, []);
+
   const handleConversationFinished = useCallback(() => {
     console.log('🎉 대화 종료됨');
     setIsFinalMessage(true);
 
-    // TTS 종료 후 1초 뒤 초기화
-    if (typeof window !== 'undefined') {
-      const synth = window.speechSynthesis;
-      if (synth.speaking) {
-        // 현재 재생 중인 음성이 끝나면 실행
-        const utteranceEndHandler = () => {
+    // 🔧 MiniMax 오디오 재생 상태 기준으로 종료 대기 → 1초 후 초기화
+    if (isSpeakingRef.current) {
+      const watcher = setInterval(() => {
+        if (!isSpeakingRef.current) {
+          clearInterval(watcher);
           setTimeout(() => {
-            setIsFinalMessage(false);
-            setIsQuestionVisible(false);
-            setDisplayText('');
-            setQuestion('');
-            setSubjectId(null);
-            setIsSpeaking(false);
-            setMouthOpen(false);
-            cancelSpeech();
-          }, 1000); // ✅ TTS 끝나고 1초 뒤
-          synth.removeEventListener('end', utteranceEndHandler as any);
-        };
-
-        // window.speechSynthesis는 직접 onend를 지원 안하니
-        // speaking 상태 감시
-        const checkSpeaking = setInterval(() => {
-          if (!synth.speaking) {
-            clearInterval(checkSpeaking);
-            utteranceEndHandler();
-          }
-        }, 100);
-      } else {
-        // 이미 말하고 있지 않으면 바로 1초 뒤 실행
-        setTimeout(() => {
-          setIsFinalMessage(false);
-          setIsQuestionVisible(false);
-          setDisplayText('');
-          setQuestion('');
-          setSubjectId(null);
-          setIsSpeaking(false);
-          setMouthOpen(false);
-          cancelSpeech();
-        }, 1000);
-      }
+            cancel(); // 안전상 호출
+            resetConversationUI();
+          }, 1000);
+        }
+      }, 100);
+    } else {
+      setTimeout(() => {
+        cancel(); // 안전상 호출
+        resetConversationUI();
+      }, 1000);
     }
-  }, [cancelSpeech]);
+  }, [cancel, resetConversationUI]);
 
   // 공통 전송 함수
   const sendFinished = useCallback(() => {
@@ -152,11 +120,10 @@ export default function ReplyPage() {
   useEffect(() => {
     return () => {
       console.log('🛑 ReplyPage 언마운트 → 캐릭터 상태 초기화 및 음성 중지');
-      setIsSpeaking(false);
       setMouthOpen(false);
-      cancelSpeech();
+      cancel(); // 🔧 MiniMax/웹스피치 모두 중지
     };
-  }, [cancelSpeech]);
+  }, [cancel]);
 
   useEffect(() => {
     subjectIdRef.current = subjectId;
@@ -208,6 +175,7 @@ export default function ReplyPage() {
     return () => clearInterval(interval);
   }, [isQuestionVisible, question]);
 
+  // 🔧 MiniMax 재생상태에 맞춘 입모양 토글
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isSpeaking) {
