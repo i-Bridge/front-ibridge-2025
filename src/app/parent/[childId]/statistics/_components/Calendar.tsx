@@ -1,31 +1,33 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { EmotionId, EMOTIONS, type EmotionKey } from '@/lib/constants';
+import { EmotionId, EMOTIONS} from '@/lib/constants';
 import { Fetcher } from '@/lib/fetcher';
 
 interface CalendarProps {
   childId: string;
-  defaultemotions: EmotionId[]; // string 대신 정확하게 EmotionKey로 타입 지정
+  defaultemotions: string[]; // string 대신 정확하게 EmotionKey로 타입 지정
 }
 
 export default function Calendar({ childId, defaultemotions }: CalendarProps) {
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth() + 1); // 1~12
-  const [emotions, setEmotions] = useState<EmotionId[]>(defaultemotions);
-
+  const [emotions, setEmotions] = useState<EmotionId[]>(
+    defaultemotions.map(e => Number(e))
+  );
   // 선택한 연월이 바뀔 때 API 호출
   useEffect(() => {
     async function fetchEmotions() {
       const dateStr = `${year}-${String(month).padStart(2, '0')}-01`;
       try {
-        const res = await Fetcher<{ emotions: EmotionId[] }>(
+        const res = await Fetcher<{ emotions: string[] }>(
           `/parent/${childId}/stat/emotion?date=${dateStr}`,
         );
 
         if (res.isSuccess && res.data?.emotions) {
-          setEmotions(res.data.emotions);
+          const numEmotions: EmotionId[] = res.data.emotions.map(e => Number(e));
+          setEmotions(numEmotions);
         } else {
           setEmotions([]); // 비어있으면 빈 배열로 초기화
         }
@@ -38,7 +40,7 @@ export default function Calendar({ childId, defaultemotions }: CalendarProps) {
     if (year !== today.getFullYear() || month !== today.getMonth() + 1) {
       fetchEmotions();
     }
-  }, [year, month, childId]);
+  }, [year, month, today, childId]);
 
   // 달력 날짜 계산
   const daysInMonth = new Date(year, month, 0).getDate();
