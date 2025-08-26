@@ -1,87 +1,91 @@
-import { useRef, useState, useCallback } from 'react';
+// hooks/useMinimaxTTS.ts
+'use client';
+
+import { useEffect, useRef, useState, useCallback } from 'react';
+
+type TTSSource = {
+  buffer: AudioBuffer;
+  dur: number;
+};
 
 export function useMinimaxTTS() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const cacheRef = useRef<Map<string, TTSSource>>(new Map());
 
-  const speak = useCallback(
-    async (text: string, opts?: { speed?: number; pitch?: number }) => {
-      if (!text) return;
+  useEffect(() => {
+    audioCtxRef.current = new (window.AudioContext ||
+      (window as any).webkitAudioContext)();
+  }, []);
 
-      try {
-        console.log('🔊 MiniMax TTS 요청:', { text, opts });
+  const makeKey = (text: string, voice = 'default', speed = 1) =>
+    `${voice}:${speed}:${text}`;
 
-        setIsSpeaking(true);
+  // ✅ 선준비: 합성 + 디코딩까지 끝내 캐시에 AudioBuffer 저장
+  const prepare = useCallback(
+    async (text: string, opts?: { voice?: string; speed?: number }) => {
+      const key = makeKey(text, opts?.voice, opts?.speed);
+      if (cacheRef.current.has(key)) return key;
 
-        const res = await fetch('/api/tts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text,
-            speed: opts?.speed ?? 1.0,
-            pitch: opts?.pitch ?? 1.0,
-          }),
-        });
+      // NOTE: 여기서 샘플레이트/비트레이트를 낮춰 응답을 더 가볍게 받을 수 있음(벤더 옵션 지원 시)
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          // vendor 옵션 예시(지원 시)
+          voice: opts?.voice ?? 'default',
+          speed: opts?.speed ?? 1,
+          format: 'mp3',
+          sampleRate: 24000,
+          bitrateKbps: 64,
+        }),
+      });
+      if (!res.ok) throw new Error('TTS fetch failed');
 
-        if (!res.ok) {
-          console.warn('⚠️ MiniMax TTS 실패 → Web Speech로 폴백');
-          const utt = new SpeechSynthesisUtterance(text);
-          utt.lang = 'ko-KR';
-          utt.pitch = 1.4;
-          utt.rate = 0.8;
-          utt.onend = () => setIsSpeaking(false);
-          window.speechSynthesis.speak(utt);
-          return;
-        }
-
-        const blob = await res.blob();
-        console.log(
-          '🎧 /api/tts Content-Type:',
-          res.headers.get('content-type'),
-        );
-        const url = URL.createObjectURL(blob);
-
-        // 기존 오디오 정리
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.src = '';
-        }
-
-        const audio = new Audio();
-        audioRef.current = audio;
-
-        // iOS 자동재생 정책 대응: 사용자 제스처 이후 재생이 안정적
-        audio.src = url;
-        audio.onended = () => {
-          setIsSpeaking(false);
-          URL.revokeObjectURL(url);
-        };
-        audio.onerror = () => {
-          console.error('❌ 오디오 재생 오류');
-          setIsSpeaking(false);
-          URL.revokeObjectURL(url);
-        };
-
-        await audio.play();
-      } catch (err) {
-        console.error('❌ MiniMax TTS 에러:', err);
-        setIsSpeaking(false);
-      }
+      const buf = await res.arrayBuffer();
+      const ctx = audioCtxRef.current!;
+      const audioBuffer = await ctx.decodeAudioData(buf);
+      cacheRef.current.set(key, {
+        buffer: audioBuffer,
+        dur: audioBuffer.duration,
+      });
+      return key;
     },
     [],
   );
 
-  const cancel = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = '';
-      audioRef.current = null;
-    }
-    if (typeof window !== 'undefined') {
-      window.speechSynthesis.cancel();
-    }
-    setIsSpeaking(false);
-  }, []);
+  const play = useCallback(
+    async (keyOrText: string, opts?: { voice?: string; speed?: number }) => {
+      const ctx = audioCtxRef.current!;
+      let key = keyOrText;
 
-  return { speak, cancel, isSpeaking };
+      // keyOrText가 캐시에 없으면 텍스트로 판단 → 즉시 준비 후 재생
+      if (!cacheRef.current.has(keyOrText)) {
+        key = await prepare(keyOrText, opts);
+      }
+
+      const cached = cacheRef.current.get(key)!;
+      if (ctx.state === 'suspended') await ctx.resume();
+
+      const src = ctx.createBufferSource();
+      src.buffer = cached.buffer;
+      src.connect(ctx.destination);
+      setIsSpeaking(true);
+      src.start();
+      src.onended = () => setIsSpeaking(false);
+
+      return cached.dur;
+    },
+    [prepare],
+  );
+
+  return {
+    isSpeaking,
+    prepare, // 선준비(합성+디코딩)
+    play, // 캐시 즉시 재생(없으면 준비 후 재생)
+    playCached: (key: string) => play(key), // alias
+    has: (text: string, voice = 'default', speed = 1) =>
+      cacheRef.current.has(`${voice}:${speed}:${text}`),
+  };
 }
