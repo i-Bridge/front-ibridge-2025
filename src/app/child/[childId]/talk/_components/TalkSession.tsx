@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Fetcher } from '@/lib/fetcher';
 import { useMinimaxTTS } from '@/hooks/useMinimaxTTS';
-import VideoRecorder from '@/components/Recorder/VideoRecorder';
+import VideoRecorder from '../_components/VideoRecorder';
 import { API } from '@/lib/constants';
 
 type TalkMode = 'question' | 'free';

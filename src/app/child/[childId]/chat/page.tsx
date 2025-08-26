@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react';
-import VideoRecorder from '@/components/Recorder/VideoRecorder';
+import VideoRecorder from '@/app/child/[childId]/talk/_components/VideoRecorder';
 import { motion } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
