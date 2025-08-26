@@ -88,11 +88,6 @@ export default function TalkMenu({
             오늘의 질문은 이미 완료했어요. 하고 싶은 말이 있나요?
           </p>
         )}
-        {isEmotionDone === false && (
-          <p className="text-sm text-orange-600 text-center">
-            오늘의 감정을 먼저 선택해 주세요.
-          </p>
-        )}
       </div>
 
       {/* 감정 선택 모달 */}

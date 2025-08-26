@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import GrapeCluster from '@/components/Reward/GrapeCluster';
-import RewardChest from '@/components/Reward/RewardChest';
+import GrapeCluster from './_components/GrapeCluster';
+import RewardChest from './_components/RewardChest';
 import { useGameStore } from '@/store/useGameStore';
 
 export default function RewardPageLocalMock() {
