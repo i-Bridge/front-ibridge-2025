@@ -34,7 +34,7 @@ export default function CumulateChart({ childId, defaultCumList }: CumulateChart
     async function fetchCumulateData() {
       try {
         const cumulateRes = await Fetcher<CumulateAPI>(
-          `/parent/${childId}/stat?periodType=${periodType}` 
+          `/parent/${childId}/stat/cumulative?periodType=${periodType}` 
         );
         const cumulateData=cumulateRes.data;
         setCumList(cumulateData?.cumList ?? []);
@@ -45,9 +45,9 @@ export default function CumulateChart({ childId, defaultCumList }: CumulateChart
     }
 
     // 기본 데이터는 이미 있으니까, periodType가 day일 때는 재호출 안 함
-    if (periodType !== 'day') {
+    //if (periodType !== 'day') {
       fetchCumulateData();
-    }
+    
   }, [periodType, childId]);
 
 

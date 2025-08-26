@@ -41,7 +41,7 @@ export default async function StatisticsPage({ params }: ChildPageParams) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 왼쪽: 달력 + 누적 데이터 */}
           <div className="flex flex-col gap-6 items-center justify-center">
-            <Calendar emotions={statisticData.emotions}/>
+            <Calendar childId={childId} defaultemotions={statisticData.emotions}/>
             <p className="text-sm text-gray-500">누적 응답 수</p>
             <p className="text-lg font-bold">{statisticData.cumulative}</p>
             <CumulateChart childId={childId} defaultCumList={statisticData.cumList}/>

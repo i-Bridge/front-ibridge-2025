@@ -1,61 +1,65 @@
-// src/app/parent/calendar/calendar.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useDateStore } from '@/store/useDateStore';
+import { EMOTIONS, type EmotionKey } from '@/lib/constants';
+import { Fetcher } from '@/lib/fetcher';
 
-interface EmotionListProps {
-  emotions: string[];
+interface CalendarProps {
+  childId: string;
+  defaultemotions: EmotionKey[]; // string 대신 정확하게 EmotionKey로 타입 지정
 }
 
-export default function Calendar({ emotions }: EmotionListProps) {
-  const { selectedDate, setSelectedDate } = useDateStore();
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [month, setMonth] = useState(new Date().getMonth() + 1); // 1~12
-  const [daysInMonth, setDaysInMonth] = useState(0);
-  const [firstDayOfWeek, setFirstDayOfWeek] = useState(0); // 첫날 요일 (0: 일요일)
+export default function Calendar({ childId, defaultemotions }: CalendarProps) {
+  const today = new Date();
+  const [year, setYear] = useState(today.getFullYear());
+  const [month, setMonth] = useState(today.getMonth() + 1); // 1~12
+  const [emotions, setEmotions] = useState<EmotionKey[]>(defaultemotions);
 
+  // 선택한 연월이 바뀔 때 API 호출
   useEffect(() => {
-    // 현재 월의 총 일수 구하기
-    const lastDay = new Date(year, month, 0).getDate();
-    setDaysInMonth(lastDay);
+    async function fetchEmotions() {
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-01`;
+      try {
+        const res = await Fetcher<{ emotions: EmotionKey[] }>(
+          `/parent/${childId}/stat/emotion?date=${dateStr}`,
+        );
 
-    // 현재 월의 1일이 무슨 요일인지 확인
-    const firstDay = new Date(year, month - 1, 1).getDay();
-    setFirstDayOfWeek(firstDay);
+        if (res.isSuccess && res.data?.emotions) {
+          setEmotions(res.data.emotions);
+        } else {
+          setEmotions([]); // 비어있으면 빈 배열로 초기화
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
-    // 현재 선택된 날짜가 해당 월에 없는 경우 1일로 변경
-    const selectedDay = selectedDate?.split('-')[2] || '01';
-    const adjustedDay = Math.min(parseInt(selectedDay, 10), lastDay)
-      .toString()
-      .padStart(2, '0');
-    setSelectedDate(
-      `${year}-${month.toString().padStart(2, '0')}-${adjustedDay}`,
-    );
-  }, [year, month, selectedDate, setSelectedDate]);
+    // 초기 달(day) 제외하고 월 변경 시 호출
+    if (year !== today.getFullYear() || month !== today.getMonth() + 1) {
+      fetchEmotions();
+    }
+  }, [year, month, childId]);
+
+  // 달력 날짜 계산
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const calendarDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   return (
-    <div className="p-4 border rounded-md w-[400px]">
-      {/* 연도 & 월 선택 */}
-      <div className="flex justify-between items-center mb-2">
-        <select
-          value={year}
-          onChange={(e) => setYear(Number(e.target.value))}
-          className="border p-1 rounded-md"
-        >
-          {Array.from(
-            { length: 10 },
-            (_, i) => new Date().getFullYear() - 5 + i,
-          ).map((y) => (
-            <option key={y} value={y}>
-              {y}년
-            </option>
-          ))}
+    <div className="border p-4 rounded w-[400px]">
+      {/* 상단: 년도/월 선택 */}
+      <div className="flex space-x-2 mb-4">
+        <select value={year} onChange={(e) => setYear(Number(e.target.value))}>
+          {Array.from({ length: 5 }, (_, i) => today.getFullYear() - 2 + i).map(
+            (y) => (
+              <option key={y} value={y}>
+                {y}년
+              </option>
+            ),
+          )}
         </select>
         <select
           value={month}
           onChange={(e) => setMonth(Number(e.target.value))}
-          className="border p-1 rounded-md"
         >
           {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
             <option key={m} value={m}>
@@ -65,40 +69,29 @@ export default function Calendar({ emotions }: EmotionListProps) {
         </select>
       </div>
 
-      {/* 요일 표시 */}
-      <div className="grid grid-cols-7 gap-1 text-center font-semibold">
-        <div className="text-red-500">Sun</div>
-        <div>Mon</div>
-        <div>Tue</div>
-        <div>Wed</div>
-        <div>Thu</div>
-        <div>Fri</div>
-        <div className="text-blue-500">Sat</div>
-      </div>
-
-      {/* 날짜 버튼 */}
-      <div className="grid grid-cols-7 gap-1 p-2 border-t">
-        {Array.from({ length: firstDayOfWeek }).map((_, i) => (
-          <div key={`empty-${i}`} className="w-12 h-12"></div> // 빈 칸 채우기
-        ))}
-        {Array.from({ length: daysInMonth }, (_, i) => {
-          const today = new Date().toISOString().split('T')[0];
-          const dateString = `${year}-${month.toString().padStart(2, '0')}-${(
-            i + 1
-          )
-            .toString()
-            .padStart(2, '0')}`;
-
+      {/* 달력 그리기 */}
+      <div className="grid grid-cols-7 gap-2">
+        {calendarDays.map((day, idx) => {
+          // idx가 emotions 배열 범위를 벗어나면 undefined
+          const emotionID = emotions[idx] ?? null;
+          const emotion = EMOTIONS.find((e) => String(e.id) === emotionID);
+          console.log(emotionID,idx);
           return (
-            <button
-              key={dateString}
-              className={`w-12 h-12 border rounded-md transition ${
-                selectedDate === dateString ? 'bg-blue-500 text-white' : ''
-              } ${dateString === today ? 'border-2 border-red-500' : ''}`}
-              onClick={() => setSelectedDate(dateString)}
+            <div
+              key={day}
+              className="relative w-10 h-10 flex items-center justify-center border rounded cursor-pointer group"
             >
-              {i + 1}
-            </button>
+              {emotion ? (
+                <>
+                  <span className="text-xl">{emotion.emoji}</span>
+                  <span className="absolute opacity-0 group-hover:opacity-100 text-sm">
+                    {day}
+                  </span>
+                </>
+              ) : (
+                <span>{day}</span>
+              )}
+            </div>
           );
         })}
       </div>
