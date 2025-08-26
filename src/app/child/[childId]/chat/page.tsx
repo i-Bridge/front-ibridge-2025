@@ -7,29 +7,34 @@ import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 import Image from 'next/image';
 import { useMinimaxTTS } from '@/hooks/useMinimaxTTS';
+import { useGameStore } from '@/store/useGameStore';
 
 export default function ReplyPage() {
   const { childId } = useParams();
   const numericChildId = useMemo(() => Number(childId), [childId]);
 
+  // ✅ zustand 전역 상태 사용 (SSR에서 이미 setOverview로 하이드레이트되어 있음)
+  const isCompleted = useGameStore((s) => s.specifiedDone);
+  const setGrapes = useGameStore((s) => s.setGrapes);
+  const setEmotionDone = useGameStore((s) => s.setEmotionDone);
+  const setSpecifiedDone = useGameStore((s) => s.setSpecifiedDone);
+
   // 보조 ref (언마운트/이벤트 핸들러에서 최신값 접근용)
   const subjectIdRef = useRef<number | null>(null);
   const childIdRef = useRef<number | null>(null);
   const finishedSentRef = useRef(false);
-  const isSpeakingRef = useRef(false); // 🔧 MiniMax isSpeaking 추적용
+  const isSpeakingRef = useRef(false); // MiniMax isSpeaking 추적용
 
   const [question, setQuestion] = useState('');
   const [displayText, setDisplayText] = useState('');
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isQuestionVisible, setIsQuestionVisible] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
-  const [isCompleted, setIsCompleted] = useState<boolean | null>(null);
   const [subjectId, setSubjectId] = useState<number | null>(null);
   const [isFinalMessage, setIsFinalMessage] = useState(false);
 
-  // 🔧 MiniMax TTS 훅 사용 (Web Speech 자동 폴백 포함)
+  // MiniMax TTS 훅
   const { speak, cancel, isSpeaking } = useMinimaxTTS();
-
   useEffect(() => {
     isSpeakingRef.current = isSpeaking;
   }, [isSpeaking]);
@@ -56,7 +61,7 @@ export default function ReplyPage() {
     console.log('🎉 대화 종료됨');
     setIsFinalMessage(true);
 
-    // 🔧 MiniMax 오디오 재생 상태 기준으로 종료 대기 → 1초 후 초기화
+    // MiniMax 오디오 재생 상태 기준으로 종료 대기 → 1초 후 초기화
     if (isSpeakingRef.current) {
       const watcher = setInterval(() => {
         if (!isSpeakingRef.current) {
@@ -75,12 +80,46 @@ export default function ReplyPage() {
     }
   }, [cancel, resetConversationUI]);
 
-  // 공통 전송 함수
+  // ✅ 정상 종료 시 /finished 호출 → 최신 grape/플래그 동기화
+  const callFinished = useCallback(async () => {
+    const sid = subjectIdRef.current;
+    const cid = childIdRef.current ?? numericChildId;
+    if (!sid || !cid) return;
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/child/${cid}/finished`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subjectId: sid }),
+        },
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json: {
+        isSuccess: boolean;
+        data?: { grape?: number; emotion?: boolean; completed?: boolean };
+      } = await res.json();
+
+      if (json.isSuccess && json.data) {
+        if (typeof json.data.grape === 'number') setGrapes(json.data.grape);
+        if (typeof json.data.emotion === 'boolean')
+          setEmotionDone(json.data.emotion);
+        if (typeof json.data.completed === 'boolean')
+          setSpecifiedDone(json.data.completed);
+        console.log('✅ /finished 반영:', json.data);
+      }
+    } catch (e) {
+      console.error('❌ /finished 호출 실패', e);
+    }
+  }, [numericChildId, setGrapes, setEmotionDone, setSpecifiedDone]);
+
+  // ✅ 언로드 백업: sendBeacon (응답은 못 읽음 → 상태 반영은 callFinished가 담당)
   const sendFinished = useCallback(() => {
     if (finishedSentRef.current) return;
 
     const sid = subjectIdRef.current;
-    const cid = childIdRef.current;
+    const cid = childIdRef.current ?? numericChildId;
     if (!sid || !cid) return;
 
     const url = `${process.env.NEXT_PUBLIC_API_URL}/child/${cid}/finished`;
@@ -106,7 +145,7 @@ export default function ReplyPage() {
         finishedSentRef.current = true;
       })
       .catch((err) => console.warn('⚠️ /finished fetch FAIL', err));
-  }, []);
+  }, [numericChildId]);
 
   // 강제 종료 + 새로고침
   useEffect(() => {
@@ -121,7 +160,7 @@ export default function ReplyPage() {
     return () => {
       console.log('🛑 ReplyPage 언마운트 → 캐릭터 상태 초기화 및 음성 중지');
       setMouthOpen(false);
-      cancel(); // 🔧 MiniMax/웹스피치 모두 중지
+      cancel(); // MiniMax/웹스피치 모두 중지
     };
   }, [cancel]);
 
@@ -134,27 +173,9 @@ export default function ReplyPage() {
     childIdRef.current = Number.isFinite(n) ? n : null;
   }, [childId]);
 
-  useEffect(() => {
-    if (!numericChildId) return;
+  // ❌ /home API 호출 useEffect 제거됨 (SSR에서 zustand로 초기 주입됨)
 
-    const fetchHomeData = async () => {
-      console.log('📥 /home API 호출');
-      const { data, isSuccess } = await Fetcher<{ completed: boolean }>(
-        `/child/${numericChildId}/home`,
-        { method: 'GET' },
-      );
-      if (isSuccess && data) {
-        console.log('✅ /home 응답:', data);
-        setIsCompleted(data.completed);
-      } else {
-        console.error('❌ /home API 실패');
-        setIsCompleted(false);
-      }
-    };
-
-    fetchHomeData();
-  }, [numericChildId]);
-
+  // 말풍선 타이핑 효과
   useEffect(() => {
     if (!isQuestionVisible || !question) return;
 
@@ -175,7 +196,7 @@ export default function ReplyPage() {
     return () => clearInterval(interval);
   }, [isQuestionVisible, question]);
 
-  // 🔧 MiniMax 재생상태에 맞춘 입모양 토글
+  // MiniMax 재생상태에 맞춘 입모양 토글
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isSpeaking) {
@@ -188,23 +209,23 @@ export default function ReplyPage() {
     return () => clearInterval(interval);
   }, [isSpeaking]);
 
-  // 이미지 preload 처리 → 두 이미지 모두 선로드
+  // 이미지 preload 처리
   useEffect(() => {
-    const preloadImages = [
-      '/images/characterDefault.png',
-      '/images/characterTalking.png',
-    ];
-    preloadImages.forEach((src) => {
-      const img = new window.Image();
-      img.src = src;
-    });
+    ['/images/characterDefault.png', '/images/characterTalking.png'].forEach(
+      (src) => {
+        const img = new window.Image();
+        img.src = src;
+      },
+    );
   }, []);
 
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
       {/* 캐릭터 이미지 */}
       <motion.div
-        className={`relative bottom-[-50px] transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
+        className={`relative bottom-[-50px] transition-all duration-300 ${
+          isImageLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
         animate={{ scale: isSpeaking ? 1.03 : 1 }}
         transition={{ duration: 0.3 }}
       >
@@ -291,7 +312,9 @@ export default function ReplyPage() {
                   const { data, isSuccess } = await Fetcher<{
                     subjectId: number;
                     question: string;
-                  }>(`/child/${numericChildId}/predesigned`, { method: 'GET' });
+                  }>(`/child/${numericChildId}/predesigned`, {
+                    method: 'GET',
+                  });
 
                   if (isSuccess && data) {
                     console.log('✅ /predesigned 응답:', data);
@@ -353,8 +376,9 @@ export default function ReplyPage() {
             <VideoRecorder
               subjectId={subjectId}
               onAIResponse={handleAIResponse}
-              onFinished={() => {
-                console.log('✅ 녹화 완료됨');
+              onFinished={async () => {
+                console.log('✅ 녹화 완료 → /finished 호출');
+                await callFinished(); // 최신 grape/플래그 동기화
               }}
               onConversationFinished={() => {
                 handleConversationFinished();

@@ -1,32 +1,56 @@
 'use client';
 
-import { useState } from 'react';
-import GrapeCluster from './_components/GrapeCluster';
-import RewardChest from './_components/RewardChest';
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useGameStore } from '@/store/useGameStore';
+import GrapeCluster from './_components/GrapeCluster';
 
-export default function RewardPageLocalMock() {
-  const [filled, setFilled] = useState(0); // 0~6
-  const [claimedOnce, setClaimedOnce] = useState(false);
-  const grapeBunches = useGameStore((s) => s.grapeBunches);
-  const addBunches = useGameStore((s) => s.addBunches);
+const GRAPES_PER_BUNCH = 6;
+const toBunches = (g: number) => Math.floor(g / GRAPES_PER_BUNCH);
 
-  const enabled = filled >= 6 && !claimedOnce;
+export default function RewardPage() {
+  // 전역: 알(서버 원장 단위)
+  const grapes = useGameStore((s) => s.grapes);
 
-  const onClaim = async () => {
-    // 보상: 포도 송이 1개
-    addBunches(1);
-    setClaimedOnce(true);
-    setFilled(0); // 다음 라운드 준비
-    return 1; // 받은 송이 수 반환
+  // 로컬(연출)
+  const [filled, setFilled] = useState(0); // 현재 클러스터에 채워진 알(0~6)
+  const [localBunchGain, setLocalBunchGain] = useState(0); // 화면에서만 보이는 추가 송이
+  const userTouchedRef = useRef(false); // 사용자가 버튼을 눌러 UI를 변경했는지
+
+  // ✅ 상단 표시용 송이 수
+  const displayBunches = useMemo(
+    () => toBunches(grapes) + localBunchGain,
+    [grapes, localBunchGain],
+  );
+
+  // ✅ 하이드레이션/서버 업데이트에 맞춰 filled 동기화(유저가 건드리기 전까지만)
+  useEffect(() => {
+    if (userTouchedRef.current) return; // 유저가 조작 시작하면 더 이상 자동 동기화 X
+    setFilled(grapes % GRAPES_PER_BUNCH);
+  }, [grapes]);
+
+  // 버튼 조작시 플래그 세우기
+  const touch = () => {
+    userTouchedRef.current = true;
   };
+
+  const enabled = filled >= GRAPES_PER_BUNCH;
+
+  // 🎁 (연출) 한 송이 완성 시: 상단 +1송이, 알 UI 리셋
+  const onClaim = useCallback(async () => {
+    if (!enabled) return 0;
+    touch();
+    setLocalBunchGain((n) => n + 1);
+    setFilled(0);
+    return 1; // RewardChest 애니메이션용
+  }, [enabled]);
 
   return (
     <section className="p-4">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-xl font-bold">리워드</h1>
         <div className="rounded-lg bg-white/10 px-3 py-1 text-sm">
-          포도 송이: <b>{grapeBunches}</b>
+          포도 송이: <b>{displayBunches}</b>{' '}
+          <span className="opacity-70">({grapes} 알)</span>
         </div>
       </div>
 
@@ -36,51 +60,6 @@ export default function RewardPageLocalMock() {
           <GrapeCluster filledCount={filled} size={50} />
           <div className="mt-4 text-center">
             <div className="text-lg font-semibold">{filled}/6 알 채움</div>
-          </div>
-
-          {/* 로컬 테스트 버튼 */}
-          <div className="mt-4 flex gap-2">
-            <button
-              onClick={() => setFilled((n) => Math.min(6, n + 1))}
-              className="rounded-lg bg-white/10 px-3 py-1 text-sm hover:bg-white/15"
-            >
-              +1 알
-            </button>
-            <button
-              onClick={() => setFilled((n) => Math.max(0, n - 1))}
-              className="rounded-lg bg-white/10 px-3 py-1 text-sm hover:bg-white/15"
-            >
-              -1 알
-            </button>
-            <button
-              onClick={() => {
-                setFilled(0);
-                setClaimedOnce(false);
-              }}
-              className="rounded-lg bg-white/10 px-3 py-1 text-sm hover:bg-white/15"
-            >
-              초기화
-            </button>
-          </div>
-        </div>
-
-        {/* 보상 상자 */}
-        <div className="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6 flex flex-col items-center">
-          <RewardChest enabled={enabled} onClaim={onClaim} />
-          <div className="mt-2 text-sm">
-            {enabled ? (
-              <span className="text-amber-300">
-                보상을 받을 수 있어요! 상자를 열어보세요.
-              </span>
-            ) : filled >= 6 && claimedOnce ? (
-              <span className="opacity-80">
-                이미 수령했어요. 다시 6알을 채워보세요!
-              </span>
-            ) : (
-              <span className="opacity-80">
-                포도를 6알 채우면 상자가 나타나요.
-              </span>
-            )}
           </div>
         </div>
       </div>
