@@ -1,21 +1,26 @@
+// store/useGameStore.ts
 import { create } from 'zustand';
 
-type CurrencyState = {
-  grapeBunches: number; // 보유 포도 송이 개수
-  addBunches: (v: number) => void; // 보상 수령 등
-  spendBunches: (v: number) => boolean; // 구매 시 사용(성공/실패 반환)
-  reset: () => void;
+type Overview = {
+  grapes: number; // 알(서버 원장 단위)
+  emotionDone: boolean;
+  specifiedDone: boolean;
 };
 
-export const useGameStore = create<CurrencyState>((set, get) => ({
-  grapeBunches: 0,
-  addBunches: (v) =>
-    set((s) => ({ grapeBunches: Math.max(0, s.grapeBunches + v) })),
-  spendBunches: (v) => {
-    const curr = get().grapeBunches;
-    if (curr < v) return false;
-    set({ grapeBunches: curr - v });
-    return true;
-  },
-  reset: () => set({ grapeBunches: 0 }),
+type State = Overview & {
+  setOverview: (o: Overview) => void;
+  setGrapes: (n: number) => void;
+  setEmotionDone: (b: boolean) => void;
+  setSpecifiedDone: (b: boolean) => void;
+};
+
+export const useGameStore = create<State>((set) => ({
+  grapes: 0,
+  emotionDone: false,
+  specifiedDone: false,
+
+  setOverview: (o) => set(o),
+  setGrapes: (n) => set({ grapes: n }),
+  setEmotionDone: (b) => set({ emotionDone: b }),
+  setSpecifiedDone: (b) => set({ specifiedDone: b }),
 }));
