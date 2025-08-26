@@ -1,6 +1,6 @@
 import { Fetcher } from '@/lib/fetcher';
 import HomeHeader from '@/components/Header/HomeHeader';
-import AiComment from '@/app/parent/[childId]/home/_components/AiComment';
+import AiComment from './_components/aiComment';
 import MonthSelector from './_components/MonthSelector';
 import Weekly from './_components/Weekly';
 import SubjectList from '@/components/Question/SubjectList';
@@ -16,7 +16,6 @@ interface HomeData {
   subjects: Subject[];
 }
 
-
 export default async function HomePage({ params }: ChildPageParams) {
   // params가 Promise이므로, await를 사용해 값을 추출
   const { childId } = await params;
@@ -28,7 +27,6 @@ export default async function HomePage({ params }: ChildPageParams) {
   const homeRes = await Fetcher<HomeData>(`/parent/${childId}/home`);
 
   const homeData = homeRes.data;
-  
 
   if (!homeData) {
     return <div>로딩 중...</div>;
@@ -44,7 +42,7 @@ export default async function HomePage({ params }: ChildPageParams) {
       <div className="flex flex-col justify-center items-center w-full pt-3">
         <div className="pt-4">
           <MonthSelector />
-          <Weekly childId={childId}/>
+          <Weekly childId={childId} />
         </div>
       </div>
       <div className="px-8">
