@@ -1,8 +1,8 @@
 import { Fetcher } from '@/lib/fetcher';
 import HomeHeader from '@/components/Header/HomeHeader';
-import AiComment from '@/components/Home/aiComment';
-import MonthSelector from '@/components/Home/monthSelector';
-import Weekly from '@/components/Home/weekly';
+import AiComment from '@/app/parent/[childId]/home/_components/AiComment';
+import MonthSelector from './_components/MonthSelector';
+import Weekly from './_components/Weekly';
 import SubjectList from '@/components/Question/SubjectList';
 import { ChildPageParams } from '@/types/page-props';
 

@@ -23,7 +23,7 @@ interface FamilyData {
   children: ChildInfo[];
 }
 
-export default function ChildrenForm() {
+export default function ChangeChildInfo() {
   const [familyInfo, setFamilyInfo] = useState<FamilyData | null>(null);
   const [editMode, setEditMode] = useState<number[]>([]);
   const [editedChildren, setEditedChildren] = useState<

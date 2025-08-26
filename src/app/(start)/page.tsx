@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { Fetcher } from '@/lib/fetcher';
 import LoginButton from '@/components/Auth/LoginButton';
 
-import StartLogoCanvas from '@/components/Logo/StartLogoCanvas';
+import StartLogoCanvas from '@/app/(start)/_components/StartLogoCanvas';
 
 export default function StartPage() {
   const { data: session } = useSession();

@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { useState, useRef } from 'react';
 import { useSubjectStore } from '@/store/useSubjectStore';
-import { useSubjectData } from '@/hooks/home/useSubjectData';
+import { useSubjectData } from '@/hooks/parentHome/useSubjectData';
 
 interface Question {
   questionId: number;

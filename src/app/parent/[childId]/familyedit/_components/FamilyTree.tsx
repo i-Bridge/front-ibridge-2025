@@ -2,7 +2,7 @@
 
 import { Tree, TreeNode } from 'react-organizational-chart';
 import Image from 'next/image';
-import CopyLinkButton from '@/components/Familyedit/copyLink';
+import CopyLinkButton from '@/app/parent/[childId]/familyedit/_components/CopyLink';
 
 interface ParentInfo {
   parentId: number;

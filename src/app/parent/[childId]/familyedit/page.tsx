@@ -1,10 +1,9 @@
 import { Fetcher } from '@/lib/fetcher';
-import EditPageHeader from '@/components/Familyedit/EditHeader';
-import FamilyTree from '@/components/Familyedit/familyTree';
-import FamilyName from '@/components/Familyedit/editFamilyName';
-import ChildrenForm from '@/components/Familyedit/changeChildInfo';
+import EditPageHeader from '@/app/parent/[childId]/familyedit/_components/EditHeader';
+import FamilyTree from '@/app/parent/[childId]/familyedit/_components/FamilyTree';
+import FamilyName from '@/app/parent/[childId]/familyedit/_components/EditFamilyName';
+import ChildrenForm from '@/app/parent/[childId]/familyedit/_components/ChangeChildInfo';
 import { ChildPageParams } from '@/types/page-props';
-
 
 interface ParentInfo {
   parentId: number;

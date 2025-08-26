@@ -27,7 +27,13 @@ export default function StartLogoCanvas() {
   const imagesRef = useRef<ImgObj[]>([]);
   const animationRef = useRef<number | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [dpr, setDpr] = useState(() => window.devicePixelRatio || 1);
+  const [dpr, setDpr] = useState(1);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setDpr(window.devicePixelRatio || 1);
+    }
+  }, []);
 
   const CSS_WIDTH = 800;
   const CSS_HEIGHT = 300;
@@ -37,7 +43,9 @@ export default function StartLogoCanvas() {
     const updateDpr = () => {
       setDpr(window.devicePixelRatio || 1);
     };
-    const mediaQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+    const mediaQuery = window.matchMedia(
+      `(resolution: ${window.devicePixelRatio}dppx)`,
+    );
     mediaQuery.addEventListener('change', updateDpr);
 
     return () => mediaQuery.removeEventListener('change', updateDpr);
@@ -89,7 +97,7 @@ export default function StartLogoCanvas() {
               });
             };
           });
-        })
+        }),
       );
       imagesRef.current = loadedImages;
       setLoaded(true);
@@ -126,7 +134,7 @@ export default function StartLogoCanvas() {
           img.x * dpr,
           img.y * dpr,
           img.width * dpr,
-          img.height * dpr
+          img.height * dpr,
         );
         ctx.restore();
 
@@ -169,7 +177,7 @@ export default function StartLogoCanvas() {
           img.x * dpr,
           img.y * dpr,
           img.width * dpr,
-          img.height * dpr
+          img.height * dpr,
         );
         ctx.restore();
       });
