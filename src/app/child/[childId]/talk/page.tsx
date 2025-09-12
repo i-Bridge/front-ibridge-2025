@@ -1,6 +1,6 @@
 import { Fetcher } from '@/lib/fetcher';
-import TalkClient from './_components/TalkMenu';
 import { ChildPageParams } from '@/types/page-props';
+import TalkMenu from './_components/TalkMenu';
 
 type HomeData = {
   emotion: boolean;
@@ -39,7 +39,7 @@ export default async function TalkPage({ params }: ChildPageParams) {
   }
 
   return (
-    <TalkClient
+    <TalkMenu
       childId={childId}
       initialCompleted={completed}
       initialEmotionDone={emotion}

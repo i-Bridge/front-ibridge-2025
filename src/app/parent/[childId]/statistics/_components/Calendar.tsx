@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { EmotionId, EMOTIONS} from '@/lib/constants';
+import { EmotionId, EMOTIONS } from '@/constants/emotions';
 import { Fetcher } from '@/lib/fetcher';
 
 interface CalendarProps {
@@ -14,7 +14,7 @@ export default function Calendar({ childId, defaultemotions }: CalendarProps) {
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth() + 1); // 1~12
   const [emotions, setEmotions] = useState<EmotionId[]>(
-    defaultemotions.map(e => Number(e))
+    defaultemotions.map((e) => Number(e)),
   );
   // 선택한 연월이 바뀔 때 API 호출
   useEffect(() => {
@@ -26,7 +26,9 @@ export default function Calendar({ childId, defaultemotions }: CalendarProps) {
         );
 
         if (res.isSuccess && res.data?.emotions) {
-          const numEmotions: EmotionId[] = res.data.emotions.map(e => Number(e));
+          const numEmotions: EmotionId[] = res.data.emotions.map((e) =>
+            Number(e),
+          );
           setEmotions(numEmotions);
         } else {
           setEmotions([]); // 비어있으면 빈 배열로 초기화
@@ -77,7 +79,7 @@ export default function Calendar({ childId, defaultemotions }: CalendarProps) {
           // idx가 emotions 배열 범위를 벗어나면 undefined
           const emotionID = emotions[idx] ?? null;
           const emotion = EMOTIONS.find((e) => e.id === emotionID);
-          console.log(emotionID,idx);
+          console.log(emotionID, idx);
           return (
             <div
               key={day}

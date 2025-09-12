@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { Fetcher } from '@/lib/fetcher';
 import { useMinimaxTTS } from '@/hooks/useMinimaxTTS';
 import VideoRecorder from '@/components/Recorder/VideoRecorder';
-import { API } from '@/lib/constants';
+import { API } from '@/constants/emotions';
 
 type TalkMode = 'question' | 'free';
 
