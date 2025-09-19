@@ -1,46 +1,44 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
 import { Fetcher } from '@/lib/fetcher';
-import { EMOTIONS, API, type EmotionId } from '@/lib/constants';
+import { API, type EmotionId } from '@/lib/constants';
+import { useRouter } from 'next/navigation';
+import { useChildStore } from '@/store/useChildStore';
+import EmotionModal from './EmotionModal';
 
 type Props = {
   childId: string; // ✅ string으로 고정
-  initialCompleted: boolean;
-  initialEmotionDone: boolean;
 };
 
-export default function TalkMenu({
-  childId,
-  initialCompleted,
-  initialEmotionDone,
-}: Props) {
-  const [isCompleted] = useState(initialCompleted);
-  const [isEmotionDone, setIsEmotionDone] = useState(initialEmotionDone);
+export default function TalkMenu({ childId }: Props) {
+  const router = useRouter(); // 라우터 사용
 
-  const [emotionModalOpen, setEmotionModalOpen] = useState(
-    initialEmotionDone === false,
-  );
-  const [submittingEmotionId, setSubmittingEmotionId] = useState<number | null>(
-    null,
-  );
+  const { emotionDone, specifiedDone, setEmotionDone } = useChildStore();
+
+  const isEmotionModalOpen = emotionDone === false;
 
   // 이모지 클릭 → 즉시 저장
-  const submitEmotion = async (emotionId: EmotionId) => {
-    if (submittingEmotionId !== null) return;
+  const handleSelectEmotion = async (emotionId: EmotionId) => {
     try {
-      setSubmittingEmotionId(emotionId);
       const { isSuccess } = await Fetcher<undefined>(API.emotion(childId), {
         method: 'POST',
         data: { emotion: emotionId },
       });
+
       if (isSuccess) {
-        setEmotionModalOpen(false);
-        setIsEmotionDone(true);
+        // ✨ 5. Zustand 스토어 상태를 직접 업데이트합니다.
+        setEmotionDone(true);
+
+        // ✨ 6. 서버 데이터 캐시를 갱신합니다. (뒤로가기 문제 해결)
+        router.refresh();
+
+        return true; // 성공했음을 EmotionModal에 알림
       }
-    } finally {
-      setSubmittingEmotionId(null);
+      return false;
+    } catch (e) {
+      console.error('감정 제출 실패', e);
+      return false;
     }
   };
 
@@ -52,7 +50,7 @@ export default function TalkMenu({
       </p>
 
       <div className="mt-4 flex flex-col gap-4">
-        {isCompleted ? (
+        {specifiedDone ? (
           <button
             disabled
             className="w-72 h-20 rounded-2xl bg-gray-300 text-gray-600 flex items-center justify-center text-xl font-bold cursor-not-allowed"
@@ -64,12 +62,12 @@ export default function TalkMenu({
           <Link
             href={`/child/${childId}/talk/question`}
             className={`w-72 h-20 rounded-2xl flex items-center justify-center text-xl font-bold hover:scale-105 transition-transform ${
-              isEmotionDone === false
+              emotionDone === false
                 ? 'bg-pink-200 pointer-events-none cursor-not-allowed'
                 : 'bg-pink-300'
             }`}
             title={
-              isEmotionDone === false ? '오늘의 감정을 먼저 선택해 주세요' : ''
+              emotionDone === false ? '오늘의 감정을 먼저 선택해 주세요' : ''
             }
           >
             오늘의 질문
@@ -83,7 +81,7 @@ export default function TalkMenu({
           하고싶은 말
         </Link>
 
-        {isCompleted && (
+        {specifiedDone && (
           <p className="text-sm text-gray-600 text-center">
             오늘의 질문은 이미 완료했어요. 하고 싶은 말이 있나요?
           </p>
@@ -91,61 +89,11 @@ export default function TalkMenu({
       </div>
 
       {/* 감정 선택 모달 */}
-      {emotionModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-[92vw] max-w-[420px] rounded-2xl bg-white p-6 shadow-xl">
-            <h3 className="text-xl font-bold text-center mb-1">
-              오늘의 감정은?
-            </h3>
-            <p className="text-sm text-gray-500 text-center mb-4">
-              지금 느끼는 감정을 선택해 주세요.
-            </p>
-
-            <div className="grid grid-cols-3 gap-3">
-              {EMOTIONS.map((e) => {
-                const busy = submittingEmotionId !== null;
-                const isThisSubmitting = submittingEmotionId === e.id;
-                return (
-                  <button
-                    key={e.id}
-                    onClick={() => submitEmotion(e.id as EmotionId)}
-                    disabled={busy}
-                    className={`h-20 rounded-xl border flex flex-col items-center justify-center gap-1 transition relative
-                      ${isThisSubmitting ? 'border-orange-400 ring-2 ring-orange-200 opacity-70' : 'border-gray-200 hover:border-gray-300'}
-                      ${busy && !isThisSubmitting ? 'opacity-50' : ''}`}
-                  >
-                    <span className="text-2xl">{e.emoji}</span>
-                    <span className="text-sm">{e.labelKo}</span>
-                    {isThisSubmitting && (
-                      <span className="absolute -bottom-2 text-[10px] text-orange-500">
-                        저장 중...
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-5 flex justify-end">
-              <button
-                onClick={() => setEmotionModalOpen(false)}
-                disabled={submittingEmotionId !== null}
-                className="h-11 px-5 rounded-xl text-base font-semibold
-                           border border-gray-300 bg-white text-gray-800
-                           hover:bg-gray-100 active:bg-gray-200
-                           focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-1
-                           disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:opacity-100"
-              >
-                나중에
-              </button>
-            </div>
-
-            <p className="mt-3 text-xs text-gray-500 text-center">
-              감정을 선택하면 바로 저장돼요.
-            </p>
-          </div>
-        </div>
-      )}
+      <EmotionModal
+        open={isEmotionModalOpen}
+        onClose={() => setEmotionDone(true)}
+        onSelect={handleSelectEmotion}
+      />
     </section>
   );
 }

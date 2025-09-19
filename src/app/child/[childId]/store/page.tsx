@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useGameStore } from '@/store/useGameStore';
+import { useChildStore } from '@/store/useChildStore';
 
 const ITEMS = [
   { id: 1, name: '에너지 포션', costBunch: 1 },
@@ -14,7 +14,7 @@ const toBunches = (g: number) => Math.floor(g / GRAPES_PER_BUNCH);
 
 export default function StorePage() {
   // 전역: 알(원장 단위)
-  const grapes = useGameStore((s) => s.grapes);
+  const grapes = useChildStore((s) => s.grapes);
   // const setGrapes = useGameStore((s) => s.setGrapes); // 실제 결제 붙일 때 사용
 
   // 연출 전용

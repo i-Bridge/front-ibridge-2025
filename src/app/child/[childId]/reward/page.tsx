@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
-import { useGameStore } from '@/store/useGameStore';
+import { useChildStore } from '@/store/useChildStore';
 import GrapeCluster from './_components/GrapeCluster';
 
 const GRAPES_PER_BUNCH = 6;
@@ -9,7 +9,7 @@ const toBunches = (g: number) => Math.floor(g / GRAPES_PER_BUNCH);
 
 export default function RewardPage() {
   // 전역: 알(서버 원장 단위)
-  const grapes = useGameStore((s) => s.grapes);
+  const grapes = useChildStore((s) => s.grapes);
 
   // 로컬(연출)
   const [filled, setFilled] = useState(0); // 현재 클러스터에 채워진 알(0~6)

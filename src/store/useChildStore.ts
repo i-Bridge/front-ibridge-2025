@@ -14,7 +14,7 @@ type State = Overview & {
   setSpecifiedDone: (b: boolean) => void;
 };
 
-export const useGameStore = create<State>((set) => ({
+export const useChildStore = create<State>((set) => ({
   grapes: 0,
   emotionDone: false,
   specifiedDone: false,
