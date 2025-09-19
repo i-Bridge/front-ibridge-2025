@@ -36,7 +36,7 @@ export default function TalkSession({ childId, mode }: Props) {
   const [isFinalMessage, setIsFinalMessage] = useState(false);
 
   // TTS (prepare / play 분리)
-  const { prepare, play, isSpeaking } = useMinimaxTTS();
+  const { prepare, play, isSpeaking, playStreamSmart } = useMinimaxTTS();
   useEffect(() => {
     isSpeakingRef.current = isSpeaking;
   }, [isSpeaking]);
@@ -64,21 +64,36 @@ export default function TalkSession({ childId, mode }: Props) {
   }, [subjectId]);
 
   // 타이핑 이펙트 (텍스트는 즉시 시작)
-  useEffect(() => {
-    if (!isQuestionVisible || !question) return;
-    let i = 0;
-    let cur = '';
-    setDisplayText('');
-    const id = setInterval(() => {
-      if (i < question.length) {
-        cur += question[i++];
-        setDisplayText(cur);
-      } else {
-        clearInterval(id);
-      }
-    }, 100);
-    return () => clearInterval(id);
-  }, [isQuestionVisible, question]);
+  // 고정 속도 타이핑
+  // useEffect(() => {
+  //   if (!isQuestionVisible || !question) return;
+  //   let i = 0;
+  //   let cur = '';
+  //   setDisplayText('');
+  //   const id = setInterval(() => {
+  //     if (i < question.length) {
+  //       cur += question[i++];
+  //       setDisplayText(cur);
+  //     } else {
+  //       clearInterval(id);
+  //     }
+  //   }, 100);
+  //   return () => clearInterval(id);
+  // }, [isQuestionVisible, question]);
+
+  /** ✨ 오디오 청크 시작 시 UI 텍스트를 업데이트하는 콜백 함수 */
+  const handleChunkDisplay = useCallback((chunk: string, isFirst: boolean) => {
+    // 🐞 DEBUG: 이 로그는 useMinimaxTTS의 [TTS_TRACE] 5번 직후에 호출되어야 합니다.
+    console.log(
+      `[TTS_TRACE] 6. UI 청크 표시: "${chunk.slice(0, 10)}..." (isFirst: ${isFirst})`,
+    );
+
+    if (isFirst) {
+      setDisplayText(chunk);
+    } else {
+      setDisplayText((prev) => prev + ' ' + chunk);
+    }
+  }, []);
 
   // unload → finished
   useEffect(() => {
@@ -99,8 +114,14 @@ export default function TalkSession({ childId, mode }: Props) {
 
   // 시작 (모드별 엔드포인트만 다름) — 선준비 후 즉시 재생
   const handleStart = useCallback(async () => {
+    // 🐞 DEBUG: 함수 시작 시간 측정
+    console.log('[TTS_TRACE] 1. handleStart 시작');
+    const t0 = performance.now();
+
     setIsQuestionVisible(true);
     setDisplayText('');
+
+    let textToPlay: string | null = null;
 
     if (mode === 'question') {
       const { data, isSuccess } = await Fetcher<{
@@ -108,17 +129,25 @@ export default function TalkSession({ childId, mode }: Props) {
         question: string;
       }>(API.predesigned(childId), { method: 'GET' });
 
+      // 🐞 DEBUG: 질문 텍스트를 받아오는 API의 응답 시간 측정
+      console.log(
+        `[TTS_TRACE] 2. 질문 API 응답 받음. (소요: ${Math.round(performance.now() - t0)}ms)`,
+      );
+
       if (isSuccess && data) {
         setSubjectId(data.subjectId);
         setQuestion(data.question);
+        textToPlay = data.question;
+        // ✨ 스트리밍 재생 시작, 콜백으로 텍스트 동기화
+        await playStreamSmart(data.question, handleChunkDisplay);
 
-        // ✅ 다음 음성 선준비 → 준비되는 즉시 재생
-        try {
-          const keyOrText = await prepare(data.question);
-          void play(keyOrText);
-        } catch (e) {
-          console.warn('⚠️ TTS 준비 실패(시작 질문)', e);
-        }
+        // // ✅ 다음 음성 선준비 → 준비되는 즉시 재생
+        // try {
+        //   const keyOrText = await prepare(data.question);
+        //   void play(keyOrText);
+        // } catch (e) {
+        //   console.warn('⚠️ TTS 준비 실패(시작 질문)', e);
+        // }
       }
     } else {
       const { data, isSuccess } = await Fetcher<{ subjectId: number }>(
@@ -129,29 +158,47 @@ export default function TalkSession({ childId, mode }: Props) {
         setSubjectId(data.subjectId);
         const first = '얘기해봐!';
         setQuestion(first);
-
         try {
-          const keyOrText = await prepare(first);
-          void play(keyOrText);
+          await playStreamSmart(first, handleChunkDisplay);
         } catch (e) {
           console.warn('⚠️ TTS 준비 실패(자유 첫 멘트)', e);
         }
+        // try {
+        //   const keyOrText = await prepare(first);
+        //   void play(keyOrText);
+        // } catch (e) {
+        //   console.warn('⚠️ TTS 준비 실패(자유 첫 멘트)', e);
+        // }
       }
     }
-  }, [childId, mode, prepare, play]);
+  }, [childId, mode, playStreamSmart, prepare, play]);
 
   // AI의 다음 문장 도착 → 즉시 표시 + 선준비 끝나는 즉시 재생
   const handleAIResponse = useCallback(
     async (ai: string) => {
+      // 🐞 DEBUG: AI 응답 시간 측정 시작
+      console.log('[TTS_TRACE] AI. 1. AI 응답 받음 (VideoRecorder가 호출함)');
+      const t_ai_start = performance.now();
+
       setQuestion(ai); // 화면 텍스트는 즉시 갱신
-      try {
-        const keyOrText = await prepare(ai); // 합성+디코딩 캐시
-        void play(keyOrText); // 캐시 즉시 재생
-      } catch (e) {
-        console.warn('⚠️ TTS 준비 실패(AI 응답)', e);
-      }
+      // ✨ 스트리밍 재생 시작, 콜백으로 텍스트 동기화
+      // 🐞 DEBUG: AI 응답 스트리밍 호출
+      console.log(
+        `[TTS_TRACE] AI. 2. playStreamSmart 호출... (텍스트: "${ai}")`,
+      );
+      await playStreamSmart(ai, handleChunkDisplay);
+      // try {
+      //   const keyOrText = await prepare(ai); // 합성+디코딩 캐시
+      //   void play(keyOrText); // 캐시 즉시 재생
+      // } catch (e) {
+      //   console.warn('⚠️ TTS 준비 실패(AI 응답)', e);
+      // }
+      // 🐞 DEBUG: AI 응답 재생 완료
+      console.log(
+        `[TTS_TRACE] AI. 7. AI 응답 재생 완료. (총 소요: ${Math.round(performance.now() - t_ai_start)}ms)`,
+      );
     },
-    [prepare, play],
+    [playStreamSmart, handleChunkDisplay],
   );
 
   // finished

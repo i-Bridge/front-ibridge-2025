@@ -8,10 +8,18 @@ type TTSSource = {
   dur: number;
 };
 
+// ✨ 스트리밍 옵션 타입
+type StreamOpts = {
+  voice?: string;
+  speed?: number;
+};
+
 export function useMinimaxTTS() {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const cacheRef = useRef<Map<string, TTSSource>>(new Map());
+  const currentAbortRef = useRef<AbortController | null>(null);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     audioCtxRef.current = new (window.AudioContext ||
@@ -92,10 +100,133 @@ export function useMinimaxTTS() {
     },
     [prepare],
   );
+  // ✨ --- 스트리밍 로직 추가 --- ✨
 
+  /** [내부함수] 단일 텍스트 스트리밍 재생 */
+  const _playStreamOnce = useCallback(
+    async (text: string, opts?: StreamOpts) => {
+      currentAbortRef.current?.abort();
+      currentAudioRef.current?.pause?.();
+
+      const controller = new AbortController();
+      currentAbortRef.current = controller;
+
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          voice: opts?.voice ?? 'default',
+          speed: opts?.speed ?? 1,
+          stream: true, // 👈 스트리밍 요청
+          format: 'mp3',
+        }),
+        signal: controller.signal,
+      });
+
+      if (!res.ok || !res.body) throw new Error('Stream fetch failed');
+
+      return new Promise<void>((resolve, reject) => {
+        const mediaSource = new MediaSource();
+        const audioEl = new Audio();
+        audioEl.src = URL.createObjectURL(mediaSource);
+        currentAudioRef.current = audioEl;
+
+        mediaSource.addEventListener(
+          'sourceopen',
+          () => {
+            try {
+              const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+              const reader = res.body!.getReader();
+
+              const updateEndHandler = () => {
+                if (mediaSource.readyState === 'open') {
+                  pump();
+                }
+              };
+
+              sourceBuffer.addEventListener('updateend', updateEndHandler);
+
+              const pump = () => {
+                if (sourceBuffer.updating) return;
+                reader
+                  .read()
+                  .then(({ done, value }) => {
+                    if (done) {
+                      if (!sourceBuffer.updating) {
+                        mediaSource.endOfStream();
+                      }
+                      sourceBuffer.removeEventListener(
+                        'updateend',
+                        updateEndHandler,
+                      );
+                      return;
+                    }
+                    sourceBuffer.appendBuffer(value);
+                  })
+                  .catch(reject);
+              };
+
+              pump();
+
+              setIsSpeaking(true);
+              audioEl.play().catch(reject);
+              audioEl.onended = () => {
+                setIsSpeaking(false);
+                resolve();
+              };
+              audioEl.onerror = (e) => {
+                setIsSpeaking(false);
+                reject(e);
+              };
+            } catch (e) {
+              reject(e);
+            }
+          },
+          { once: true },
+        );
+      });
+    },
+    [],
+  );
+
+  /** 텍스트를 작은 단위로 잘라 순차 스트리밍 + UI 동기화 콜백 */
+  const playStreamSmart = useCallback(
+    async (
+      text: string,
+      onChunkStart: (chunkText: string, isFirstChunk: boolean) => void,
+      opts?: StreamOpts,
+    ) => {
+      const chunks = text
+        .split(/(?<=[\.!\?。！？\n,،])/) // 쉼표(,) 기준으로 잘게 나눔
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      if (chunks.length === 0 && text) chunks.push(text);
+
+      let isFirst = true;
+      for (const chunk of chunks) {
+        onChunkStart(chunk, isFirst); // ✨ UI 업데이트 콜백 호출
+        isFirst = false;
+
+        try {
+          await _playStreamOnce(chunk, opts);
+        } catch (e) {
+          console.warn('⚠️ 스트리밍 실패, 일반 재생으로 폴백:', chunk, e);
+          try {
+            await play(chunk, opts); // 실패 시 기존 방식으로 재생
+          } catch {
+            /* ignore */
+          }
+        }
+      }
+    },
+    [_playStreamOnce, play],
+  );
   return {
     isSpeaking, // 현재 tts가 재생 중인지
     prepare, // 선준비(합성+디코딩)
     play, // 캐시 즉시 재생(없으면 준비 후 재생)
+    playStreamSmart, // ✨ 외부에서 사용할 스트리밍 함수
   };
 }
