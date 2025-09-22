@@ -194,9 +194,14 @@ export default function VideoRecorder({
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; ++i) {
-        finalTranscript += event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
       }
-      console.log('📝 인식된 텍스트:', finalTranscript);
+      if (finalTranscript) {
+        console.log('📝 인식된 텍스트:', finalTranscript);
+      }
+
       setRecognizedText(finalTranscript);
     };
 
