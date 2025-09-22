@@ -173,9 +173,18 @@ export default function TalkSession({ childId, mode }: Props) {
     }
   }, [childId, mode, playStreamSmart, prepare, play]);
 
+  const resetUI = useCallback(() => {
+    setIsFinalMessage(false);
+    setIsQuestionVisible(false);
+    setDisplayText('');
+    setQuestion('');
+    setSubjectId(null);
+    setMouthOpen(false);
+  }, []);
+
   // AI의 다음 문장 도착 → 즉시 표시 + 선준비 끝나는 즉시 재생
   const handleAIResponse = useCallback(
-    async (ai: string) => {
+    async (ai: string, isFinished: boolean) => {
       // 🐞 DEBUG: AI 응답 시간 측정 시작
       console.log('[TTS_TRACE] AI. 1. AI 응답 받음 (VideoRecorder가 호출함)');
       const t_ai_start = performance.now();
@@ -197,8 +206,14 @@ export default function TalkSession({ childId, mode }: Props) {
       console.log(
         `[TTS_TRACE] AI. 7. AI 응답 재생 완료. (총 소요: ${Math.round(performance.now() - t_ai_start)}ms)`,
       );
+      if (isFinished) {
+        console.log('[AI 응답] 마지막 응답이므로 1초 후 UI를 리셋합니다.');
+        setTimeout(() => {
+          resetUI();
+        }, 1000); // 약간의 텀을 주어 자연스러운 전환 유도
+      }
     },
-    [playStreamSmart, handleChunkDisplay],
+    [playStreamSmart, handleChunkDisplay, resetUI],
   );
 
   // finished
@@ -232,32 +247,10 @@ export default function TalkSession({ childId, mode }: Props) {
       .catch((err) => console.warn('⚠️ /finished fetch FAIL', err));
   }, []);
 
-  const resetUI = useCallback(() => {
-    setIsFinalMessage(false);
-    setIsQuestionVisible(false);
-    setDisplayText('');
-    setQuestion('');
-    setSubjectId(null);
-    setMouthOpen(false);
-  }, []);
-
   const handleConversationFinished = useCallback(() => {
     setIsFinalMessage(true);
     sendFinished();
-    const done = () => {
-      resetUI();
-    };
-    if (isSpeakingRef.current) {
-      const watcher = setInterval(() => {
-        if (!isSpeakingRef.current) {
-          clearInterval(watcher);
-          setTimeout(done, 1000);
-        }
-      }, 100);
-    } else {
-      setTimeout(done, 1000);
-    }
-  }, [sendFinished, resetUI]);
+  }, [sendFinished]);
 
   const startBtn = useMemo(
     () => ({
@@ -370,6 +363,7 @@ export default function TalkSession({ childId, mode }: Props) {
         ) : (
           subjectId !== null && (
             <VideoRecorder
+              childId={childId}
               subjectId={subjectId}
               onAIResponse={handleAIResponse}
               onFinished={() => console.log('✅ 녹화 완료')}

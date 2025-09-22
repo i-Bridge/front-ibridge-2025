@@ -1,18 +1,19 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 import { showError } from '@/lib/toast';
 
 export default function VideoRecorder({
+  childId,
   subjectId,
   onAIResponse,
   onFinished, //녹화가 종료됨
   onConversationFinished, //한 주제에 대한 대화가 종료됨
 }: {
+  childId: string;
   subjectId: number | null;
-  onAIResponse: (message: string) => void;
+  onAIResponse: (message: string, isFinished: boolean) => void; // ✅ isFinished 파라미터 추가
   onFinished: () => void;
   onConversationFinished: () => void;
 }) {
@@ -28,8 +29,6 @@ export default function VideoRecorder({
   const [isRecording, setIsRecording] = useState(false);
 
   const [recognizedText, setRecognizedText] = useState('');
-
-  const { childId } = useParams();
 
   const sendAnswer = async () => {
     if (!recognizedText || !subjectId || !childId) {
@@ -51,7 +50,7 @@ export default function VideoRecorder({
 
     if (isSuccess && data) {
       console.log('✅ /answer 응답:', data);
-      onAIResponse(data.ai);
+      onAIResponse(data.ai, data.finished);
 
       if (data.finished) {
         onConversationFinished();
