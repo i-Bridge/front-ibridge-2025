@@ -25,15 +25,16 @@ export default function VideoRecorder({
   const pendingUploadsRef = useRef<string[]>([]);
   // 같은 파일 URL을 중복으로 /uploaded에 보내지 않도록 막는 Set
   const postedSetRef = useRef<Set<string>>(new Set());
+  const recognizedTextRef = useRef('');
 
   const [isRecording, setIsRecording] = useState(false);
 
-  const [recognizedText, setRecognizedText] = useState('');
-
   const sendAnswer = async () => {
-    if (!recognizedText || !subjectId || !childId) {
+    const currentRecognizedText = recognizedTextRef.current;
+
+    if (!currentRecognizedText || !subjectId || !childId) {
       console.log('⚠️ 조건 부족으로 /answer 호출 생략', {
-        recognizedText,
+        recognizedText: currentRecognizedText,
         subjectId,
         childId,
       });
@@ -45,7 +46,7 @@ export default function VideoRecorder({
       ai: string;
     }>(`/child/${childId}/answer`, {
       method: 'POST',
-      data: { subjectId, text: recognizedText },
+      data: { subjectId, text: currentRecognizedText },
     });
 
     if (isSuccess && data) {
@@ -113,8 +114,8 @@ export default function VideoRecorder({
         video: true,
         audio: false,
       });
-      setRecognizedText('');
 
+      recognizedTextRef.current = '';
       answerSentRef.current = false;
       pendingUploadsRef.current = [];
       postedSetRef.current.clear(); // (중복 방지 세트도 라운드 기준으로 초기화 추천)
@@ -200,8 +201,6 @@ export default function VideoRecorder({
       if (finalTranscript) {
         console.log('📝 인식된 텍스트:', finalTranscript);
       }
-
-      setRecognizedText(finalTranscript);
     };
 
     recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
@@ -311,8 +310,7 @@ export default function VideoRecorder({
       <canvas ref={canvasRef} className="hidden" />
 
       <div className="text-gray-700 w-80 p-2 bg-orange-200 rounded shadow-sm text-sm">
-        <strong>🎙️인식된 텍스트:</strong>{' '}
-        {recognizedText || '버튼을 눌러 시작...'}
+        <strong>🎙️버튼을 눌러 말해보세요!</strong>{' '}
       </div>
 
       {!isRecording ? (
