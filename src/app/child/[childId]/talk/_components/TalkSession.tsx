@@ -207,10 +207,10 @@ export default function TalkSession({ childId, mode }: Props) {
         `[TTS_TRACE] AI. 7. AI 응답 재생 완료. (총 소요: ${Math.round(performance.now() - t_ai_start)}ms)`,
       );
       if (isFinished) {
-        console.log('[AI 응답] 마지막 응답이므로 1초 후 UI를 리셋합니다.');
+        console.log('[AI 응답] 마지막 응답이므로 3초 후 UI를 리셋합니다.');
         setTimeout(() => {
           resetUI();
-        }, 1000); // 약간의 텀을 주어 자연스러운 전환 유도
+        }, 3000); // 약간의 텀을 주어 자연스러운 전환 유도
       }
     },
     [playStreamSmart, handleChunkDisplay, resetUI],
