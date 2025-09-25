@@ -1,7 +1,7 @@
 // app/child/[childId]/layout.tsx
 import type { ReactNode } from 'react';
 import ChildShell from './ChildShell';
-import HydrateGameStore from './hydrate/HydrateGameStore';
+import HydrateChildStore from './hydrate/HydrateChildStore';
 import { redirect } from 'next/navigation';
 import { Fetcher, type ApiResponse } from '@/lib/fetcher';
 
@@ -27,7 +27,8 @@ async function getOverview(childId: string): Promise<Overview> {
       `/child/${childId}/home`,
       { method: 'GET' },
     );
-
+    console.log('getoverview 호출');
+    console.log(`[Layout SSR] /home API 응답 데이터:`, res.data);
     // 백엔드 표준 응답(code/message/isSuccess) 처리
     if (res.isSuccess !== true || !res.data) {
       console.warn('[overview] API logical failure:', res);
@@ -64,8 +65,8 @@ export default async function ChildLayout({
   // 2) 클라이언트에서 zustand로 1회 하이드레이트
   // 3) ChildShell에서 pathname 보고 사이드바/HUD 제어
   return (
-    <HydrateGameStore overview={overview}>
+    <HydrateChildStore overview={overview}>
       <ChildShell>{children}</ChildShell>
-    </HydrateGameStore>
+    </HydrateChildStore>
   );
 }

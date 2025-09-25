@@ -18,29 +18,29 @@ export default function ChildShell({ children }: { children: ReactNode }) {
   const hide = shouldHideLayout(pathname ?? '', childId);
 
   return (
-    <div className="min-h-screen flex bg-[#0F1320] text-white">
+    <div className="min-h-screen flex bg-[#FDFDFD] text-gray-800">
       {/* 사이드바 */}
       {!hide && (
-        <aside className="w-64 bg-[#1C1F2A] border-r border-white/10 p-4">
-          <h2 className="text-lg font-bold">Sidebar</h2>
+        <aside className="w-64 bg-[#FFF9E6] border-r border-gray-200 p-4">
+          <h2 className="text-lg font-bold text-[#FF8A3D]">메뉴</h2>
           <nav className="mt-4 space-y-2">
             <Link
               href={`/child/${childId}/reward`}
-              className="block hover:underline"
+              className="block px-3 py-2 rounded-lg bg-[#FFEDD5] hover:bg-[#FFD8A8] transition"
             >
-              Reward
+              🎁 Reward
             </Link>
             <Link
               href={`/child/${childId}/store`}
-              className="block hover:underline"
+              className="block px-3 py-2 rounded-lg bg-[#E0F7FA] hover:bg-[#B2EBF2] transition"
             >
-              Store
+              🛒 Store
             </Link>
             <Link
               href={`/child/${childId}/talk`}
-              className="block hover:underline"
+              className="block px-3 py-2 rounded-lg bg-[#E8F5E9] hover:bg-[#C8E6C9] transition"
             >
-              Talk
+              💬 Talk
             </Link>
           </nav>
         </aside>
@@ -49,8 +49,10 @@ export default function ChildShell({ children }: { children: ReactNode }) {
       {/* 메인 */}
       <div className="flex-1">
         {!hide && (
-          <header className="bg-[#1C1F2A] border-b border-white/10 p-3">
-            <span className="font-semibold">Top HUD 영역</span>
+          <header className="bg-[#FFF9E6] border-b border-gray-200 p-3">
+            <span className="font-semibold text-[#FF8A3D]">
+              ✨ 오늘도 즐겁게 대화해요!
+            </span>
           </header>
         )}
         <main className="p-6">{children}</main>

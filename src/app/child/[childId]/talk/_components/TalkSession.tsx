@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Fetcher } from '@/lib/fetcher';
-import { useMinimaxTTS } from '@/hooks/useMinimaxTTS';
-import VideoRecorder from '@/components/Recorder/VideoRecorder';
+import { useMinimaxTTS } from '@/hooks/useMinimaxTTS'; // ✅ prepare/play 지원 버전
+import VideoRecorder from '../_components/VideoRecorder';
 import { API } from '@/lib/constants';
 
 type TalkMode = 'question' | 'free';
@@ -35,8 +35,8 @@ export default function TalkSession({ childId, mode }: Props) {
   const [mouthOpen, setMouthOpen] = useState(false);
   const [isFinalMessage, setIsFinalMessage] = useState(false);
 
-  // TTS
-  const { speak, cancel, isSpeaking } = useMinimaxTTS();
+  // TTS (prepare / play 분리)
+  const { prepare, play, isSpeaking, playStreamSmart } = useMinimaxTTS();
   useEffect(() => {
     isSpeakingRef.current = isSpeaking;
   }, [isSpeaking]);
@@ -49,7 +49,7 @@ export default function TalkSession({ childId, mode }: Props) {
     return () => id && clearInterval(id);
   }, [isSpeaking]);
 
-  // preload images
+  // 프리로드
   useEffect(() => {
     ['/images/characterDefault.png', '/images/characterTalking.png'].forEach(
       (src) => {
@@ -63,20 +63,37 @@ export default function TalkSession({ childId, mode }: Props) {
     subjectIdRef.current = subjectId;
   }, [subjectId]);
 
-  // typing
-  useEffect(() => {
-    if (!isQuestionVisible || !question) return;
-    let i = 0,
-      cur = '';
-    setDisplayText('');
-    const id = setInterval(() => {
-      if (i < question.length) {
-        cur += question[i++];
-        setDisplayText(cur);
-      } else clearInterval(id);
-    }, 100);
-    return () => clearInterval(id);
-  }, [isQuestionVisible, question]);
+  // 타이핑 이펙트 (텍스트는 즉시 시작)
+  // 고정 속도 타이핑
+  // useEffect(() => {
+  //   if (!isQuestionVisible || !question) return;
+  //   let i = 0;
+  //   let cur = '';
+  //   setDisplayText('');
+  //   const id = setInterval(() => {
+  //     if (i < question.length) {
+  //       cur += question[i++];
+  //       setDisplayText(cur);
+  //     } else {
+  //       clearInterval(id);
+  //     }
+  //   }, 100);
+  //   return () => clearInterval(id);
+  // }, [isQuestionVisible, question]);
+
+  /** ✨ 오디오 청크 시작 시 UI 텍스트를 업데이트하는 콜백 함수 */
+  const handleChunkDisplay = useCallback((chunk: string, isFirst: boolean) => {
+    // 🐞 DEBUG: 이 로그는 useMinimaxTTS의 [TTS_TRACE] 5번 직후에 호출되어야 합니다.
+    console.log(
+      `[TTS_TRACE] 6. UI 청크 표시: "${chunk.slice(0, 10)}..." (isFirst: ${isFirst})`,
+    );
+
+    if (isFirst) {
+      setDisplayText(chunk);
+    } else {
+      setDisplayText((prev) => prev + ' ' + chunk);
+    }
+  }, []);
 
   // unload → finished
   useEffect(() => {
@@ -90,25 +107,47 @@ export default function TalkSession({ childId, mode }: Props) {
   useEffect(
     () => () => {
       setMouthOpen(false);
-      cancel();
+      // play/cancel 분리 구조에서 cancel이 없다면, AudioContext 관리 훅에서 처리
     },
-    [cancel],
+    [],
   );
 
-  // start (mode별 엔드포인트만 다름)
+  // 시작 (모드별 엔드포인트만 다름) — 선준비 후 즉시 재생
   const handleStart = useCallback(async () => {
+    // 🐞 DEBUG: 함수 시작 시간 측정
+    console.log('[TTS_TRACE] 1. handleStart 시작');
+    const t0 = performance.now();
+
     setIsQuestionVisible(true);
     setDisplayText('');
+
+    let textToPlay: string | null = null;
 
     if (mode === 'question') {
       const { data, isSuccess } = await Fetcher<{
         subjectId: number;
         question: string;
       }>(API.predesigned(childId), { method: 'GET' });
+
+      // 🐞 DEBUG: 질문 텍스트를 받아오는 API의 응답 시간 측정
+      console.log(
+        `[TTS_TRACE] 2. 질문 API 응답 받음. (소요: ${Math.round(performance.now() - t0)}ms)`,
+      );
+
       if (isSuccess && data) {
         setSubjectId(data.subjectId);
         setQuestion(data.question);
-        speak(data.question);
+        textToPlay = data.question;
+        // ✨ 스트리밍 재생 시작, 콜백으로 텍스트 동기화
+        await playStreamSmart(data.question, handleChunkDisplay);
+
+        // // ✅ 다음 음성 선준비 → 준비되는 즉시 재생
+        // try {
+        //   const keyOrText = await prepare(data.question);
+        //   void play(keyOrText);
+        // } catch (e) {
+        //   console.warn('⚠️ TTS 준비 실패(시작 질문)', e);
+        // }
       }
     } else {
       const { data, isSuccess } = await Fetcher<{ subjectId: number }>(
@@ -119,18 +158,62 @@ export default function TalkSession({ childId, mode }: Props) {
         setSubjectId(data.subjectId);
         const first = '얘기해봐!';
         setQuestion(first);
-        speak(first);
+        try {
+          await playStreamSmart(first, handleChunkDisplay);
+        } catch (e) {
+          console.warn('⚠️ TTS 준비 실패(자유 첫 멘트)', e);
+        }
+        // try {
+        //   const keyOrText = await prepare(first);
+        //   void play(keyOrText);
+        // } catch (e) {
+        //   console.warn('⚠️ TTS 준비 실패(자유 첫 멘트)', e);
+        // }
       }
     }
-  }, [childId, mode, speak]);
+  }, [childId, mode, playStreamSmart, prepare, play]);
 
-  // next question from AI
+  const resetUI = useCallback(() => {
+    setIsFinalMessage(false);
+    setIsQuestionVisible(false);
+    setDisplayText('');
+    setQuestion('');
+    setSubjectId(null);
+    setMouthOpen(false);
+  }, []);
+
+  // AI의 다음 문장 도착 → 즉시 표시 + 선준비 끝나는 즉시 재생
   const handleAIResponse = useCallback(
-    (ai: string) => {
-      setQuestion(ai);
-      speak(ai);
+    async (ai: string, isFinished: boolean) => {
+      // 🐞 DEBUG: AI 응답 시간 측정 시작
+      console.log('[TTS_TRACE] AI. 1. AI 응답 받음 (VideoRecorder가 호출함)');
+      const t_ai_start = performance.now();
+
+      setQuestion(ai); // 화면 텍스트는 즉시 갱신
+      // ✨ 스트리밍 재생 시작, 콜백으로 텍스트 동기화
+      // 🐞 DEBUG: AI 응답 스트리밍 호출
+      console.log(
+        `[TTS_TRACE] AI. 2. playStreamSmart 호출... (텍스트: "${ai}")`,
+      );
+      await playStreamSmart(ai, handleChunkDisplay);
+      // try {
+      //   const keyOrText = await prepare(ai); // 합성+디코딩 캐시
+      //   void play(keyOrText); // 캐시 즉시 재생
+      // } catch (e) {
+      //   console.warn('⚠️ TTS 준비 실패(AI 응답)', e);
+      // }
+      // 🐞 DEBUG: AI 응답 재생 완료
+      console.log(
+        `[TTS_TRACE] AI. 7. AI 응답 재생 완료. (총 소요: ${Math.round(performance.now() - t_ai_start)}ms)`,
+      );
+      if (isFinished) {
+        console.log('[AI 응답] 마지막 응답이므로 3초 후 UI를 리셋합니다.');
+        setTimeout(() => {
+          resetUI();
+        }, 3000); // 약간의 텀을 주어 자연스러운 전환 유도
+      }
     },
-    [speak],
+    [playStreamSmart, handleChunkDisplay, resetUI],
   );
 
   // finished
@@ -164,33 +247,10 @@ export default function TalkSession({ childId, mode }: Props) {
       .catch((err) => console.warn('⚠️ /finished fetch FAIL', err));
   }, []);
 
-  const resetUI = useCallback(() => {
-    setIsFinalMessage(false);
-    setIsQuestionVisible(false);
-    setDisplayText('');
-    setQuestion('');
-    setSubjectId(null);
-    setMouthOpen(false);
-  }, []);
-
   const handleConversationFinished = useCallback(() => {
     setIsFinalMessage(true);
     sendFinished();
-    const done = () => {
-      cancel();
-      resetUI();
-    };
-    if (isSpeakingRef.current) {
-      const watcher = setInterval(() => {
-        if (!isSpeakingRef.current) {
-          clearInterval(watcher);
-          setTimeout(done, 1000);
-        }
-      }, 100);
-    } else {
-      setTimeout(done, 1000);
-    }
-  }, [cancel, sendFinished, resetUI]);
+  }, [sendFinished]);
 
   const startBtn = useMemo(
     () => ({
@@ -210,7 +270,9 @@ export default function TalkSession({ childId, mode }: Props) {
     <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
       {/* 캐릭터 */}
       <motion.div
-        className={`relative bottom-[-50px] transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
+        className={`relative bottom-[-50px] transition-all duration-300 ${
+          isImageLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
         animate={{ scale: isSpeaking ? 1.03 : 1 }}
         transition={{ duration: 0.3 }}
       >
@@ -247,15 +309,18 @@ export default function TalkSession({ childId, mode }: Props) {
               <p className="text-xl text-gray-900 text-center break-words whitespace-pre-wrap px-10 leading-relaxed">
                 {displayText}
               </p>
+
               {isQuestionVisible && (
                 <button
-                  onClick={() => speak(question)}
+                  onClick={() => void play(question)} // ✅ 캐시 즉시 재생(미스면 내부에서 준비→재생)
                   className="absolute right-6 top-1/2 -translate-y-1/2 transition-transform hover:scale-110"
                   style={{
                     background: 'transparent',
                     padding: 0,
                     border: 'none',
                   }}
+                  aria-label="다시 듣기"
+                  title="다시 듣기"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -298,6 +363,7 @@ export default function TalkSession({ childId, mode }: Props) {
         ) : (
           subjectId !== null && (
             <VideoRecorder
+              childId={childId}
               subjectId={subjectId}
               onAIResponse={handleAIResponse}
               onFinished={() => console.log('✅ 녹화 완료')}
