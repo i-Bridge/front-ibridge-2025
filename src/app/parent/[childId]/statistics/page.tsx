@@ -28,7 +28,7 @@ export default async function StatisticsPage({ params }: ChildPageParams) {
 
   const statisticRes = await Fetcher<StatisticData>(`/parent/${childId}/stat`);
   const statisticData = statisticRes.data;
-  console.log("로그 찍기",statisticData);
+  console.log("분석 /stat api 호출 ",statisticData);
   if (!statisticData) {
     return <div>분석 데이터 불러오기 실패...</div>;
   }
