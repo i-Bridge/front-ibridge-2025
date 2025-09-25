@@ -1,4 +1,3 @@
-// app/components/Statistic/CumulateChart.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -6,6 +5,7 @@ import { Fetcher } from '@/lib/fetcher';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
+  ChartOptions,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -16,85 +16,108 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
-interface CumulateAPI{
- cumList: number[];
+interface CumulateAPI {
+  cumList: number[];
 }
 
 interface CumulateChartProps {
   childId: string;
-  defaultCumList: number[]; // 기본 "일" 기준 데이터
+  defaultCumList: number[];
 }
 
 export default function CumulateChart({ childId, defaultCumList }: CumulateChartProps) {
- const [periodType, setPeriodType] = useState<'day' | 'week' | 'month'>('day'); 
+  const [periodType, setPeriodType] = useState<'day' | 'week' | 'month'>('day');
   const [cumList, setCumList] = useState<number[]>(defaultCumList);
 
-    // range 바뀔 때마다 API 호출
   useEffect(() => {
     async function fetchCumulateData() {
       try {
         const cumulateRes = await Fetcher<CumulateAPI>(
-          `/parent/${childId}/stat/cumulative?periodType=${periodType}` 
+          `/parent/${childId}/stat/cumulative?periodType=${periodType}`
         );
-        const cumulateData=cumulateRes.data;
-        setCumList(cumulateData?.cumList ?? []);
-        console.log("cumulateData",cumulateData?.cumList);
+        setCumList(cumulateRes.data?.cumList ?? []);
       } catch (err) {
         console.error(err);
       }
     }
 
-    // 기본 데이터는 이미 있으니까, periodType가 day일 때는 재호출 안 함
-    //if (periodType !== 'day') {
-      fetchCumulateData();
-    
+    fetchCumulateData();
   }, [periodType, childId]);
 
+  // X축 레이블 생성
+  const generateLabels = () => {
+    const length = cumList.length || 7;
+    const labels: string[] = [];
+    for (let i = length - 1; i >= 0; i--) {
+      if (periodType === 'day') labels.push(`${i}일 전`);
+      else if (periodType === 'week') labels.push(`${i}주 전`);
+      else if (periodType === 'month') labels.push(`${i}달 전`);
+    }
+    // 마지막 요소를 오늘 / 이번 주 / 이번 달로 변경
+    if (labels.length > 0) {
+      labels[labels.length - 1] = periodType === 'day' ? '오늘' : periodType === 'week' ? '이번 주' : '이번 달';
+    }
+    return labels;
+  };
 
-const labels = ['1','2','3','4','5','6','7'];
-const chartdata = {
-  labels,
-  datasets: [
-    {
-      label: '누적 답변 수',
-      data: cumList,
-      borderColor: '#3b82f6',
-      backgroundColor: 'rgba(59, 130, 246, 0.2)',
-      tension: 0.4, // 곡선 모양
-      fill: true,
-      pointRadius: 0, // 점 없애기
+  const chartdata = {
+    labels: generateLabels(),
+    datasets: [
+      {
+        label: '누적 답변 수',
+        data: cumList,
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+        tension: 0.4,
+        fill: true,
+        pointRadius: 0,
+      },
+    ],
+  };
+
+const chartoptions: ChartOptions<'line'> = {
+  responsive: true,
+  plugins: {
+    legend: { display: false },
+  },
+  scales: {
+    x: {
+      type: 'category',
+      grid: { display: false },
+      ticks: {
+        maxRotation: 45,
+        minRotation: 45,
+        align: 'end' as const,
+        autoSkip: false,
+      },
     },
-  ],
+    y: {
+      type: 'linear',
+      beginAtZero: true,
+      ticks: {
+        precision: 0, // 소수 제거
+      },
+    },
+  },
 };
 
-  const chartoptions = {
-    responsive: true,
-    plugins: {
-      legend: { display: false },
-    },
-    scales: {
-      x: { grid: { display: false } },
-      y: { beginAtZero: true },
-    },
-  };
-console.log("cumList",cumList);
   return (
-    <div className="flex flex-col items-center justify-center border rounded p-4 text-center space-y-4 w-[400px]">
+    <div className="flex flex-col  text-center space-y-2">
       {/* 상단 버튼 */}
-      <div className="flex space-x-2">
+      <div className="flex space-x-2 justify-end mr-4">
         {['day', 'week', 'month'].map((option) => (
           <button
             key={option}
             onClick={() => setPeriodType(option as 'day' | 'week' | 'month')}
-            className={`px-3 py-1 rounded ${
+            className={`px-3 py-1 rounded-full text-sm ${
               periodType === option ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
             }`}
           >
-            {option === 'day' ? '일' : option === 'week' ? '주' : '달'}
+            {option === 'day' ? '일별' : option === 'week' ? '주별' : '월별'}
           </button>
         ))}
       </div>
-      
+
       {/* 그래프 */}
       <div style={{ width: '100%', height: 200 }}>
         <Line data={chartdata} options={chartoptions} />

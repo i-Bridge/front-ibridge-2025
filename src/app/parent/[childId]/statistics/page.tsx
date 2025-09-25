@@ -25,10 +25,9 @@ export default async function StatisticsPage({ params }: ChildPageParams) {
     return <div> 자녀 정보 없음 </div>;
   }
 
-
   const statisticRes = await Fetcher<StatisticData>(`/parent/${childId}/stat`);
   const statisticData = statisticRes.data;
-  console.log("분석 /stat api 호출 ",statisticData);
+  console.log('분석 /stat api 호출 ', statisticData);
   if (!statisticData) {
     return <div>분석 데이터 불러오기 실패...</div>;
   }
@@ -41,10 +40,19 @@ export default async function StatisticsPage({ params }: ChildPageParams) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 왼쪽: 달력 + 누적 데이터 */}
           <div className="flex flex-col gap-6 items-center justify-center">
-            <Calendar childId={childId} defaultemotions={statisticData.emotions}/>
-            <p className="text-sm text-gray-500">누적 응답 수</p>
-            <p className="text-lg font-bold">{statisticData.cumulative}</p>
-            <CumulateChart childId={childId} defaultCumList={statisticData.cumList}/>
+            <Calendar
+              childId={childId}
+              defaultemotions={statisticData.emotions}
+            />
+            <div className="flex flex-col items-center border rounded p-4  space-y-6 w-[400px]">
+              <p className="text-sm text-gray-500 ">누적 응답 수</p>
+              <p className="text-lg font-bold w-10 h-10 bg-gray-200 rounded-full ">{statisticData.cumulative}</p>
+              <hr className="w-2/3 border-t border-gray-300 " />
+              <CumulateChart
+                childId={childId}
+                defaultCumList={statisticData.cumList}
+              />
+            </div>
           </div>
 
           {/* 오른쪽: 키워드 파이차트 */}
