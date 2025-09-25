@@ -84,7 +84,7 @@ export default function DropMotionMypage({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-10 h-10 rounded-full p-1 mt-1"
+              className="w-10 h-10 rounded-full p-1 mt-1 transition-colors duration-200 ease-in-out hover:text-orange-600"
             >
               <path
                 strokeLinecap="round"
