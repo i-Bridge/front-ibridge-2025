@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Fetcher } from '@/lib/fetcher';
 import { Child } from '@/types';
+import ParentDropdown from './_components/ParentDropDown';  
 
 export const dynamic = 'force-dynamic';
 
@@ -43,20 +44,9 @@ export default async function Profile() {
         </p>
       </div>
 
-      {/* 부모 계정 프로필 */}
-      <div className="bg-white flex justify-center items-center flex-wrap gap-8 p-8">
-        {profileData.children.map((child) => (
-          <div key={child.id} className="flex flex-col items-center ">
-            <Link href={`/parent/${child.id}/home`}>
-              <div className="text-center w-32">
-                <div className="break-words text-xl h-32 bg-i-lightgreen rounded-full hover:shadow-md hover:bg-i-lightgreen/70 cursor-pointer flex flex-col justify-between items-center text-white py-10">
-                  <div>{child.name}</div>
-                  <span className="text-sm text-orange-100">부모님</span>
-                </div>
-              </div>
-            </Link>
-          </div>
-        ))}
+      {/* 우측 상단 부모 드롭다운 */}
+      <div className="absolute top-6 right-6">
+        <ParentDropdown childrenData={profileData.children} />
       </div>
 
       {/* 자식 계정 프로필 */}
