@@ -13,33 +13,49 @@ import {
   eachDayOfInterval,
   format,
   getDay,
-} from "date-fns";
+  startOfDay,
+} from 'date-fns';
 
-const WEEKDAYS = ["월", "화", "수", "목", "금", "토", "일"];
+const WEEKDAYS = ['월', '화', '수', '목', '금', '토', '일'];
 
 interface CalendarProps {
   childId: string;
   defaultemotions: string[];
+  signupDate: string;
 }
 
-export default function Calendar({ childId, defaultemotions }: CalendarProps) {
+export default function Calendar({
+  childId,
+  defaultemotions,
+  signupDate,
+}: CalendarProps) {
   const today = new Date();
+  const signup = new Date(signupDate);
+
   const [currentDate, setCurrentDate] = useState(today);
-  const [prevYearMonth, setPrevYearMonth] = useState({ year: today.getFullYear(), month: today.getMonth() + 1 });
-  const [emotions, setEmotions] = useState<EmotionId[]>(defaultemotions.map((e) => Number(e)));
+  const [prevYearMonth, setPrevYearMonth] = useState({
+    year: today.getFullYear(),
+    month: today.getMonth() + 1,
+  });
+  const [emotions, setEmotions] = useState<EmotionId[]>(
+    defaultemotions.map((e) => Number(e)),
+  );
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1;
 
-  // 현재 달인지 체크
-  const isCurrentMonth =
-    year === today.getFullYear() && month === today.getMonth() + 1;
+  const startMonth = startOfMonth(currentDate);
+  const endMonth = endOfMonth(currentDate);
+  const signupMonthStart = startOfMonth(signup);
+  const currentMonthStart = startOfMonth(today);
 
-  // 선택한 연월이 바뀔 때 API 호출
+  const isCurrentMonth = startMonth.getTime() === currentMonthStart.getTime();
+  const isSignupMonth = startMonth.getTime() === signupMonthStart.getTime();
+
+  // 연월 변경 시 API 호출
   useEffect(() => {
     if (year !== prevYearMonth.year || month !== prevYearMonth.month) {
-      // API 호출 전 감정 초기화 (로딩 상태)
-      setEmotions([]);
+      setEmotions([]); // 로딩 상태
 
       async function fetchEmotions() {
         const dateStr = `${year}-${String(month).padStart(2, '0')}-01`;
@@ -47,15 +63,14 @@ export default function Calendar({ childId, defaultemotions }: CalendarProps) {
           const res = await Fetcher<{ emotions: string[] }>(
             `/parent/${childId}/stat/emotion?date=${dateStr}`,
           );
-
           if (res.isSuccess && res.data?.emotions) {
-            const numEmotions: EmotionId[] = res.data.emotions.map((e) => Number(e));
-            setEmotions(numEmotions);
+            setEmotions(res.data.emotions.map((e) => Number(e)));
           } else {
             setEmotions([]);
           }
         } catch (err) {
           console.error(err);
+          setEmotions([]);
         }
       }
 
@@ -64,31 +79,35 @@ export default function Calendar({ childId, defaultemotions }: CalendarProps) {
     }
   }, [year, month, childId]);
 
-  // 달력 날짜 계산
-  const startMonth = startOfMonth(currentDate);
-  const endMonth = endOfMonth(currentDate);
-  const startDate = startOfWeek(startMonth, { weekStartsOn: 1 }); // 월요일 시작
+  const startDate = startOfWeek(startMonth, { weekStartsOn: 1 });
   const endDate = endOfWeek(endMonth, { weekStartsOn: 1 });
   const calendarDays = eachDayOfInterval({ start: startDate, end: endDate });
 
-  // 이전/다음 달 이동
-  const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
+  const prevMonth = () => {
+    if (!isSignupMonth) setCurrentDate(subMonths(currentDate, 1));
+  };
   const nextMonth = () => {
-    if (!isCurrentMonth) {
-      setCurrentDate(addMonths(currentDate, 1));
-    }
+    if (!isCurrentMonth) setCurrentDate(addMonths(currentDate, 1));
   };
 
   return (
     <div className="border p-4 rounded w-[400px]">
       {/* 상단: 이전/다음 화살표 */}
       <div className="flex items-center justify-between mb-6">
-        <button onClick={prevMonth}>«</button>
-        <span className="font-semibold">{format(currentDate, "yyyy년 M월")}</span>
+        <button
+          onClick={prevMonth}
+          disabled={isSignupMonth}
+          className={`px-2 ${isSignupMonth ? 'opacity-40 ' : ''}`}
+        >
+          «
+        </button>
+        <span className="font-semibold">
+          {format(currentDate, 'yyyy년 M월')}
+        </span>
         <button
           onClick={nextMonth}
           disabled={isCurrentMonth}
-          className={`px-2 ${isCurrentMonth ? "opacity-40 " : ""}`}
+          className={`px-2 ${isCurrentMonth ? 'opacity-40 ' : ''}`}
         >
           »
         </button>
@@ -97,49 +116,62 @@ export default function Calendar({ childId, defaultemotions }: CalendarProps) {
       {/* 요일 표시 */}
       <div className="grid grid-cols-7 text-center font-medium mb-2 gap-5">
         {WEEKDAYS.map((d) => (
-          <div className="bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center text-sm" key={d}>{d}</div>
+          <div
+            className="bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center text-sm"
+            key={d}
+          >
+            {d}
+          </div>
         ))}
       </div>
 
-      {/* 달력 날짜 */}
+      {/* 날짜 표시 */}
       <div className="grid grid-cols-7 gap-2">
         {calendarDays.map((day) => {
-          // 이번 달만 표시
-          if (day.getMonth() + 1 !== month) return <div key={day.toString()}></div>;
-
-          // 미래 날짜는 표시하지 않음
-          if (day > today) return <div key={day.toString()}></div>;
+          // 이번 달 외 날짜는 공백
+          if (day.getMonth() + 1 !== month)
+            return <div key={day.toString()}></div>;
 
           const dayNumber = day.getDate();
-          const isWeekend = getDay(day) === 0 || getDay(day) === 6;
-
-          // emotions 배열 1일 = index 0
-          const emotionID = emotions[dayNumber - 1] ?? null;
-          const emotion = EMOTIONS.find((e) => e.id === emotionID);
-
-          // 로딩 상태
+          const isBeforeSignupDay =
+            isSignupMonth &&
+            startOfDay(day).getTime() < startOfDay(signup).getTime();
+          const isFutureDay = isCurrentMonth && day > today;
           const isLoading = emotions.length === 0;
-          const dayColorClass = isLoading
-            ? "text-gray-400"       // 로딩 중 모두 회색
-            : isWeekend
-              ? "text-red-500"      // 로딩 끝나면 주말 빨강
-              : "";
+
+          let content: React.ReactNode = <span>{dayNumber}</span>;
+          let dayColorClass = '';
+
+          if (isLoading || isFutureDay || isBeforeSignupDay) {
+            // 로딩, 미래, 가입 이전 날짜는 회색
+            dayColorClass = 'text-gray-400';
+          } else {
+            // 가입 이후 날짜 또는 다른 달
+            const emotionID = emotions[dayNumber - 1] ?? null;
+            const emotion = EMOTIONS.find((e) => e.id === emotionID);
+            if (emotion) {
+              content = (
+                <>
+                  <span className="text-xl group-hover:opacity-20">
+                    {emotion.emoji}
+                  </span>
+                  <span className="absolute opacity-0 group-hover:opacity-100 text-sm">
+                    {dayNumber}
+                  </span>
+                </>
+              );
+            }
+            // 주말 색상
+            const isWeekend = getDay(day) === 0 || getDay(day) === 6;
+            dayColorClass = isWeekend ? 'text-red-500' : '';
+          }
 
           return (
             <div
               key={day.toString()}
               className={`relative w-10 h-10 flex items-center justify-center cursor-pointer group ${dayColorClass}`}
             >
-              {emotion ? (
-                <>
-                  <span className="text-xl group-hover:opacity-20">{emotion.emoji}</span>
-                  <span className="absolute opacity-0 group-hover:opacity-100 text-sm">
-                    {dayNumber}
-                  </span>
-                </>
-              ) : (
-                <span>{dayNumber}</span>
-              )}
+              {content}
             </div>
           );
         })}
