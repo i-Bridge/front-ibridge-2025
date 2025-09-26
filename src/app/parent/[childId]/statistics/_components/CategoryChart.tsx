@@ -10,35 +10,43 @@ interface Keyword {
 }
 
 interface CategoryChartProps {
-  categories?: Keyword[]; // 실제 API 데이터는 여기로 전달
+  categories?: Keyword[];
   childId: string;
 }
 
-// count 기반으로 원 반지름 계산 (예: 20~80px)
+// count 기반 크기 계산
 const sizeScale = (count: number, maxCount: number) => {
   const minR = 20;
   const maxR = 80;
-  return minR + ((count / maxCount) * (maxR - minR));
+  return minR + (count / maxCount) * (maxR - minR);
 };
 
-// positiveScore 기반 색상 (0 -> 하늘, 1 -> 주황)
+// positiveScore 기반 색상
 const getColor = (score: number) => {
-  const r = Math.round(0 + score * (255 - 0));       // 0 -> 255
-  const g = Math.round(191 + score * (165 - 191));   // 191 -> 165
-  const b = Math.round(255 + score * (0 - 255));     // 255 -> 0
+  const r = Math.round(0 + score * (255 - 0));
+  const g = Math.round(191 + score * (165 - 191));
+  const b = Math.round(255 + score * (0 - 255));
   return `rgb(${r},${g},${b})`;
 };
 
-export default function CategoryChart({ categories: propCategories, childId }: CategoryChartProps) {
+export default function CategoryChart({
+  categories: propCategories,
+  childId,
+}: CategoryChartProps) {
   const [activeKeyword, setActiveKeyword] = useState<string | null>(null);
-  const containerSize = 400;
-  const center = containerSize / 2;
+  const [fullscreenMode, setFullscreenMode] = useState(false);
 
-  // ===================
+  // ================
+  // 고정 캔버스 크기 (픽셀)
+  // ================
+  const containerWidth = 800;
+  const containerHeight = 500;
+  const centerX = containerWidth / 2;
+  const centerY = containerHeight / 2;
+
   // 더미 데이터
-  // ===================
   const USE_DUMMY_DATA = true;
-const dummyCategories: Keyword[] = [
+  const dummyCategories: Keyword[] = [
     { keyword: '친구들과 놀이터에서', count: 15, positiveScore: 0.8 },
     { keyword: '공룡', count: 10, positiveScore: 0.6 },
     { keyword: '아빠와의 갈등', count: 5, positiveScore: 0.2 },
@@ -47,55 +55,78 @@ const dummyCategories: Keyword[] = [
   ];
 
   const categories = USE_DUMMY_DATA ? dummyCategories : propCategories || [];
-
-  if (!categories.length) return null; // 데이터 없으면 렌더링 X
-
+  if (!categories.length) return null;
   const maxCount = Math.max(...categories.map((c) => c.count));
 
-  // ===================
-  // 원 위치 계산 (나선형 배치)
-  // ===================
-  const positions = (() => {
-    const radii = categories.map((c) => sizeScale(c.count, maxCount));
-    const pos: { x: number; y: number }[] = [];
+  // =====================
+  // 배치 (나선형)
+  // =====================
+const positions = (() => {
+  const radii = categories.map((c) => sizeScale(c.count, maxCount));
+  const pos: { x: number; y: number }[] = [];
 
-    radii.forEach((r, i) => {
-      if (i === 0) {
-        pos.push({ x: center, y: center });
-      } else {
-        let angle = 0;
-        let spiralRadius = radii[0] + r; // 첫 원 중심에서 시작
-        let placed = false;
+  radii.forEach((r, i) => {
+    if (i === 0) {
+      pos.push({ x: centerX, y: centerY });
+    } else {
+      let angle = 0;
+      let spiralRadius = radii[0] + r;
+      let placed = false;
 
-        while (!placed) {
-          const x = center + Math.cos(angle) * spiralRadius;
-          const y = center + Math.sin(angle) * spiralRadius;
+      while (!placed) {
+        const x = centerX + Math.cos(angle) * spiralRadius;
+        const y = centerY + Math.sin(angle) * spiralRadius;
 
-          let overlap = pos.some((p, j) => {
-            const d = Math.hypot(x - p.x, y - p.y);
-            return d < r + radii[j] + 2; // 2px 여유
-          });
+        const overlap = pos.some((p, j) => {
+          const d = Math.hypot(x - p.x, y - p.y);
+          return d < r + radii[j] + 2;
+        });
 
-          if (!overlap) {
-            pos.push({ x, y });
-            placed = true;
-          }
+        if (
+          !overlap &&
+          x - r >= 0 &&
+          x + r <= containerWidth &&
+          y - r >= 0 &&
+          y + r <= containerHeight
+        ) {
+          pos.push({ x, y });
+          placed = true;
+        }
 
-          angle += 0.1;
-          if (angle > Math.PI * 2) {
-            angle = 0;
-            spiralRadius += 5;
-          }
+        angle += 0.1;
+        if (angle > Math.PI * 2) {
+          angle = 0;
+          spiralRadius += 5;
         }
       }
-    });
+    }
+  });
 
-    return pos;
-  })();
+  // ===============
+  // 중앙 보정 추가
+  // ===============
+  const avgX = pos.reduce((sum, p) => sum + p.x, 0) / pos.length;
+  const avgY = pos.reduce((sum, p) => sum + p.y, 0) / pos.length;
+  const offsetX = centerX - avgX;
+  const offsetY = centerY - avgY;
 
-  // ===================
-  // 렌더링
-  // ===================
+  return pos.map((p) => ({
+    x: p.x + offsetX,
+    y: p.y + offsetY,
+  }));
+})();
+
+
+  const handleClick = (keyword: string) => {
+    if (fullscreenMode && activeKeyword === keyword) {
+      setFullscreenMode(false);
+      setActiveKeyword(null);
+    } else {
+      setActiveKeyword(keyword);
+      setFullscreenMode(true);
+    }
+  };
+
   return (
     <div>
       <h3 className="text-lg font-semibold mb-1">분석 결과</h3>
@@ -103,31 +134,65 @@ const dummyCategories: Keyword[] = [
         답변 15개 쌓일 때마다 업데이트 진행됩니다.
       </p>
 
-      <div className="relative w-[400px] h-[400px]  -mt-24">
+      {/* 고정 크기 컨테이너 */}
+      <div
+        className="relative border"
+        style={{ width: `${containerWidth}px`, height: `${containerHeight}px` }}
+      >
         {categories.map((cat, idx) => {
           const radius = sizeScale(cat.count, maxCount);
           const color = getColor(cat.positiveScore);
           const { x, y } = positions[idx];
+          const isActive = fullscreenMode && activeKeyword === cat.keyword;
 
           return (
             <motion.div
               key={cat.keyword}
-              className="absolute flex flex-col items-center justify-center rounded-full text-white cursor-pointer"
+              className="absolute flex flex-col items-center justify-center text-white cursor-pointer"
               style={{
-                width: radius * 2,
-                height: radius * 2,
                 backgroundColor: color,
-                left: x - radius,
-                top: y - radius,
-                zIndex: Math.min(Math.floor(radius), 48), // 큰 원이 위
+                zIndex: isActive ? 999 : 1,
+                borderRadius: isActive ? 0 : '50%',
+                display: fullscreenMode && !isActive ? 'none' : 'flex',
+                padding: 4,
+                boxSizing: 'border-box',
+                overflowWrap: 'break-word',
+                textAlign: 'center',
               }}
-              animate={{ scale: activeKeyword === cat.keyword ? 1.2 : 1 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-              onClick={() =>
-                setActiveKeyword(activeKeyword === cat.keyword ? null : cat.keyword)
-              }
+              whileHover={{
+                scale: !fullscreenMode ? 1.2 : 1,
+                zIndex: 1000,
+              }}
+              animate={{
+                scale: fullscreenMode && isActive ? 1 : 1,
+                width: isActive ? containerWidth : radius * 2,
+                height: isActive ? containerHeight : radius * 2,
+                left: isActive ? 0 : x - radius,
+                top: isActive ? 0 : y - radius,
+                borderRadius: isActive ? 0 : '50%',
+              }}
+              transition={{
+                type: 'spring',
+                stiffness: 300,
+                damping: 25,
+                duration: isActive ? 0.5 : 0.3,
+              }}
+              onClick={() => handleClick(cat.keyword)}
             >
-              <span className="text-xs font-bold text-center">{cat.keyword}</span>
+              {isActive && (
+                <button
+                  className="absolute top-2 right-2 text-white text-lg font-bold"
+                  onClick={() => {
+                    setFullscreenMode(false);
+                    setActiveKeyword(null);
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+              <span className="text-xs font-bold break-words text-center">
+                {cat.keyword}
+              </span>
               <span className="text-[10px] mt-1">
                 {cat.positiveScore >= 0.7
                   ? '긍정'
