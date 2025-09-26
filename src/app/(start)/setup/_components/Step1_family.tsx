@@ -9,7 +9,7 @@ interface DupFamilyNameData {
   exist: boolean;
 }
 
-const Step1 = () => {
+const Step1_family = () => {
   {
     /* */
   }
@@ -176,4 +176,4 @@ const Step1 = () => {
   );
 };
 
-export default Step1;
+export default Step1_family;
