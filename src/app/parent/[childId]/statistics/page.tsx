@@ -1,11 +1,12 @@
 import CumulateChart from '@/app/parent/[childId]/statistics/_components/CumulateChart';
-import KeywordChart from '@/app/parent/[childId]/statistics/_components/KeywordChart';
+import CategoryChart from '@/app/parent/[childId]/statistics/_components/CategoryChart';
 import Calendar from '@/app/parent/[childId]/statistics/_components/Calendar';
 import HomeHeader from '@/components/Header/HomeHeader';
 import { ChildPageParams } from '@/types/page-props';
 import { Fetcher } from '@/lib/fetcher';
 
 interface StatisticData {
+  signupDate: string; // 가입일
   cumulative: number; // 누적 응답 수
   emotions: string[]; // 감정 배열 (예: "JOY", "ANXIETY")
   cumList: number[]; // 일별 응답 수 (오늘 포함 7일)
@@ -43,10 +44,11 @@ export default async function StatisticsPage({ params }: ChildPageParams) {
             <Calendar
               childId={childId}
               defaultemotions={statisticData.emotions}
+              signupDate={statisticData.signupDate}
             />
-            <div className="flex flex-col items-center border rounded p-4  space-y-6 w-[400px]">
+            <div className="flex flex-col items-center border rounded p-4  space-y-4 w-[400px]">
               <p className="text-sm text-gray-500 ">누적 응답 수</p>
-              <p className="text-lg font-bold w-10 h-10 bg-gray-200 rounded-full ">{statisticData.cumulative}</p>
+              <p className="text-lg font-bold w-10 h-10 text-center  rounded-full ">{statisticData.cumulative}</p>
               <hr className="w-2/3 border-t border-gray-300 " />
               <CumulateChart
                 childId={childId}
@@ -57,7 +59,7 @@ export default async function StatisticsPage({ params }: ChildPageParams) {
 
           {/* 오른쪽: 키워드 파이차트 */}
           <div className="flex flex-col gap-6">
-            <KeywordChart />
+            <CategoryChart categories={statisticData.keywords} childId={childId}/>
           </div>
         </div>
       </div>
