@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Fetcher } from '@/lib/fetcher';
-import { EMOTIONS, API, type EmotionId } from '@/constants/emotions';
+import { EmotionId, EMOTIONS } from '@/constants/emotions';
+import { API } from '@/constants/api';
 
 type Props = {
   childId: string; // ✅ string으로 고정
