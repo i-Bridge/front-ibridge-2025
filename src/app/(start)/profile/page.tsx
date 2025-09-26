@@ -41,6 +41,7 @@ export default async function Profile() {
         <p>
           <strong>🏠 </strong> {profileData.familyName}
           <strong> 🏠</strong>
+          
         </p>
       </div>
 

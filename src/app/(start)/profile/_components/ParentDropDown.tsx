@@ -13,8 +13,8 @@ export default function ParentDropdown({ childrenData }: { childrenData: Child[]
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >
-      {/* 관리자 아이콘 (집 모양) */}
-      <button className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
+      {/* 아이콘 버튼 */}
+      <button className="p-2 rounded-full  hover:bg-gray-100">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -26,14 +26,15 @@ export default function ParentDropdown({ childrenData }: { childrenData: Child[]
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
+            d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z"
           />
         </svg>
       </button>
 
+
       {/* 드롭다운 */}
       {open && (
-        <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-lg border overflow-hidden z-50">
+        <div className="absolute right-0  w-56 bg-white shadow-lg rounded-lg  overflow-hidden z-50">
           <div className="p-2 text-gray-700 font-semibold border-b">부모님 계정</div>
           <ul className="max-h-60 overflow-auto">
             {childrenData.map((child) => (
