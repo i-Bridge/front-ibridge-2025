@@ -262,7 +262,7 @@ const MailRow = ({
 
       {/* 드롭다운 내용 */}
       {open && (
-        <div className="absolute z-10 mt-2 w-96 right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+        <div className="absolute z-49 mt-2 w-96 right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-bold text-center ">메일함</h3>
             <button
