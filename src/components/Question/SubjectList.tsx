@@ -6,7 +6,7 @@ import { useHomeData } from '@/hooks/parentHome/useHomeData';
 import StyledQuestionList from './StyledQuestionList';
 import SubjectTitleEdit from './SubjectTitleEdit';
 import AnalysisList from './AnalysisList';
-import Loading from '../UI/Loading';
+import Loading from '../UI/LoadingAnim';
 
 type Subject = {
   subjectId: number;
