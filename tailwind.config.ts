@@ -8,6 +8,11 @@ export default {
   ],
   theme: {
     extend: {
+      keyframes: {
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
+        },
+      },
       colors: {
         'i-orange': '#FF662D',
         'i-skyblue': '#57b5ce',

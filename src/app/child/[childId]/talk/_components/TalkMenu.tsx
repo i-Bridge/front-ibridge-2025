@@ -2,12 +2,11 @@
 
 import Link from 'next/link';
 import { Fetcher } from '@/lib/fetcher';
-import { EmotionId, EMOTIONS } from '@/constants/emotions';
+import { EmotionId } from '@/constants/emotions';
 import { API } from '@/constants/api';
 import { useRouter } from 'next/navigation';
 import { useChildStore } from '@/store/useChildStore';
 import EmotionModal from './EmotionModal';
-
 
 type Props = {
   childId: string; // ✅ string으로 고정
