@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export const runtime = 'nodejs';
+export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
-
+export const preferredRegion = 'icn1'; // or 'hnd1'
 const BASE_URLS = [
   'https://api.minimax.io/v1/t2a_v2',
   'https://api.minimaxi.chat/v1/t2a_v2',

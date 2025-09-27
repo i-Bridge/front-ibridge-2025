@@ -1,18 +1,19 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useCallback, useRef, useState } from 'react';
 import { Fetcher } from '@/lib/fetcher';
 import { showError } from '@/lib/toast';
 
 export default function VideoRecorder({
+  childId,
   subjectId,
   onAIResponse,
   onFinished, //녹화가 종료됨
   onConversationFinished, //한 주제에 대한 대화가 종료됨
 }: {
+  childId: string;
   subjectId: number | null;
-  onAIResponse: (message: string) => void;
+  onAIResponse: (message: string, isFinished: boolean) => void;
   onFinished: () => void;
   onConversationFinished: () => void;
 }) {
@@ -24,34 +25,34 @@ export default function VideoRecorder({
   const pendingUploadsRef = useRef<string[]>([]);
   // 같은 파일 URL을 중복으로 /uploaded에 보내지 않도록 막는 Set
   const postedSetRef = useRef<Set<string>>(new Set());
+  // ✅ [수정] UI용 state를 제거하고, 데이터 처리용 ref만 남깁니다.
+  const recognizedTextRef = useRef('');
 
-  const [isRecording, setIsRecording] = useState(false);
+  const [isRecording, setIsRecording] = useState(false); // const [recognizedText, setRecognizedText] = useState('');
+  // ❌ [제거] UI와 연결된 useState를 완전히 제거합니다.
+  const sendAnswer = useCallback(async () => {
+    const currentRecognizedText = recognizedTextRef.current;
 
-  const [recognizedText, setRecognizedText] = useState('');
-
-  const { childId } = useParams();
-
-  const sendAnswer = async () => {
-    if (!recognizedText || !subjectId || !childId) {
+    if (!currentRecognizedText || !subjectId || !childId) {
       console.log('⚠️ 조건 부족으로 /answer 호출 생략', {
-        recognizedText,
+        currentRecognizedText,
         subjectId,
         childId,
       });
       return;
     }
-    console.log('✉️ 텍스트만 /answer로 전송');
+    console.log('✉️ 텍스트만 /answer로 전송:', currentRecognizedText);
     const { data, isSuccess } = await Fetcher<{
       finished: boolean;
       ai: string;
     }>(`/child/${childId}/answer`, {
       method: 'POST',
-      data: { subjectId, text: recognizedText },
+      data: { subjectId, text: currentRecognizedText },
     });
 
     if (isSuccess && data) {
       console.log('✅ /answer 응답:', data);
-      onAIResponse(data.ai);
+      onAIResponse(data.ai, data.finished);
 
       if (data.finished) {
         onConversationFinished();
@@ -68,9 +69,8 @@ export default function VideoRecorder({
     } else {
       console.error('❌ /answer 실패');
     }
-  };
+  }, [childId, subjectId, onAIResponse, onConversationFinished, onFinished]);
 
-  // ✅ 공통: 업로드된 파일 URL을 백엔드에 즉시 알림
   const postUploaded = async (fileUrl: string | null) => {
     if (!fileUrl || !subjectId || !childId) {
       console.log('⚠️ /uploaded 전송 조건 불충족', {
@@ -80,18 +80,15 @@ export default function VideoRecorder({
       });
       return;
     }
-
     if (!answerSentRef.current) {
       console.log('⏸ /answer 대기중 → 업로드 보류:', fileUrl);
       pendingUploadsRef.current.push(fileUrl);
       return;
     }
-
     if (postedSetRef.current.has(fileUrl)) {
       console.log('🚫 중복 /uploaded 스킵 (이미 전송된 URL):', fileUrl);
       return;
     }
-
     try {
       console.log('📤 /uploaded 전송:', { subjectId, file: fileUrl });
       await Fetcher(`/child/${childId}/uploaded`, {
@@ -107,18 +104,17 @@ export default function VideoRecorder({
 
   const startRecording = async () => {
     if (isRecording || mediaRecorderRef.current) return;
-
     try {
       console.log('🎬 녹화 시작 요청됨');
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: false,
       });
-      setRecognizedText('');
-
+      // ✅ [수정] ref만 초기화합니다.
+      recognizedTextRef.current = '';
       answerSentRef.current = false;
       pendingUploadsRef.current = [];
-      postedSetRef.current.clear(); // (중복 방지 세트도 라운드 기준으로 초기화 추천)
+      postedSetRef.current.clear();
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
@@ -133,13 +129,14 @@ export default function VideoRecorder({
       };
 
       recorder.onstop = async () => {
-        console.log('🛑 녹화 종료됨');
+        console.log('🛑 [MediaRecorder] 녹화 종료됨');
         const blob = new Blob(chunks, { type: 'video/webm' });
         console.log('📦 영상 Blob 생성 완료, 업로드 시작');
-        await uploadVideo(blob, 'video');
         mediaStream.getTracks().forEach((track) => track.stop());
-        stopSTT();
         mediaRecorderRef.current = null;
+
+        await uploadVideo(blob, 'video');
+        await captureAndUploadThumbnail();
       };
 
       mediaRecorderRef.current = recorder;
@@ -152,35 +149,29 @@ export default function VideoRecorder({
     }
   };
 
-  const stopRecording = async () => {
-    console.log('🛑 녹화 종료 버튼 클릭됨');
-    mediaRecorderRef.current?.stop();
-    recognitionRef.current?.stop();
-    setIsRecording(false);
-
-    try {
-      await sendAnswer();
-      await captureAndUploadThumbnail();
-    } catch (e) {
-      console.warn('⚠️ 썸네일 캡처/업로드 실패:', e);
+  const stopRecording = () => {
+    console.log('🛑 녹화/음성인식 종료 신호 보냄');
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop();
     }
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+    setIsRecording(false);
   };
+
+  const handleRecognitionEnd = useCallback(async () => {
+    console.log(
+      '🏁 [SpeechRecognition] 완전히 종료됨. 이제 답변을 전송합니다.',
+    );
+    await sendAnswer();
+  }, [sendAnswer]);
 
   const startSTT = () => {
     console.log('🎤 음성 인식 시작');
-
     const SpeechRecognitionConstructor =
-      (
-        window as typeof window & {
-          webkitSpeechRecognition: new () => SpeechRecognition;
-        }
-      ).SpeechRecognition ||
-      (
-        window as typeof window & {
-          webkitSpeechRecognition: new () => SpeechRecognition;
-        }
-      ).webkitSpeechRecognition;
-
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
     if (!SpeechRecognitionConstructor) {
       showError('이 브라우저는 음성 인식을 지원하지 않습니다.');
       return;
@@ -194,23 +185,26 @@ export default function VideoRecorder({
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; ++i) {
-        finalTranscript += event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
       }
-      console.log('📝 인식된 텍스트:', finalTranscript);
-      setRecognizedText(finalTranscript);
+      if (finalTranscript) {
+        console.log('📝 확정 텍스트 추가:', finalTranscript);
+        // ✅ [수정] ref의 값을 직접 업데이트합니다.
+        recognizedTextRef.current += finalTranscript + ' ';
+      }
     };
 
     recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
       console.error('🎤 음성 인식 오류:', e);
     };
 
+    // ✅ [수정] 'onend'가 표준 타입에 없어 TypeScript 오류가 발생할 수 있으므로, 'as any'로 타입 단언을 추가합니다.
+    (recognition as any).onend = handleRecognitionEnd;
+
     recognitionRef.current = recognition;
     recognition.start();
-  };
-
-  const stopSTT = () => {
-    recognitionRef.current?.stop();
-    console.log('🛑 음성 인식 종료');
   };
 
   const captureAndUploadThumbnail = async () => {
@@ -222,8 +216,8 @@ export default function VideoRecorder({
       });
       return;
     }
-
     console.log('🖼 썸네일 캡처 중...');
+
     const canvas = canvasRef.current;
     const video = videoRef.current;
     canvas.width = video.videoWidth;
@@ -245,17 +239,17 @@ export default function VideoRecorder({
         },
       );
 
-      if (!data?.url) {
-        console.error('❌ 썸네일 URL 획득 실패');
-        return;
-      }
+      if (!data?.url) return console.error('❌ 썸네일 URL 획득 실패');
 
-      const res = await fetch(data.url, { method: 'PUT', body: blob });
+      const res = await fetch(data.url, {
+        method: 'PUT',
+        body: blob,
+      });
+
       if (res.ok) {
         const s3Url = data.url.split('?')[0];
         console.log('✅ 썸네일 S3 업로드 완료:', s3Url);
 
-        // 🔹 썸네일 업로드 후 즉시 /uploaded 전송
         await postUploaded(s3Url);
       } else {
         console.error('❌ 썸네일 업로드 실패');
@@ -264,9 +258,7 @@ export default function VideoRecorder({
   };
 
   const uploadVideo = async (blob: Blob, type: 'video') => {
-    if (!subjectId) return;
-
-    console.log(`☁️ ${type} Presigned URL 요청`);
+    if (!subjectId || !childId) return;
     const { data } = await Fetcher<{ url: string }>(
       `/child/${childId}/getURL`,
       {
@@ -303,12 +295,13 @@ export default function VideoRecorder({
       <video
         ref={videoRef}
         className="w-80 h-60 bg-black rounded shadow-sm mt-4"
+        autoPlay
+        muted
       />
       <canvas ref={canvasRef} className="hidden" />
 
       <div className="text-gray-700 w-80 p-2 bg-orange-200 rounded shadow-sm text-sm">
-        <strong>🎙️인식된 텍스트:</strong>{' '}
-        {recognizedText || '버튼을 눌러 시작...'}
+        <strong>🎙️버튼을 눌러 말해보세요!</strong>{' '}
       </div>
 
       {!isRecording ? (

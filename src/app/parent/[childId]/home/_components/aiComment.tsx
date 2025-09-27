@@ -9,6 +9,7 @@ const bannerTitles = [
   '요즘 아이가 자주 관심을 갖는 주제는 무엇일까요?',
 ];
 
+
 const mockupData = [
   '최근 아이는 슬라임에 관심이 많으며, 다양한 재료를 섞어보는 것을 즐기고 있습니다.',
 
@@ -38,6 +39,7 @@ export default function AiComment(childname: {childname: string}) {
     const randomIndex = Math.floor(Math.random() * bannerTitles.length);
     setCurrentTitle(bannerTitles[randomIndex]);
   };
+
 
   // 타이핑 애니메이션
   useEffect(() => {
@@ -95,7 +97,6 @@ export default function AiComment(childname: {childname: string}) {
               
             </div>
           </div>
-
           {/* 배너 요소 그리드 컨테이너 */}
           <div className="flex flex-wrap justify-center gap-4">
             {mockupData.map((text, index) => (
