@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import type { EmotionId, EmotionOption } from '@/lib/constants';
-import { EMOTIONS } from '@/lib/constants';
+import type { EmotionId, EmotionOption } from '@/constants/emotions';
+import { EMOTIONS } from '@/constants/emotions';
 
 type EmotionModalProps = {
   /** 모달 열림 여부 */

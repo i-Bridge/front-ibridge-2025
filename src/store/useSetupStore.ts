@@ -25,7 +25,7 @@ interface SetupState {
 }
 
 export const useSetupStore = create<SetupState>((set) => ({
-  step: 1,
+  step: 0,
   familyName: '',
   childrenCount: 0,
   currentChildIndex: 0,
@@ -57,7 +57,7 @@ export const useSetupStore = create<SetupState>((set) => ({
 
   resetSetupStore: () =>
     set({
-      step: 1,
+      step: 0,
       familyName: '',
       childrenCount: 0,
       currentChildIndex: 0,

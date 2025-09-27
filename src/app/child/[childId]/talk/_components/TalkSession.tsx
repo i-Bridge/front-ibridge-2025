@@ -4,9 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Fetcher } from '@/lib/fetcher';
+import { API } from '@/constants/emotions';
 import { useMinimaxTTS } from '@/hooks/useMinimaxTTS'; // ✅ prepare/play 지원 버전
 import VideoRecorder from '../_components/VideoRecorder';
-import { API } from '@/lib/constants';
+
+
 
 type TalkMode = 'question' | 'free';
 

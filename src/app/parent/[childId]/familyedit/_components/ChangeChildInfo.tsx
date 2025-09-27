@@ -161,6 +161,7 @@ export default function ChangeChildInfo() {
           data: { childId: child.childId },
         });
       }
+      console.log('삭제 완료', child.childId);
       setFamilyInfo((prev) => {
         if (!prev) return prev;
         return {
@@ -168,7 +169,7 @@ export default function ChangeChildInfo() {
           children: prev.children.filter((c) => c !== child),
         };
       });
-      window.location.reload();
+      //window.location.reload();
     } catch (error) {
       console.error('삭제 실패:', error);
     }

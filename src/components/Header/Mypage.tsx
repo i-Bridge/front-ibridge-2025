@@ -24,7 +24,7 @@ export default function Mypage({
   userEmail,
 }: MypageDataProps) {
   return (
-    <div>
+    <div className="z-50">
       <div className="flex items-center p-4 border-b ">
         <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
           <svg

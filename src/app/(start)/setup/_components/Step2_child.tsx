@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { Fetcher } from '@/lib/fetcher';
 import { toast } from 'sonner';
 
-const Step2 = () => {
+const Step2_child = () => {
   const router = useRouter();
 
   const {
@@ -209,4 +209,4 @@ const Step2 = () => {
   );
 };
 
-export default Step2;
+export default Step2_child;

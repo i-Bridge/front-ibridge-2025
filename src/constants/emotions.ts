@@ -34,22 +34,5 @@ export const EMOTION_BY_ID: Record<EmotionId, EmotionOption> = EMOTIONS.reduce(
 export const isEmotionId = (x: unknown): x is EmotionId =>
   typeof x === 'number' && EMOTIONS.some((e) => e.id === x);
 
-//
-// API 경로(항상 string childId 사용)
-//
-export const API = {
-  childHome: (childId: string) => `/child/${childId}/home`,
-  emotion: (childId: string) => `/child/${childId}/emotion`,
-  predesigned: (childId: string) => `/child/${childId}/predesigned`,
-  new: (childId: string) => `/child/${childId}/new`,
-  finished: (childId: string) => `/child/${childId}/finished`,
-} as const;
 
-//
-// 라우트 경로 헬퍼(항상 string childId 사용)
-//
-export const ROUTES = {
-  talk: (childId: string) => `/child/${childId}/talk`,
-  talkQuestion: (childId: string) => `/child/${childId}/talk/question`,
-  talkFree: (childId: string) => `/child/${childId}/talk/free`,
-} as const;
+
