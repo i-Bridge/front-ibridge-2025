@@ -11,6 +11,7 @@ interface Keyword {
 
 interface CategoryChartProps {
   categories?: Keyword[];
+  childname: string;
   childId: string;
 }
 
@@ -31,6 +32,7 @@ const getColor = (score: number) => {
 
 export default function CategoryChart({
   categories: propCategories,
+  childname,
   childId,
 }: CategoryChartProps) {
   const [activeKeyword, setActiveKeyword] = useState<string | null>(null);
@@ -39,8 +41,8 @@ export default function CategoryChart({
   // ================
   // 고정 캔버스 크기 (픽셀)
   // ================
-  const containerWidth = 800;
-  const containerHeight = 500;
+  const containerWidth = 600;
+  const containerHeight = 400;
   const centerX = containerWidth / 2;
   const centerY = containerHeight / 2;
 
@@ -61,61 +63,60 @@ export default function CategoryChart({
   // =====================
   // 배치 (나선형)
   // =====================
-const positions = (() => {
-  const radii = categories.map((c) => sizeScale(c.count, maxCount));
-  const pos: { x: number; y: number }[] = [];
+  const positions = (() => {
+    const radii = categories.map((c) => sizeScale(c.count, maxCount));
+    const pos: { x: number; y: number }[] = [];
 
-  radii.forEach((r, i) => {
-    if (i === 0) {
-      pos.push({ x: centerX, y: centerY });
-    } else {
-      let angle = 0;
-      let spiralRadius = radii[0] + r;
-      let placed = false;
+    radii.forEach((r, i) => {
+      if (i === 0) {
+        pos.push({ x: centerX, y: centerY });
+      } else {
+        let angle = 0;
+        let spiralRadius = radii[0] + r;
+        let placed = false;
 
-      while (!placed) {
-        const x = centerX + Math.cos(angle) * spiralRadius;
-        const y = centerY + Math.sin(angle) * spiralRadius;
+        while (!placed) {
+          const x = centerX + Math.cos(angle) * spiralRadius;
+          const y = centerY + Math.sin(angle) * spiralRadius;
 
-        const overlap = pos.some((p, j) => {
-          const d = Math.hypot(x - p.x, y - p.y);
-          return d < r + radii[j] + 2;
-        });
+          const overlap = pos.some((p, j) => {
+            const d = Math.hypot(x - p.x, y - p.y);
+            return d < r + radii[j] + 2;
+          });
 
-        if (
-          !overlap &&
-          x - r >= 0 &&
-          x + r <= containerWidth &&
-          y - r >= 0 &&
-          y + r <= containerHeight
-        ) {
-          pos.push({ x, y });
-          placed = true;
-        }
+          if (
+            !overlap &&
+            x - r >= 0 &&
+            x + r <= containerWidth &&
+            y - r >= 0 &&
+            y + r <= containerHeight
+          ) {
+            pos.push({ x, y });
+            placed = true;
+          }
 
-        angle += 0.1;
-        if (angle > Math.PI * 2) {
-          angle = 0;
-          spiralRadius += 5;
+          angle += 0.1;
+          if (angle > Math.PI * 2) {
+            angle = 0;
+            spiralRadius += 5;
+          }
         }
       }
-    }
-  });
+    });
 
-  // ===============
-  // 중앙 보정 추가
-  // ===============
-  const avgX = pos.reduce((sum, p) => sum + p.x, 0) / pos.length;
-  const avgY = pos.reduce((sum, p) => sum + p.y, 0) / pos.length;
-  const offsetX = centerX - avgX;
-  const offsetY = centerY - avgY;
+    // ===============
+    // 중앙 보정 추가
+    // ===============
+    const avgX = pos.reduce((sum, p) => sum + p.x, 0) / pos.length;
+    const avgY = pos.reduce((sum, p) => sum + p.y, 0) / pos.length;
+    const offsetX = centerX - avgX;
+    const offsetY = centerY - avgY;
 
-  return pos.map((p) => ({
-    x: p.x + offsetX,
-    y: p.y + offsetY,
-  }));
-})();
-
+    return pos.map((p) => ({
+      x: p.x + offsetX,
+      y: p.y + offsetY,
+    }));
+  })();
 
   const handleClick = (keyword: string) => {
     if (fullscreenMode && activeKeyword === keyword) {
@@ -129,7 +130,9 @@ const positions = (() => {
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-1">분석 결과</h3>
+      <h3 className="text-lg font-semibold mb-1">
+        {childname || '아이'}의 분석 결과
+      </h3>
       <p className="text-xs text-gray-400 mb-4">
         답변 15개 쌓일 때마다 업데이트 진행됩니다.
       </p>
@@ -197,8 +200,8 @@ const positions = (() => {
                 {cat.positiveScore >= 0.7
                   ? '긍정'
                   : cat.positiveScore <= 0.3
-                  ? '부정'
-                  : ''}
+                    ? '부정'
+                    : ''}
               </span>
             </motion.div>
           );

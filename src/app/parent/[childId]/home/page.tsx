@@ -13,6 +13,7 @@ interface Subject {
 }
 
 interface HomeData {
+  name: string; // 자녀 이름
   subjects: Subject[];
 }
 
@@ -39,7 +40,7 @@ export default async function HomePage({ params }: ChildPageParams) {
       {/* 헤더에 알림 개수 정보 전달 필요 */}
       <div className="flex flex-col space-y-14">
         <HomeHeader childId={childId} />
-        <AiComment />
+        <AiComment childname={homeData.name} />
       </div>
       <div className="flex flex-col justify-center items-center w-full pt-3">
         <div className="pt-4">

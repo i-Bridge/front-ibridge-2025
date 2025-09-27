@@ -91,7 +91,7 @@ export default function Calendar({
   };
 
   return (
-    <div className="border p-4 rounded w-[400px]">
+    <div className="border p-4 rounded w-[350px]">
       {/* 상단: 이전/다음 화살표 */}
       <div className="flex items-center justify-between mb-6">
         <button

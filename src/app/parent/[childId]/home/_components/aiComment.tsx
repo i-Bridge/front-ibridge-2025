@@ -28,7 +28,7 @@ const emojiData = [
   '😄', // 다섯 번째 문장 - 친구와 즐겁게 놀면서 기분이 좋아진 상태
 ];
 
-export default function AiComment() {
+export default function AiComment(childname: {childname: string}) {
   const [displayedText, setDisplayedText] = useState('');
   const [currentTitle, setCurrentTitle] = useState('');
   const typingIntervalRef = useRef<number | null>(null);
@@ -86,9 +86,13 @@ export default function AiComment() {
           {/* 배너 설명 멘트 */}
           <div className="bg-orange-100 h-1/2 max-w-5xl rounded-3xl flex  justify-center items-center p-6 min-h-[3rem] mb-8">
             <div className="min-h-[2rem]">
+              <h2 className=" text-gray-900 ">
+                {childname.childname}의 이야기
+              </h2>
               <h2 className="text-xl font-bold text-center text-gray-900 ">
                 {displayedText}
               </h2>
+              
             </div>
           </div>
 
