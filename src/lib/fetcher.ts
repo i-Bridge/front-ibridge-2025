@@ -57,16 +57,6 @@ export async function Fetcher<T = undefined>(
       baseHeaders['Authorization'] = `Bearer ${accessToken}`;
       baseHeaders['Provider'] = provider || '';
     }
-    
-    {
-      /* console.log('🚀 요청 정보:', {
-      url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
-      method: options.method ?? 'GET',
-      headers: baseHeaders,
-      params: options.params,
-      data: options.data,
-    }); */
-    }
 
     const res = await axios({
       url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,

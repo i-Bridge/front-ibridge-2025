@@ -9,6 +9,7 @@ const bannerTitles = [
   '요즘 아이가 자주 관심을 갖는 주제는 무엇일까요?',
 ];
 
+
 interface AICommentData {
   childname: string; // 자녀 이름
   cumulativeAnswerCount: number;
@@ -39,6 +40,7 @@ export default function AiComment({
     const randomIndex = Math.floor(Math.random() * bannerTitles.length);
     setCurrentTitle(bannerTitles[randomIndex]);
   };
+
 
   // 타이핑 애니메이션
   useEffect(() => {
