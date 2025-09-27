@@ -6,6 +6,7 @@ import { useHomeData } from '@/hooks/parentHome/useHomeData';
 import StyledQuestionList from './StyledQuestionList';
 import SubjectTitleEdit from './SubjectTitleEdit';
 import AnalysisList from './AnalysisList';
+import Loading from '../UI/Loading';
 
 type Subject = {
   subjectId: number;
@@ -60,11 +61,7 @@ const SubjectList = ({ initialSubjects }: Props) => {
       >
         <div className="w-full max-w-2xl space-y-2 px-4 mb-10 mt-2">
           {loading ? (
-            <div className="flex items-center justify-center space-x-2 mt-4">
-              <span className="w-2 h-2 bg-gray-200 rounded-full animate-bounce [animation-delay:-0.3s]" />
-              <span className="w-2 h-2 bg-gray-200 rounded-full animate-bounce [animation-delay:-0.15s]" />
-              <span className="w-2 h-2 bg-gray-200 rounded-full animate-bounce" />
-            </div>
+            <Loading/>
           ) : subjects.length === 0 ? (
             <div className="text-center text-gray-500 mt-3 text-sm">
               질문이 없습니다.
