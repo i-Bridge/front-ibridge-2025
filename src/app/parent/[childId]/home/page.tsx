@@ -1,6 +1,6 @@
 import { Fetcher } from '@/lib/fetcher';
 import HomeHeader from '@/components/Header/HomeHeader';
-import AiComment from './_components/aiComment';
+import AiComment from './_components/AiComment';
 import MonthSelector from './_components/MonthSelector';
 import Weekly from './_components/Weekly';
 import SubjectList from '@/components/Question/SubjectList';
