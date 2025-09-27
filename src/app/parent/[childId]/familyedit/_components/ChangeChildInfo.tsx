@@ -169,7 +169,7 @@ export default function ChangeChildInfo() {
           children: prev.children.filter((c) => c !== child),
         };
       });
-      //window.location.reload();
+      window.location.reload();
     } catch (error) {
       console.error('삭제 실패:', error);
     }
