@@ -8,7 +8,6 @@ import { useMinimaxTTS } from '@/hooks/useMinimaxTTS';
 import VideoRecorder from './VideoRecorder'; // VideoRecorder 경로에 맞게 수정
 import { Fetcher } from '@/lib/fetcher';
 
-// ✅ [수정] Props 타입: 'mode' 대신, 서버에서 직접 가져온 초기 데이터를 받도록 변경되었습니다.
 type Props = {
   childId: string;
   initialSubjectId: number;
@@ -26,7 +25,7 @@ export default function TalkSession({
   const isSpeakingRef = useRef(false); // state
 
   // ✅ [수정] state를 props로 초기화합니다. 대화가 진행되면서 AI의 다음 질문으로 바뀌어야 하므로 state로 관리합니다.
-  const [subjectId, setSubjectId] = useState<number>(initialSubjectId);
+  const [subjectId] = useState<number>(initialSubjectId);
   const [question, setQuestion] = useState<string>(initialQuestion);
   const [displayText, setDisplayText] = useState('');
   // ✅ [수정] isQuestionVisible은 이제 항상 true로 시작하여, 시작 버튼 없이 바로 대화 화면을 보여줍니다.
@@ -126,15 +125,11 @@ export default function TalkSession({
   }, [initialQuestion, playStreamSmart, handleChunkDisplay]);
 
   const resetUI = useCallback(() => {
-    // TODO: 대화 종료 후 '뒤로가기' 또는 다른 페이지로 이동하는 로직을 여기에 추가하세요.
-    // 예: window.location.href = `/child/${childId}/talk`;
-    setIsFinalMessage(false);
-    setIsQuestionVisible(false);
-    setDisplayText('');
-    setQuestion('');
-    setSubjectId(0);
-    setMouthOpen(false);
-  }, []);
+    console.log(
+      `[TalkSession] 대화 종료. ${`/child/${childId}/talk`} 경로로 이동합니다.`,
+    );
+    window.location.href = `/child/${childId}/talk`;
+  }, [childId]);
 
   const handleAIResponse = useCallback(
     async (ai: string, isFinished: boolean) => {
