@@ -6,12 +6,17 @@ import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import { useDateStore } from '@/store/useDateStore';
-import { Type1Notice, Type2Notice, Type3Notice } from './MailTypes';
+import {
+  Type1Notice,
+  Type2Notice,
+  Type3Notice,
+  Type4Notice,
+} from './MailTypes';
 import emitter from '@/lib/eventBus';
 
 interface Notice {
   noticeId: number;
-  type: 1 | 2 | 3;
+  type: 1 | 2 | 3 | 4;
   senderId: number | null;
   senderName: string | null;
   time: string;
@@ -142,102 +147,145 @@ export default function MailBox() {
     }
   }
 
-  const filteredNotices = noticeData?.notices
-    ?.filter((mail) => !mail.accept);
+  // 🔹 모두 열람 버튼 핸들러
+  const handleReadAll = async () => {
+    const res = await Fetcher('/parent/notice/readAll', {
+      method: 'POST',
+    });
+
+    if (res.isSuccess) {
+      await fetchNoticeData(setNoticeData, setError, setLoading);
+    } else {
+      console.error('모두 열람 실패:', res.message);
+    }
+  };
+
+  const filteredNotices = noticeData?.notices?.filter((mail) => !mail.accept);
 
   // 🔹 카드 그룹 나누기
   const row1Mails = filteredNotices?.filter((mail) => mail.type !== 1) || [];
   const row2Mails = filteredNotices?.filter((mail) => mail.type === 1) || [];
 
- 
   // 🔹 MailRow 재사용
-const MailRow = ({
-  mails,
-  label,
-  loading,
-  error,
-}: {
-  mails: Notice[];
-  label?: string;
-  loading?: boolean;
-  error?: string | null;
-}) =>  {
-  const [startIdx, setStartIdx] = useState(0);
+  const MailRow = ({
+    mails,
+    label,
+    loading,
+    error,
+  }: {
+    mails: Notice[];
+    label?: string;
+    loading?: boolean;
+    error?: string | null;
+  }) => {
+    const [startIdx, setStartIdx] = useState(0);
 
-  const handlePrev = () => setStartIdx((prev) => Math.max(prev - MAX_VISIBLE, 0));
-  const handleNext = () =>
-    setStartIdx((prev) => Math.min(prev + MAX_VISIBLE, mails.length - MAX_VISIBLE));
+    const handlePrev = () =>
+      setStartIdx((prev) => Math.max(prev - MAX_VISIBLE, 0));
+    const handleNext = () =>
+      setStartIdx((prev) =>
+        Math.min(prev + MAX_VISIBLE, mails.length - MAX_VISIBLE),
+      );
 
-  const visibleMails = mails.slice(startIdx, startIdx + MAX_VISIBLE);
+    const visibleMails = mails.slice(startIdx, startIdx + MAX_VISIBLE);
 
-  return (
-    <div className="mb-4">
-      {label && <div className="text-sm text-gray-500 mb-2">{label}</div>}
+    return (
+      <div className="mb-4">
+      {label && (
+  <div className="flex items-center justify-between mb-2">
+    <div className="text-sm text-gray-500">{label}</div>
+    {label === '답변 열람' && (
+      <button
+        onClick={handleReadAll}
+        disabled={mails.length === 0} // 🔹 메일 없으면 비활성화
+        className={`text-xs px-2 py-1 rounded border 
+          ${mails.length === 0 
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+          }`}
+      >
+        모두 열람
+      </button>
+    )}
+  </div>
+)}
 
-     <div className="flex flex-col gap-2 border border-gray-200 rounded-lg ">
-        {loading ? (
-          <div className="p-2 text-sm text-gray-500">로딩 중...</div>
-        ) : error ? (
-          <div className="p-2 text-sm text-red-500">{error}</div>
-        ) : mails.length === 0 ? (
-          <div className="p-2 text-sm text-gray-500">새로운 알림이 없습니다.</div>
-        ) : (
-          visibleMails.map((mail) => {
-            switch (mail.type) {
-              case 1:
-                return (
-                  <Type1Notice
-                    key={mail.noticeId}
-                    mail={mail}
-                    onView={() =>
-                      handleView(mail.noticeId, mail.senderId, mail.subject, mail.time)
-                    }
-                  />
-                );
-              case 2:
-                return (
-                  <Type2Notice
-                    key={mail.noticeId}
-                    mail={mail}
-                    onAccept={() => handleAccept(mail.senderId)}
-                    onDecline={() => handleDecline(mail.senderId)}
-                  />
-                );
-              case 3:
-                return <Type3Notice key={mail.noticeId} />;
-              
-              default:
-                return null;
-            }
-          })
+        <div className="flex flex-col gap-2 border border-gray-200 rounded-lg ">
+          {loading ? (
+            <div className=" text-sm text-gray-500 p-6">로딩 중...</div>
+          ) : error ? (
+            <div className="p-2 text-sm text-red-500">{error}</div>
+          ) : mails.length === 0 ? (
+            <div className=" text-sm text-gray-500 p-6">
+              새로운 알림이 없습니다.
+            </div>
+          ) : (
+            visibleMails.map((mail) => {
+              switch (mail.type) {
+                case 1:
+                  return (
+                    <Type1Notice
+                      key={mail.noticeId}
+                      mail={mail}
+                      onView={() =>
+                        handleView(
+                          mail.noticeId,
+                          mail.senderId,
+                          mail.subject,
+                          mail.time,
+                        )
+                      }
+                    />
+                  );
+                case 2:
+                  return (
+                    <Type2Notice
+                      key={mail.noticeId}
+                      mail={mail}
+                      onAccept={() => handleAccept(mail.senderId)}
+                      onDecline={() => handleDecline(mail.senderId)}
+                    />
+                  );
+                case 3:
+                  return <Type3Notice key={mail.noticeId} mail={mail} />;
+                case 4:
+                  return <Type4Notice key={mail.noticeId} mail={mail} />;
+                default:
+                  return null;
+              }
+            })
+          )}
+        </div>
+
+        {mails.length > MAX_VISIBLE && (
+          <div className="flex justify-center mt-2 gap-2">
+            <button
+              onClick={handlePrev}
+              disabled={startIdx === 0}
+              className={`w-8 h-6 flex items-center justify-center rounded-full border  bg-gray-100 hover:bg-gray-200 ${
+                startIdx === 0
+                  ? 'text-gray-300 cursor-not-allowed'
+                  : 'text-black'
+              }`}
+            >
+              {'<'}
+            </button>
+            <button
+              onClick={handleNext}
+              disabled={startIdx >= mails.length - MAX_VISIBLE}
+              className={`w-8 h-6 flex items-center justify-center rounded-full border  bg-gray-100 hover:bg-gray-200 ${
+                startIdx >= mails.length - MAX_VISIBLE
+                  ? 'text-gray-300 cursor-not-allowed'
+                  : 'text-black'
+              }`}
+            >
+              {'>'}
+            </button>
+          </div>
         )}
       </div>
-
-      {mails.length > MAX_VISIBLE && (
-        <div className="flex justify-center mt-2 gap-2">
-  <button
-    onClick={handlePrev}
-    disabled={startIdx === 0}
-    className={`w-8 h-6 flex items-center justify-center rounded-full border  bg-gray-100 hover:bg-gray-200 ${
-      startIdx === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-black'
-    }`}
-  >
-    {'<'}
-  </button>
-  <button
-    onClick={handleNext}
-    disabled={startIdx >= mails.length - MAX_VISIBLE}
-    className={`w-8 h-6 flex items-center justify-center rounded-full border  bg-gray-100 hover:bg-gray-200 ${
-      startIdx >= mails.length - MAX_VISIBLE ? 'text-gray-300 cursor-not-allowed' : 'text-black'
-    }`}
-  >
-    {'>'}
-  </button>
-</div>
-      )}
-    </div>
-  );
-};
+    );
+  };
 
   return (
     <div className="relative inline-block text-left">
@@ -261,32 +309,25 @@ const MailRow = ({
       </button>
 
       {/* 드롭다운 내용 */}
-      {open && (
-        <div className="absolute z-49 mt-2 w-96 right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-bold text-center ">메일함</h3>
-            <button
-              onClick={() => setOpen(false)}
-              className="text-red-700 hover:text-red-900 font-bold"
-            >
-              X
-            </button>
-          </div>
+      
+{open && (
+  <div className="absolute z-49 mt-2 w-96 right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+    <div className="flex justify-between items-center mb-4">
+      <h3 className="text-lg font-bold text-center ">메일함</h3>
+      <button
+        onClick={() => setOpen(false)}
+        className="text-red-700 hover:text-red-900 font-bold"
+      >
+        X
+      </button>
+    </div>
 
-          {loading ? (
-            <div className="p-4 text-sm text-gray-500">로딩 중...</div>
-          ) : error ? (
-            <div className="p-4 text-sm text-red-500">{error}</div>
-          ) : (!row1Mails.length && !row2Mails.length) ? (
-            <div className="p-4 text-sm text-gray-500">새로운 알림이 없습니다.</div>
-          ) : (
-            <>
-              <MailRow mails={row1Mails} label="알림"  />
-              <MailRow mails={row2Mails} label="답변 열람" />
-            </>
-          )}
-        </div>
-      )}
+    {/* ✅ 로딩/에러 상태를 MailRow로 넘김 */}
+    <MailRow mails={row1Mails} label="알림" loading={loading} error={error} />
+    <MailRow mails={row2Mails} label="답변 열람" loading={loading} error={error} />
+  </div>
+)}
+
     </div>
   );
 }
