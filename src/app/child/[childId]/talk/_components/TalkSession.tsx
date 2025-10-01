@@ -24,8 +24,7 @@ export default function TalkSession({
   const finishedSentRef = useRef(false);
   const isSpeakingRef = useRef(false); // state
 
-  // ✅ [수정] state를 props로 초기화합니다. 대화가 진행되면서 AI의 다음 질문으로 바뀌어야 하므로 state로 관리합니다.
-  const [subjectId] = useState<number>(initialSubjectId);
+  const [subjectId, setSubjectId] = useState<number>(initialSubjectId);
   const [question, setQuestion] = useState<string>(initialQuestion);
   const [displayText, setDisplayText] = useState('');
   // ✅ [수정] isQuestionVisible은 이제 항상 true로 시작하여, 시작 버튼 없이 바로 대화 화면을 보여줍니다.
@@ -59,11 +58,6 @@ export default function TalkSession({
     }
   }, [childId]);
 
-  const handleConversationFinished = useCallback(() => {
-    setIsFinalMessage(true);
-    sendFinished();
-  }, [sendFinished]);
-
   const handleChunkDisplay = useCallback((chunk: string, isFirst: boolean) => {
     if (isFirst) {
       setDisplayText(chunk);
@@ -96,19 +90,32 @@ export default function TalkSession({
     subjectIdRef.current = subjectId;
   }, [subjectId]);
 
-  // ✅ [추가] 컴포넌트가 사라질 때(언마운트) 실행될 클린업 함수입니다.
-  // 사용자가 뒤로가기, 다른 페이지 이동 등으로 이 컴포넌트를 벗어날 때 호출됩니다.
+  // ✅ [수정] useEffect 클린업 로직을 '소멸성'과 '비소멸성'으로 분리하여 엄격 모드에 대응합니다.
+
+  // 1. 비소멸성 클린업: TTS 중단(cancel)은 언제든지 안전하게 실행할 수 있습니다.
   useEffect(() => {
     return () => {
-      console.log(
-        '[TalkSession] 언마운트! TTS 재생 중지 및 대화 종료 신호 전송.',
-      );
-      // 1. 진행 중인 모든 오디오 출력을 중단시킵니다.
+      console.log('[TalkSession] 언마운트 감지, TTS 재생을 중단합니다.');
       cancel();
-      // 2. 백엔드에 대화가 종료되었음을 알립니다.
-      void sendFinished();
     };
-  }, [cancel, sendFinished]); // 의존성 배열에 함수들을 추가합니다.
+  }, [cancel]);
+
+  // 2. 소멸성 클린업: /finished API 호출은 '진짜 언마운트' 시에만 실행되어야 합니다.
+  const didMountRef = useRef(false);
+  useEffect(() => {
+    // 엄격 모드의 두 번째(진짜) 마운트부터 didMountRef.current는 true가 됩니다.
+    if (didMountRef.current) {
+      // 진짜 마운트 이후의 클린업 함수 (진짜 언마운트 시 실행됨)
+      return () => {
+        console.log('[TalkSession] 진짜 언마운트! /finished API를 호출합니다.');
+        void sendFinished();
+      };
+    } else {
+      // 첫 번째 마운트 시에는 ref 값을 true로 설정하기만 합니다.
+      // 이로 인해 엄격 모드의 '가짜' 언마운트 시에는 아무 일도 일어나지 않습니다.
+      didMountRef.current = true;
+    }
+  }, [sendFinished]);
 
   // ✅ [추가] 브라우저 탭/창을 닫을 때를 위한 종료 처리 로직입니다.
   useEffect(() => {
@@ -133,17 +140,33 @@ export default function TalkSession({
 
   const handleAIResponse = useCallback(
     async (ai: string, isFinished: boolean) => {
+      // 1. 다음 질문(ai)을 상태에 설정합니다.
       setQuestion(ai);
-      await playStreamSmart(ai, handleChunkDisplay);
 
+      // 2. 만약 이것이 마지막 응답이라면...
       if (isFinished) {
-        console.log('[AI 응답] 마지막 응답이므로 3초 후 UI를 리셋합니다.');
+        console.log(
+          '[AI 응답] 마지막 응답 감지. /finished API를 먼저 호출합니다.',
+        );
+        // 2-1. UI를 '마지막 메시지' 상태로 바꾸고, /finished API를 '먼저' 호출합니다.
+        setIsFinalMessage(true);
+        await sendFinished();
+
+        // 2-2. 그 다음, 마지막 TTS를 재생합니다.
+        await playStreamSmart(ai, handleChunkDisplay);
+
+        console.log(
+          '[AI 응답] 마지막 TTS 재생 완료. 3초 후 페이지를 이동합니다.',
+        );
+        // 2-3. TTS 재생이 모두 끝나면, 3초 후 페이지를 이동시킵니다.
         setTimeout(resetUI, 3000);
+      } else {
+        // 마지막 응답이 아니라면, 그냥 다음 TTS를 재생합니다.
+        await playStreamSmart(ai, handleChunkDisplay);
       }
     },
-    [playStreamSmart, handleChunkDisplay, resetUI],
+    [playStreamSmart, handleChunkDisplay, resetUI, sendFinished],
   );
-
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
       {/* 캐릭터 */}
@@ -224,9 +247,9 @@ export default function TalkSession({
           <VideoRecorder
             childId={childId}
             subjectId={subjectId}
+            isCharacterSpeaking={isSpeaking}
             onAIResponse={handleAIResponse}
             onFinished={() => console.log('✅ 녹화 완료')}
-            onConversationFinished={handleConversationFinished}
           />
         ) : (
           // subjectId가 없는 경우를 대비한 UI (예: 로딩 스피너)

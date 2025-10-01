@@ -7,15 +7,15 @@ import { showError } from '@/lib/toast';
 export default function VideoRecorder({
   childId,
   subjectId,
+  isCharacterSpeaking,
   onAIResponse,
   onFinished,
-  onConversationFinished,
 }: {
   childId: string;
   subjectId: number | null;
+  isCharacterSpeaking: boolean;
   onAIResponse: (message: string, isFinished: boolean) => void;
   onFinished: () => void;
-  onConversationFinished: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -25,15 +25,33 @@ export default function VideoRecorder({
   const pendingUploadsRef = useRef<string[]>([]);
   const postedSetRef = useRef<Set<string>>(new Set());
   const recognizedTextRef = useRef('');
-
   const subjectIdRef = useRef(subjectId);
+
   useEffect(() => {
     subjectIdRef.current = subjectId;
   }, [subjectId]);
 
   const [isRecording, setIsRecording] = useState(false);
+  // 녹화 시작 프로세스가 진행 중인지 추적하는 상태. 더블클릭 방지용.
+  const [isStarting, setIsStarting] = useState(false);
+  const [isWaitingForAI, setIsWaitingForAI] = useState(true); // AI 응답 대기중
+
+  useEffect(() => {
+    // 이 로직은 버튼 비활성화 상태를 끊김 없이 유지하기 위한 "역할 교대"를 담당합니다.
+    // 1. (사용자 녹음 종료 후) isWaitingForAI가 true가 되어 버튼이 비활성화됩니다.
+    // 2. (AI 응답 도착 후) isCharacterSpeaking이 true가 되는 순간,
+    //    이제 버튼 비활성화의 책임이 isCharacterSpeaking에게 넘어갑니다.
+    // 3. 따라서 isWaitingForAI는 false로 바꿔주어, 나중에 isCharacterSpeaking이
+    //    false가 되었을 때 버튼이 정상적으로 활성화될 수 있도록 준비합니다.
+    if (isCharacterSpeaking && isWaitingForAI) {
+      setIsWaitingForAI(false);
+    }
+  }, [isCharacterSpeaking, isWaitingForAI]);
 
   const sendAnswer = useCallback(async () => {
+    // 답변 전송을 시작하면, 'AI 응답 대기 중' 상태로 만들어 버튼을 비활성화합니다.
+    setIsWaitingForAI(true);
+
     const currentRecognizedText = recognizedTextRef.current.trim();
     const currentSubjectId = subjectIdRef.current;
 
@@ -63,10 +81,6 @@ export default function VideoRecorder({
       console.log('✅ /answer 응답:', data);
       onAIResponse(data.ai, data.finished);
 
-      if (data.finished) {
-        onConversationFinished();
-      }
-
       onFinished();
       answerSentRef.current = true;
 
@@ -77,7 +91,7 @@ export default function VideoRecorder({
     } else {
       console.error('❌ /answer 실패');
     }
-  }, [childId, onAIResponse, onConversationFinished, onFinished]);
+  }, [childId, onAIResponse, onFinished]);
 
   const postUploaded = async (fileUrl: string | null) => {
     const currentSubjectId = subjectIdRef.current;
@@ -114,7 +128,12 @@ export default function VideoRecorder({
   };
 
   const startRecording = async () => {
-    if (isRecording || mediaRecorderRef.current) return;
+    // 이미 녹음 중이거나, '시작 중' 상태일 때는 아무것도 하지 않습니다.
+    if (isRecording || isStarting || mediaRecorderRef.current) return;
+
+    // 즉시 '시작 중' 상태로 만들어 버튼을 비활성화합니다.
+    setIsStarting(true);
+
     try {
       console.log('🎬 녹화 시작 요청됨');
       const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -156,6 +175,9 @@ export default function VideoRecorder({
       startSTT();
     } catch (err) {
       console.error('❌ 녹화 시작 실패:', err);
+    } finally {
+      // 모든 작업이 끝나면 (성공하든 실패하든) '시작 중' 상태를 해제합니다.
+      setIsStarting(false);
     }
   };
 
@@ -287,7 +309,17 @@ export default function VideoRecorder({
       {!isRecording ? (
         <button
           onClick={startRecording}
-          className="p-4 bg-i-lightgreen text-white rounded-full shadow-sm hover:scale-105 transition-transform"
+          disabled={isCharacterSpeaking || isStarting || isWaitingForAI}
+          className="p-4 bg-i-lightgreen text-white rounded-full shadow-sm hover:scale-105 transition-transform disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
+          title={
+            isCharacterSpeaking
+              ? '캐릭터가 말하는 중에는 녹음할 수 없어요.'
+              : isStarting
+                ? '녹화를 준비 중입니다...'
+                : isWaitingForAI
+                  ? 'AI가 응답을 준비 중입니다...'
+                  : '녹음 시작'
+          }
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

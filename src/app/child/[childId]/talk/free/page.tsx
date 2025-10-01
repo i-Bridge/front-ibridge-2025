@@ -1,7 +1,7 @@
 import { Fetcher } from '@/lib/fetcher';
 import { API } from '@/constants/api';
-import TalkSession from '../_components/TalkSession'; // TalkSessionClient 경로에 맞게 수정
-import { ChildPageParams } from '@/types/page-props'; // 프로젝트에 맞는 타입 경로로 수정하세요.
+import TalkSession from '../_components/TalkSession';
+import { ChildPageParams } from '@/types/page-props';
 
 // 서버 컴포넌트로, 페이지에 진입하기 전에 데이터를 미리 가져옵니다.
 export default async function FreeTalkPage({ params }: ChildPageParams) {
