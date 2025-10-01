@@ -9,13 +9,11 @@ export default function VideoRecorder({
   subjectId,
   onAIResponse,
   onFinished,
-  onConversationFinished,
 }: {
   childId: string;
   subjectId: number | null;
   onAIResponse: (message: string, isFinished: boolean) => void;
   onFinished: () => void;
-  onConversationFinished: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -63,10 +61,6 @@ export default function VideoRecorder({
       console.log('✅ /answer 응답:', data);
       onAIResponse(data.ai, data.finished);
 
-      if (data.finished) {
-        onConversationFinished();
-      }
-
       onFinished();
       answerSentRef.current = true;
 
@@ -77,7 +71,7 @@ export default function VideoRecorder({
     } else {
       console.error('❌ /answer 실패');
     }
-  }, [childId, onAIResponse, onConversationFinished, onFinished]);
+  }, [childId, onAIResponse, onFinished]);
 
   const postUploaded = async (fileUrl: string | null) => {
     const currentSubjectId = subjectIdRef.current;

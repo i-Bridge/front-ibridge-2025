@@ -24,8 +24,7 @@ export default function TalkSession({
   const finishedSentRef = useRef(false);
   const isSpeakingRef = useRef(false); // state
 
-  // ✅ [수정] state를 props로 초기화합니다. 대화가 진행되면서 AI의 다음 질문으로 바뀌어야 하므로 state로 관리합니다.
-  const [subjectId] = useState<number>(initialSubjectId);
+  const [subjectId, setSubjectId] = useState<number>(initialSubjectId);
   const [question, setQuestion] = useState<string>(initialQuestion);
   const [displayText, setDisplayText] = useState('');
   // ✅ [수정] isQuestionVisible은 이제 항상 true로 시작하여, 시작 버튼 없이 바로 대화 화면을 보여줍니다.
@@ -58,11 +57,6 @@ export default function TalkSession({
       console.warn('⚠️ /finished API 호출 실패', err);
     }
   }, [childId]);
-
-  const handleConversationFinished = useCallback(() => {
-    setIsFinalMessage(true);
-    sendFinished();
-  }, [sendFinished]);
 
   const handleChunkDisplay = useCallback((chunk: string, isFirst: boolean) => {
     if (isFirst) {
@@ -133,17 +127,33 @@ export default function TalkSession({
 
   const handleAIResponse = useCallback(
     async (ai: string, isFinished: boolean) => {
+      // 1. 다음 질문(ai)을 상태에 설정합니다.
       setQuestion(ai);
-      await playStreamSmart(ai, handleChunkDisplay);
 
+      // 2. 만약 이것이 마지막 응답이라면...
       if (isFinished) {
-        console.log('[AI 응답] 마지막 응답이므로 3초 후 UI를 리셋합니다.');
+        console.log(
+          '[AI 응답] 마지막 응답 감지. /finished API를 먼저 호출합니다.',
+        );
+        // 2-1. UI를 '마지막 메시지' 상태로 바꾸고, /finished API를 '먼저' 호출합니다.
+        setIsFinalMessage(true);
+        await sendFinished();
+
+        // 2-2. 그 다음, 마지막 TTS를 재생합니다.
+        await playStreamSmart(ai, handleChunkDisplay);
+
+        console.log(
+          '[AI 응답] 마지막 TTS 재생 완료. 3초 후 페이지를 이동합니다.',
+        );
+        // 2-3. TTS 재생이 모두 끝나면, 3초 후 페이지를 이동시킵니다.
         setTimeout(resetUI, 3000);
+      } else {
+        // 마지막 응답이 아니라면, 그냥 다음 TTS를 재생합니다.
+        await playStreamSmart(ai, handleChunkDisplay);
       }
     },
-    [playStreamSmart, handleChunkDisplay, resetUI],
+    [playStreamSmart, handleChunkDisplay, resetUI, sendFinished],
   );
-
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
       {/* 캐릭터 */}
@@ -226,7 +236,6 @@ export default function TalkSession({
             subjectId={subjectId}
             onAIResponse={handleAIResponse}
             onFinished={() => console.log('✅ 녹화 완료')}
-            onConversationFinished={handleConversationFinished}
           />
         ) : (
           // subjectId가 없는 경우를 대비한 UI (예: 로딩 스피너)
