@@ -47,7 +47,7 @@ export default function CategoryChart({
   const centerY = containerHeight / 2;
 
   // 더미 데이터
-  const USE_DUMMY_DATA = true;
+  const USE_DUMMY_DATA = false;
   const dummyCategories: Keyword[] = [
     { keyword: '친구들과 놀이터에서', count: 15, positiveScore: 0.8 },
     { keyword: '공룡', count: 10, positiveScore: 0.6 },
@@ -57,7 +57,22 @@ export default function CategoryChart({
   ];
 
   const categories = USE_DUMMY_DATA ? dummyCategories : propCategories || [];
-  if (!categories.length) return null;
+    if (!categories.length) {
+    return (
+      <div>
+        <h3 className="text-lg font-semibold mb-1">
+          {childname || '아이'}의 분석 결과
+        </h3>
+        <p className="text-xs text-gray-400 mb-4">
+          답변 15개 쌓일 때마다 업데이트 진행됩니다.
+        </p>
+        <div className="p-16 text-sm text-gray-500 border rounded">
+          아직 군집화 결과가 존재하지 않습니다. <br />
+          아이의 답변이 더 필요합니다.
+        </div>
+      </div>
+    );
+  }
   const maxCount = Math.max(...categories.map((c) => c.count));
 
   // =====================
