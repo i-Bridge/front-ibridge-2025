@@ -103,7 +103,6 @@ export function useMinimaxTTS() {
 
   const _playStreamOnce = useCallback(
     async (text: string, opts?: StreamOpts) => {
-      cancel();
       const controller = new AbortController();
       currentAbortRef.current = controller;
       const res = await fetch('/api/tts', {
@@ -160,7 +159,6 @@ export function useMinimaxTTS() {
               audioEl.play().catch(reject);
               audioEl.onended = () => {
                 if (currentAudioRef.current === audioEl) {
-                  setIsSpeaking(false);
                   currentAudioRef.current = null;
                   currentAbortRef.current = null;
                 }
@@ -168,7 +166,6 @@ export function useMinimaxTTS() {
               };
               audioEl.onerror = (e) => {
                 if (currentAudioRef.current === audioEl) {
-                  setIsSpeaking(false);
                   currentAudioRef.current = null;
                   currentAbortRef.current = null;
                 }
@@ -191,31 +188,47 @@ export function useMinimaxTTS() {
       onChunkStart: (chunkText: string, isFirstChunk: boolean) => void,
       opts?: StreamOpts,
     ) => {
-      const chunks = text
-        .split(/(?<=[\.!\?。！？\n,،])/)
-        .map((s) => s.trim())
-        .filter(Boolean);
-      if (chunks.length === 0 && text) chunks.push(text);
-      let isFirst = true;
-      for (const chunk of chunks) {
-        onChunkStart(chunk, isFirst);
-        isFirst = false;
-        try {
-          await _playStreamOnce(chunk, opts);
-        } catch (e) {
-          // ✅ [수정] 에러의 종류를 확인하여, AbortError인 경우에는 폴백을 실행하지 않습니다.
-          if (e instanceof Error && e.name === 'AbortError') {
-            break;
-          } else {
-            // AbortError가 아닌 다른 네트워크 오류 등의 경우에만 폴백을 시도합니다.
-            console.warn('⚠️ 스트리밍 실패, 일반 재생으로 폴백:', chunk, e);
-            try {
-              await play(chunk, opts);
-            } catch {
-              /* ignore */
+      // 1. 스트리밍 시퀀스 시작 전, 이전에 재생 중이던 모든 오디오를 정리합니다.
+      cancel();
+      // 2. 스트리밍 시퀀스 시작 시, isSpeaking을 true로 설정합니다.
+      setIsSpeaking(true);
+      try {
+        const chunks = text
+          .split(/(?<=[\.!\?。！？\n,،])/)
+          .map((s) => s.trim())
+          .filter(Boolean);
+
+        if (chunks.length === 0 && text) chunks.push(text);
+
+        let isFirst = true;
+        for (const chunk of chunks) {
+          onChunkStart(chunk, isFirst);
+          isFirst = false;
+
+          try {
+            await _playStreamOnce(chunk, opts);
+          } catch (e) {
+            if (e instanceof Error && e.name === 'AbortError') {
+              console.log(
+                '🔇 스트리밍이 의도적으로 중단되었습니다. 폴백을 실행하지 않습니다.',
+              );
+              // cancel()이 호출되면 여기서 에러가 발생하며, isSpeaking은 finally에서 false가 됩니다.
+              // 따라서 즉시 함수를 종료하여 더 이상 진행되지 않도록 합니다.
+              return;
+            } else {
+              console.warn('⚠️ 스트리밍 실패, 일반 재생으로 폴백:', chunk, e);
+              try {
+                await play(chunk, opts);
+              } finally {
+                // 3. 모든 청크의 재생이 성공적으로 끝나거나, 도중에 에러가 발생하더라도,
+                //    반드시 마지막에 isSpeaking을 false로 설정하여 상태를 정리합니다.
+                setIsSpeaking(false);
+              }
             }
           }
         }
+      } finally {
+        setIsSpeaking(false);
       }
     },
     [_playStreamOnce, play],
