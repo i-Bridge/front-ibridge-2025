@@ -1,5 +1,7 @@
 export interface Question {
-    questionid: number;
-    text: string;
-    video: string;
-  }
+  questionId: number;
+  text: string;
+  video: string;
+  image: string;
+  answer: string;
+}
