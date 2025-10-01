@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { EmotionId, EMOTIONS } from '@/constants/emotions';
 
 const bannerTitles = [
   '최근 아이가 즐거움을 느끼며 자주 이야기하는 주제가 있어요 ✨ 함께 살펴볼까요?',
@@ -107,6 +108,10 @@ function addTopicParticle(name: string): string {
 
 const nameWithIga = addSubjectParticle(childname); // 이/가
 const nameWithEunNeun = addTopicParticle(childname); // 은/는
+
+const emotionID = emotion?? null;
+  const Emotion = EMOTIONS.find((e) => e.id === emotionID);
+
   // --------------------------
   // 📌 props 기반 문장 생성
   // --------------------------
@@ -138,18 +143,20 @@ const nameWithEunNeun = addTopicParticle(childname); // 은/는
 
     // 감정
     emotion
-      ? `이번 달 ${nameWithIga} 가장 많이 선택한 감정 이모지는 "${emotion}"이에요.`
+      ? `이번 달 ${nameWithIga} 가장 많이 선택한 감정 이모지는 "${Emotion?.emoji}"이에요.`
       : `${nameWithIga} 표현한 감정이 아직 없어요.`,
   ];
 
   const emojis = ['🍇', '🌱', '💬', '😊', '😟', '💖'];
 
+  
+
   return (
-    <div className="flex justify-center py-4">
-      <div className="w-4/5 max-w-7xl bg-orange-300 p-10 overflow-hidden rounded-3xl shadow-lg">
+    <div className=" py-4">
+      <div className=" max-w-7xl bg-orange-300 p-10 overflow-hidden rounded-3xl shadow-lg">
         <div className="w-full mx-auto text-md space-y-2 flex flex-col items-center">
           {/* 배너 설명 멘트 */}
-          <div className="bg-orange-100 h-1/2 max-w-5xl rounded-3xl flex justify-center items-center p-6 min-h-[3rem] mb-8">
+          <div className="bg-orange-100 h-1/2 max-w-5xl rounded-3xl flex justify-center items-center p-4 min-h-[3rem] mb-6">
             <div className="min-h-[2rem]">
               <h2 className="text-xl font-bold text-center text-gray-900 ">
                 {displayedText}

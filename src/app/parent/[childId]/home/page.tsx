@@ -1,17 +1,16 @@
 import { Fetcher } from '@/lib/fetcher';
 import HomeHeader from '@/components/Header/HomeHeader';
 import AiComment from './_components/AiComment';
-import MonthSelector from './_components/MonthSelector';
-import Weekly from './_components/Weekly';
-import SubjectList from '@/components/Question/SubjectList';
+import ContentSwitcher from './_components/ContentSwitcher';
 import { ChildPageParams } from '@/types/page-props';
 import NotFound from '@/components/Exception/not-found';
-import HomeLoading from './loading';
 
 interface Subject {
   subjectId: number;
   subjectTitle: string;
   answer: boolean;
+  date: string; // yyyy-MM-dd
+  image: string | null;
 }
 
 interface HomeData {
@@ -25,6 +24,15 @@ interface HomeData {
   newGrape: number;
 }
 
+interface BannerData {
+  cumulativeAnswerCount: number;
+  mostTalkedCategory: string;
+  positiveCategory: string;
+  negativeCategory: string;
+  emotion: number;
+  name: string;
+  newGrape: number;
+}
 export default async function HomePage({ params }: ChildPageParams) {
   // params가 Promise이므로, await를 사용해 값을 추출
   const { childId } = await params;
@@ -32,42 +40,45 @@ export default async function HomePage({ params }: ChildPageParams) {
   if (!childId) return <NotFound message="자녀 ID가 존재하지 않습니다." />;
 
   const homeRes = await Fetcher<HomeData>(`/parent/${childId}/home`);
+  const bannerRes = await Fetcher<BannerData>(`/parent/${childId}/banner`);
 
-  const homeData = homeRes.data;
-  console.log("/home",homeData);
-
-  if (!homeData) {
-    return <div>로딩 중...</div>;
+  if (!homeRes || !homeRes.data) {
+    return <NotFound message="데이터를 불러오지 못했습니다." />;
   }
 
-  // 이후
-  if (!homeData) return <HomeLoading />;
+  const homeData = homeRes.data;
+  const bannerData = bannerRes.data;
+
+  if (!homeData || !bannerData) {
+    return <NotFound message="데이터가 존재하지 않습니다." />;
+  }
+  console.log('/home', homeData);
+  console.log('/banner', bannerData);
 
   return (
     <div>
       {/* 헤더에 알림 개수 정보 전달 필요 */}
       <div className="flex flex-col space-y-14">
         <HomeHeader childId={childId} />
-        <AiComment
-          childname={homeData.name}
-          cumulativeAnswerCount={homeData.cumulativeAnswerCount}
-          mostTalkedCategory={homeData.mostTalkedCategory}
-          positiveCategory={homeData.positiveCategory}
-          negativeCategory={homeData.negativeCategory}
-          emotion={homeData.emotion}
-          newGrape={homeData.newGrape}
-        />
-      </div>
-      <div className="flex flex-col justify-center items-center w-full pt-3">
-        <div className="pt-4">
-          <MonthSelector />
-          <Weekly childId={childId} />
-          <Weekly childId={childId} />
+        <div className="flex flex-col items-center justify-center">
+          <AiComment
+            childname={bannerData.name}
+            cumulativeAnswerCount={bannerData.cumulativeAnswerCount}
+            mostTalkedCategory={bannerData.mostTalkedCategory}
+            positiveCategory={bannerData.positiveCategory}
+            negativeCategory={bannerData.negativeCategory}
+            emotion={bannerData.emotion}
+            newGrape={bannerData.newGrape}
+          />
+          <div className="mt-4">
+            <ContentSwitcher
+              initialSubjects={homeData.subjects ?? []}
+              childname={bannerData.name}
+            />
+          </div>
         </div>
       </div>
-      <div className="px-8">
-        <SubjectList initialSubjects={homeData.subjects} />
-      </div>
+
       <footer className="bg-gray-200 text-white text-center py-10">
         ⓒ 2025 i-Bridge. All rights reserved.
       </footer>
