@@ -7,11 +7,13 @@ import { showError } from '@/lib/toast';
 export default function VideoRecorder({
   childId,
   subjectId,
+  isCharacterSpeaking,
   onAIResponse,
   onFinished,
 }: {
   childId: string;
   subjectId: number | null;
+  isCharacterSpeaking: boolean;
   onAIResponse: (message: string, isFinished: boolean) => void;
   onFinished: () => void;
 }) {
@@ -30,6 +32,8 @@ export default function VideoRecorder({
   }, [subjectId]);
 
   const [isRecording, setIsRecording] = useState(false);
+  // ✅ [추가] 녹화 시작 프로세스가 진행 중인지 추적하는 상태. 더블클릭 방지용.
+  const [isStarting, setIsStarting] = useState(false);
 
   const sendAnswer = useCallback(async () => {
     const currentRecognizedText = recognizedTextRef.current.trim();
@@ -108,7 +112,12 @@ export default function VideoRecorder({
   };
 
   const startRecording = async () => {
-    if (isRecording || mediaRecorderRef.current) return;
+    // 이미 녹음 중이거나, '시작 중' 상태일 때는 아무것도 하지 않습니다.
+    if (isRecording || isStarting || mediaRecorderRef.current) return;
+
+    // 즉시 '시작 중' 상태로 만들어 버튼을 비활성화합니다.
+    setIsStarting(true);
+
     try {
       console.log('🎬 녹화 시작 요청됨');
       const mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -150,6 +159,9 @@ export default function VideoRecorder({
       startSTT();
     } catch (err) {
       console.error('❌ 녹화 시작 실패:', err);
+    } finally {
+      // 모든 작업이 끝나면 (성공하든 실패하든) '시작 중' 상태를 해제합니다.
+      setIsStarting(false);
     }
   };
 
@@ -281,7 +293,15 @@ export default function VideoRecorder({
       {!isRecording ? (
         <button
           onClick={startRecording}
-          className="p-4 bg-i-lightgreen text-white rounded-full shadow-sm hover:scale-105 transition-transform"
+          disabled={isCharacterSpeaking || isStarting}
+          className="p-4 bg-i-lightgreen text-white rounded-full shadow-sm hover:scale-105 transition-transform disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
+          title={
+            isCharacterSpeaking
+              ? '캐릭터가 말하는 중에는 녹음할 수 없어요.'
+              : isStarting
+                ? '녹화를 준비 중입니다...'
+                : '녹음 시작'
+          }
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

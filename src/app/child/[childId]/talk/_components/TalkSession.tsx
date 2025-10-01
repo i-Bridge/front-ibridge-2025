@@ -90,19 +90,32 @@ export default function TalkSession({
     subjectIdRef.current = subjectId;
   }, [subjectId]);
 
-  // ✅ [추가] 컴포넌트가 사라질 때(언마운트) 실행될 클린업 함수입니다.
-  // 사용자가 뒤로가기, 다른 페이지 이동 등으로 이 컴포넌트를 벗어날 때 호출됩니다.
+  // ✅ [수정] useEffect 클린업 로직을 '소멸성'과 '비소멸성'으로 분리하여 엄격 모드에 대응합니다.
+
+  // 1. 비소멸성 클린업: TTS 중단(cancel)은 언제든지 안전하게 실행할 수 있습니다.
   useEffect(() => {
     return () => {
-      console.log(
-        '[TalkSession] 언마운트! TTS 재생 중지 및 대화 종료 신호 전송.',
-      );
-      // 1. 진행 중인 모든 오디오 출력을 중단시킵니다.
+      console.log('[TalkSession] 언마운트 감지, TTS 재생을 중단합니다.');
       cancel();
-      // 2. 백엔드에 대화가 종료되었음을 알립니다.
-      void sendFinished();
     };
-  }, [cancel, sendFinished]); // 의존성 배열에 함수들을 추가합니다.
+  }, [cancel]);
+
+  // 2. 소멸성 클린업: /finished API 호출은 '진짜 언마운트' 시에만 실행되어야 합니다.
+  const didMountRef = useRef(false);
+  useEffect(() => {
+    // 엄격 모드의 두 번째(진짜) 마운트부터 didMountRef.current는 true가 됩니다.
+    if (didMountRef.current) {
+      // 진짜 마운트 이후의 클린업 함수 (진짜 언마운트 시 실행됨)
+      return () => {
+        console.log('[TalkSession] 진짜 언마운트! /finished API를 호출합니다.');
+        void sendFinished();
+      };
+    } else {
+      // 첫 번째 마운트 시에는 ref 값을 true로 설정하기만 합니다.
+      // 이로 인해 엄격 모드의 '가짜' 언마운트 시에는 아무 일도 일어나지 않습니다.
+      didMountRef.current = true;
+    }
+  }, [sendFinished]);
 
   // ✅ [추가] 브라우저 탭/창을 닫을 때를 위한 종료 처리 로직입니다.
   useEffect(() => {
@@ -234,6 +247,7 @@ export default function TalkSession({
           <VideoRecorder
             childId={childId}
             subjectId={subjectId}
+            isCharacterSpeaking={isSpeaking}
             onAIResponse={handleAIResponse}
             onFinished={() => console.log('✅ 녹화 완료')}
           />

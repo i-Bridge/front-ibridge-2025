@@ -1,7 +1,7 @@
 import { Fetcher } from '@/lib/fetcher';
 import { API } from '@/constants/api';
 import TalkSession from '../_components/TalkSession';
-import { ChildPageParams } from '@/types/page-props'; // 프로젝트에 맞는 타입 경로로 수정하세요.
+import { ChildPageParams } from '@/types/page-props';
 
 type QuestionItem = {
   ai: string;
