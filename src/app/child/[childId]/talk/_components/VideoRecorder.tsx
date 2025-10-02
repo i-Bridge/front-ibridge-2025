@@ -1,21 +1,21 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { Fetcher } from '@/lib/fetcher';
 import { showError } from '@/lib/toast';
 
 export default function VideoRecorder({
   childId,
   subjectId,
+  isCharacterSpeaking,
   onAIResponse,
-  onFinished, //녹화가 종료됨
-  onConversationFinished, //한 주제에 대한 대화가 종료됨
+  onFinished,
 }: {
   childId: string;
   subjectId: number | null;
+  isCharacterSpeaking: boolean;
   onAIResponse: (message: string, isFinished: boolean) => void;
   onFinished: () => void;
-  onConversationFinished: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -23,45 +23,67 @@ export default function VideoRecorder({
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const answerSentRef = useRef(false);
   const pendingUploadsRef = useRef<string[]>([]);
-  // 같은 파일 URL을 중복으로 /uploaded에 보내지 않도록 막는 Set
   const postedSetRef = useRef<Set<string>>(new Set());
-  // ✅ [수정] UI용 state를 제거하고, 데이터 처리용 ref만 남깁니다.
   const recognizedTextRef = useRef('');
+  const subjectIdRef = useRef(subjectId);
 
-  const [isRecording, setIsRecording] = useState(false); // const [recognizedText, setRecognizedText] = useState('');
-  // ❌ [제거] UI와 연결된 useState를 완전히 제거합니다.
+  useEffect(() => {
+    subjectIdRef.current = subjectId;
+  }, [subjectId]);
+
+  const [isRecording, setIsRecording] = useState(false);
+  // 녹화 시작 프로세스가 진행 중인지 추적하는 상태. 더블클릭 방지용.
+  const [isStarting, setIsStarting] = useState(false);
+  const [isWaitingForAI, setIsWaitingForAI] = useState(true); // AI 응답 대기중
+
+  useEffect(() => {
+    // 이 로직은 버튼 비활성화 상태를 끊김 없이 유지하기 위한 "역할 교대"를 담당합니다.
+    // 1. (사용자 녹음 종료 후) isWaitingForAI가 true가 되어 버튼이 비활성화됩니다.
+    // 2. (AI 응답 도착 후) isCharacterSpeaking이 true가 되는 순간,
+    //    이제 버튼 비활성화의 책임이 isCharacterSpeaking에게 넘어갑니다.
+    // 3. 따라서 isWaitingForAI는 false로 바꿔주어, 나중에 isCharacterSpeaking이
+    //    false가 되었을 때 버튼이 정상적으로 활성화될 수 있도록 준비합니다.
+    if (isCharacterSpeaking && isWaitingForAI) {
+      setIsWaitingForAI(false);
+    }
+  }, [isCharacterSpeaking, isWaitingForAI]);
+
   const sendAnswer = useCallback(async () => {
-    const currentRecognizedText = recognizedTextRef.current;
+    // 답변 전송을 시작하면, 'AI 응답 대기 중' 상태로 만들어 버튼을 비활성화합니다.
+    setIsWaitingForAI(true);
 
-    if (!currentRecognizedText || !subjectId || !childId) {
-      console.log('⚠️ 조건 부족으로 /answer 호출 생략', {
-        currentRecognizedText,
-        subjectId,
-        childId,
-      });
+    const currentRecognizedText = recognizedTextRef.current.trim();
+    const currentSubjectId = subjectIdRef.current;
+
+    // 1. subjectId나 childId가 없으면 여전히 전송을 막습니다.
+    if (!currentSubjectId || !childId) {
+      console.log(
+        '⚠️ 조건 부족으로 /answer 호출 생략 (subjectId 또는 childId 없음)',
+      );
       return;
     }
-    console.log('✉️ 텍스트만 /answer로 전송:', currentRecognizedText);
+
+    // 2. 인식된 텍스트가 없을 경우, AI에게 보낼 특별한 신호를 정의합니다.
+    // 이 신호는 백엔드에서 해석하여 적절한 프롬프트를 생성하는 데 사용됩니다.
+    const textToSend = currentRecognizedText || '[NO_AUDIO_INPUT]';
+
+    console.log('✉️ 텍스트를 /answer로 전송:', textToSend);
     const { data, isSuccess } = await Fetcher<{
       finished: boolean;
       ai: string;
     }>(`/child/${childId}/answer`, {
       method: 'POST',
-      data: { subjectId, text: currentRecognizedText },
+      // 3. 백엔드에는 'subjectId'와 'text' key를 사용하여 데이터를 보냅니다.
+      data: { subjectId: currentSubjectId, text: textToSend },
     });
 
     if (isSuccess && data) {
       console.log('✅ /answer 응답:', data);
       onAIResponse(data.ai, data.finished);
 
-      if (data.finished) {
-        onConversationFinished();
-      }
-
       onFinished();
       answerSentRef.current = true;
 
-      // 대기 중인 업로드 flush
       for (const url of pendingUploadsRef.current) {
         await postUploaded(url);
       }
@@ -69,31 +91,34 @@ export default function VideoRecorder({
     } else {
       console.error('❌ /answer 실패');
     }
-  }, [childId, subjectId, onAIResponse, onConversationFinished, onFinished]);
+  }, [childId, onAIResponse, onFinished]);
 
   const postUploaded = async (fileUrl: string | null) => {
-    if (!fileUrl || !subjectId || !childId) {
+    const currentSubjectId = subjectIdRef.current;
+    if (!fileUrl || !currentSubjectId || !childId) {
       console.log('⚠️ /uploaded 전송 조건 불충족', {
         fileUrl,
-        subjectId,
+        subjectId: currentSubjectId,
         childId,
       });
       return;
     }
     if (!answerSentRef.current) {
-      console.log('⏸ /answer 대기중 → 업로드 보류:', fileUrl);
       pendingUploadsRef.current.push(fileUrl);
       return;
     }
     if (postedSetRef.current.has(fileUrl)) {
-      console.log('🚫 중복 /uploaded 스킵 (이미 전송된 URL):', fileUrl);
       return;
     }
     try {
-      console.log('📤 /uploaded 전송:', { subjectId, file: fileUrl });
+      console.log('📤 /uploaded 전송:', {
+        subjectId: currentSubjectId,
+        file: fileUrl,
+      });
       await Fetcher(`/child/${childId}/uploaded`, {
         method: 'POST',
-        data: { subjectId, file: fileUrl },
+
+        data: { subjectId: currentSubjectId, file: fileUrl },
       });
       postedSetRef.current.add(fileUrl);
       console.log('✅ 백엔드에 업로드 완료(/uploaded):', fileUrl);
@@ -103,14 +128,18 @@ export default function VideoRecorder({
   };
 
   const startRecording = async () => {
-    if (isRecording || mediaRecorderRef.current) return;
+    // 이미 녹음 중이거나, '시작 중' 상태일 때는 아무것도 하지 않습니다.
+    if (isRecording || isStarting || mediaRecorderRef.current) return;
+
+    // 즉시 '시작 중' 상태로 만들어 버튼을 비활성화합니다.
+    setIsStarting(true);
+
     try {
       console.log('🎬 녹화 시작 요청됨');
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: true,
-        audio: false,
+        audio: true, // ✅ [수정 2] 음성 인식을 위해 반드시 true로 설정해야 합니다.
       });
-      // ✅ [수정] ref만 초기화합니다.
       recognizedTextRef.current = '';
       answerSentRef.current = false;
       pendingUploadsRef.current = [];
@@ -146,11 +175,13 @@ export default function VideoRecorder({
       startSTT();
     } catch (err) {
       console.error('❌ 녹화 시작 실패:', err);
+    } finally {
+      // 모든 작업이 끝나면 (성공하든 실패하든) '시작 중' 상태를 해제합니다.
+      setIsStarting(false);
     }
   };
 
   const stopRecording = () => {
-    console.log('🛑 녹화/음성인식 종료 신호 보냄');
     if (mediaRecorderRef.current?.state === 'recording') {
       mediaRecorderRef.current.stop();
     }
@@ -161,14 +192,10 @@ export default function VideoRecorder({
   };
 
   const handleRecognitionEnd = useCallback(async () => {
-    console.log(
-      '🏁 [SpeechRecognition] 완전히 종료됨. 이제 답변을 전송합니다.',
-    );
     await sendAnswer();
   }, [sendAnswer]);
 
   const startSTT = () => {
-    console.log('🎤 음성 인식 시작');
     const SpeechRecognitionConstructor =
       (window as any).SpeechRecognition ||
       (window as any).webkitSpeechRecognition;
@@ -176,12 +203,10 @@ export default function VideoRecorder({
       showError('이 브라우저는 음성 인식을 지원하지 않습니다.');
       return;
     }
-
     const recognition: SpeechRecognition = new SpeechRecognitionConstructor();
     recognition.lang = 'ko-KR';
     recognition.interimResults = true;
     recognition.continuous = true;
-
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; ++i) {
@@ -190,66 +215,49 @@ export default function VideoRecorder({
         }
       }
       if (finalTranscript) {
-        console.log('📝 확정 텍스트 추가:', finalTranscript);
-        // ✅ [수정] ref의 값을 직접 업데이트합니다.
         recognizedTextRef.current += finalTranscript + ' ';
       }
     };
-
     recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
       console.error('🎤 음성 인식 오류:', e);
     };
-
-    // ✅ [수정] 'onend'가 표준 타입에 없어 TypeScript 오류가 발생할 수 있으므로, 'as any'로 타입 단언을 추가합니다.
     (recognition as any).onend = handleRecognitionEnd;
-
     recognitionRef.current = recognition;
     recognition.start();
   };
 
   const captureAndUploadThumbnail = async () => {
-    if (!videoRef.current || !canvasRef.current || !subjectId) {
+    const currentSubjectId = subjectIdRef.current;
+    if (!videoRef.current || !canvasRef.current || !currentSubjectId) {
       console.warn('⚠️ 썸네일 캡처 불가: video/canvas/subjectId 부족', {
         video: !!videoRef.current,
         canvas: !!canvasRef.current,
-        subjectId,
+        subjectId: currentSubjectId,
       });
       return;
     }
     console.log('🖼 썸네일 캡처 중...');
-
     const canvas = canvasRef.current;
     const video = videoRef.current;
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-
     const ctx = canvas.getContext('2d');
     ctx?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-
     canvas.toBlob(async (blob) => {
       if (!blob) return;
-
       console.log('☁️ 썸네일 Presigned URL 요청');
       const { data } = await Fetcher<{ url: string }>(
         `/child/${childId}/getURL`,
         {
           method: 'POST',
-          data: { type: 'image', subjectId },
-          skipAuthHeader: true,
+          data: { type: 'image', subjectId: currentSubjectId },
         },
       );
-
       if (!data?.url) return console.error('❌ 썸네일 URL 획득 실패');
-
-      const res = await fetch(data.url, {
-        method: 'PUT',
-        body: blob,
-      });
-
+      const res = await fetch(data.url, { method: 'PUT', body: blob });
       if (res.ok) {
         const s3Url = data.url.split('?')[0];
         console.log('✅ 썸네일 S3 업로드 완료:', s3Url);
-
         await postUploaded(s3Url);
       } else {
         console.error('❌ 썸네일 업로드 실패');
@@ -258,27 +266,25 @@ export default function VideoRecorder({
   };
 
   const uploadVideo = async (blob: Blob, type: 'video') => {
-    if (!subjectId || !childId) return;
+    const currentSubjectId = subjectIdRef.current;
+    if (!currentSubjectId || !childId) return;
     const { data } = await Fetcher<{ url: string }>(
       `/child/${childId}/getURL`,
       {
         method: 'POST',
-        data: { type, subjectId },
-        skipAuthHeader: true,
+        // ✅ [수정 1] API 요청 시 JSON key를 'subjectId'로 변경합니다.
+        data: { type, subjectId: currentSubjectId },
+        // skipAuthHeader: true,
       },
     );
-
     if (!data?.url) {
       console.error(`❌ ${type} URL 획득 실패`);
       return;
     }
-
     const res = await fetch(data.url, { method: 'PUT', body: blob });
     if (res.ok) {
       const s3Url = data.url.split('?')[0];
       console.log(`✅ ${type} S3 업로드 완료:`, s3Url);
-
-      // 🔹 영상 업로드 후 즉시 /uploaded 전송
       await postUploaded(s3Url);
     } else {
       console.error(`❌ ${type} 업로드 실패`);
@@ -288,9 +294,7 @@ export default function VideoRecorder({
   return (
     <div
       className="flex flex-col items-center min-w-[300px] max-w-[400px] gap-4 p-10 pr-14 bg-contain bg-center bg-no-repeat "
-      style={{
-        backgroundImage: `url('/images/영상박스_점선.png')`,
-      }}
+      style={{ backgroundImage: `url('/images/영상박스_점선.png')` }}
     >
       <video
         ref={videoRef}
@@ -298,16 +302,24 @@ export default function VideoRecorder({
         autoPlay
         muted
       />
-      <canvas ref={canvasRef} className="hidden" />
-
+      <canvas ref={canvasRef} className="hidden" /> 
       <div className="text-gray-700 w-80 p-2 bg-orange-200 rounded shadow-sm text-sm">
-        <strong>🎙️버튼을 눌러 말해보세요!</strong>{' '}
+        <strong>🎙️버튼을 눌러 말해보세요!</strong>
       </div>
-
       {!isRecording ? (
         <button
           onClick={startRecording}
-          className="p-4 bg-i-lightgreen text-white rounded-full shadow-sm hover:scale-105 transition-transform"
+          disabled={isCharacterSpeaking || isStarting || isWaitingForAI}
+          className="p-4 bg-i-lightgreen text-white rounded-full shadow-sm hover:scale-105 transition-transform disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
+          title={
+            isCharacterSpeaking
+              ? '캐릭터가 말하는 중에는 녹음할 수 없어요.'
+              : isStarting
+                ? '녹화를 준비 중입니다...'
+                : isWaitingForAI
+                  ? 'AI가 응답을 준비 중입니다...'
+                  : '녹음 시작'
+          }
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
