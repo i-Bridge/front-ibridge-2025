@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
-import {ScheduledSubject} from '@/types/index';
+import { ScheduledSubject } from '@/types/index';
 
 interface ScheduledSubjectsData {
   subjects: ScheduledSubject[];
@@ -20,15 +20,11 @@ export function useScheduledSubjects() {
     setLoading(true);
     try {
       const res = await Fetcher<ScheduledSubjectsData>(`/parent/${childId}/scheduled`);
-      const scheduledSubjectdata= res?.data;
+      const scheduledSubjectData = res?.data;
 
-      console.log("scheduled subjects 호출함",scheduledSubjectdata);
-      
-      if (scheduledSubjectdata?.subjects) {
-        setSubjects(scheduledSubjectdata.subjects);
-      } else {
-        setSubjects([]);
-      }
+      console.log("scheduled subjects 호출함", scheduledSubjectData);
+
+      setSubjects(scheduledSubjectData?.subjects ?? []);
     } catch (err) {
       console.error('Scheduled subjects fetch error:', err);
       setSubjects([]);
@@ -37,10 +33,6 @@ export function useScheduledSubjects() {
     }
   }, [childId]);
 
-  // childId가 바뀌면 fetch
-  useEffect(() => {
-    fetchScheduledSubjects();
-  }, [fetchScheduledSubjects]);
 
-  return { subjects, loading, refetch: fetchScheduledSubjects };
+  return { subjects, loading, refetch: fetchScheduledSubjects, setSubjects };
 }

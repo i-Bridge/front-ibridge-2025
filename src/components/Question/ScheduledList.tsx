@@ -1,20 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useScheduledSubjects } from '@/hooks/parentHome/useScheduledSubjects';
 import SubjectTitleEdit from './SubjectTitleEdit';
 import Loading from '../UI/LoadingAnim';
-import { ScheduledSubject } from '@/types/index';
 
 export default function ScheduledList() {
-  const { subjects: fetchedSubjects, loading } = useScheduledSubjects();
-  const [subjects, setSubjects] = useState<ScheduledSubject[]>([]);
+  const { subjects, loading, refetch } = useScheduledSubjects();
 
   useEffect(() => {
-    if (fetchedSubjects) {
-      setSubjects(fetchedSubjects);
-    }
-  }, [fetchedSubjects]);
+    refetch();
+  }, [refetch]);
 
   if (loading) return <Loading />;
 
@@ -26,22 +22,27 @@ export default function ScheduledList() {
     );
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-2">
-      {subjects.map((subject) => (
-        <div
-          key={subject.subjectId}
-          className="p-2 mt-2 rounded-lg bg-gray-50 flex flex-col"
-        >
-          {/* 날짜를 박스 왼쪽 상단에 작게 표시 */}
-          <span className="text-gray-400 text-xs mb-1">{subject.date}</span>
+    <div className="w-full max-w-2xl mx-auto space-y-2 px-4 mt-2 mb-10">
+      {subjects.map((subject, idx) => {
+        const prevDate = idx > 0 ? subjects[idx - 1].date : null;
+        const showDateDivider = prevDate !== subject.date;
 
-          <SubjectTitleEdit
-            subjectId={subject.subjectId}
-            subjectTitle={subject.subjectTitle}
-            subjectDate={subject.date}
-          />
-        </div>
-      ))}
+        return (
+          <div key={subject.subjectId}>
+            {showDateDivider && (
+              <div className="text-gray-400 text-sm mt-4">{subject.date}</div>
+            )}
+
+            <div className="p-2 mt-2 rounded-lg bg-gray-100 transition-all hover:bg-orange-100">
+              <SubjectTitleEdit
+                subjectId={subject.subjectId}
+                subjectTitle={subject.subjectTitle}
+                subjectDate={subject.date}
+              />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
