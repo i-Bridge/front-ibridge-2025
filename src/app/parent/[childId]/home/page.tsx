@@ -4,24 +4,12 @@ import AiComment from './_components/AiComment';
 import ContentSwitcher from './_components/ContentSwitcher';
 import { ChildPageParams } from '@/types/page-props';
 import NotFound from '@/components/Exception/not-found';
+import {Subject} from '@/types/index';
 
-interface Subject {
-  subjectId: number;
-  subjectTitle: string;
-  answer: boolean;
-  date: string; // yyyy-MM-dd
-  image: string | null;
-}
 
 interface HomeData {
-  name: string; // 자녀 이름
+  hasNext: boolean;
   subjects: Subject[];
-  cumulativeAnswerCount: number;
-  mostTalkedCategory: string;
-  positiveCategory: string;
-  negativeCategory: string;
-  emotion: number;
-  newGrape: number;
 }
 
 interface BannerData {
@@ -47,7 +35,15 @@ export default async function HomePage({ params }: ChildPageParams) {
   }
 
   const homeData = homeRes.data;
-  const bannerData = bannerRes.data;
+  const  bannerData = bannerRes?.data ?? {
+      cumulativeAnswerCount: 0,
+      mostTalkedCategory: '',
+      positiveCategory: '',
+      negativeCategory: '',
+      emotion: 0,
+      name: '',
+      newGrape: 0,
+    };
 
   if (!homeData || !bannerData) {
     return <NotFound message="데이터가 존재하지 않습니다." />;
