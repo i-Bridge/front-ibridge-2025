@@ -26,6 +26,8 @@ export default function VideoRecorder({
   const postedSetRef = useRef<Set<string>>(new Set());
   const recognizedTextRef = useRef('');
   const subjectIdRef = useRef(subjectId);
+  // ✅ [추가] 말 멈춤 감지를 위한 타이머의 ID를 저장할 ref입니다.
+  const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     subjectIdRef.current = subjectId;
@@ -35,6 +37,7 @@ export default function VideoRecorder({
   // 녹화 시작 프로세스가 진행 중인지 추적하는 상태. 더블클릭 방지용.
   const [isStarting, setIsStarting] = useState(false);
   const [isWaitingForAI, setIsWaitingForAI] = useState(true); // AI 응답 대기중
+  const [isUserSpeaking, setIsUserSpeaking] = useState(false); // 사용자 말하는 중
 
   useEffect(() => {
     // 이 로직은 버튼 비활성화 상태를 끊김 없이 유지하기 위한 "역할 교대"를 담당합니다.
@@ -133,6 +136,8 @@ export default function VideoRecorder({
 
     // 즉시 '시작 중' 상태로 만들어 버튼을 비활성화합니다.
     setIsStarting(true);
+    // ✅ [추가] 녹화 시작 시, 사용자 음성 감지 상태를 초기화합니다.
+    setIsUserSpeaking(false);
 
     try {
       console.log('🎬 녹화 시작 요청됨');
@@ -188,7 +193,13 @@ export default function VideoRecorder({
     if (recognitionRef.current) {
       recognitionRef.current.stop();
     }
+    // 종료 시 타이머 제거
+    if (speechTimeoutRef.current) {
+      clearTimeout(speechTimeoutRef.current);
+    }
     setIsRecording(false);
+    // 종료 시 사용자 음성 감지 상태 해제
+    setIsUserSpeaking(false);
   };
 
   const handleRecognitionEnd = useCallback(async () => {
@@ -207,7 +218,15 @@ export default function VideoRecorder({
     recognition.lang = 'ko-KR';
     recognition.interimResults = true;
     recognition.continuous = true;
+
     recognition.onresult = (event: SpeechRecognitionEvent) => {
+      // 1. 이전 타이머가 있다면 초기화합니다.
+      if (speechTimeoutRef.current) {
+        clearTimeout(speechTimeoutRef.current);
+      }
+      // 2. 음성 결과가 들어왔으므로, '말하는 중' 상태로 설정합니다.
+      setIsUserSpeaking(true);
+
       let finalTranscript = '';
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
@@ -217,7 +236,14 @@ export default function VideoRecorder({
       if (finalTranscript) {
         recognizedTextRef.current += finalTranscript + ' ';
       }
+
+      // 3.'말 멈춤'으로 간주하고 상태를 false로 바꾸는 새 타이머를 설정합니다.
+      speechTimeoutRef.current = setTimeout(() => {
+        console.log('🎤 사용자 말 멈춤 감지 (타임아웃)');
+        setIsUserSpeaking(false);
+      }, 1000);
     };
+
     recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
       console.error('🎤 음성 인식 오류:', e);
     };
@@ -291,20 +317,34 @@ export default function VideoRecorder({
     }
   };
 
+  const feedbackText = isRecording
+    ? isUserSpeaking
+      ? '듣고 있어요...'
+      : '지금 말씀해주세요!'
+    : '버튼을 눌러 말해보세요!';
+
   return (
     <div
       className="flex flex-col items-center min-w-[300px] max-w-[400px] gap-4 p-10 pr-14 bg-contain bg-center bg-no-repeat "
       style={{ backgroundImage: `url('/images/영상박스_점선.png')` }}
     >
-      <video
-        ref={videoRef}
-        className="w-80 h-60 bg-black rounded shadow-sm mt-4"
-        autoPlay
-        muted
-      />
-      <canvas ref={canvasRef} className="hidden" /> 
-      <div className="text-gray-700 w-80 p-2 bg-orange-200 rounded shadow-sm text-sm">
-        <strong>🎙️버튼을 눌러 말해보세요!</strong>
+      {/* ✅ [수정] 비디오를 div로 감싸고, isUserSpeaking 상태에 따라 빛나는 효과를 추가합니다. */}
+      <div
+        className={`relative transition-all duration-300 rounded-lg ${isUserSpeaking ? 'ring-4 ring-green-400 ring-offset-2 animate-pulse' : ''}`}
+      >
+        <video
+          ref={videoRef}
+          className="w-80 h-60 bg-black rounded shadow-sm"
+          autoPlay
+          muted
+        />
+      </div>
+      <canvas ref={canvasRef} className="hidden" />
+      {/* 안내 텍스트를 동적인 feedbackText로 변경합니다. */} 
+      <div className="text-gray-700 w-80 p-2 bg-orange-200 rounded shadow-sm text-sm h-10 flex items-center justify-center">
+        <strong className="transition-opacity duration-300">
+          🎙️ {feedbackText}
+        </strong>
       </div>
       {!isRecording ? (
         <button
