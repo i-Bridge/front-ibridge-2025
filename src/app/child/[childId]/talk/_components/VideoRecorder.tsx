@@ -180,12 +180,34 @@ export default function VideoRecorder({
       startSTT();
     } catch (err) {
       console.error('❌ 녹화 시작 실패:', err);
+      if (err instanceof Error) {
+        switch (err.name) {
+          case 'NotAllowedError':
+            showError(
+              '카메라와 마이크 권한을 허용해야 대화를 시작할 수 있어요.',
+            );
+            break;
+          case 'NotFoundError':
+            showError(
+              '연결된 카메라나 마이크를 찾을 수 없어요. 기기를 확인해주세요.',
+            );
+            break;
+          case 'NotReadableError':
+            showError(
+              '카메라나 마이크를 사용할 수 없어요. 다른 프로그램이 사용 중인지 확인해주세요.',
+            );
+            break;
+          default:
+            showError(
+              '녹화를 시작하는 중 문제가 발생했습니다. 페이지를 새로고침 해주세요.',
+            );
+            break;
+        }
+      }
     } finally {
-      // 모든 작업이 끝나면 (성공하든 실패하든) '시작 중' 상태를 해제합니다.
       setIsStarting(false);
     }
   };
-
   const stopRecording = () => {
     if (mediaRecorderRef.current?.state === 'recording') {
       mediaRecorderRef.current.stop();
