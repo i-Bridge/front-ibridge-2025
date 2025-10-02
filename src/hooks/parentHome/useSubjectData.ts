@@ -6,14 +6,7 @@ import { useEffect, useState } from 'react';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import { Fetcher } from '@/lib/fetcher';
 import { useParams } from 'next/navigation';
-
-interface Question {
-  questionId: number;
-  text: string;
-  video: string;
-  image: string;
-  answer: string;
-}
+import{ Question } from '@/types/index';
 
 interface Subject {
   subjectId: number;

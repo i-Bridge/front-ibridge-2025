@@ -2,14 +2,7 @@ import Image from 'next/image';
 import { useState, useRef } from 'react';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import { useSubjectData } from '@/hooks/parentHome/useSubjectData';
-
-interface Question {
-  questionId: number;
-  text: string;
-  video: string;
-  image: string;
-  answer: string;
-}
+import { Question } from '@/types/index';
 
 export default function AnalysisList() {
   const { selectedQuestionId, setSelectedQuestionId } = useSubjectStore();

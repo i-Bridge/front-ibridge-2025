@@ -1,14 +1,7 @@
 'use client';
 
 import { useSubjectStore } from '@/store/useSubjectStore';
-
-interface Question {
-  questionId: number;
-  text: string;
-  video: string;
-  image: string;
-  answer: string;
-}
+import { Question } from '@/types/index';
 
 interface Props {
   questions: Question[];
