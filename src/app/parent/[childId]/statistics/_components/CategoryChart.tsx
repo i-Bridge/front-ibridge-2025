@@ -24,9 +24,14 @@ const sizeScale = (count: number, maxCount: number) => {
 
 // positiveScore 기반 색상
 const getColor = (score: number) => {
-  const r = Math.round(0 + score * (255 - 0));
-  const g = Math.round(191 + score * (165 - 191));
-  const b = Math.round(255 + score * (0 - 255));
+  // 점수 0~100 범위에서만 처리
+  const s = Math.min(Math.max(score, 0), 100);
+
+  // 하늘색 (135, 206, 235) → 주황색 (255, 165, 0)
+  const r = Math.round(135 + (255 - 135) * (s / 100)); // 135 → 255
+  const g = Math.round(206 + (165 - 206) * (s / 100)); // 206 → 165
+  const b = Math.round(235 + (0 - 235) * (s / 100));   // 235 → 0
+
   return `rgb(${r},${g},${b})`;
 };
 
