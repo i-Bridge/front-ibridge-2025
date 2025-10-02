@@ -5,7 +5,6 @@ import { Fetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { useSubjectStore } from '@/store/useSubjectStore';
-import { useDateStore } from '@/store/useDateStore';
 import {
   Type1Notice,
   Type2Notice,
@@ -13,6 +12,7 @@ import {
   Type4Notice,
 } from './MailTypes';
 import emitter from '@/lib/eventBus';
+import { useSubjectsInfinite } from '@/hooks/parentHome/useSubjectsInfinite';
 
 interface Notice {
   noticeId: number;
@@ -59,7 +59,7 @@ export default function MailBox() {
   const [open, setOpen] = useState(false); // 드롭다운 상태
   const [fetched, setFetched] = useState(false); // 버튼 이벤트 계속 발생해도 처음 한 번만 호출하게
   const { setSelectedSubjectId, setShowPanels } = useSubjectStore();
-  const { setSelectedDate } = useDateStore();
+  const { loadNext } = useSubjectsInfinite();
   const MAX_VISIBLE = 3;
 
   // 🔹 버튼 클릭 시 열리고, 처음 열릴 때만 fetch
@@ -76,43 +76,34 @@ export default function MailBox() {
 
   // 🔹 자식 답변 열람 handle
   async function handleView(
-    noticeId: number | null,
-    senderId: number | null,
-    subject: number | null,
-    time: string | null,
+    noticeId: number,
+    senderId: number|null,
+    subjectId: number,
+    time: string,
   ) {
     if (!noticeId || !time) return;
-    //+)notice 답변 열람 엔드포인트 호출 -> notice, readSubject 정보 바뀜
-    const res = await Fetcher('/parent/openNotice', {
-      method: 'POST',
-      data: { noticeId: noticeId },
-    });
 
-    if (res.isSuccess) {
-      console.log('메일 삭제 성공:', res.message);
-    } else {
-      console.error('메일 삭제 실패:', res.message);
-    }
+    loadNext(noticeId, subjectId);
 
     //알람 업데이트, 알림창 닫아짐
     await fetchNoticeData(setNoticeData, setError);
     setOpen(false);
 
-    //선택날짜 설정
-    const date = time.split(' ')[0]; // "2025-08-12"
-
     const currentChildId = Number(params.childId);
+
+    setSelectedSubjectId(subjectId);
+    setShowPanels(true);
+
     if (currentChildId !== senderId) {
       //해당 자식의 답변 열람 화면으로 이동, 자식 바뀌며 readSubject 자동 호출
+
       router.push(`/redirect/mailToSubject?target=/parent/${senderId}/home`);
     } else {
       //weekly router.refresh()로 readSubject 자동 호출
       emitter.emit('reloadReadData');
     }
 
-    setSelectedDate(date);
-    setSelectedSubjectId(subject);
-    setShowPanels(true);
+    
   }
 
   // 🔹요청 accept handle
@@ -191,24 +182,25 @@ export default function MailBox() {
 
     return (
       <div className="mb-4">
-      {label && (
-  <div className="flex items-center justify-between mb-2">
-    <div className="text-sm text-gray-500">{label}</div>
-    {label === '답변 열람' && (
-      <button
-        onClick={handleReadAll}
-        disabled={mails.length === 0} // 🔹 메일 없으면 비활성화
-        className={`text-xs px-2 py-1 rounded border 
-          ${mails.length === 0 
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+        {label && (
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm text-gray-500">{label}</div>
+            {label === '답변 열람' && (
+              <button
+                onClick={handleReadAll}
+                disabled={mails.length === 0} // 🔹 메일 없으면 비활성화
+                className={`text-xs px-2 py-1 rounded border 
+          ${
+            mails.length === 0
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
           }`}
-      >
-        모두 열람
-      </button>
-    )}
-  </div>
-)}
+              >
+                모두 열람
+              </button>
+            )}
+          </div>
+        )}
 
         <div className="flex flex-col gap-2 border border-gray-200 rounded-lg ">
           {loading ? (
@@ -309,25 +301,34 @@ export default function MailBox() {
       </button>
 
       {/* 드롭다운 내용 */}
-      
-{open && (
-  <div className="absolute z-49 mt-2 w-96 right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
-    <div className="flex justify-between items-center mb-4">
-      <h3 className="text-lg font-bold text-center ">메일함</h3>
-      <button
-        onClick={() => setOpen(false)}
-        className="text-red-700 hover:text-red-900 font-bold"
-      >
-        X
-      </button>
-    </div>
 
-    {/* ✅ 로딩/에러 상태를 MailRow로 넘김 */}
-    <MailRow mails={row1Mails} label="알림" loading={loading} error={error} />
-    <MailRow mails={row2Mails} label="답변 열람" loading={loading} error={error} />
-  </div>
-)}
+      {open && (
+        <div className="absolute z-49 mt-2 w-96 right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-bold text-center ">메일함</h3>
+            <button
+              onClick={() => setOpen(false)}
+              className="text-red-700 hover:text-red-900 font-bold"
+            >
+              X
+            </button>
+          </div>
 
+          {/* ✅ 로딩/에러 상태를 MailRow로 넘김 */}
+          <MailRow
+            mails={row1Mails}
+            label="알림"
+            loading={loading}
+            error={error}
+          />
+          <MailRow
+            mails={row2Mails}
+            label="답변 열람"
+            loading={loading}
+            error={error}
+          />
+        </div>
+      )}
     </div>
   );
 }
