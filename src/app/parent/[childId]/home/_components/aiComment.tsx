@@ -1,6 +1,7 @@
 'use client';
+
 import { useState, useEffect, useRef } from 'react';
-import { EmotionId, EMOTIONS } from '@/constants/emotions';
+import { EMOTIONS } from '@/constants/emotions';
 
 const bannerTitles = [
   '최근 아이가 즐거움을 느끼며 자주 이야기하는 주제가 있어요 ✨ 함께 살펴볼까요?',

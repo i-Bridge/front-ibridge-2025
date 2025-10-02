@@ -26,11 +26,12 @@ async function getFreshSession(): Promise<Session | null> {
   if (!res.ok) return null;
   return res.json();
 }
-
 export async function Fetcher<T = undefined>(
   url: string,
   options: FetcherOptions = {},
 ): Promise<ApiResponse<T>> {
+  const fullUrl = `${process.env.NEXT_PUBLIC_API_URL}${url}`;
+
   try {
     let session: Session | null = null;
 
@@ -59,12 +60,10 @@ export async function Fetcher<T = undefined>(
     }
 
     const res = await axios({
-      url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
+      url: fullUrl,
       method: options.method ?? 'GET',
       headers: baseHeaders,
-      ...(options.method !== 'GET' && options.data
-        ? { data: options.data }
-        : {}),
+      ...(options.method !== 'GET' && options.data ? { data: options.data } : {}),
       params: options.params,
     });
 
@@ -72,27 +71,27 @@ export async function Fetcher<T = undefined>(
 
     if (responseData.code !== '200') {
       console.warn(
-        `⚠️ API 응답: 실패 [${responseData.code}]: ${responseData.message}`,
+        `⚠️ API 응답 실패 [${responseData.code}] at ${fullUrl}: ${responseData.message}`,
+        { response: responseData },
       );
+    } else {
+      console.log(`✅ API 호출 성공: ${fullUrl}`);
     }
 
     return responseData;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
-      const errorUrl = error.config?.url;
-      const errorMessage =
-        error.response?.data?.message || error.message || '서버 통신 오류';
+      const errorMessage = error.response?.data?.message || error.message || '서버 통신 오류';
+      const errorUrl = error.config?.url || fullUrl;
 
       console.error(
         `❌ Axios Error [${status}] at ${errorUrl}: ${errorMessage}`,
-        {
-          response: error.response?.data,
-        },
+        { response: error.response?.data },
       );
+    } else {
+      console.error(`❌ 일반 API Error at ${fullUrl}:`, error);
     }
-
-    console.error('❌ 일반 API Error:', error);
     throw error;
   }
 }
