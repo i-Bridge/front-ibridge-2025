@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import CategorySubjectList from '@/components/Question/CategorySubjectList'; 
 
 interface Keyword {
   keyword: string;
@@ -203,6 +204,10 @@ export default function CategoryChart({
               onClick={() => handleClick(cat.keyword)}
             >
               {isActive && (
+                <div>
+                <div className="absolute inset-x-0 bottom-0 bg-white shadow-md rounded-t-lg p-4">
+    <CategorySubjectList childId={childId} keywords={cat.keyword} />
+  </div>
                 <button
                   className="absolute top-2 right-2 text-white text-lg font-bold"
                   onClick={() => {
@@ -212,6 +217,7 @@ export default function CategoryChart({
                 >
                   ✕
                 </button>
+                </div>
               )}
               <span className="text-xs font-bold break-words text-center">
                 {cat.keyword}
