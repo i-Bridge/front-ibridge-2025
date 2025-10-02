@@ -3,7 +3,7 @@ export interface Subject {
   subjectTitle: string;
   answer: boolean;
   date: string; // yyyy-MM-dd
-  image: string | null;
+  image?: string | null;
 }
 
 export interface ScheduledSubject {

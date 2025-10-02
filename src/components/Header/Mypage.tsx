@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import LogoutButton from '@/components/Auth/LogoutButton';
+import { useSubjectStore } from '@/store/useSubjectStore';
 
 type MypageDataProps = {
   childId: string;
@@ -23,6 +24,7 @@ export default function Mypage({
   userName,
   userEmail,
 }: MypageDataProps) {
+  const { setSelectedSubjectId, setShowPanels } = useSubjectStore();
   return (
     <div className="z-50">
       <div className="flex items-center p-4 border-b ">
@@ -64,6 +66,11 @@ export default function Mypage({
                   key={child.childId}
                   href={`/parent/${child.childId}/home`}
                   className="flex flex-col items-center"
+                  onClick={() => {
+                    // 다른 자식 클릭 시 상태 초기화
+                    setSelectedSubjectId(null);
+                    setShowPanels(false);
+                  }}
                 >
                   <div
                     className={`w-16 h-16 rounded-full flex items-center justify-center text-sm font-medium ${
