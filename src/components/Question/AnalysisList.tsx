@@ -11,6 +11,7 @@ export default function AnalysisList() {
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
 
   if (!questions) return null;
+
   const selectedIndex = questions.findIndex(
     (q) => q.questionId === selectedQuestionId,
   );
@@ -37,88 +38,80 @@ export default function AnalysisList() {
         }}
         controls
         onEnded={() => handleVideoEnd(q.questionId)}
-        className="w-1/2 mx-auto"
+        className="w-40 h-28 object-cover rounded-lg shadow"
       >
         <source src={q.video} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
     ) : (
       <div
-        className="relative cursor-pointer w-1/2 mx-auto"
+        className="relative cursor-pointer w-40 h-28"
         onClick={() => handlePlayClick(q.questionId)}
       >
         <Image
           src={q.image}
           alt="썸네일"
-          width={500}
-          height={300}
-          className="w-full h-auto object-cover"
+          width={160}
+          height={112}
+          className="w-full h-full object-cover rounded-lg shadow"
         />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-4xl">
-          ▶
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="bg-black/50 rounded-full p-2">
+            <span className="text-white text-xl">▶</span>
+          </div>
         </div>
       </div>
     );
   };
 
+  const renderQuestionCard = (q: Question, idx: number) => (
+    <div
+      key={q.questionId}
+      className="bg-white rounded-2xl p-6 mb-6 shadow-md"
+    >
+      {/* 질문 */}
+      <h4 className="text-base font-semibold text-gray-800 mb-4">
+        Q{idx + 1}. {q.text}
+      </h4>
+
+      {/* 영상 + 답변 2열 레이아웃 */}
+      <div className="flex items-start gap-6">
+        <p className="text-gray-700 leading-relaxed flex-1">
+          {q.answer}
+        </p>
+        {renderVideoOrThumbnail(q)}
+        
+      </div>
+    </div>
+  );
+
   let content;
   if (!selectedQuestionId) {
     // 전체 보기
-    content = (
-      <>
-        {questions.map((q, idx) => (
-          <div key={q.questionId} className="mb-4">
-            <h4 className=" mb-2 text-gray-600 text-sm">
-              Q{idx + 1}: {q.text}
-            </h4>
-            <p className="text-gray-700 mb-4 font-semibold">답변: {q.answer}</p>
-            <div className="relative">{renderVideoOrThumbnail(q)}</div>
-            <div className="border-t mt-4"></div>
-          </div>
-        ))}
-      </>
-    );
+    content = <>{questions.map((q, idx) => renderQuestionCard(q, idx))}</>;
   } else {
-    // 선택된 질문
-
     if (!selectedQuestion) {
       content = (
-        <div className="font-sm text-gray-200">
-          선택한 질문을 찾을 수 없습니다.
-        </div>
+        <div className="text-gray-400 text-sm">선택한 질문을 찾을 수 없습니다.</div>
       );
     } else {
-      //<h4 className="  font-medium">q{selectedIndex + 1}: {selectedQuestion.text}</h4>
-      content = (
-        <>
-          <p className="text-gray-700 ">답변: {selectedQuestion.answer}</p>
-          <div className="relative mt-4 ">
-            {renderVideoOrThumbnail(selectedQuestion)}
-          </div>
-        </>
-      );
+      content = renderQuestionCard(selectedQuestion, selectedIndex);
     }
   }
 
   return (
-    <div>
-      <div className=" mt-8 pt-4 mr-12 mb-20 relative ">
-        {selectedQuestionId !== null ? (
-          <div className="border-t">
-            <button
-              onClick={() => setSelectedQuestionId(null)}
-              className="absolute  -top-3 right-8 px-1 py-0 text-sm text-white bg-orange-400 rounded-xl hover:bg-orange-200"
-            >
-              전체보기
-            </button>
-          </div>
-        ) : (
-          <h3 className="absolute -top-6 left-0 py-3 text-sm font-light text-gray-600 "></h3>
-        )}
-        <div className=" ">
-          <div className="mt-3 ">{content}</div>
+    <div className="w-[700px] mt-8 mb-20 relative bg-orange-200 p-10 rounded-3xl ">
+      {selectedQuestionId !== null && (
+        <div className="absolute -top-10 right-0">
+          <button
+            onClick={() => setSelectedQuestionId(null)}
+            className="px-3 py-1 text-sm text-white bg-orange-500 rounded-lg hover:bg-orange-400 transition"
+          >
+            전체보기
+          </button>
         </div>
-      </div>
+      )}
+      {content}
     </div>
   );
 }
