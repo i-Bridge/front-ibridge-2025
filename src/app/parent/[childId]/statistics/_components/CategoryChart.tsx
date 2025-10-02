@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import CategorySubjectList from '@/components/Question/CategorySubjectList'; 
 
 interface Keyword {
   keyword: string;
@@ -24,9 +25,14 @@ const sizeScale = (count: number, maxCount: number) => {
 
 // positiveScore 기반 색상
 const getColor = (score: number) => {
-  const r = Math.round(0 + score * (255 - 0));
-  const g = Math.round(191 + score * (165 - 191));
-  const b = Math.round(255 + score * (0 - 255));
+  // 점수 0~100 범위에서만 처리
+  const s = Math.min(Math.max(score, 0), 100);
+
+  // 하늘색 (135, 206, 235) → 주황색 (255, 165, 0)
+  const r = Math.round(135 + (255 - 135) * (s / 100)); // 135 → 255
+  const g = Math.round(206 + (165 - 206) * (s / 100)); // 206 → 165
+  const b = Math.round(235 + (0 - 235) * (s / 100));   // 235 → 0
+
   return `rgb(${r},${g},${b})`;
 };
 
@@ -47,7 +53,7 @@ export default function CategoryChart({
   const centerY = containerHeight / 2;
 
   // 더미 데이터
-  const USE_DUMMY_DATA = true;
+  const USE_DUMMY_DATA = false;
   const dummyCategories: Keyword[] = [
     { keyword: '친구들과 놀이터에서', count: 15, positiveScore: 0.8 },
     { keyword: '공룡', count: 10, positiveScore: 0.6 },
@@ -57,7 +63,22 @@ export default function CategoryChart({
   ];
 
   const categories = USE_DUMMY_DATA ? dummyCategories : propCategories || [];
-  if (!categories.length) return null;
+    if (!categories.length) {
+    return (
+      <div>
+        <h3 className="text-lg font-semibold mb-1">
+          {childname || '아이'}의 분석 결과
+        </h3>
+        <p className="text-xs text-gray-400 mb-4">
+          답변 15개 쌓일 때마다 업데이트 진행됩니다.
+        </p>
+        <div className="p-16 text-sm text-gray-500 border rounded">
+          아직 군집화 결과가 존재하지 않습니다. <br />
+          아이의 답변이 더 필요합니다.
+        </div>
+      </div>
+    );
+  }
   const maxCount = Math.max(...categories.map((c) => c.count));
 
   // =====================
@@ -183,6 +204,10 @@ export default function CategoryChart({
               onClick={() => handleClick(cat.keyword)}
             >
               {isActive && (
+                <div>
+                <div className="absolute inset-x-0 bottom-0 bg-white shadow-md rounded-t-lg p-4">
+    <CategorySubjectList childId={childId} keywords={cat.keyword} />
+  </div>
                 <button
                   className="absolute top-2 right-2 text-white text-lg font-bold"
                   onClick={() => {
@@ -192,6 +217,7 @@ export default function CategoryChart({
                 >
                   ✕
                 </button>
+                </div>
               )}
               <span className="text-xs font-bold break-words text-center">
                 {cat.keyword}

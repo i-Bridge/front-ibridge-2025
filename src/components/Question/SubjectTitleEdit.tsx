@@ -2,22 +2,23 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useDateStore } from '@/store/useDateStore';
 import { Fetcher } from '@/lib/fetcher';
-import { useHomeData } from '@/hooks/parentHome/useHomeData';
+import { useSubjectsInfinite } from '@/hooks/parentHome/useSubjectsInfinite';
+import { useScheduledSubjects } from '@/hooks/parentHome/useScheduledSubjects';
 import { showWarning, showError } from '@/lib/toast';
 
 interface Props {
   subjectId: number;
   subjectTitle: string;
+  subjectDate: string; // YYYY-MM-DD
 }
 
 const MAX_REFRESH_COUNT = 2;
 
-const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
+const SubjectTitleEdit = ({ subjectId, subjectTitle, subjectDate }: Props) => {
   const { childId } = useParams();
-  const { selectedDate } = useDateStore();
-  const { refetch } = useHomeData();
+  const { refetch: refetchInfinite } = useSubjectsInfinite();
+  const { refetch: refetchScheduled } = useScheduledSubjects();
 
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(subjectTitle);
@@ -25,7 +26,7 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
 
   const [refreshCount, setRefreshCount] = useState(0);
   const [showTooltip, setShowTooltip] = useState(false);
-  const localStorageKey = `refreshCount-${childId}-${selectedDate}-${subjectId}`;
+  const localStorageKey = `refreshCount-${childId}-${subjectId}`;
 
   useEffect(() => {
     const stored = localStorage.getItem(localStorageKey);
@@ -45,23 +46,27 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
   const handleSave = async () => {
     try {
       const res = await Fetcher(
-        `/parent/${childId}/questions/edit?date=${selectedDate}`,
-        {
-          method: 'PATCH',
-          data: { title: inputValue },
-        },
+        `/parent/${childId}/questions/edit?subjectId=${subjectId}`,
+        { method: 'PATCH', data: { title: inputValue } }
       );
-
-      console.log('!!!!!!!!!!!!편집 api:' + res);
+      console.log('편집 저장 응답:', res);
       if (res?.isSuccess) {
         setTitle(inputValue);
         setEditing(false);
-        refetch();
+
+        // 오늘 날짜면 infiniteSubjects refetch, 아니면 scheduledSubjects refetch
+        const todayStr = new Date().toISOString().slice(0, 10);
+        if (subjectDate === todayStr) {
+          refetchInfinite();
+        } else {
+          refetchScheduled();
+        }
       } else {
         showError('저장 실패');
       }
     } catch (err) {
       console.error('편집 저장 실패:', err);
+      showError('편집 저장 중 오류 발생');
     }
   };
 
@@ -73,14 +78,13 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
 
     try {
       const res = await Fetcher<Props>(
-        `/parent/${childId}/questions/reroll?date=${selectedDate}`,
+        `/parent/${childId}/questions/reroll?subjectId=${subjectId}`
       );
 
       const subjectdata = res.data;
+      console.log('새로고침 응답:', res);
+      if (!subjectdata) return;
 
-      if (!subjectdata) {
-        return <div>subjectdata 로딩 중...</div>;
-      }
       if (res?.isSuccess) {
         const newTitle = subjectdata.subjectTitle;
         setTitle(newTitle);
@@ -90,10 +94,17 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
         setRefreshCount(newCount);
         localStorage.setItem(localStorageKey, String(newCount));
 
-        refetch();
+        // 새로고침 후도 날짜 기준 refetch
+        const todayStr = new Date().toISOString().slice(0, 10);
+        if (subjectDate === todayStr) {
+          refetchInfinite();
+        } else {
+          refetchScheduled();
+        }
       }
     } catch (err) {
       console.error('새로고침 실패:', err);
+      showError('새로고침 중 오류 발생');
     }
   };
 
@@ -106,7 +117,7 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
           onChange={(e) => setInputValue(e.target.value)}
         />
       ) : (
-        <span className="">{title}</span>
+        <span>{title}</span>
       )}
 
       <div className="flex gap-2">
@@ -117,65 +128,22 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
               className="text-green-600 hover:underline"
               aria-label="저장"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="size-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                />
-              </svg>
+              저장
             </button>
-
             <button
               onClick={handleCancel}
               className="text-gray-500 hover:underline"
               aria-label="취소"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="size-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                />
-              </svg>
+              취소
             </button>
           </>
         ) : (
           <>
-            {/* 수정 아이콘 */}
             <button onClick={handleEditClick} className="text-blue-600">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 
-                  19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 
-                  0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-                />
-              </svg>
+              수정
             </button>
-            {/* 새로고침 아이콘 + 툴팁 */}
+
             <div
               className="relative"
               onMouseEnter={() => setShowTooltip(true)}
@@ -190,22 +158,7 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
                     : 'hover:text-orange-700'
                 }`}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-5 h-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 
-                       3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 
-                       8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                  />
-                </svg>
+                새로고침
               </button>
 
               {showTooltip && (
@@ -213,8 +166,7 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
                   새로고침하면 질문을 다시 생성할 수 있습니다.
                   <br />
                   새로고침 기회는{' '}
-                  <strong>{MAX_REFRESH_COUNT - refreshCount}</strong>번
-                  남았습니다.
+                  <strong>{MAX_REFRESH_COUNT - refreshCount}</strong>번 남았습니다.
                 </div>
               )}
             </div>

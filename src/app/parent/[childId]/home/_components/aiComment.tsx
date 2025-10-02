@@ -1,5 +1,7 @@
 'use client';
+
 import { useState, useEffect, useRef } from 'react';
+import { EMOTIONS } from '@/constants/emotions';
 
 const bannerTitles = [
   '최근 아이가 즐거움을 느끼며 자주 이야기하는 주제가 있어요 ✨ 함께 살펴볼까요?',
@@ -10,31 +12,32 @@ const bannerTitles = [
 ];
 
 
-const mockupData = [
-  '최근 아이는 슬라임에 관심이 많으며, 다양한 재료를 섞어보는 것을 즐기고 있습니다.',
+interface AICommentData {
+  childname: string; // 자녀 이름
+  cumulativeAnswerCount: number;
+  newGrape: number;
+  mostTalkedCategory: string;
+  positiveCategory: string;
+  negativeCategory: string;
+  emotion: number | null; // 없으면 null
+}
 
-  '아이의 장래 희망은 우주 비행사이며, 우주에 가보고 싶은 이유를 이야기했습니다.',
-
-  '요즘 가장 좋아하는 놀이는 블록 쌓기이며, 더 높은 구조물을 만들고 싶어 합니다.',
-
-  '최근 관심 있는 주제는 공룡이며, 티라노사우루스에 대해 더 많이 알고 싶어 합니다.',
-
-  '아이에게 ‘세상에서 가장 좋아하는 음식’을 물어보았을 때, 초코 아이스크림이라고 답했습니다.',
-];
-const emojiData = [
-  '🙂', // 첫 번째 문장 - 아이가 혼자 있는 시간을 선호하는 상태
-  '🙂', // 두 번째 문장 - 피곤해하고 쉬고 싶어하는 상태
-  '🤔', // 세 번째 문장 - 마음이 복잡할 때 멍하니 있는 상태
-  '📚', // 네 번째 문장 - 공부에 어려움을 겪고 있지만 노력하는 상태
-  '😄', // 다섯 번째 문장 - 친구와 즐겁게 놀면서 기분이 좋아진 상태
-];
-
-export default function AiComment(childname: {childname: string}) {
+export default function AiComment({
+  childname,
+  cumulativeAnswerCount,
+  newGrape,
+  mostTalkedCategory,
+  positiveCategory,
+  negativeCategory,
+  emotion,
+}: AICommentData) {
   const [displayedText, setDisplayedText] = useState('');
   const [currentTitle, setCurrentTitle] = useState('');
   const typingIntervalRef = useRef<number | null>(null);
 
-  // 랜덤 문장 선택
+  const name = childname || '아이';
+
+  // 랜덤 배너 타이틀 선택
   const pickRandomTitle = () => {
     const randomIndex = Math.floor(Math.random() * bannerTitles.length);
     setCurrentTitle(bannerTitles[randomIndex]);
@@ -45,12 +48,11 @@ export default function AiComment(childname: {childname: string}) {
   useEffect(() => {
     if (!currentTitle) return;
 
-    // 이전 interval 제거
     if (typingIntervalRef.current) {
       clearInterval(typingIntervalRef.current);
     }
 
-    setDisplayedText(''); // 이전 글자 초기화
+    setDisplayedText('');
     let index = 0;
 
     typingIntervalRef.current = window.setInterval(() => {
@@ -72,41 +74,105 @@ export default function AiComment(childname: {childname: string}) {
 
   // 30초마다 문장 변경
   useEffect(() => {
-    pickRandomTitle(); // 초기 문장 선택
-
+    pickRandomTitle();
     const intervalId = window.setInterval(() => {
       pickRandomTitle();
     }, 30000);
-
     return () => clearInterval(intervalId);
   }, []);
-  return (
-    <div className="flex justify-center py-4">
-      <div className="w-4/5 max-w-7xl bg-orange-300 p-10 overflow-hidden rounded-3xl shadow-lg">
-        <div className="w-full mx-auto text-md space-y-2 flex flex-col items-center">
 
+// 한글 받침 확인 후 '이' 또는 '가' 붙이기
+function addSubjectParticle(name: string): string {
+  if (!name) return '아이가'; // 이름 없으면 기본값
+  const lastChar = name[name.length - 1];
+  const code = lastChar.charCodeAt(0);
+
+  // 한글 유니코드 범위인지 확인
+  if (code < 0xac00 || code > 0xd7a3) return name + '가';
+
+  const jong = (code - 0xac00) % 28; // 받침 계산
+  return name + (jong === 0 ? '가' : '이');
+}
+
+// 한글 받침 확인 후 '은' 또는 '는' 붙이기
+function addTopicParticle(name: string): string {
+  if (!name) return '아이는'; // 이름 없으면 기본값
+  const lastChar = name[name.length - 1];
+  const code = lastChar.charCodeAt(0);
+
+  // 한글 유니코드 범위인지 확인
+  if (code < 0xac00 || code > 0xd7a3) return name + '는';
+
+  const jong = (code - 0xac00) % 28; // 받침 계산
+  return name + (jong === 0 ? '는' : '은');
+}
+
+const nameWithIga = addSubjectParticle(childname); // 이/가
+const nameWithEunNeun = addTopicParticle(childname); // 은/는
+
+const emotionID = emotion?? null;
+  const Emotion = EMOTIONS.find((e) => e.id === emotionID);
+
+  // --------------------------
+  // 📌 props 기반 문장 생성
+  // --------------------------
+  const grapeCount = Math.floor(cumulativeAnswerCount / 6);
+  const sentences: string[] = [
+    // 누적 + 당일 포도송이
+    !grapeCount || grapeCount === 0
+      ? `${nameWithIga} 아직 포도송이를 수확하지 못했어요.`
+      : `${nameWithEunNeun} 지금까지 총 ${grapeCount}송이의 포도송이를 모았어요! ${
+          newGrape > 0
+            ? `오늘은 ${newGrape}개의 포도송이를 수확했어요.`
+            : `응원이 필요해요!`
+        }`,
+
+    // 가장 많이 이야기한 카테고리
+    mostTalkedCategory
+      ? `${nameWithIga} 가장 많이 이야기한 주제는 "${mostTalkedCategory}"예요.`
+      : `아직 많이 이야기한 주제가 없어요.`,
+
+    // 긍정 비율 높은 카테고리
+    positiveCategory
+      ? `긍정적인 표현이 가장 많았던 주제는 "${positiveCategory}"예요.`
+      : `아직 긍정적인 주제가 두드러지지 않았어요.`,
+
+    // 부정 비율 높은 카테고리
+    negativeCategory
+      ? `부정적인 표현이 가장 많았던 주제는 "${negativeCategory}"예요.`
+      : `아직 특별히 부정적인 주제는 없어요.`,
+
+    // 감정
+    emotion
+      ? `이번 달 ${nameWithIga} 가장 많이 선택한 감정 이모지는 "${Emotion?.emoji}"이에요.`
+      : `${nameWithIga} 표현한 감정이 아직 없어요.`,
+  ];
+
+  const emojis = ['🍇', '🌱', '💬', '😊', '😟', '💖'];
+
+  
+
+  return (
+    <div className=" py-4">
+      <div className=" max-w-7xl bg-orange-300 p-10 overflow-hidden rounded-3xl shadow-lg">
+        <div className="w-full mx-auto text-md space-y-2 flex flex-col items-center">
           {/* 배너 설명 멘트 */}
-          <div className="bg-orange-100 h-1/2 max-w-5xl rounded-3xl flex  justify-center items-center p-6 min-h-[3rem] mb-8">
+          <div className="bg-orange-100 h-1/2 max-w-5xl rounded-3xl flex justify-center items-center p-4 min-h-[3rem] mb-6">
             <div className="min-h-[2rem]">
-              <h2 className=" text-gray-900 ">
-                {childname.childname}의 이야기
-              </h2>
               <h2 className="text-xl font-bold text-center text-gray-900 ">
                 {displayedText}
               </h2>
-              
             </div>
           </div>
-          {/* 배너 요소 그리드 컨테이너 */}
+
+          {/* 배너 요소 박스 */}
           <div className="flex flex-wrap justify-center gap-4">
-            {mockupData.map((text, index) => (
+            {sentences.map((text, index) => (
               <div
                 key={index}
                 className="bg-white px-4 py-2 rounded-xl shadow-md flex items-center border border-gray-200 max-w-xs break-words"
               >
-                <span className="mr-2 text-2xl">
-                  {emojiData[index % emojiData.length]}
-                </span>
+                <span className="mr-2 text-2xl">{emojis[index % emojis.length]}</span>
                 <span className="text-base font-medium">{text}</span>
               </div>
             ))}

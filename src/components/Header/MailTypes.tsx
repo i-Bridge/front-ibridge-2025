@@ -2,7 +2,7 @@
 
 interface Notice {
   noticeId: number;
-  type: 1 | 2 | 3;
+  type: 1 | 2 | 3 | 4;
   senderId: number | null;
   senderName: string | null;
   time: string;
@@ -107,12 +107,13 @@ export function Type2Notice({
   );
 }
 
-// 🔹 type === 3 (서버 점검)
-export function Type3Notice() {
+
+// 🔹 type === 3 (포도송이 수확)
+export function Type3Notice({ mail }: { mail: Notice }) {
   return (
     <div className="flex items-center justify-between py-3 px-4">
       <div className="flex items-center space-x-2">
-        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 text-gray-600">
+        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-purple-100 text-purple-600">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="w-5 h-5"
@@ -124,15 +125,47 @@ export function Type3Notice() {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M13 16h-1v-4h-1m1-4h.01M12 20h.01M4.93 4.93l1.414 1.414M1 12h2m15.657-7.071l1.414 1.414M20 12h2m-2 0a8 8 0 11-16 0 8 8 0 0116 0z"
+              d="M12 2a10 10 0 100 20 10 10 0 000-20z"
             />
           </svg>
         </div>
-        <span className="text-sm text-gray-700">서버 점검 공지</span>
+        <span className="text-sm text-gray-700">
+          {mail.senderName ?? '자녀'}(이)가 포도송이를 하나 수확했어요!
+        </span>
       </div>
     </div>
   );
 }
+
+// 🔹 type === 4 (분석 결과 업데이트)
+export function Type4Notice({ mail }: { mail: Notice }) {
+  return (
+    <div className="flex items-center justify-between py-3 px-4">
+      <div className="flex items-center space-x-2">
+        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-green-100 text-green-600">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+        </div>
+        <span className="text-sm text-gray-700">
+          {mail.senderName ?? '자녀'}의 분석 결과가 업데이트되었어요
+        </span>
+      </div>
+    </div>
+  );
+}
+
 
 // 🔹 알림 전송된 시각
 function formatDateKST(dateStr: string) {
