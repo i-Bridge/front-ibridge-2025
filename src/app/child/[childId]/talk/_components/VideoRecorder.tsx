@@ -51,6 +51,7 @@ export default function VideoRecorder({
     }
   }, [isCharacterSpeaking, isWaitingForAI]);
 
+  // sendAnswer 함수의 로직이, 텍스트 유무에 따라 분기 처리되도록
   const sendAnswer = useCallback(async () => {
     // 답변 전송을 시작하면, 'AI 응답 대기 중' 상태로 만들어 버튼을 비활성화합니다.
     setIsWaitingForAI(true);
@@ -66,33 +67,74 @@ export default function VideoRecorder({
       return;
     }
 
-    // 2. 인식된 텍스트가 없을 경우, AI에게 보낼 특별한 신호를 정의합니다.
-    // 이 신호는 백엔드에서 해석하여 적절한 프롬프트를 생성하는 데 사용됩니다.
-    const textToSend = currentRecognizedText || '[NO_AUDIO_INPUT]';
+    // [분기 1] 인식된 텍스트가 없는 경우 (사용자가 아무 말도 안 한 경우)
+    if (!currentRecognizedText) {
+      console.log(
+        '🎤 인식된 음성이 없어 프론트엔드에서 직접 응답을 생성합니다.',
+      );
 
-    console.log('✉️ 텍스트를 /answer로 전송:', textToSend);
-    const { data, isSuccess } = await Fetcher<{
-      finished: boolean;
-      ai: string;
-    }>(`/child/${childId}/answer`, {
-      method: 'POST',
-      // 3. 백엔드에는 'subjectId'와 'text' key를 사용하여 데이터를 보냅니다.
-      data: { subjectId: currentSubjectId, text: textToSend },
-    });
+      // 미리 준비된 격려 메시지 배열
+      const noAudioPrompts = [
+        '인식된 음성이 없어요. 다시 말해볼까요?',
+        '괜찮아. 천천히 생각해보고 다시 말해볼래?',
+        '다른 질문을 해줄까?',
+      ];
 
-    if (isSuccess && data) {
-      console.log('✅ /answer 응답:', data);
-      onAIResponse(data.ai, data.finished);
+      // 배열에서 랜덤하게 하나의 메시지를 선택합니다.
+      const randomPrompt =
+        noAudioPrompts[Math.floor(Math.random() * noAudioPrompts.length)];
 
+      // 부모 컴포넌트(TalkSessionClient)로 직접 응답을 전달하여 AI가 말하는 것처럼 처리합니다.
+      // 대화는 끝나지 않았으므로 isFinished는 false입니다.
+      onAIResponse(randomPrompt, false);
+
+      // onFinished()를 호출하여 녹화 사이클이 끝났음을 알립니다.
       onFinished();
-      answerSentRef.current = true;
 
-      for (const url of pendingUploadsRef.current) {
-        await postUploaded(url);
+      // 텍스트가 없으므로 업로드 없이 MediaRecorder를 바로 중지합니다.
+      if (mediaRecorderRef.current?.state === 'recording') {
+        mediaRecorderRef.current.stop();
       }
-      pendingUploadsRef.current = [];
-    } else {
-      console.error('❌ /answer 실패');
+      return;
+    }
+    // [분기 2] 인식된 텍스트가 있는 경우 (기존 로직)
+    const textToSend = currentRecognizedText;
+    console.log('✉️ 텍스트를 /answer로 전송:', textToSend);
+
+    try {
+      const { data, isSuccess } = await Fetcher<{
+        finished: boolean;
+        ai: string;
+      }>(`/child/${childId}/answer`, {
+        method: 'POST',
+        data: { subjectId: currentSubjectId, text: textToSend },
+      });
+
+      if (isSuccess && data) {
+        onAIResponse(data.ai, data.finished);
+
+        onFinished();
+        answerSentRef.current = true;
+
+        // 텍스트가 있고 API 호출이 성공했으므로, 이제 MediaRecorder를 중지시켜 업로드를 시작합니다.
+        if (mediaRecorderRef.current?.state === 'recording') {
+          mediaRecorderRef.current.stop();
+        }
+
+        for (const url of pendingUploadsRef.current) {
+          await postUploaded(url);
+        }
+        pendingUploadsRef.current = [];
+      } else {
+        setIsWaitingForAI(false);
+        // API 실패 시에도 녹화는 중지해야 합니다.
+        if (mediaRecorderRef.current?.state === 'recording') {
+          mediaRecorderRef.current.stop();
+        }
+      }
+    } catch (error) {
+      console.error('❌ /answer API 호출 중 에러 발생:', error);
+      setIsWaitingForAI(false);
     }
   }, [childId, onAIResponse, onFinished]);
 
@@ -164,18 +206,26 @@ export default function VideoRecorder({
 
       recorder.onstop = async () => {
         console.log('🛑 [MediaRecorder] 녹화 종료됨');
-        const blob = new Blob(chunks, { type: 'video/webm' });
-        console.log('📦 영상 Blob 생성 완료, 업로드 시작');
         mediaStream.getTracks().forEach((track) => track.stop());
         mediaRecorderRef.current = null;
 
-        await uploadVideo(blob, 'video');
-        await captureAndUploadThumbnail();
+        // ✅ [수정] 이제 onstop은 "인식된 텍스트가 있을 경우에만" 업로드를 시작합니다.
+        // recognizedTextRef는 onend에서 확정되므로, 이 시점에는 최신 값입니다.
+        if (answerSentRef.current) {
+          console.log(
+            '📦 텍스트가 있어 영상 Blob 생성 및 업로드를 시작합니다.',
+          );
+          const blob = new Blob(chunks, { type: 'video/webm' }); // ✅ 필요할 때만 Blob을 생성합니다.
+          await uploadVideo(blob, 'video');
+          await captureAndUploadThumbnail();
+        } else {
+          console.log(
+            '📦 텍스트가 없어 영상 Blob 생성 및 업로드를 건너뜁니다.',
+          );
+        }
       };
-
       mediaRecorderRef.current = recorder;
       recorder.start();
-      console.log('🔴 녹화 시작됨');
       setIsRecording(true);
       startSTT();
     } catch (err) {
@@ -208,23 +258,27 @@ export default function VideoRecorder({
       setIsStarting(false);
     }
   };
+
+  // 음성 인식과 영상 녹화를 모두 '중단 요청'합니다.
   const stopRecording = () => {
-    if (mediaRecorderRef.current?.state === 'recording') {
-      mediaRecorderRef.current.stop();
-    }
+    console.log('🛑 사용자가 종료 버튼 클릭. 녹화 및 음성 인식을 중단합니다.');
     if (recognitionRef.current) {
       recognitionRef.current.stop();
     }
-    // 종료 시 타이머 제거
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
     if (speechTimeoutRef.current) {
       clearTimeout(speechTimeoutRef.current);
     }
     setIsRecording(false);
-    // 종료 시 사용자 음성 감지 상태 해제
     setIsUserSpeaking(false);
   };
 
   const handleRecognitionEnd = useCallback(async () => {
+    console.log(
+      '🏁 [SpeechRecognition] 완전히 종료됨. 이제 답변을 전송합니다.',
+    );
     await sendAnswer();
   }, [sendAnswer]);
 
