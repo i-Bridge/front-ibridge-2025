@@ -10,6 +10,8 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.90.2",
+    "@tanstack/react-query-devtools": "^5.90.2",
     "@types/next-auth": "^3.13.0",
     "axios": "^1.7.9",
     "chart.js": "^4.5.0",
