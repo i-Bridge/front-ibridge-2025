@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { EmotionId, EMOTIONS } from '@/constants/emotions';
 import { Fetcher } from '@/lib/fetcher';
 import {
@@ -33,13 +33,12 @@ export default function Calendar({
   const signup = new Date(signupDate);
 
   const [currentDate, setCurrentDate] = useState(today);
-  const [prevYearMonth, setPrevYearMonth] = useState({
-    year: today.getFullYear(),
-    month: today.getMonth() + 1,
-  });
   const [emotions, setEmotions] = useState<EmotionId[]>(
     defaultemotions.map((e) => Number(e)),
   );
+
+  // ✅ useRef로 이전 연/월 추적
+  const prevYearMonthRef = useRef({ year: today.getFullYear(), month: today.getMonth() + 1 });
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1;
@@ -52,10 +51,11 @@ export default function Calendar({
   const isCurrentMonth = startMonth.getTime() === currentMonthStart.getTime();
   const isSignupMonth = startMonth.getTime() === signupMonthStart.getTime();
 
-  // 연월 변경 시 API 호출
+  // ✅ 연/월 변경 시 감정 데이터 다시 불러오기
   useEffect(() => {
-    if (year !== prevYearMonth.year || month !== prevYearMonth.month) {
-      setEmotions([]); // 로딩 상태
+    const prev = prevYearMonthRef.current;
+    if (year !== prev.year || month !== prev.month) {
+      setEmotions([]); // 로딩 상태로 전환
 
       async function fetchEmotions() {
         const dateStr = `${year}-${String(month).padStart(2, '0')}-01`;
@@ -75,7 +75,7 @@ export default function Calendar({
       }
 
       fetchEmotions();
-      setPrevYearMonth({ year, month });
+      prevYearMonthRef.current = { year, month }; // ✅ 이전 값 갱신
     }
   }, [year, month, childId]);
 
@@ -128,7 +128,6 @@ export default function Calendar({
       {/* 날짜 표시 */}
       <div className="grid grid-cols-7 gap-2">
         {calendarDays.map((day) => {
-          // 이번 달 외 날짜는 공백
           if (day.getMonth() + 1 !== month)
             return <div key={day.toString()}></div>;
 
@@ -143,10 +142,8 @@ export default function Calendar({
           let dayColorClass = '';
 
           if (isLoading || isFutureDay || isBeforeSignupDay) {
-            // 로딩, 미래, 가입 이전 날짜는 회색
             dayColorClass = 'text-gray-400';
           } else {
-            // 가입 이후 날짜 또는 다른 달
             const emotionID = emotions[dayNumber - 1] ?? null;
             const emotion = EMOTIONS.find((e) => e.id === emotionID);
             if (emotion) {
@@ -161,7 +158,6 @@ export default function Calendar({
                 </>
               );
             }
-            // 주말 색상
             const isWeekend = getDay(day) === 0 || getDay(day) === 6;
             dayColorClass = isWeekend ? 'text-red-500' : '';
           }
