@@ -16,13 +16,22 @@ const Step0_agreement = () => {
   return (
     <div className="w-full flex flex-col gap-4 text-base px-4 py-6">
       {/* 환영 메시지 */}
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold mb-2">환영합니다 🎉</h2>
-        <p className="text-gray-600">(서비스 가입 환영 인사, 개인정보 동의, 자녀 정보 개인용으로 저장됨, 동의하고 가족 등록해서 서비스 시작 유도 멘트)</p>
-      </div>
+      <div className="text-center mb-2">
+  <h2 className="text-2xl font-bold mb-4">환영합니다 🎉</h2>
+  <p className="text-gray-600 whitespace-pre-line text-sm">
+    우리 아이의 성장 이야기를 함께 기록하고 돌아볼 수 있는 여정에 오신 걸 진심으로 환영해요.
+    <br />
+    <br />
+    서비스 이용을 위해 최소한의 개인정보를 수집·이용하며, 모든 정보는 관련 법령에 따라 안전하게 관리됩니다.
+    <br />
+    등록하신 자녀 정보는 부모님 계정에만 개인적으로 저장되며, 외부에 공유되지 않습니다.
+    <br />
+    
+  </p>
+</div>
 
       {/* 개인정보 동의서 */}
-      <div className="border p-4 rounded-lg bg-white text-sm h-48 overflow-y-auto">
+      <div className="border p-4 rounded-lg bg-white text-sm h-48 overflow-y-auto scrollbar-custom">
         <h3 className="font-semibold mb-2">개인정보 처리 방침</h3>
         <p className="mb-2">
           본 서비스는 가족 계정 생성과 자녀 관리 기능을 제공하기 위해 개인정보를 수집/활용합니다.
