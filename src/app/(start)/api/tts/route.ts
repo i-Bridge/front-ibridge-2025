@@ -8,6 +8,19 @@ const BASE_URLS = [
   'https://api.minimaxi.chat/v1/t2a_v2',
 ];
 
+interface MiniMaxJsonResponse {
+  base_resp?: {
+    status_code: number;
+    status_msg?: string;
+  };
+  data?: {
+    audio?: string;
+    audio_hex?: string;
+  };
+  audio?: string;
+  audio_hex?: string;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const {
@@ -78,7 +91,7 @@ export async function POST(req: NextRequest) {
 
         // 응답은 JSON에 hex 오디오가 들어오는 경우가 일반적
         if (ct.includes('application/json')) {
-          const json = (await res.json()) as any;
+          const json = (await res.json()) as MiniMaxJsonResponse;
 
           // MiniMax 표준: base_resp.status_code === 0 이면 성공
           if (json?.base_resp?.status_code !== 0) {
@@ -112,10 +125,12 @@ export async function POST(req: NextRequest) {
           status: 200,
           headers: { 'Content-Type': ct || 'audio/mpeg' },
         });
-      } catch (err: any) {
-        console.error(`❌ fetch error @${base}:`, err);
-        lastError = String(err?.message || err);
-        // 다음 도메인 계속 시도
+      } catch (err) {
+        // ✅ [수정 2] (err: any) 대신 (err)를 사용합니다.
+        // ✅ 에러 타입을 확인하여 안전하게 메시지에 접근합니다.
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        console.error(`❌ fetch error @${base}:`, errorMessage);
+        lastError = errorMessage;
       }
     }
 
@@ -123,10 +138,11 @@ export async function POST(req: NextRequest) {
       { error: 'MiniMax TTS failed on all endpoints', detail: lastError },
       { status: 502 },
     );
-  } catch (e: any) {
-    console.error('❌ /api/tts handler error:', e);
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    console.error('❌ /api/tts handler error:', errorMessage);
     return NextResponse.json(
-      { error: e?.message ?? 'Unknown error' },
+      { error: errorMessage ?? 'Unknown error' },
       { status: 500 },
     );
   }

@@ -12,6 +12,10 @@ type StreamOpts = {
   speed?: number;
 };
 
+interface WindowWithAudioContext extends Window {
+  webkitAudioContext?: typeof AudioContext;
+}
+
 export function useMinimaxTTS() {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -22,7 +26,7 @@ export function useMinimaxTTS() {
 
   useEffect(() => {
     audioCtxRef.current = new (window.AudioContext ||
-      (window as any).webkitAudioContext)();
+      (window as WindowWithAudioContext).webkitAudioContext)();
   }, []);
 
   const cancel = useCallback(() => {
@@ -34,7 +38,7 @@ export function useMinimaxTTS() {
     }
     try {
       currentBufferSourceRef.current?.stop();
-    } catch (e) {}
+    } catch {}
 
     setIsSpeaking(false);
     currentAbortRef.current = null;
@@ -179,7 +183,7 @@ export function useMinimaxTTS() {
         );
       });
     },
-    [cancel],
+    [],
   );
 
   const playStreamSmart = useCallback(
@@ -231,7 +235,7 @@ export function useMinimaxTTS() {
         setIsSpeaking(false);
       }
     },
-    [_playStreamOnce, play],
+    [_playStreamOnce, play, cancel],
   );
 
   return {

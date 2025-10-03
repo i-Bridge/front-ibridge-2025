@@ -1,11 +1,10 @@
 import { Fetcher } from '@/lib/fetcher';
 import HomeHeader from '@/components/Header/HomeHeader';
-import AiComment from './_components/AiComment';
+import AiComment from './_components/aiComment';
 import ContentSwitcher from './_components/ContentSwitcher';
 import { ChildPageParams } from '@/types/page-props';
 import NotFound from '@/components/Exception/not-found';
-import {Subject} from '@/types/index';
-
+import { Subject } from '@/types/index';
 
 interface HomeData {
   hasNext: boolean;
@@ -35,15 +34,15 @@ export default async function HomePage({ params }: ChildPageParams) {
   }
 
   const homeData = homeRes.data;
-  const  bannerData = bannerRes?.data ?? {
-      cumulativeAnswerCount: 0,
-      mostTalkedCategory: '',
-      positiveCategory: '',
-      negativeCategory: '',
-      emotion: 0,
-      name: '',
-      newGrape: 0,
-    };
+  const bannerData = bannerRes?.data ?? {
+    cumulativeAnswerCount: 0,
+    mostTalkedCategory: '',
+    positiveCategory: '',
+    negativeCategory: '',
+    emotion: 0,
+    name: '',
+    newGrape: 0,
+  };
 
   if (!homeData || !bannerData) {
     return <NotFound message="데이터가 존재하지 않습니다." />;
