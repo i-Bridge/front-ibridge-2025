@@ -35,7 +35,6 @@ export default function AiComment({
   const [currentTitle, setCurrentTitle] = useState('');
   const typingIntervalRef = useRef<number | null>(null);
 
-  const name = childname || '아이';
 
   // 랜덤 배너 타이틀 선택
   const pickRandomTitle = () => {
