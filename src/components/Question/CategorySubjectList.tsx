@@ -6,9 +6,8 @@ import AnalysisList from './AnalysisList';
 import Loading from '../UI/LoadingAnim';
 import DateFormatter from '@/hooks/dateFormatter';
 
-
 type Props = {
-  keywords: string; // API 응답으로 받은 subjects
+  keywords: string;
   childId: string;
 };
 
@@ -37,11 +36,14 @@ const CategorySubjectList = ({ childId, keywords }: Props) => {
     }
   }, [selectedSubjectId, setShowPanels]);
 
-   useEffect(() => {
+  // 데이터 가져오기
+  useEffect(() => {
     const fetchSubjects = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/parent/${childId}/stat/${encodeURIComponent(keywords)}`);
+        const res = await fetch(
+          `/parent/${childId}/stat/${encodeURIComponent(keywords)}`
+        );
         const data = await res.json();
         if (data.isSuccess) {
           setSubjects(data.data.subjects || []);
@@ -58,8 +60,16 @@ const CategorySubjectList = ({ childId, keywords }: Props) => {
   // 질문 클릭 시
   const handleClick = (subjectId: number) => {
     setSelectedSubjectId(selectedSubjectId === subjectId ? null : subjectId);
-    // 필요하다면 readSubject 호출 추가
   };
+
+  // ✅ 로딩 중일 때 로딩 애니메이션 먼저 렌더링
+  if (loading) {
+    return (
+      <div className="w-full flex justify-center items-center min-h-[400px]">
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div className="relative overflow-x-hidden mx-auto flex justify-center min-h-[400px]">
@@ -89,11 +99,14 @@ const CategorySubjectList = ({ childId, keywords }: Props) => {
 
                   <div
                     onClick={() => handleClick(subject.subjectId)}
-                    className={`p-2 mb-8 rounded-lg transition-all 
-                      ${selectedSubjectId === subject.subjectId ? ' bg-gray-200' : 'bg-orange-50'}
-                      `}
+                    className={`p-2 mb-8 rounded-lg cursor-pointer transition-all 
+                      ${
+                        selectedSubjectId === subject.subjectId
+                          ? 'bg-gray-200'
+                          : 'bg-orange-50'
+                      }`}
                   >
-            
+                    {subject.subjectTitle}
                   </div>
                 </div>
               );
@@ -101,10 +114,9 @@ const CategorySubjectList = ({ childId, keywords }: Props) => {
           )}
         </div>
       </div>
- {showPanels && selectedSubjectId && (
-        <AnalysisList />
-      )}
-      
+
+      {/* 오른쪽 영역 - 분석 패널 */}
+      {showPanels && selectedSubjectId && <AnalysisList />}
     </div>
   );
 };
