@@ -107,7 +107,6 @@ const SubjectList = ({ initialSubjects }: Props) => {
                       <SubjectTitleEdit
                         subjectId={subject.subjectId}
                         subjectTitle={subject.subjectTitle}
-                        subjectDate={subject.date}
                       />
                     )}{' '}
                   </div>{' '}

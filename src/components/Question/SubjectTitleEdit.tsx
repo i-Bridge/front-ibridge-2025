@@ -3,19 +3,17 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
-import { useSubjectsInfinite } from '@/hooks/parentHome/useSubjectsInfinite';
 import { useScheduledSubjects } from '@/hooks/parentHome/useScheduledSubjects';
 import { showWarning, showError } from '@/lib/toast';
 
 interface Props {
   subjectId: number;
   subjectTitle: string;
-  subjectDate: string; // YYYY-MM-DD
 }
 
 const MAX_REFRESH_COUNT = 2;
 
-const SubjectTitleEdit = ({ subjectId, subjectTitle, subjectDate }: Props) => {
+const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
   const { childId } = useParams();
   const { refetch: refetchScheduled } = useScheduledSubjects();
 
