@@ -3,21 +3,18 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
-import { useSubjectsInfinite } from '@/hooks/parentHome/useSubjectsInfinite';
 import { useScheduledSubjects } from '@/hooks/parentHome/useScheduledSubjects';
 import { showWarning, showError } from '@/lib/toast';
 
 interface Props {
   subjectId: number;
   subjectTitle: string;
-  subjectDate: string; // YYYY-MM-DD
 }
 
 const MAX_REFRESH_COUNT = 2;
 
-const SubjectTitleEdit = ({ subjectId, subjectTitle, subjectDate }: Props) => {
+const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
   const { childId } = useParams();
-  const { refetch: refetchInfinite } = useSubjectsInfinite();
   const { refetch: refetchScheduled } = useScheduledSubjects();
 
   const [editing, setEditing] = useState(false);
@@ -55,12 +52,9 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle, subjectDate }: Props) => {
         setEditing(false);
 
         // 오늘 날짜면 infiniteSubjects refetch, 아니면 scheduledSubjects refetch
-        const todayStr = new Date().toISOString().slice(0, 10);
-        if (subjectDate === todayStr) {
-          refetchInfinite();
-        } else {
+        
           refetchScheduled();
-        }
+        
       } else {
         showError('저장 실패');
       }
@@ -95,12 +89,7 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle, subjectDate }: Props) => {
         localStorage.setItem(localStorageKey, String(newCount));
 
         // 새로고침 후도 날짜 기준 refetch
-        const todayStr = new Date().toISOString().slice(0, 10);
-        if (subjectDate === todayStr) {
-          refetchInfinite();
-        } else {
-          refetchScheduled();
-        }
+        refetchScheduled();
       }
     } catch (err) {
       console.error('새로고침 실패:', err);

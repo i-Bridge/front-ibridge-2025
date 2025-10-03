@@ -97,7 +97,7 @@ export default function MailBox() {
     if (currentChildId !== senderId) {
       //해당 자식의 답변 열람 화면으로 이동, 자식 바뀌며 readSubject 자동 호출
 
-      router.push(`/redirect/mailToSubject?target=/parent/${senderId}/home`);
+      router.push(`/parent/${senderId}/home`);
     } else {
       //weekly router.refresh()로 readSubject 자동 호출
       emitter.emit('reloadReadData');
