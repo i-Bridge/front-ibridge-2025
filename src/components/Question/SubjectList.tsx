@@ -11,7 +11,6 @@ import { Subject } from '@/types/index';
 
 type Props = {
   initialSubjects: Subject[]; // SSR로 초기 1페이지 subjects
-  childId: string;
 };
 
 const SubjectList = ({ initialSubjects }: Props) => {
@@ -22,6 +21,7 @@ const SubjectList = ({ initialSubjects }: Props) => {
     useSubjectsInfinite();
 
   const [animating, setAnimating] = useState(false);
+
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   // 초기 subjects 세팅
@@ -38,16 +38,9 @@ const SubjectList = ({ initialSubjects }: Props) => {
       setAnimating(true);
     } else {
       setAnimating(true);
-
       setShowPanels(false);
     }
   }, [selectedSubjectId, setShowPanels]);
-
-  // 질문 클릭 시
-  const handleClick = (subjectId: number) => {
-    setSelectedSubjectId(selectedSubjectId === subjectId ? null : subjectId);
-    //readSubject 다시 호출
-  };
 
   // 무한스크롤 IntersectionObserver
   const observeLastSubject = useCallback(
@@ -66,11 +59,16 @@ const SubjectList = ({ initialSubjects }: Props) => {
     [loading, loadNext, hasNext],
   );
 
+  // 질문 클릭 시
+  const handleClick = (subjectId: number) => {
+    setSelectedSubjectId(selectedSubjectId === subjectId ? null : subjectId);
+  };
+
   return (
-    <div className="relative overflow-x-hidden  mx-auto flex justify-center min-h-[600px]">
+    <div className="relative overflow-x-hidden mx-auto flex justify-center min-h-[600px]">
       {/* 왼쪽 영역 - Subject List + Detail */}
       <div
-        className={` flex flex-col justify-start z-10 
+        className={`flex flex-col justify-start z-10 
           ${animating ? 'animate-slide-in-right' : 'animate-slide-in-left'}
           transition-transform ease-in-out`}
       >
@@ -88,22 +86,21 @@ const SubjectList = ({ initialSubjects }: Props) => {
 
               return (
                 <div key={subject.subjectId}>
+                  {' '}
                   {showDateDivider && (
                     <div className="text-gray-400 text-sm mt-4 mb-2">
-                      {DateFormatter(subject.date)}
+                      {' '}
+                      {DateFormatter(subject.date)}{' '}
                     </div>
-                  )}
-
+                  )}{' '}
                   <div
                     onClick={() => handleClick(subject.subjectId)}
-                    className={`p-2 mb-8 rounded-lg transition-all 
-                      ${selectedSubjectId === subject.subjectId ? ' bg-gray-200' : 'bg-orange-50'}
-                      ${subject.answer ? 'cursor-pointer  hover:bg-gray-200' : 'bg-orange-50'} 
-                      `}
+                    className={`p-2 mb-8 rounded-lg transition-all ${selectedSubjectId === subject.subjectId ? ' bg-gray-200' : 'bg-orange-50'} ${subject.answer ? 'cursor-pointer hover:bg-gray-200' : 'bg-orange-50'} `}
                     ref={
                       idx === allSubjects.length - 1 ? observeLastSubject : null
                     }
                   >
+                    {' '}
                     {subject.answer ? (
                       <div>{subject.subjectTitle}</div>
                     ) : (
@@ -112,12 +109,13 @@ const SubjectList = ({ initialSubjects }: Props) => {
                         subjectTitle={subject.subjectTitle}
                         subjectDate={subject.date}
                       />
-                    )}
-                  </div>
+                    )}{' '}
+                  </div>{' '}
                 </div>
               );
             })
           )}
+
           {/* 무한스크롤 로딩/끝 표시 */}
           {loading && (
             <div className="flex justify-center py-4">
