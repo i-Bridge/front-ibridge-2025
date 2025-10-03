@@ -7,6 +7,7 @@ import { API } from '@/constants/api';
 import { useMinimaxTTS } from '@/hooks/useMinimaxTTS';
 import VideoRecorder from './VideoRecorder'; // VideoRecorder 경로에 맞게 수정
 import { Fetcher } from '@/lib/fetcher';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   childId: string;
@@ -19,6 +20,8 @@ export default function TalkSession({
   initialSubjectId,
   initialQuestion,
 }: Props) {
+  const router = useRouter();
+
   // refs
   const subjectIdRef = useRef<number | null>(initialSubjectId);
   const finishedSentRef = useRef(false);
@@ -32,7 +35,7 @@ export default function TalkSession({
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
   const [isFinalMessage, setIsFinalMessage] = useState(false);
-
+  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   // ✅ [수정] useMinimaxTTS 훅에서 오디오 중단/재생을 위한 cancel과 play 함수를 가져옵니다.
   const { isSpeaking, playStreamSmart, cancel, play } = useMinimaxTTS();
 
@@ -169,6 +172,62 @@ export default function TalkSession({
   );
   return (
     <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
+      <button
+        onClick={() => setIsExitModalOpen(true)} // 바로 이동하는 대신 모달을 엽니다.
+        className="absolute top-6 right-6 z-50 p-3 bg-white/70 rounded-full shadow-lg hover:bg-white active:scale-95 transition-all"
+        aria-label="대화 그만하기"
+        title="대화 그만하기"
+      >
+        {/* 집 아이콘 SVG */}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-8 h-8 text-gray-700"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5"
+          />
+        </svg>
+      </button>
+
+      {/* ✅ [추가] 나가기 확인 모달 (실수 방지 장치) */}
+      {isExitModalOpen && (
+        <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2 }}
+            className="w-[90vw] max-w-sm p-6 bg-white rounded-2xl shadow-xl text-center"
+          >
+            <h3 className="text-xl font-bold text-gray-800">
+              잠깐! 벌써 가는 거야?
+            </h3>
+            <p className="mt-2 text-gray-600">
+              괜찮아, 언제든 다시 돌아와서 이야기를 이어갈 수 있어!
+            </p>
+            <div className="mt-6 flex justify-center gap-4">
+              <button
+                onClick={() => setIsExitModalOpen(false)}
+                className="px-8 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                계속할래
+              </button>
+              <button
+                onClick={() => router.push(`/child/${childId}/talk`)}
+                className="px-8 py-3 bg-orange-400 text-white font-semibold rounded-lg hover:bg-orange-500 transition-colors"
+              >
+                그만할래
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       {/* 캐릭터 */}
       <motion.div
         className={`relative bottom-[-50px] transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
