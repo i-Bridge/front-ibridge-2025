@@ -1,6 +1,6 @@
 import { Fetcher } from '@/lib/fetcher';
 import HomeHeader from '@/components/Header/HomeHeader';
-import AiComment from './_components/aiComment';
+import AiComment from './_components/AiComment';
 import ContentSwitcher from './_components/ContentSwitcher';
 import { ChildPageParams } from '@/types/page-props';
 import NotFound from '@/components/Exception/not-found';

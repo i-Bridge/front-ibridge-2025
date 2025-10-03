@@ -1,8 +1,8 @@
 //회원 정보 설정 페이지 기본 UI
 
 import React from 'react';
-import Setup from './_components/setup';
-import ProgressBar from './_components/progressBar';
+import Setup from './_components/Setup';
+import ProgressBar from './_components/ProgressBar';
 
 export default function SetUpPage() {
   return (
