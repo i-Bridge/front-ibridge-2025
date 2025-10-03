@@ -51,6 +51,43 @@ export default function VideoRecorder({
     }
   }, [isCharacterSpeaking, isWaitingForAI]);
 
+  const postUploaded = useCallback(
+    async (fileUrl: string | null) => {
+      const currentSubjectId = subjectIdRef.current;
+      if (!fileUrl || !currentSubjectId || !childId) {
+        console.log('⚠️ /uploaded 전송 조건 불충족', {
+          fileUrl,
+          subjectId: currentSubjectId,
+          childId,
+        });
+        return;
+      }
+      if (!answerSentRef.current) {
+        pendingUploadsRef.current.push(fileUrl);
+        return;
+      }
+      if (postedSetRef.current.has(fileUrl)) {
+        return;
+      }
+      try {
+        console.log('📤 /uploaded 전송:', {
+          subjectId: currentSubjectId,
+          file: fileUrl,
+        });
+        await Fetcher(`/child/${childId}/uploaded`, {
+          method: 'POST',
+
+          data: { subjectId: currentSubjectId, file: fileUrl },
+        });
+        postedSetRef.current.add(fileUrl);
+        console.log('✅ 백엔드에 업로드 완료(/uploaded):', fileUrl);
+      } catch (err) {
+        console.error('❌ /uploaded 실패', err);
+      }
+    },
+    [childId],
+  );
+
   // sendAnswer 함수의 로직이, 텍스트 유무에 따라 분기 처리되도록
   const sendAnswer = useCallback(async () => {
     // 답변 전송을 시작하면, 'AI 응답 대기 중' 상태로 만들어 버튼을 비활성화합니다.
@@ -136,41 +173,7 @@ export default function VideoRecorder({
       console.error('❌ /answer API 호출 중 에러 발생:', error);
       setIsWaitingForAI(false);
     }
-  }, [childId, onAIResponse, onFinished]);
-
-  const postUploaded = async (fileUrl: string | null) => {
-    const currentSubjectId = subjectIdRef.current;
-    if (!fileUrl || !currentSubjectId || !childId) {
-      console.log('⚠️ /uploaded 전송 조건 불충족', {
-        fileUrl,
-        subjectId: currentSubjectId,
-        childId,
-      });
-      return;
-    }
-    if (!answerSentRef.current) {
-      pendingUploadsRef.current.push(fileUrl);
-      return;
-    }
-    if (postedSetRef.current.has(fileUrl)) {
-      return;
-    }
-    try {
-      console.log('📤 /uploaded 전송:', {
-        subjectId: currentSubjectId,
-        file: fileUrl,
-      });
-      await Fetcher(`/child/${childId}/uploaded`, {
-        method: 'POST',
-
-        data: { subjectId: currentSubjectId, file: fileUrl },
-      });
-      postedSetRef.current.add(fileUrl);
-      console.log('✅ 백엔드에 업로드 완료(/uploaded):', fileUrl);
-    } catch (err) {
-      console.error('❌ /uploaded 실패', err);
-    }
-  };
+  }, [childId, onAIResponse, onFinished, postUploaded]);
 
   const startRecording = async () => {
     // 이미 녹음 중이거나, '시작 중' 상태일 때는 아무것도 하지 않습니다.
@@ -284,8 +287,7 @@ export default function VideoRecorder({
 
   const startSTT = () => {
     const SpeechRecognitionConstructor =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
+      window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognitionConstructor) {
       showError('이 브라우저는 음성 인식을 지원하지 않습니다.');
       return;
@@ -323,7 +325,7 @@ export default function VideoRecorder({
     recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
       console.error('🎤 음성 인식 오류:', e);
     };
-    (recognition as any).onend = handleRecognitionEnd;
+    recognition.onend = handleRecognitionEnd;
     recognitionRef.current = recognition;
     recognition.start();
   };
