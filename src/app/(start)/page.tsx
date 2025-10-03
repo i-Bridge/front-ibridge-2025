@@ -59,6 +59,7 @@ export default function StartPage() {
                 iBridge는 부모가 아이의 진짜 마음을 이해할 수 있도록 돕는, 사고
                 분석 기반의 소통 플랫폼입니다.
               </p>
+              
             </div>
 
             {/* 오른쪽 로그인 */}
@@ -80,7 +81,21 @@ export default function StartPage() {
           <StartLogoCanvas />
         </div>
       </div>
-
+<section className="w-full py-16 bg-orange-50 flex flex-col items-center text-center px-4">
+  <h2 className="text-2xl font-bold mb-4">서비스 이용해 주셔서 감사합니다 🙏</h2>
+  <p className="text-gray-600 max-w-lg mb-6">
+    여러분의 소중한 의견은 서비스를 더 나은 방향으로 개선하는 데 큰 도움이 됩니다.<br />
+    아래 버튼을 눌러 간단한 후기를 남겨주세요!
+  </p>
+  <a
+    href="https://docs.google.com/forms/d/e/1FAIpQLSf9O601gs0MEqv2KqFb-1c14W4Ifb0kwG5Fmk6fJ3UlIWWl8g/viewform?usp=header"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
+  >
+    후기 남기러 가기 ✍️
+  </a>
+</section>
       {/* Intro Text Section */}
       <section className="max-w-5xl mx-auto px-16 mt-12 mb-32 relative text-center">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">
@@ -93,6 +108,7 @@ export default function StartPage() {
           이해할 수 있도록 도와주는 웹 플랫폼입니다.
         </p>
       </section>
+      
 
       {/* Features Section */}
       <section className="max-w-6xl mx-auto px-6 py-24 text-center">
@@ -122,6 +138,7 @@ export default function StartPage() {
               이끌어냅니다.
             </p>
           </motion.div>
+          
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
