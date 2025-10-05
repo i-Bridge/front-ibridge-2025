@@ -42,7 +42,7 @@ const CategorySubjectList = ({ childId, keywords }: Props) => {
       try {
         setLoading(true);
         const res = await fetch(
-          `/parent/${childId}/stat/${encodeURIComponent(keywords)}`
+          `/parent/${childId}/stat/subject?keyword=${encodeURIComponent(keywords)}`
         );
         const data = await res.json();
         if (data.isSuccess) {
