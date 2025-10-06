@@ -100,17 +100,8 @@ export default function AnalysisList() {
   }
 
   return (
-    <div className="w-[700px] mt-8 mb-20 relative bg-orange-200 p-10 rounded-3xl ">
-      {selectedQuestionId !== null && (
-        <div className="absolute -top-10 right-0">
-          <button
-            onClick={() => setSelectedQuestionId(null)}
-            className="px-3 py-1 text-sm text-white bg-orange-500 rounded-lg hover:bg-orange-400 transition"
-          >
-            전체보기
-          </button>
-        </div>
-      )}
+    <div className=" mt-8 mb-20 relative bg-orange-200 p-10 rounded-3xl ">
+      
       {content}
     </div>
   );

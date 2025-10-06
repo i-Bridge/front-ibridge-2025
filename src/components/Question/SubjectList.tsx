@@ -139,7 +139,7 @@ const SubjectList = ({ initialSubjects }: Props) => {
 
           {/* 오른쪽 패널 */}
           <div className="pl-16 z-10">
-            <div className="relative bg-white overflow-auto">
+            <div className="relative bg-white overflow-auto w-[700px]">
               <AnalysisList />
             </div>
           </div>

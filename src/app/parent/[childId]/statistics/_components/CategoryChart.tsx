@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import CategorySubjectList from '@/components/Question/CategorySubjectList'; 
+import CategorySubjectList from '@/components/Question/CategorySubjectList';
 
 interface Keyword {
   keyword: string;
@@ -31,7 +31,7 @@ const getColor = (score: number) => {
   // 하늘색 (135, 206, 235) → 주황색 (255, 165, 0)
   const r = Math.round(135 + (255 - 135) * (s / 100)); // 135 → 255
   const g = Math.round(206 + (165 - 206) * (s / 100)); // 206 → 165
-  const b = Math.round(235 + (0 - 235) * (s / 100));   // 235 → 0
+  const b = Math.round(235 + (0 - 235) * (s / 100)); // 235 → 0
 
   return `rgb(${r},${g},${b})`;
 };
@@ -63,7 +63,7 @@ export default function CategoryChart({
   ];
 
   const categories = USE_DUMMY_DATA ? dummyCategories : propCategories || [];
-    if (!categories.length) {
+  if (!categories.length) {
     return (
       <div>
         <h3 className="text-lg font-semibold mb-1">
@@ -201,22 +201,30 @@ export default function CategoryChart({
                 damping: 25,
                 duration: isActive ? 0.5 : 0.3,
               }}
-              onClick={() => handleClick(cat.keyword)}
+              // ✅ fullscreenMode 아닐 때만 클릭 가능하게 수정
+              onClick={() => {
+                if (!fullscreenMode) handleClick(cat.keyword);
+              }}
             >
               {isActive && (
                 <div>
-                <div className="absolute inset-x-0 bottom-0 bg-white shadow-md rounded-t-lg p-4">
-    <CategorySubjectList childId={childId} keywords={cat.keyword} />
-  </div>
-                <button
-                  className="absolute top-2 right-2 text-white text-lg font-bold"
-                  onClick={() => {
-                    setFullscreenMode(false);
-                    setActiveKeyword(null);
-                  }}
-                >
-                  ✕
-                </button>
+                  <div className="absolute inset-x-0 bottom-0 bg-white shadow-md rounded-t-lg p-4">
+                    <CategorySubjectList
+                      childId={childId}
+                      keywords={cat.keyword}
+                    />
+                  </div>
+                  {/* 닫기 버튼만 닫히는 동작 */}
+                  <button
+                    className="absolute top-2 right-2 text-red-500 text-lg font-bold"
+                    onClick={(e) => {
+                      e.stopPropagation(); // ✅ 이벤트 버블링 방지
+                      setFullscreenMode(false);
+                      setActiveKeyword(null);
+                    }}
+                  >
+                    ✕
+                  </button>
                 </div>
               )}
               <span className="text-xs font-bold break-words text-center">
