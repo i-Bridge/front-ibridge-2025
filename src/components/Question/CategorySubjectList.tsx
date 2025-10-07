@@ -18,6 +18,10 @@ interface CategorySubject {
   date: string;
 }
 
+interface CategorySubjectResponse {
+  subjects: CategorySubject[];
+}
+
 const CategorySubjectList = ({ childId, keywords }: Props) => {
   const { selectedSubjectId, setSelectedSubjectId, setShowPanels } =
     useSubjectStore();
@@ -29,7 +33,7 @@ const CategorySubjectList = ({ childId, keywords }: Props) => {
     const fetchSubjects = async () => {
       try {
         setLoading(true);
-        const res = await Fetcher(
+        const res = await Fetcher<CategorySubjectResponse>(
           `/parent/${childId}/stat/subject?keyword=${encodeURIComponent(keywords)}`
         );
         const data = res.data;
