@@ -19,7 +19,7 @@ export default function ChildShell({ children }: { children: ReactNode }) {
   const hide = shouldHideLayout(pathname ?? '', childId);
 
   return (
-    <div className="min-h-screen flex bg-[#FDFDFD] text-gray-800 relative">
+    <div className="min-h-screen flex bg-[#FDFDFD] text-gray-800 relative select-none">
       {/* ✅ [추가] 전체 화면 토글 버튼을 화면 우측 상단에 배치합니다. */}
       {/* 이 버튼은 hide 상태와 상관없이 항상 보입니다. */}
       <div className="absolute bottom-6 right-6 z-50">
