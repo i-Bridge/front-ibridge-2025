@@ -32,7 +32,6 @@ export default function TalkSession({
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [mouthOpen, setMouthOpen] = useState(false);
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
-  // ✅ [수정] useMinimaxTTS 훅에서 오디오 중단/재생을 위한 cancel과 play 함수를 가져옵니다.
   const { isSpeaking, playStreamSmart, cancel, play } = useMinimaxTTS();
 
   // ✅ [수정] sendFinished를 useCallback으로 감싸고, 중복 호출 방지 로직을 강화했습니다.

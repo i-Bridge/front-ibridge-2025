@@ -4,6 +4,7 @@
 import type { ReactNode } from 'react';
 import { usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
+import FullscreenToggle from './_components/FullscreenToggle';
 
 function shouldHideLayout(pathname: string, childId?: string | string[]) {
   if (!pathname || !childId) return false;
@@ -18,7 +19,12 @@ export default function ChildShell({ children }: { children: ReactNode }) {
   const hide = shouldHideLayout(pathname ?? '', childId);
 
   return (
-    <div className="min-h-screen flex bg-[#FDFDFD] text-gray-800">
+    <div className="min-h-screen flex bg-[#FDFDFD] text-gray-800 relative">
+      {/* ✅ [추가] 전체 화면 토글 버튼을 화면 우측 상단에 배치합니다. */}
+      {/* 이 버튼은 hide 상태와 상관없이 항상 보입니다. */}
+      <div className="absolute bottom-6 right-6 z-50">
+        <FullscreenToggle />
+      </div>
       {/* 사이드바 */}
       {!hide && (
         <aside className="w-64 bg-[#FFF9E6] border-r border-gray-200 p-4">
