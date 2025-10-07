@@ -7,7 +7,7 @@ import { API } from '@/constants/api';
 import { useRouter } from 'next/navigation';
 import { useChildStore } from '@/store/useChildStore';
 import EmotionModal from './EmotionModal';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 
 type Props = {
   childId: string; // ✅ string으로 고정
@@ -57,20 +57,6 @@ export default function TalkMenu({ childId }: Props) {
     }
   };
 
-  // ✅ [추가] 전체 화면으로 전환하고 페이지를 이동시키는 함수
-  const handleNavigateAndFullscreen = useCallback(
-    (path: string) => {
-      // 1. 문서의 최상위 요소를 전체 화면으로 만듭니다.
-      document.documentElement.requestFullscreen().catch((err) => {
-        // 사용자가 전체 화면 요청을 거부하거나, API를 지원하지 않는 경우 에러가 발생할 수 있습니다.
-        console.warn(`전체 화면 전환 실패: ${err.message}`);
-      });
-      // 2. 전체 화면 전환 후, 지정된 경로로 페이지를 이동합니다.
-      router.push(path);
-    },
-    [router],
-  );
-
   // ✅ [추가] 하이드레이션이 완료되기 전에는 아무것도 렌더링하지 않거나, 로딩 스피너를 보여줄 수 있습니다.
   // 이렇게 하면 초기 상태(emotionDone: false)에 기반한 잘못된 UI가 렌더링되는 것을 막을 수 있습니다.
   if (!isHydrated) {
@@ -94,35 +80,28 @@ export default function TalkMenu({ childId }: Props) {
             오늘의 질문
           </button>
         ) : (
-          // ✅ [수정] <Link>를 <button>으로 변경하고, onClick 이벤트를 연결합니다.
-          <button
-            onClick={() =>
-              handleNavigateAndFullscreen(`/child/${childId}/talk/question`)
-            }
+          <Link
+            href={`/child/${childId}/talk/question`}
             className={`w-72 h-20 rounded-2xl flex items-center justify-center text-xl font-bold hover:scale-105 transition-transform ${
               emotionDone === false
-                ? 'bg-pink-200 pointer-events-none cursor-not-allowed opacity-70'
+                ? 'bg-pink-200 pointer-events-none cursor-not-allowed'
                 : 'bg-pink-300'
             }`}
             title={
-              emotionDone === false
-                ? '오늘의 감정을 먼저 선택해 주세요'
-                : '오늘의 질문 시작하기'
+              emotionDone === false ? '오늘의 감정을 먼저 선택해 주세요' : ''
             }
-            disabled={emotionDone === false}
           >
             오늘의 질문
-          </button>
+          </Link>
         )}
-         {' '}
-        <button
-          onClick={() =>
-            handleNavigateAndFullscreen(`/child/${childId}/talk/free`)
-          }
+
+        <Link
+          href={`/child/${childId}/talk/free`}
           className="w-72 h-20 rounded-2xl bg-green-300 flex items-center justify-center text-xl font-bold hover:scale-105 transition-transform"
         >
           하고싶은 말
-        </button>
+        </Link>
+
         {specifiedDone && (
           <p className="text-sm text-gray-600 text-center">
             오늘의 질문은 이미 완료했어요. 하고 싶은 말이 있나요?
