@@ -1,22 +1,14 @@
 import Image from 'next/image';
 import { useState, useRef } from 'react';
-import { useSubjectStore } from '@/store/useSubjectStore';
 import { useSubjectData } from '@/hooks/parentHome/useSubjectData';
 import { Question } from '@/types/index';
 
 export default function AnalysisList() {
-  const { selectedQuestionId, setSelectedQuestionId } = useSubjectStore();
   const { questions } = useSubjectData();
   const [playingMap, setPlayingMap] = useState<{ [key: number]: boolean }>({});
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
 
   if (!questions) return null;
-
-  const selectedIndex = questions.findIndex(
-    (q) => q.questionId === selectedQuestionId,
-  );
-  const selectedQuestion =
-    selectedIndex !== -1 ? questions[selectedIndex] : null;
 
   const handlePlayClick = (questionId: number) => {
     setPlayingMap((prev) => ({ ...prev, [questionId]: true }));
@@ -76,33 +68,15 @@ export default function AnalysisList() {
 
       {/* 영상 + 답변 2열 레이아웃 */}
       <div className="flex items-start gap-6">
-        <p className="text-gray-700 leading-relaxed flex-1">
-          {q.answer}
-        </p>
+        <p className="text-gray-700 leading-relaxed flex-1">{q.answer}</p>
         {renderVideoOrThumbnail(q)}
-        
       </div>
     </div>
   );
 
-  let content;
-  if (!selectedQuestionId) {
-    // 전체 보기
-    content = <>{questions.map((q, idx) => renderQuestionCard(q, idx))}</>;
-  } else {
-    if (!selectedQuestion) {
-      content = (
-        <div className="text-gray-400 text-sm">선택한 질문을 찾을 수 없습니다.</div>
-      );
-    } else {
-      content = renderQuestionCard(selectedQuestion, selectedIndex);
-    }
-  }
-
   return (
-    <div className=" mt-8 mb-20 relative bg-orange-200 p-10 rounded-3xl ">
-      
-      {content}
+    <div className="mt-8 mb-20 relative bg-orange-200 p-10 rounded-3xl">
+      {questions.map((q, idx) => renderQuestionCard(q, idx))}
     </div>
   );
 }
