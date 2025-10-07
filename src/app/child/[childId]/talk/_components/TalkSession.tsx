@@ -162,7 +162,7 @@ export default function TalkSession({
   );
   return (
     <div
-      className="flex items-center justify-center h-screen relative p-6-"
+      className="flex items-center justify-center h-screen relative p-6 overflow-hidden"
       style={{
         backgroundImage: "url('/images/fantasy-forest-bg.png')", // 배경 이미지 경로
         backgroundSize: 'cover', // 화면을 꽉 채우도록 설정
@@ -228,7 +228,7 @@ export default function TalkSession({
 
       {/* 캐릭터 */}
       <motion.div
-        className={`relative bottom-[-50px] transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
+        className={`translate-y-[20px] transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
         animate={{ scale: isSpeaking ? 1.03 : 1 }}
         transition={{ duration: 0.3 }}
       >
