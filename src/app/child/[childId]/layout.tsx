@@ -50,7 +50,7 @@ export default async function ChildLayout({
   children: ReactNode;
   params: Params;
 }) {
-  const { childId } = params;
+  const { childId } = await params;
 
   const overview = await getOverview(childId);
 

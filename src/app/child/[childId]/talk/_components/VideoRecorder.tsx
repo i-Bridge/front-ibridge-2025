@@ -403,12 +403,16 @@ export default function VideoRecorder({
 
   return (
     <div
-      className="flex flex-col items-center min-w-[300px] max-w-[400px] gap-4 p-10 pr-14 bg-contain bg-center bg-no-repeat "
+      className="flex flex-col justify-between items-center min-w-[300px] max-w-[400px] h-[580px] py-24 px-10 bg-contain bg-center bg-no-repeat"
       style={{ backgroundImage: `url('/images/영상박스_점선.png')` }}
     >
-      {/* ✅ [수정] 비디오를 div로 감싸고, isUserSpeaking 상태에 따라 빛나는 효과를 추가합니다. */}
+      {/* 비디오 영역 */}
       <div
-        className={`relative transition-all duration-300 rounded-lg ${isUserSpeaking ? 'ring-4 ring-green-400 ring-offset-2 animate-pulse' : ''}`}
+        className={`relative transition-all duration-300 rounded-lg ${
+          isUserSpeaking
+            ? 'ring-4 ring-green-400 ring-offset-2 animate-pulse'
+            : ''
+        }`}
       >
         <video
           ref={videoRef}
@@ -418,63 +422,66 @@ export default function VideoRecorder({
         />
       </div>
       <canvas ref={canvasRef} className="hidden" />
-      {/* 안내 텍스트를 동적인 feedbackText로 변경합니다. */} 
-      <div className="text-gray-700 w-80 p-2 bg-orange-200 rounded shadow-sm text-sm h-10 flex items-center justify-center">
-        <strong className="transition-opacity duration-300">
-          🎙️ {feedbackText}
-        </strong>
+
+      {/* ✅ [수정] 안내 문구와 버튼을 그룹으로 묶습니다. */}
+      <div className="flex flex-col items-center gap-5">
+        <div className="text-gray-700 w-80 p-2 bg-orange-200 rounded shadow-sm text-sm h-10 flex items-center justify-center">
+          <strong className="transition-opacity duration-300">
+            🎙️ {feedbackText}
+          </strong>
+        </div>
+        {!isRecording ? (
+          <button
+            onClick={startRecording}
+            disabled={isCharacterSpeaking || isStarting || isWaitingForAI}
+            className="p-4 bg-i-lightgreen text-white rounded-full shadow-sm hover:scale-105 transition-transform disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
+            title={
+              isCharacterSpeaking
+                ? '캐릭터가 말하는 중에는 녹음할 수 없어요.'
+                : isStarting
+                  ? '녹화를 준비 중입니다...'
+                  : isWaitingForAI
+                    ? 'AI가 응답을 준비 중입니다...'
+                    : '녹음 시작'
+            }
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"
+              />
+            </svg>
+          </button>
+        ) : (
+          <button
+            onClick={stopRecording}
+            className="p-4 bg-i-orange text-white rounded-full shadow-sm hover:scale-105 transition-transform"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z"
+              />
+            </svg>
+          </button>
+        )}
       </div>
-      {!isRecording ? (
-        <button
-          onClick={startRecording}
-          disabled={isCharacterSpeaking || isStarting || isWaitingForAI}
-          className="p-4 bg-i-lightgreen text-white rounded-full shadow-sm hover:scale-105 transition-transform disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
-          title={
-            isCharacterSpeaking
-              ? '캐릭터가 말하는 중에는 녹음할 수 없어요.'
-              : isStarting
-                ? '녹화를 준비 중입니다...'
-                : isWaitingForAI
-                  ? 'AI가 응답을 준비 중입니다...'
-                  : '녹음 시작'
-          }
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"
-            />
-          </svg>
-        </button>
-      ) : (
-        <button
-          onClick={stopRecording}
-          className="p-4 bg-i-orange text-white rounded-full shadow-sm hover:scale-105 transition-transform"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z"
-            />
-          </svg>
-        </button>
-      )}
     </div>
   );
 }
