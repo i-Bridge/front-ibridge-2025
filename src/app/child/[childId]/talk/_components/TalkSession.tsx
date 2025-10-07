@@ -161,7 +161,15 @@ export default function TalkSession({
     [playStreamSmart, handleChunkDisplay, resetUI, sendFinished],
   );
   return (
-    <div className="flex items-center justify-center h-screen relative p-6 bg-i-skyblue">
+    <div
+      className="flex items-center justify-center h-screen relative p-6-"
+      style={{
+        backgroundImage: "url('/images/fantasy-forest-bg.png')", // 배경 이미지 경로
+        backgroundSize: 'cover', // 화면을 꽉 채우도록 설정
+        backgroundPosition: 'center', // 이미지가 중앙에 위치하도록 설정
+        backgroundRepeat: 'no-repeat', // 이미지가 반복되지 않도록 설정
+      }}
+    >
       <button
         onClick={() => setIsExitModalOpen(true)} // 바로 이동하는 대신 모달을 엽니다.
         className="absolute top-6 right-6 z-50 p-3 bg-white/70 rounded-full shadow-lg hover:bg-white active:scale-95 transition-all"

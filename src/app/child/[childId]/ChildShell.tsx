@@ -55,7 +55,7 @@ export default function ChildShell({ children }: { children: ReactNode }) {
             </span>
           </header>
         )}
-        <main className="p-6">{children}</main>
+        <main className={!hide ? 'p-6' : ''}>{children}</main>
       </div>
     </div>
   );
