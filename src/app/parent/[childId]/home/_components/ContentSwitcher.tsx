@@ -35,7 +35,7 @@ const ContentSwitcher = ({ initialSubjects, childname }: Props) => {
               : 'bg-gray-100 text-gray-600' // 선택 안된 버튼 회색
           }`}
         >
-          예정된 질문
+          예정 질문 List
         </button>
       </div>
 
