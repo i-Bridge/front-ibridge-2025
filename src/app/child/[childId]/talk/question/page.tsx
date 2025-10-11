@@ -23,7 +23,7 @@ export default async function QuestionTalkPage({ params }: ChildPageParams) {
       API.predesigned(childId),
       { method: 'GET' },
     );
-
+    console.log(data);
     if (isSuccess && data) {
       const lastQuestionItem = data.questions?.[data.questions.length - 1];
 

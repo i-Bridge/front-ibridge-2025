@@ -39,7 +39,6 @@ export function useMinimaxTTS() {
     try {
       currentBufferSourceRef.current?.stop();
     } catch {}
-
     setIsSpeaking(false);
   }, []);
 
@@ -75,9 +74,10 @@ export function useMinimaxTTS() {
     [],
   );
 
-  // _playStrameOnce가 실패할 경우를 대비한 일반재생 코드
   const play = useCallback(
     async (keyOrText: string, opts?: { voice?: string; speed?: number }) => {
+      cancel();
+      setIsSpeaking(true);
       const ctx = audioCtxRef.current!;
       let key = keyOrText;
       if (!cacheRef.current.has(keyOrText)) {
@@ -86,23 +86,22 @@ export function useMinimaxTTS() {
       const cached = cacheRef.current.get(key)!;
       if (ctx.state === 'suspended') await ctx.resume();
 
-      // Promise를 사용하여 onended 이벤트를 기다립니다.
       return new Promise<number>((resolve) => {
         const src = ctx.createBufferSource();
         currentBufferSourceRef.current = src;
         src.buffer = cached.buffer;
         src.connect(ctx.destination);
-
         src.start();
         src.onended = () => {
           if (currentBufferSourceRef.current === src) {
             currentBufferSourceRef.current = null;
           }
+          setIsSpeaking(false); // ← 여기서 내림 (finally 금지)
           resolve(cached.dur);
         };
       });
     },
-    [prepare],
+    [prepare, cancel],
   );
 
   const _playStreamOnce = useCallback(
@@ -233,6 +232,7 @@ export function useMinimaxTTS() {
     },
     [_playStreamOnce, play, cancel],
   );
+
   return {
     isSpeaking,
     prepare,
