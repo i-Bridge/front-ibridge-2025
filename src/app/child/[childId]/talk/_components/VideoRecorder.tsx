@@ -4,7 +4,26 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Fetcher } from '@/lib/fetcher';
 import { showError } from '@/lib/toast';
 
+/** ===== 공용 타입 ===== */
 type SendMode = 'no-audio' | 'text-only' | 'with-uploads';
+
+/** ===== 헬퍼: SpeechRecognition 생성자 안전 획득 ===== */
+type SpeechRecognitionConstructor = new () => SpeechRecognition;
+function getSpeechRecognitionCtor(): SpeechRecognitionConstructor | undefined {
+  return window.SpeechRecognition ?? window.webkitSpeechRecognition;
+}
+
+/** ===== 헬퍼: ImageCapture 생성자 안전 획득 ===== */
+type ImageCaptureLike = { grabFrame: () => Promise<ImageBitmap> };
+type ImageCaptureCtor = new (track: MediaStreamTrack) => ImageCaptureLike;
+function getImageCaptureCtor(): ImageCaptureCtor | null {
+  // 일부 브라우저만 제공
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const anyWin = window as any;
+  return typeof anyWin.ImageCapture === 'function'
+    ? (anyWin.ImageCapture as ImageCaptureCtor)
+    : null;
+}
 
 export default function VideoRecorder({
   childId,
@@ -19,44 +38,45 @@ export default function VideoRecorder({
   onAIResponse: (message: string, isFinished: boolean) => void;
   onFinished: () => void;
 }) {
+  /** ===== refs ===== */
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
+  const recognizedTextRef = useRef('');
+  const subjectIdRef = useRef(subjectId);
+
   const answerSentRef = useRef(false);
   const pendingUploadsRef = useRef<string[]>([]);
   const postedSetRef = useRef<Set<string>>(new Set());
 
-  const recognizedTextRef = useRef('');
-  const subjectIdRef = useRef(subjectId);
-
-  // 말 멈춤 감지 타이머
-  const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // 두 비동기(녹화, 인식) 완료 동기화 플래그
   const isRecognitionFinishedRef = useRef(false);
   const videoBlobRef = useRef<Blob | null>(null);
 
-  // ✅ 사전 캡처한 썸네일을 보관 (정지 후 캡처 블랙 방지)
+  // 정지 후 블랙 썸네일 방지: stop 전에 사전 캡처한 Blob 보관
   const thumbnailBlobRef = useRef<Blob | null>(null);
 
+  // 말 멈춤 감지 타이머
+  const speechTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /** ===== state ===== */
+  const [isRecording, setIsRecording] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
+  const [isWaitingForAI, setIsWaitingForAI] = useState(false); // 기본 false
+  const [isUserSpeaking, setIsUserSpeaking] = useState(false);
+
+  /** ===== subjectId 최신화 ===== */
   useEffect(() => {
     subjectIdRef.current = subjectId;
   }, [subjectId]);
 
-  const [isRecording, setIsRecording] = useState(false);
-  const [isStarting, setIsStarting] = useState(false);
-
-  // 🔑 기본값 false: 첫 질문 TTS가 끝나면 버튼이 켜질 수 있도록
-  const [isWaitingForAI, setIsWaitingForAI] = useState(false);
-  const [isUserSpeaking, setIsUserSpeaking] = useState(false);
-
-  // 캐릭터가 말하지 않을 때는 항상 대기 해제 (역할 교대 보강)
+  /** ===== 역할 교대: 캐릭터가 말하지 않으면 버튼 대기 해제 ===== */
   useEffect(() => {
     if (!isCharacterSpeaking) setIsWaitingForAI(false);
   }, [isCharacterSpeaking]);
 
+  /** ===== /uploaded 통지 ===== */
   const postUploaded = useCallback(
     async (fileUrl: string | null) => {
       const currentSubjectId = subjectIdRef.current;
@@ -92,39 +112,36 @@ export default function VideoRecorder({
     [childId],
   );
 
-  // =========================
-  // 썸네일 사전 캡처 유틸
-  // =========================
-  // 비디오의 현재 프레임을 JPEG Blob으로 캡처 (ImageCapture → 캔버스 폴백)
-  async function captureFrameToBlob(): Promise<Blob | null> {
+  /** ===== 썸네일 사전 캡처: ImageCapture → Canvas 폴백 ===== */
+  const captureFrameToBlob = useCallback(async (): Promise<Blob | null> => {
     try {
       const v = videoRef.current;
       const c = canvasRef.current;
       if (!v || !c) return null;
 
       // 1) ImageCapture 우선
-      const stream = v.srcObject as MediaStream | null;
-      const track = stream?.getVideoTracks?.()[0];
-      const hasImageCapture =
-        typeof (window as any).ImageCapture === 'function';
-      if (track && hasImageCapture) {
-        try {
-          // @ts-ignore
-          const imgCap = new (window as any).ImageCapture(track);
-          const bitmap: ImageBitmap = await imgCap.grabFrame();
-          c.width = bitmap.width;
-          c.height = bitmap.height;
-          const ctx = c.getContext('2d');
-          ctx?.drawImage(bitmap, 0, 0);
-          return await new Promise<Blob | null>((resolve) =>
-            c.toBlob((b) => resolve(b), 'image/jpeg', 0.92),
-          );
-        } catch {
-          // 실패 시 폴백
+      const ctor = getImageCaptureCtor();
+      if (ctor) {
+        const stream = v.srcObject as MediaStream | null;
+        const track = stream?.getVideoTracks?.()[0];
+        if (track) {
+          try {
+            const ic = new ctor(track);
+            const bitmap = await ic.grabFrame();
+            c.width = bitmap.width;
+            c.height = bitmap.height;
+            const ctx = c.getContext('2d');
+            ctx?.drawImage(bitmap, 0, 0);
+            return await new Promise<Blob | null>((resolve) =>
+              c.toBlob(resolve, 'image/jpeg', 0.92),
+            );
+          } catch {
+            // 실패 시 폴백
+          }
         }
       }
 
-      // 2) 캔버스 폴백: 메타데이터/페인트 보장 후 그리기
+      // 2) Canvas 폴백: 메타데이터/페인트 보장 후 그리기
       const waitReady = async (attempts = 10) => {
         for (let i = 0; i < attempts; i++) {
           if (v.videoWidth > 0 && v.videoHeight > 0) return true;
@@ -142,21 +159,18 @@ export default function VideoRecorder({
       ctx?.drawImage(v, 0, 0, v.videoWidth, v.videoHeight);
 
       return await new Promise<Blob | null>((resolve) =>
-        c.toBlob((b) => resolve(b), 'image/jpeg', 0.92),
+        c.toBlob(resolve, 'image/jpeg', 0.92),
       );
     } catch {
       return null;
     }
-  }
+  }, []);
 
-  // =========================
-  // 업로드 유틸
-  // =========================
-  const captureAndUploadThumbnail = async () => {
+  /** ===== 업로드: 썸네일(사전 캡처 Blob만 사용) ===== */
+  const captureAndUploadThumbnail = useCallback(async () => {
     const currentSubjectId = subjectIdRef.current;
     if (!currentSubjectId || !childId) return;
 
-    // ✅ 사전 캡처된 썸네일만 사용 (정지 후 블랙 방지)
     const blob = thumbnailBlobRef.current;
     if (!blob) {
       console.warn('⚠️ 썸네일 Blob이 없어 업로드를 생략합니다.');
@@ -189,45 +203,49 @@ export default function VideoRecorder({
       const body = await res.text().catch(() => '');
       console.error('❌ 썸네일 업로드 실패', res.status, body);
     }
-  };
+  }, [childId, postUploaded]);
 
-  const uploadVideo = async (blob: Blob, type: 'video') => {
-    const currentSubjectId = subjectIdRef.current;
-    if (!currentSubjectId || !childId) return;
+  /** ===== 업로드: 비디오 ===== */
+  const uploadVideo = useCallback(
+    async (blob: Blob, type: 'video') => {
+      const currentSubjectId = subjectIdRef.current;
+      if (!currentSubjectId || !childId) return;
 
-    const { data } = await Fetcher<{ url: string }>(
-      `/child/${childId}/getURL`,
-      {
-        method: 'POST',
-        data: { type, subjectId: currentSubjectId },
-      },
-    );
-    if (!data?.url) {
-      console.error(`❌ ${type} URL 획득 실패`);
-      return;
-    }
+      const { data } = await Fetcher<{ url: string }>(
+        `/child/${childId}/getURL`,
+        {
+          method: 'POST',
+          data: { type, subjectId: currentSubjectId },
+        },
+      );
+      if (!data?.url) {
+        console.error(`❌ ${type} URL 획득 실패`);
+        return;
+      }
 
-    // S3 서명과 동일해야 하는 Content-Type (코덱 파라미터 제거)
-    const contentType = (blob.type || 'application/octet-stream').split(';')[0];
+      // S3 서명과 동일해야 하는 Content-Type (코덱 파라미터 제거)
+      const contentType = (blob.type || 'application/octet-stream').split(
+        ';',
+      )[0];
 
-    const res = await fetch(data.url, {
-      method: 'PUT',
-      headers: { 'Content-Type': contentType },
-      body: blob,
-    });
-    if (res.ok) {
-      const s3Url = data.url.split('?')[0];
-      console.log(`✅ ${type} S3 업로드 완료:`, s3Url);
-      await postUploaded(s3Url);
-    } else {
-      const body = await res.text().catch(() => '');
-      console.error(`❌ ${type} 업로드 실패`, res.status, body);
-    }
-  };
+      const res = await fetch(data.url, {
+        method: 'PUT',
+        headers: { 'Content-Type': contentType },
+        body: blob,
+      });
+      if (res.ok) {
+        const s3Url = data.url.split('?')[0];
+        console.log(`✅ ${type} S3 업로드 완료:`, s3Url);
+        await postUploaded(s3Url);
+      } else {
+        const body = await res.text().catch(() => '');
+        console.error(`❌ ${type} 업로드 실패`, res.status, body);
+      }
+    },
+    [childId, postUploaded],
+  );
 
-  // =========================
-  // 제출 흐름
-  // =========================
+  /** ===== 제출 흐름 ===== */
   const sendAnswer = useCallback(
     async ({ mode }: { mode: SendMode }) => {
       setIsWaitingForAI(true);
@@ -240,7 +258,7 @@ export default function VideoRecorder({
         return;
       }
 
-      // ✅ 텍스트 없음: 업로드 일절 금지 + 프론트 문구만 출력
+      // 텍스트 없음: 업로드 전부 금지 + 프론트 문구만
       if (mode === 'no-audio') {
         const noAudioPrompts = [
           '인식된 음성이 없어요. 다시 말해볼까요?',
@@ -251,11 +269,11 @@ export default function VideoRecorder({
           noAudioPrompts[Math.floor(Math.random() * noAudioPrompts.length)];
         onAIResponse(randomPrompt, false);
         onFinished();
-        setIsWaitingForAI(false); // 버튼 잠김 해제
+        setIsWaitingForAI(false);
         return;
       }
 
-      // 서버 답변 요청 (텍스트만 또는 업로드 포함)
+      // 서버 답변 요청
       const textToSend = currentRecognizedText;
 
       try {
@@ -283,7 +301,7 @@ export default function VideoRecorder({
             }
             pendingUploadsRef.current = [];
           } else {
-            // text-only: 업로드는 일절 금지
+            // text-only: 업로드 금지
             videoBlobRef.current = null;
             pendingUploadsRef.current = [];
           }
@@ -295,7 +313,14 @@ export default function VideoRecorder({
         setIsWaitingForAI(false);
       }
     },
-    [childId, onAIResponse, onFinished, postUploaded],
+    [
+      childId,
+      onAIResponse,
+      onFinished,
+      postUploaded,
+      uploadVideo,
+      captureAndUploadThumbnail,
+    ],
   );
 
   const processFinalSubmission = useCallback(async () => {
@@ -303,11 +328,9 @@ export default function VideoRecorder({
     const hasVideo = !!videoBlobRef.current;
 
     if (!hasText) {
-      // 🎯 텍스트 없음: 업로드 전부 금지, 프론트 문구만
       await sendAnswer({ mode: 'no-audio' });
       return;
     }
-
     if (hasVideo) {
       await sendAnswer({ mode: 'with-uploads' });
     } else {
@@ -315,17 +338,14 @@ export default function VideoRecorder({
     }
   }, [sendAnswer]);
 
-  // =========================
-  // STT
-  // =========================
-  const startSTT = () => {
-    const SpeechRecognitionConstructor =
-      window.SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognitionConstructor) {
+  /** ===== STT ===== */
+  const startSTT = useCallback(() => {
+    const Ctor = getSpeechRecognitionCtor();
+    if (!Ctor) {
       showError('이 브라우저는 음성 인식을 지원하지 않습니다.');
       return;
     }
-    const recognition: SpeechRecognition = new SpeechRecognitionConstructor();
+    const recognition = new Ctor();
     recognition.lang = 'ko-KR';
     recognition.interimResults = true;
     recognition.continuous = true;
@@ -365,12 +385,10 @@ export default function VideoRecorder({
 
     recognitionRef.current = recognition;
     recognition.start();
-  };
+  }, [processFinalSubmission]);
 
-  // =========================
-  // 녹화 제어
-  // =========================
-  const startRecording = async () => {
+  /** ===== 녹화 제어 ===== */
+  const startRecording = useCallback(async () => {
     if (isRecording || isStarting || mediaRecorderRef.current) return;
 
     setIsStarting(true);
@@ -397,18 +415,20 @@ export default function VideoRecorder({
       }
 
       const chunks: BlobPart[] = [];
-      // 일부 브라우저는 MimeType 지원 체크가 다름 → 안전하게 설정
       const preferred = 'video/webm;codecs=vp9,opus';
       const fallback = 'video/webm;codecs=vp8,opus';
-      const options: MediaRecorderOptions = {
-        mimeType: MediaRecorder.isTypeSupported?.(preferred)
+      const selected =
+        typeof MediaRecorder !== 'undefined' &&
+        typeof MediaRecorder.isTypeSupported === 'function' &&
+        MediaRecorder.isTypeSupported(preferred)
           ? preferred
-          : MediaRecorder.isTypeSupported?.(fallback)
+          : typeof MediaRecorder !== 'undefined' &&
+              typeof MediaRecorder.isTypeSupported === 'function' &&
+              MediaRecorder.isTypeSupported(fallback)
             ? fallback
-            : 'video/webm',
-      };
+            : 'video/webm';
 
-      const recorder = new MediaRecorder(mediaStream, options);
+      const recorder = new MediaRecorder(mediaStream, { mimeType: selected });
 
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) chunks.push(event.data);
@@ -419,7 +439,7 @@ export default function VideoRecorder({
         mediaStream.getTracks().forEach((track) => track.stop());
         mediaRecorderRef.current = null;
 
-        // ✅ Blob 생성 & 보관
+        // Blob 생성 & 보관
         try {
           const blob = new Blob(chunks, {
             type: recorder.mimeType || 'video/webm',
@@ -469,9 +489,9 @@ export default function VideoRecorder({
     } finally {
       setIsStarting(false);
     }
-  };
+  }, [isRecording, isStarting, processFinalSubmission, startSTT]);
 
-  const stopRecording = async () => {
+  const stopRecording = useCallback(async () => {
     console.log('🛑 사용자가 종료 버튼 클릭. 녹화 및 음성 인식을 중단합니다.');
 
     // ✅ 트랙 stop 하기 *전*에 프레임 한 컷 확보 (블랙 썸네일 방지)
@@ -485,7 +505,7 @@ export default function VideoRecorder({
       }
     }
 
-    if (recognitionRef.current) recognitionRef.current.stop();
+    recognitionRef.current?.stop();
     if (mediaRecorderRef.current?.state === 'recording') {
       mediaRecorderRef.current.stop();
     }
@@ -493,9 +513,9 @@ export default function VideoRecorder({
 
     setIsRecording(false);
     setIsUserSpeaking(false);
-  };
+  }, [captureFrameToBlob]);
 
-  // --- 디버깅: 버튼 비활성 이유 로그 ---
+  /** ===== 디버깅: 버튼 비활성 이유 로그 ===== */
   const disabledReason = isCharacterSpeaking
     ? '캐릭터가 말하는 중'
     : isStarting
@@ -518,6 +538,7 @@ export default function VideoRecorder({
       : '지금 말씀해주세요!'
     : '버튼을 눌러 말해보세요!';
 
+  /** ===== UI ===== */
   return (
     <div
       className="flex flex-col justify-between items-center min-w-[300px] max-w-[400px] h-[580px] py-24 px-10 bg-contain bg-center bg-no-repeat"
