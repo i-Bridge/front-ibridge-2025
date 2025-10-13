@@ -160,8 +160,8 @@ export default function TalkSession({
     [playStreamSmart, handleChunkDisplay, resetUI, sendFinished],
   );
   return (
-    <div className="relative isolate min-h-screen supports-[min-height:100dvh]:min-h-dvh overflow-hidden p-6 flex items-center justify-center">
-      {/* 배경 이미지: next/image + fill */}
+    <div className="relative isolate grid min-h-screen supports-[min-height:100dvh]:min-h-dvh place-items-center overflow-hidden">
+      {/* 1) 배경 */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <Image
           src="/images/child-bg.webp"
@@ -172,7 +172,9 @@ export default function TalkSession({
           className="object-cover object-center"
         />
       </div>
-      <div className="relative z-10 w-full flex items-center justify-center">
+
+      {/* 3) 헤더/액션: 콘텐츠 바깥에 분리 */}
+      <div className="absolute top-6 right-6 z-40">
         <button
           onClick={() => setIsExitModalOpen(true)}
           className="absolute top-6 right-6 z-50 p-3 bg-white/70 rounded-full shadow-lg hover:bg-white active:scale-95 transition-all"
@@ -195,40 +197,43 @@ export default function TalkSession({
             />
           </svg>
         </button>
+      </div>
 
-        {/* ✅ [추가] 나가기 확인 모달 (실수 방지 장치) */}
-        {isExitModalOpen && (
-          <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2 }}
-              className="w-[90vw] max-w-sm p-6 bg-white rounded-2xl shadow-xl text-center"
-            >
-              <h3 className="text-xl font-bold text-gray-800">
-                잠깐! 벌써 가는 거야?
-              </h3>
-              <p className="mt-2 text-gray-600">
-                괜찮아, 언제든 다시 돌아와서 이야기를 이어갈 수 있어!
-              </p>
-              <div className="mt-6 flex justify-center gap-4">
-                <button
-                  onClick={() => setIsExitModalOpen(false)}
-                  className="px-8 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
-                >
-                  계속할래
-                </button>
-                <button
-                  onClick={() => router.push(`/child/${childId}/talk`)}
-                  className="px-8 py-3 bg-orange-400 text-white font-semibold rounded-lg hover:bg-orange-500 transition-colors"
-                >
-                  그만할래
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
+      {/* 4) 모달 오버레이 */}
+      {isExitModalOpen && (
+        <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2 }}
+            className="w-[90vw] max-w-sm p-6 bg-white rounded-2xl shadow-xl text-center"
+          >
+            <h3 className="text-xl font-bold text-gray-800">
+              잠깐! 벌써 가는 거야?
+            </h3>
+            <p className="mt-2 text-gray-600">
+              괜찮아, 언제든 다시 돌아와서 이야기를 이어갈 수 있어!
+            </p>
+            <div className="mt-6 flex justify-center gap-4">
+              <button
+                onClick={() => setIsExitModalOpen(false)}
+                className="px-8 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                계속할래
+              </button>
+              <button
+                onClick={() => router.push(`/child/${childId}/talk`)}
+                className="px-8 py-3 bg-orange-400 text-white font-semibold rounded-lg hover:bg-orange-500 transition-colors"
+              >
+                그만할래
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
+      {/* 2) 콘텐츠 */}
+      <div className="relative z-10 p-6 flex items-center justify-center">
         {/* 캐릭터 */}
         <motion.div
           className={`relative z-10 translate-y-[20px] transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
@@ -250,6 +255,7 @@ export default function TalkSession({
         </motion.div>
         {/* ✅ [수정] isQuestionVisible이 항상 true이므로, isFinalMessage와 함께 묶어 조건부 렌더링을 단순화합니다. */}
 
+        {/* 말풍선 */}
         <div className="relative z-10 w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
           <motion.div
             className="relative w-full h-full"
@@ -299,6 +305,8 @@ export default function TalkSession({
             </div>
           </motion.div>
         </div>
+
+        {/* VideoRecorder */}
 
         <div className="relative z-10 ml-32 flex flex-col gap-8 text-center">
           {initialSubjectId ? ( // subjectId가 초기화되지 않았을 때만 렌더링
