@@ -1,11 +1,13 @@
-// app/child/[childId]/hydrate/HydrateChildStore.tsx
 'use client';
 
 import { useEffect } from 'react';
 import { useChildStore } from '@/store/useChildStore';
 
+// ✅ [수정] layout.tsx에서 전달하는 새로운 Overview 타입과 일치시킵니다.
 type Overview = {
+  childName: string;
   grapes: number;
+  emotion: number;
   emotionDone: boolean;
   specifiedDone: boolean;
 };
@@ -19,8 +21,6 @@ export default function HydrateChildStore({
 }) {
   const setOverview = useChildStore((s) => s.setOverview);
 
-  //overview prop이 변경될 때마다
-  // 스토어가 항상 최신 상태를 반영하도록 합니다.
   useEffect(() => {
     setOverview(overview);
   }, [overview, setOverview]);

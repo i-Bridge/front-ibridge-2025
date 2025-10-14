@@ -24,8 +24,8 @@ export default function ChildSelector({ childrenData }: Props) {
         });
       }
 
-      // 2. 전체 화면 전환 시도 후, 해당 아동의 talk 페이지로 이동합니다.
-      router.push(`/child/${childId}/talk`);
+      // 2. 전체 화면 전환 시도 후, 해당 아동의 home 페이지로 이동합니다.
+      router.push(`/child/${childId}/home`);
     },
     [router],
   );

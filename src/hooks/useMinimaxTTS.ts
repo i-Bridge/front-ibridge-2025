@@ -39,11 +39,7 @@ export function useMinimaxTTS() {
     try {
       currentBufferSourceRef.current?.stop();
     } catch {}
-
     setIsSpeaking(false);
-    currentAbortRef.current = null;
-    currentAudioRef.current = null;
-    currentBufferSourceRef.current = null;
   }, []);
 
   const makeKey = (text: string, voice = 'default', speed = 1) =>
@@ -81,6 +77,7 @@ export function useMinimaxTTS() {
   const play = useCallback(
     async (keyOrText: string, opts?: { voice?: string; speed?: number }) => {
       cancel();
+      setIsSpeaking(true);
       const ctx = audioCtxRef.current!;
       let key = keyOrText;
       if (!cacheRef.current.has(keyOrText)) {
@@ -88,27 +85,29 @@ export function useMinimaxTTS() {
       }
       const cached = cacheRef.current.get(key)!;
       if (ctx.state === 'suspended') await ctx.resume();
-      const src = ctx.createBufferSource();
-      currentBufferSourceRef.current = src;
-      src.buffer = cached.buffer;
-      src.connect(ctx.destination);
-      setIsSpeaking(true);
-      src.start();
-      src.onended = () => {
-        if (currentBufferSourceRef.current === src) {
-          setIsSpeaking(false);
-          currentBufferSourceRef.current = null;
-        }
-      };
-      return cached.dur;
+
+      return new Promise<number>((resolve) => {
+        const src = ctx.createBufferSource();
+        currentBufferSourceRef.current = src;
+        src.buffer = cached.buffer;
+        src.connect(ctx.destination);
+        src.start();
+        src.onended = () => {
+          if (currentBufferSourceRef.current === src) {
+            currentBufferSourceRef.current = null;
+          }
+          setIsSpeaking(false); // ← 여기서 내림 (finally 금지)
+          resolve(cached.dur);
+        };
+      });
     },
     [prepare, cancel],
   );
 
   const _playStreamOnce = useCallback(
     async (text: string, opts?: StreamOpts) => {
-      const controller = new AbortController();
-      currentAbortRef.current = controller;
+      const controller = currentAbortRef.current;
+      if (!controller) throw new Error('AbortController가 없습니다.');
       const res = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -159,20 +158,11 @@ export function useMinimaxTTS() {
                   .catch(reject);
               };
               pump();
-              setIsSpeaking(true);
               audioEl.play().catch(reject);
               audioEl.onended = () => {
-                if (currentAudioRef.current === audioEl) {
-                  currentAudioRef.current = null;
-                  currentAbortRef.current = null;
-                }
                 resolve();
               };
               audioEl.onerror = (e) => {
-                if (currentAudioRef.current === audioEl) {
-                  currentAudioRef.current = null;
-                  currentAbortRef.current = null;
-                }
                 reject(e);
               };
             } catch (e) {
@@ -194,6 +184,13 @@ export function useMinimaxTTS() {
     ) => {
       // 1. 스트리밍 시퀀스 시작 전, 이전에 재생 중이던 모든 오디오를 정리합니다.
       cancel();
+      currentAbortRef.current = null;
+      currentAudioRef.current = null;
+      currentBufferSourceRef.current = null;
+
+      const controller = new AbortController();
+      currentAbortRef.current = controller;
+
       // 2. 스트리밍 시퀀스 시작 시, isSpeaking을 true로 설정합니다.
       setIsSpeaking(true);
       try {
@@ -212,21 +209,19 @@ export function useMinimaxTTS() {
           try {
             await _playStreamOnce(chunk, opts);
           } catch (e) {
-            if (e instanceof Error && e.name === 'AbortError') {
+            // ✅ [수정] 에러의 종류(e.name) 대신, 이 함수 스코프의 controller.signal 상태를 직접 확인합니다.
+            // 이것이 '의도된 중단'인지 판단하는 가장 확실한 방법입니다.
+            if (controller.signal.aborted) {
               console.log(
                 '🔇 스트리밍이 의도적으로 중단되었습니다. 폴백을 실행하지 않습니다.',
               );
-              // cancel()이 호출되면 여기서 에러가 발생하며, isSpeaking은 finally에서 false가 됩니다.
-              // 따라서 즉시 함수를 종료하여 더 이상 진행되지 않도록 합니다.
-              return;
+              return; // 함수를 즉시 종료
             } else {
               console.warn('⚠️ 스트리밍 실패, 일반 재생으로 폴백:', chunk, e);
               try {
                 await play(chunk, opts);
-              } finally {
-                // 3. 모든 청크의 재생이 성공적으로 끝나거나, 도중에 에러가 발생하더라도,
-                //    반드시 마지막에 isSpeaking을 false로 설정하여 상태를 정리합니다.
-                setIsSpeaking(false);
+              } catch (playError) {
+                console.error('- 폴백 재생조차 실패했습니다:', playError);
               }
             }
           }

@@ -1,43 +1,50 @@
-interface SpeechRecognition extends EventTarget {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  onresult: (event: SpeechRecognitionEvent) => void;
-  onerror: (event: SpeechRecognitionErrorEvent) => void;
-  onend: (() => void) | null;
-  onspeechstart: (() => void) | null;
-  onspeechend: (() => void) | null;
-  start(): void;
-  stop(): void;
-}
+export {}; // 이 파일을 모듈로 만들어 전역 보강 충돌 방지
 
-interface SpeechRecognitionEvent extends Event {
-  resultIndex: number;
-  results: SpeechRecognitionResultList;
-}
+declare global {
+  interface SpeechRecognition extends EventTarget {
+    lang: string;
+    continuous: boolean;
+    interimResults: boolean;
+    onresult: (event: SpeechRecognitionEvent) => void;
+    onerror: (event: SpeechRecognitionErrorEvent) => void;
+    onend: (() => void) | null;
+    onspeechstart: (() => void) | null;
+    onspeechend: (() => void) | null;
+    start(): void;
+    stop(): void;
+  }
 
-interface SpeechRecognitionResultList {
-  length: number;
-  [index: number]: SpeechRecognitionResult;
-}
+  interface SpeechRecognitionEvent extends Event {
+    resultIndex: number;
+    results: SpeechRecognitionResultList;
+  }
 
-interface SpeechRecognitionResult {
-  0: SpeechRecognitionAlternative;
-  isFinal: boolean;
-  length: number;
-}
+  interface SpeechRecognitionResultList {
+    length: number;
+    [index: number]: SpeechRecognitionResult;
+  }
 
-interface SpeechRecognitionAlternative {
-  transcript: string;
-  confidence: number;
-}
+  interface SpeechRecognitionResult {
+    0: SpeechRecognitionAlternative;
+    isFinal: boolean;
+    length: number;
+  }
 
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string;
-  message: string;
-}
+  interface SpeechRecognitionAlternative {
+    transcript: string;
+    confidence: number;
+  }
 
-interface Window {
-  webkitSpeechRecognition: typeof SpeechRecognition;
-  SpeechRecognition: new () => SpeechRecognition;
+  interface SpeechRecognitionErrorEvent extends Event {
+    error: string;
+    message: string;
+  }
+
+  // 생성자 타입 정의
+  type SpeechRecognitionConstructor = new () => SpeechRecognition;
+
+  interface Window {
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+    SpeechRecognition?: SpeechRecognitionConstructor;
+  }
 }
