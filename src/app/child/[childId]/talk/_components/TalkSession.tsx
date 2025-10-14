@@ -126,9 +126,9 @@ export default function TalkSession({
 
   const resetUI = useCallback(() => {
     console.log(
-      `[TalkSession] 대화 종료. ${`/child/${childId}/talk`} 경로로 이동합니다.`,
+      `[TalkSession] 대화 종료. ${`/child/${childId}/home`} 경로로 이동합니다.`,
     );
-    window.location.href = `/child/${childId}/talk`;
+    window.location.href = `/child/${childId}/home`;
   }, [childId]);
 
   const handleAIResponse = useCallback(
@@ -222,7 +222,7 @@ export default function TalkSession({
                 계속할래
               </button>
               <button
-                onClick={() => router.push(`/child/${childId}/talk`)}
+                onClick={() => router.push(`/child/${childId}/home`)}
                 className="px-8 py-3 bg-orange-400 text-white font-semibold rounded-lg hover:bg-orange-500 transition-colors"
               >
                 그만할래
