@@ -81,7 +81,7 @@ export default function TalkMenu({ childId }: Props) {
           </button>
         ) : (
           <Link
-            href={`/child/${childId}/talk/question`}
+            href={`/child/${childId}/question`}
             className={`w-72 h-20 rounded-2xl flex items-center justify-center text-xl font-bold hover:scale-105 transition-transform ${
               emotionDone === false
                 ? 'bg-pink-200 pointer-events-none cursor-not-allowed'
@@ -96,7 +96,7 @@ export default function TalkMenu({ childId }: Props) {
         )}
 
         <Link
-          href={`/child/${childId}/talk/free`}
+          href={`/child/${childId}/free`}
           className="w-72 h-20 rounded-2xl bg-green-300 flex items-center justify-center text-xl font-bold hover:scale-105 transition-transform"
         >
           하고싶은 말

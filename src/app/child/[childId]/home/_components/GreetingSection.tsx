@@ -66,7 +66,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
               </div>
             ) : (
               <Link
-                href={`/child/${childId}/talk/question`}
+                href={`/child/${childId}/question`}
                 className="flex-1 md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-primary flex items-center justify-center p-5 md:py-7 md:px-10 text-white hover:bg-primary/90 transition-colors"
               >
                 <ButtonContent>
@@ -77,7 +77,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
               </Link>
             )}
             <Link
-              href={`/child/${childId}/talk/free`}
+              href={`/child/${childId}/free`}
               className="flex-1 md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-gray-90 flex items-center justify-center p-5 md:py-7 md:px-10 text-white hover:bg-gray-80 transition-colors"
             >
               <ButtonContent>
