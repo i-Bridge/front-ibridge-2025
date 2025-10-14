@@ -8,6 +8,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-nanum)', 'sans-serif'],
+      },
       keyframes: {
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
@@ -65,9 +68,6 @@ export default {
         'i-lightgray': '#D9D9D9',
         'i-black': '#202123',
         'i-white': '#FFFFF',
-      },
-      fontFamily: {
-        noto: 'var(--font-noto)',
       },
     },
   },
