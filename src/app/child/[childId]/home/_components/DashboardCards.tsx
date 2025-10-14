@@ -18,7 +18,7 @@ export default function DashboardCards({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
       {/* 감정 상태 카드 */}
       {/* ✅ [수정] 보상 카드와 디자인 통일성을 위해 동일한 스펙을 적용합니다. */}
-      <div className="bg-secondary/10 h-[284px] rounded-[40px] shadow-lg py-10 px-12 flex flex-col justify-between gap-10">
+      <div className="bg-secondary/10 h-[284px] rounded-[40px] shadow-sm py-10 px-12 flex flex-col justify-between gap-10">
         <div className="flex items-center gap-5">
           <div className="w-[100px] h-[100px] bg-white rounded-full flex-shrink-0 flex items-center justify-center text-5xl">
             🍀
@@ -48,7 +48,7 @@ export default function DashboardCards({
 
       {/* 보상 카드 */}
       {/* ✅ [수정] Figma 스펙에 맞춰 h-[284px], rounded-[40px], py-10, px-12, gap-10 클래스를 적용합니다. */}
-      <div className="bg-purple-100/50 h-[284px] rounded-[40px] shadow-lg py-10 px-12 flex flex-col justify-between gap-10">
+      <div className="bg-purple-100/50 h-[284px] rounded-[40px] shadow-sm py-10 px-12 flex flex-col justify-between gap-10">
         {/* 상단 텍스트 영역 */}
         <div className="flex items-center gap-5">
           <div className="w-[100px] h-[100px] relative">

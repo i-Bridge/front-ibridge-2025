@@ -16,7 +16,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
   );
 
   return (
-    <div className="relative rounded-[40px] shadow-lg overflow-hidden h-[400px]">
+    <div className="relative rounded-[40px] shadow-md overflow-hidden h-[400px]">
       {/* 배경 레이어 (z-0) */}
       <Image
         src="/images/child-bg.webp"
@@ -30,9 +30,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
       {/* 콘텐츠 레이어 (z-10) */}
       <div className="relative z-10 h-full flex items-center justify-center gap-x-5 px-12">
         {/* 왼쪽 캐릭터 영역 */}
-        {/* ✅ [수정] 부모 div가 500x400 크기를 갖고, 자식 div가 그 안에서 절대 위치를 잡도록 구조를 변경했습니다. */}
         <div className="w-[500px] h-[400px] relative flex-shrink-0">
-          {/* 이 div가 실제 이미지의 크기, 위치, 회전, 그림자를 담당합니다. */}
           <div
             className="absolute w-[417.44px] h-[410.58px] top-[45.22px] left-[26.74px] rotate-[4.22deg]"
             style={{
@@ -45,12 +43,14 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
               fill
               style={{ objectFit: 'contain' }}
               sizes="418px"
+              quality={100}
             />
           </div>
         </div>
 
         {/* 오른쪽 콘텐츠 영역 */}
-        <div className="w-[500px] flex flex-col gap-7">
+        {/* ✅ [수정] Figma 스펙에 맞춰 w-[500px], py-[60px], gap-7(28px)을 적용합니다. */}
+        <div className="w-[500px] flex flex-col justify-center py-[60px] gap-7">
           <h2 className="text-[40px] font-extrabold leading-[150%] text-gray-800">
             안녕, 오늘은
             <br />
@@ -58,7 +58,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
           </h2>
 
           {/* 버튼 그룹 */}
-          <div className="w-full flex gap-5">
+          <div className="w-full h-[124px] flex gap-5">
             {specifiedDone ? (
               <div className="w-[240px] h-[124px] rounded-[40px] bg-gray-10 flex items-center justify-center p-7 text-gray-30 cursor-not-allowed">
                 <ButtonContent text="오늘의 질문 답변 완료" />
@@ -68,7 +68,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
                 href={`/child/${childId}/talk/question`}
                 className="w-[240px] h-[124px] rounded-[40px] bg-primary flex items-center justify-center p-7 text-white hover:bg-primary/90 transition-colors"
               >
-                <ButtonContent text="오늘의 질문에 대답할래!" />
+                <ButtonContent text="오늘의 질문에 대답할게!" />
               </Link>
             )}
             <Link
