@@ -27,6 +27,7 @@ async function getOverview(childId: string): Promise<Overview> {
   );
 
   if (res.isSuccess && res.data) {
+    console.log(res.data);
     const { childName, grapes, emotion, emotionDone, specifiedDone } = res.data;
     return {
       childName,

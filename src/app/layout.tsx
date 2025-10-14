@@ -1,18 +1,21 @@
-'use client';
-
+import type { Metadata } from 'next';
 import './globals.css';
-import { SessionProvider } from 'next-auth/react';
-import { Toaster } from 'sonner';
+import Providers from './Providers';
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export const metadata: Metadata = {
+  title: 'i-Bridge',
+  description: 'AI 대화 서비스',
+};
 
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="ko">
       <body>
-          <SessionProvider>
-            <Toaster position="top-center" richColors />
-            {children}
-          </SessionProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
