@@ -9,11 +9,10 @@ type Props = {
 };
 
 export default function GreetingSection({ childId, specifiedDone }: Props) {
-  const ButtonContent = ({ text }: { text: string }) => (
-    // ✅ [수정] 데스크탑(md) 크기 이상에서는 버튼 내부 콘텐츠의 크기를 Figma 스펙에 맞게 고정합니다.
+  const ButtonContent = ({ children }: { children: React.ReactNode }) => (
     <div className="flex items-center w-full h-full md:w-[160px] md:h-[68px]">
       <p className="w-full text-lg sm:text-xl md:text-2xl font-extrabold leading-[140%] text-left">
-        {text}
+        {children}
       </p>
     </div>
   );
@@ -58,25 +57,34 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
           {/* 버튼 그룹 */}
           <div className="w-full max-w-md md:max-w-none flex flex-col sm:flex-row gap-3 md:gap-5">
             {specifiedDone ? (
-              // ✅ [수정] 데스크탑(md) 크기 이상에서 고정 너비, 높이, 패딩을 적용합니다.
               <div className="flex-1 md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-gray-10 flex items-center justify-center p-5 md:py-7 md:px-10 text-gray-30 cursor-not-allowed">
-                <ButtonContent text="오늘의 질문 답변 완료" />
+                <ButtonContent>
+                  오늘의 질문
+                  <br />
+                  답변 완료
+                </ButtonContent>
               </div>
             ) : (
-              // ✅ [수정] 데스크탑(md) 크기 이상에서 고정 너비, 높이, 패딩을 적용합니다.
               <Link
                 href={`/child/${childId}/talk/question`}
                 className="flex-1 md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-primary flex items-center justify-center p-5 md:py-7 md:px-10 text-white hover:bg-primary/90 transition-colors"
               >
-                <ButtonContent text="오늘의 질문에 대답할게!" />
+                <ButtonContent>
+                  오늘의 질문에
+                  <br />
+                  대답할게!
+                </ButtonContent>
               </Link>
             )}
-            {/* ✅ [수정] 데스크탑(md) 크기 이상에서 고정 너비, 높이, 패딩을 적용합니다. */}
             <Link
               href={`/child/${childId}/talk/free`}
               className="flex-1 md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-gray-90 flex items-center justify-center p-5 md:py-7 md:px-10 text-white hover:bg-gray-80 transition-colors"
             >
-              <ButtonContent text="하고싶은 말이 있어!" />
+              <ButtonContent>
+                하고싶은
+                <br />
+                말이 있어!
+              </ButtonContent>
             </Link>
           </div>
         </div>
