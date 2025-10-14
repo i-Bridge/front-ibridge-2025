@@ -2,33 +2,33 @@
 
 import Image from 'next/image';
 
-// ✅ [수정] Props 타입에서 rewardAvailable를 제거합니다.
+// ✅ [수정] Props 타입에 onEmotionSelectClick 함수를 추가합니다.
 type Props = {
   emotionDone: boolean;
   grapes: number;
+  onEmotionSelectClick: () => void;
 };
 
-export default function DashboardCards({ emotionDone, grapes }: Props) {
+export default function DashboardCards({
+  emotionDone,
+  grapes,
+  onEmotionSelectClick,
+}: Props) {
   const today = new Date();
   const formattedDate = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
 
-  // ✅ [추가] 포도송이를 받을 수 있는지 여부(isRewardAvailable)를 grapes 값에 따라 직접 계산합니다.
-  // 포도알이 0보다 크고 6으로 나누어 떨어질 때 '한 송이 받기'가 활성화됩니다.
-  const isRewardAvailable = grapes > 0 && grapes % 6 === 0;
-
-  // ✅ [추가] 아이콘에 표시할 낱알 개수를 계산하는 로직입니다.
-  // 6, 12, 18개 등 6의 배수일 때는 꽉 찬 포도송이(6개) 아이콘을 보여주고,
-  // 그 외에는 나머지 낱알 개수를 보여줍니다.
   const remainder = grapes % 6;
-  const displayGrapes = isRewardAvailable ? 6 : remainder;
+  // 6의 배수일 때는 꽉 찬 포도송이(6)를, 아닐 때는 나머지(0~5)를 보여줍니다.
+  const displayGrapes = grapes > 0 && remainder === 0 ? 6 : remainder;
 
   const getGrapeIconPath = (count: number) => {
-    const grapeCount = Math.max(0, Math.min(6, count));
-    // ✅ [수정] 파일 확장자를 .webp로 변경하여 일관성을 맞춥니다.
-    return `/images/grape-bunch-${grapeCount}.webp`;
+    return `/images/grape-bunch-${count}.webp`;
   };
 
   const grapeIconSrc = getGrapeIconPath(displayGrapes);
+
+  // '한 송이 받기' 버튼 활성화 로직
+  const isRewardAvailable = grapes > 0 && grapes % 6 === 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -49,7 +49,9 @@ export default function DashboardCards({ emotionDone, grapes }: Props) {
           </div>
         </div>
 
+        {/* ✅ [수정] onClick 이벤트에 onEmotionSelectClick 함수를 연결합니다. */}
         <button
+          onClick={onEmotionSelectClick}
           disabled={emotionDone}
           className="w-full h-16 rounded-full bg-secondary flex items-center justify-center py-5 px-10 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
         >
@@ -63,7 +65,6 @@ export default function DashboardCards({ emotionDone, grapes }: Props) {
 
       {/* 보상 카드 */}
       <div className="bg-purple-100/50 h-[284px] rounded-[40px] shadow-lg py-10 px-12 flex flex-col justify-between gap-10">
-        {/* 상단 텍스트 영역 */}
         <div className="flex items-center gap-5">
           <div className="w-[100px] h-[100px] relative">
             <Image
@@ -72,8 +73,6 @@ export default function DashboardCards({ emotionDone, grapes }: Props) {
               fill
               style={{ objectFit: 'contain' }}
               quality={100}
-              // ✅ [추가] fill 속성 사용 시, 브라우저가 화면 너비에 맞는 최적의 이미지를 선택하도록 sizes 정보를 제공합니다.
-              // 이 이미지는 항상 100px 너비의 컨테이너 안에 있으므로 '100px'로 설정합니다.
               sizes="100px"
             />
           </div>
@@ -88,10 +87,8 @@ export default function DashboardCards({ emotionDone, grapes }: Props) {
           </div>
         </div>
 
-        {/* 하단 버튼 그룹 */}
         <div className="flex w-full gap-3">
           <button
-            // ✅ [수정] '한 송이 받기' 버튼의 disabled 조건을 내부에서 계산한 isRewardAvailable로 변경합니다.
             disabled={!isRewardAvailable}
             className="flex-1 h-16 rounded-full bg-purple-600/15 flex items-center justify-center py-5 px-10 disabled:bg-purple-600/5 disabled:cursor-not-allowed transition-colors"
           >
