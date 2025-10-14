@@ -24,6 +24,7 @@ export default function DashboardCards({ emotionDone, grapes }: Props) {
 
   const getGrapeIconPath = (count: number) => {
     const grapeCount = Math.max(0, Math.min(6, count));
+    // ✅ [수정] 파일 확장자를 .webp로 변경하여 일관성을 맞춥니다.
     return `/images/grape-bunch-${grapeCount}.webp`;
   };
 
@@ -71,6 +72,9 @@ export default function DashboardCards({ emotionDone, grapes }: Props) {
               fill
               style={{ objectFit: 'contain' }}
               quality={100}
+              // ✅ [추가] fill 속성 사용 시, 브라우저가 화면 너비에 맞는 최적의 이미지를 선택하도록 sizes 정보를 제공합니다.
+              // 이 이미지는 항상 100px 너비의 컨테이너 안에 있으므로 '100px'로 설정합니다.
+              sizes="100px"
             />
           </div>
           <div className="flex flex-col">
