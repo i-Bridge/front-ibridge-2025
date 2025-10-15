@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 import { API } from '@/constants/api';
 import { EmotionId } from '@/constants/emotions';
-import EmotionModal from './EmotionModal'; // EmotionModal 경로를 확인해주세요.
+import EmotionModal from './EmotionModal';
 
 type Props = {
   childId: string;
@@ -17,19 +17,25 @@ type Props = {
 export default function HomePageClient({ childId }: Props) {
   const router = useRouter();
 
-  // Zustand 스토어에서 모든 필요한 데이터를 가져옵니다.
-  const { specifiedDone, emotionDone, grapes, setEmotionDone } =
-    useChildStore();
+  // ✅ [수정] 스토어에서 새로운 데이터 구조에 맞는 값들과 액션을 가져옵니다.
+  const {
+    specifiedDone,
+    emotionDone,
+    rewardAvailable,
+    grapeBunches,
+    grapePieces,
+    setEmotionDone,
+    setGrapeState,
+  } = useChildStore();
 
-  // ✅ [추가] 하이드레이션 깜빡임 방지 및 모달 상태 관리 로직
   const [isHydrated, setIsHydrated] = useState(false);
   const [isEmotionModalOpen, setIsEmotionModalOpen] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
 
   useEffect(() => {
     setIsHydrated(true);
   }, []);
 
-  // ✅ [추가] 감정 선택 API를 호출하는 핸들러 함수
   const handleSelectEmotion = useCallback(
     async (emotionId: EmotionId) => {
       try {
@@ -37,13 +43,9 @@ export default function HomePageClient({ childId }: Props) {
           method: 'POST',
           data: { emotion: emotionId },
         });
-
         if (isSuccess) {
-          // Zustand 스토어 상태를 직접 업데이트합니다.
           setEmotionDone(true);
-          // 서버 데이터 캐시를 갱신하여 페이지 전체의 일관성을 유지합니다.
           router.refresh();
-          // 모달을 닫습니다.
           setIsEmotionModalOpen(false);
           return true;
         }
@@ -56,7 +58,33 @@ export default function HomePageClient({ childId }: Props) {
     [childId, router, setEmotionDone],
   );
 
-  // 하이드레이션이 완료되기 전에는 렌더링하지 않아 UI 깜빡임을 방지합니다.
+  // ✅ [수정] '한 송이 받기' 버튼 클릭 시 새로운 /getBunch API를 호출하도록 수정합니다.
+  const handleClaimReward = useCallback(async () => {
+    if (isClaiming) return;
+    setIsClaiming(true);
+    try {
+      const { data, isSuccess } = await Fetcher<{
+        grapeBunches: number;
+        grapePieces: number;
+        available: boolean; // 백엔드 응답은 'available'
+      }>(API.getBunch(childId), { method: 'POST' });
+
+      if (isSuccess && data) {
+        console.log('포도송이 받기 성공:', data);
+        // 백엔드 응답을 프론트엔드 스토어 상태에 맞게 매핑하여 업데이트합니다.
+        setGrapeState({
+          grapeBunches: data.grapeBunches,
+          grapePieces: data.grapePieces,
+          rewardAvailable: data.available,
+        });
+      }
+    } catch (e) {
+      console.error('포도송이 받기 실패:', e);
+    } finally {
+      setIsClaiming(false);
+    }
+  }, [childId, setGrapeState, isClaiming]);
+
   if (!isHydrated) {
     return null;
   }
@@ -66,11 +94,12 @@ export default function HomePageClient({ childId }: Props) {
       <GreetingSection childId={childId} specifiedDone={specifiedDone} />
       <DashboardCards
         emotionDone={emotionDone}
-        grapes={grapes}
-        // ✅ [수정] DashboardCards의 버튼 클릭 시 모달을 열도록 함수를 전달합니다.
+        rewardAvailable={rewardAvailable}
+        grapePieces={grapePieces} // ✅ [수정] prop으로 전달
         onEmotionSelectClick={() => setIsEmotionModalOpen(true)}
+        onClaimReward={handleClaimReward}
+        isClaiming={isClaiming}
       />
-      {/* ✅ [추가] 감정 선택 모달을 렌더링합니다. */}
       <EmotionModal
         open={isEmotionModalOpen}
         onClose={() => setIsEmotionModalOpen(false)}

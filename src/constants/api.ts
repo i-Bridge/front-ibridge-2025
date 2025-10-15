@@ -7,4 +7,5 @@ export const API = {
   predesigned: (childId: string) => `/child/${childId}/predesigned`,
   new: (childId: string) => `/child/${childId}/new`,
   finished: (childId: string) => `/child/${childId}/finished`,
+  getBunch: (childId: string) => `/child/${childId}/getBunch`,
 } as const;

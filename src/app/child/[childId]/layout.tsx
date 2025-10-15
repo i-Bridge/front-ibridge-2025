@@ -28,6 +28,7 @@ async function getOverview(childId: string): Promise<Overview> {
     );
 
     if (res.isSuccess && res.data) {
+      console.log('Fetched overview data:', res.data);
       // ✅ [수정] 이제 별도의 가공 없이 받은 데이터를 그대로 반환합니다.
       return res.data;
     } else {

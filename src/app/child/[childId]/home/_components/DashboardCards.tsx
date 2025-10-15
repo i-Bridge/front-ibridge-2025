@@ -2,33 +2,34 @@
 
 import Image from 'next/image';
 
-// ✅ [수정] Props 타입에 onEmotionSelectClick 함수를 추가합니다.
+// ✅ [수정] Props 타입을 새로운 데이터 구조와 로딩 상태에 맞게 업데이트합니다.
 type Props = {
   emotionDone: boolean;
-  grapes: number;
+  rewardAvailable: boolean;
+  grapePieces: number;
   onEmotionSelectClick: () => void;
+  onClaimReward: () => void;
+  isClaiming: boolean; // "한 송이 받기" 로딩 상태
 };
 
 export default function DashboardCards({
   emotionDone,
-  grapes,
+  rewardAvailable,
+  grapePieces,
   onEmotionSelectClick,
+  onClaimReward,
+  isClaiming,
 }: Props) {
   const today = new Date();
   const formattedDate = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
 
-  const remainder = grapes % 6;
-  // 6의 배수일 때는 꽉 찬 포도송이(6)를, 아닐 때는 나머지(0~5)를 보여줍니다.
-  const displayGrapes = grapes > 0 && remainder === 0 ? 6 : remainder;
-
   const getGrapeIconPath = (count: number) => {
-    return `/images/grape-bunch-${count}.webp`;
+    const grapeCount = Math.max(0, Math.min(6, count));
+    return `/images/grape-bunch-${grapeCount}.webp`;
   };
 
-  const grapeIconSrc = getGrapeIconPath(displayGrapes);
-
-  // '한 송이 받기' 버튼 활성화 로직
-  const isRewardAvailable = grapes > 0 && grapes % 6 === 0;
+  // ✅ [수정] prop으로 받은 grapePieces를 직접 사용합니다.
+  const grapeIconSrc = getGrapeIconPath(grapePieces);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -48,8 +49,6 @@ export default function DashboardCards({
             </p>
           </div>
         </div>
-
-        {/* ✅ [수정] onClick 이벤트에 onEmotionSelectClick 함수를 연결합니다. */}
         <button
           onClick={onEmotionSelectClick}
           disabled={emotionDone}
@@ -69,7 +68,7 @@ export default function DashboardCards({
           <div className="w-[100px] h-[100px] relative">
             <Image
               src={grapeIconSrc}
-              alt={`포도알 ${displayGrapes}개`}
+              alt={`포도알 ${grapePieces}개`}
               fill
               style={{ objectFit: 'contain' }}
               quality={100}
@@ -86,15 +85,15 @@ export default function DashboardCards({
             </p>
           </div>
         </div>
-
         <div className="flex w-full gap-3">
           <button
-            disabled={!isRewardAvailable}
+            onClick={onClaimReward}
+            disabled={!rewardAvailable || isClaiming}
             className="flex-1 h-16 rounded-full bg-purple-600/15 flex items-center justify-center py-5 px-10 disabled:bg-purple-600/5 disabled:cursor-not-allowed transition-colors"
           >
             <div className="h-8 flex items-center justify-center">
               <p className="text-xl font-extrabold leading-[160%] text-purple-600">
-                한 송이 받기
+                {isClaiming ? '처리 중...' : '한 송이 받기'}
               </p>
             </div>
           </button>
