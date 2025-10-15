@@ -3,10 +3,11 @@
 import { useEffect } from 'react';
 import { useChildStore } from '@/store/useChildStore';
 
-// ✅ [수정] layout.tsx에서 전달하는 새로운 Overview 타입과 일치시킵니다.
 type Overview = {
   childName: string;
-  grapes: number;
+  grapeBunches: number;
+  grapePieces: number;
+  rewardAvailable: boolean;
   emotion: number;
   emotionDone: boolean;
   specifiedDone: boolean;
