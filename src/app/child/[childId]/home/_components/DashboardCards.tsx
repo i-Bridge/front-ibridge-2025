@@ -81,8 +81,7 @@ export default function DashboardCards({
               지금 바로
             </p>
             <p className="text-[28px] font-extrabold leading-[150%]">
-              <span className="text-purple-600">포도송이 1송이</span>를 받을 수
-              있어!
+              <span className="text-purple-600">포도송이</span>를 받을 수 있어!
             </p>
           </div>
         </div>
