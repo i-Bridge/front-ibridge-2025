@@ -73,6 +73,7 @@ export default function DashboardCards({
               style={{ objectFit: 'contain' }}
               quality={100}
               sizes="100px"
+              priority
             />
           </div>
           <div className="flex flex-col">

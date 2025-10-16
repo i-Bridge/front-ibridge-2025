@@ -24,6 +24,7 @@ export default function Header() {
               width={24}
               height={24}
               quality={100}
+              priority
             />
             {/* ✅ [수정] 스토어에서 가져온 grapeBunches 값을 바로 사용합니다. */}
             <span>{grapeBunches}송이</span>
@@ -35,6 +36,7 @@ export default function Header() {
               width={24}
               height={24}
               quality={100}
+              priority
             />
             {/* ✅ [수정] 스토어에서 가져온 grapePieces 값을 바로 사용합니다. */}
             <span>{grapePieces}알</span>
