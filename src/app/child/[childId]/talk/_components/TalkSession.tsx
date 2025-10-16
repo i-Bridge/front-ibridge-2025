@@ -102,8 +102,11 @@ export default function TalkSession({
   // ✅ [추가] 컴포넌트가 마운트되자마자, prop으로 받은 첫 질문을 바로 재생하는 로직입니다.
   useEffect(() => {
     console.log('[TalkSession] 시작! 첫 질문 재생:', initialQuestion);
-    setDisplayText(''); // 타이핑 효과를 위해 초기화
-    playStreamSmart(initialQuestion, handleChunkDisplay);
+    setDisplayText('');
+    // ⭐ 첫 진입에만 첫 문장 WebAudio 재생 → 이후는 스트리밍으로 이어짐
+    playStreamSmart(initialQuestion, handleChunkDisplay, {
+      firstChunkViaWebAudio: true,
+    });
   }, [initialQuestion, playStreamSmart, handleChunkDisplay]);
 
   const resetUI = useCallback(() => {
@@ -298,18 +301,6 @@ export default function TalkSession({
             <div>대화 세션을 준비 중입니다...</div>
           )}
         </div>
-        {/* 페이지 어딘가에 임시로 */}
-        <div
-          className="fixed left-4 bottom-4 z-[70] border border-red-500"
-          style={{
-            width: 200,
-            height: 200,
-            backgroundImage: "url('/images/mouth-sprite.webp')",
-            backgroundSize: '200% 100%',
-            backgroundRepeat: 'no-repeat',
-            animation: 'beak-talk .6s steps(2) infinite',
-          }}
-        />
       </div>
     </div>
   );
