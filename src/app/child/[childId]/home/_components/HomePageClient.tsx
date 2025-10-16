@@ -22,7 +22,6 @@ export default function HomePageClient({ childId }: Props) {
     specifiedDone,
     emotionDone,
     rewardAvailable,
-    grapeBunches,
     grapePieces,
     setEmotionDone,
     setGrapeState,

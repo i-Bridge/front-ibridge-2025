@@ -1,9 +1,11 @@
 'use client';
 
+// React를 import해야 CSSProperties 타입을 정확히 참조할 수 있습니다.
+import React from 'react';
 import Image from 'next/image';
 
 type Size = { w: number; h: number };
-type Percent = { x: number; y: number }; // 0~1 (바디 원본 기준 퍼센트)
+type Percent = { x: number; y: number };
 
 type Props = {
   isSpeaking: boolean;
@@ -20,10 +22,8 @@ type Props = {
 
   /** 바디 원본 좌표계 기준 '부리 중심' 위치(퍼센트) — 처음엔 대략 0.5, 0.56로 시작해서 미세조정 */
   beakAnchorPct?: Percent;
-
-  /** 에셋 경로 */
-  bodySrc?: string; // 부리 없는 바디
-  beakSpriteSrc?: string; // 부리 스프라이트 (가로 2프레임)
+  bodySrc?: string;
+  beakSpriteSrc?: string;
 };
 
 export default function TalkingCharacter({
@@ -36,22 +36,27 @@ export default function TalkingCharacter({
   bodySrc = '/images/talking-owlly.webp',
   beakSpriteSrc = '/images/mouth-sprite.webp',
 }: Props) {
-  // ✅ 1) 단일 스케일(가로 기준)만 사용
-  const s = width / baseSize.w; // ← sx, sy 따로 쓰지 않기
-
-  // ✅ 2) 프레임 표시 크기: 정수 고정(정사각 프레임이라 bh = bw)
+  const s = width / baseSize.w;
   const bw = Math.round(frameSize.w * s);
-  const bh = bw; // Math.round(frameSize.h * s) 대신, 정사각이면 bw로 통일
-
-  // ✅ 3) 앵커 계산도 같은 s로, 그리고 정수 반올림
+  const bh = bw;
   const ax = beakAnchorPct.x * baseSize.w * s;
   const ay = beakAnchorPct.y * baseSize.h * s;
   const left = Math.round(ax - bw / 2);
   const top = Math.round(ay - bh / 2);
 
+  const beakStyle: React.CSSProperties & { [key: `--${string}`]: string } = {
+    left,
+    top,
+    width: bw,
+    height: bh,
+    backgroundImage: `url('${beakSpriteSrc}')`,
+    backgroundPosition: '0px 0px',
+    '--bw': `${bw}px`,
+    '--bh': `${bh}px`,
+  };
+
   return (
     <div className="relative" style={{ width, height }}>
-      {/* 1) 바디(부리 없음) */}
       <Image
         src={bodySrc}
         alt="캐릭터"
@@ -60,18 +65,10 @@ export default function TalkingCharacter({
         priority
       />
       <span
-        className={`absolute pointer-events-none beak-sprite ${isSpeaking ? 'beak-play' : ''}`}
-        style={{
-          left,
-          top,
-          width: bw,
-          height: bh,
-          backgroundImage: `url('${beakSpriteSrc}')`,
-          backgroundPosition: '0px 0px',
-          // 배경크기/점프를 '같은 수'로 묶는 CSS 변수
-          ['--bw' as any]: `${bw}px`,
-          ['--bh' as any]: `${bh}px`,
-        }}
+        className={`absolute pointer-events-none beak-sprite ${
+          isSpeaking ? 'beak-play' : ''
+        }`}
+        style={beakStyle}
         aria-hidden
       />
     </div>
