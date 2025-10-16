@@ -8,6 +8,7 @@ import { useMinimaxTTS } from '@/hooks/useMinimaxTTS';
 import VideoRecorder from './VideoRecorder'; // VideoRecorder 경로에 맞게 수정
 import { Fetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';
+import TalkingCharacter from './TalkingCharacter';
 
 type Props = {
   childId: string;
@@ -29,8 +30,6 @@ export default function TalkSession({
 
   const [question, setQuestion] = useState<string>(initialQuestion);
   const [displayText, setDisplayText] = useState('');
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [mouthOpen, setMouthOpen] = useState(false);
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const { isSpeaking, playStreamSmart, cancel, play } = useMinimaxTTS();
 
@@ -68,23 +67,6 @@ export default function TalkSession({
     isSpeakingRef.current = isSpeaking;
   }, [isSpeaking]); // 캐릭터 입 모양 토글 애니메이션
 
-  useEffect(() => {
-    let id: NodeJS.Timeout | undefined;
-    if (isSpeaking) id = setInterval(() => setMouthOpen((p) => !p), 250);
-    else setMouthOpen(false);
-    return () => id && clearInterval(id);
-  }, [isSpeaking]); // 캐릭터 이미지 프리로드
-
-  useEffect(() => {
-    ['/images/characterDefault.png', '/images/characterTalking.png'].forEach(
-      (src) => {
-        new window.Image().src = src;
-      },
-    );
-  }, []);
-
-  // ✅ [수정] useEffect 클린업 로직을 '소멸성'과 '비소멸성'으로 분리하여 엄격 모드에 대응합니다.
-
   // 1. 비소멸성 클린업: TTS 중단(cancel)은 언제든지 안전하게 실행할 수 있습니다.
   useEffect(() => {
     return () => {
@@ -120,15 +102,18 @@ export default function TalkSession({
   // ✅ [추가] 컴포넌트가 마운트되자마자, prop으로 받은 첫 질문을 바로 재생하는 로직입니다.
   useEffect(() => {
     console.log('[TalkSession] 시작! 첫 질문 재생:', initialQuestion);
-    setDisplayText(''); // 타이핑 효과를 위해 초기화
-    playStreamSmart(initialQuestion, handleChunkDisplay);
+    setDisplayText('');
+    // ⭐ 첫 진입에만 첫 문장 WebAudio 재생 → 이후는 스트리밍으로 이어짐
+    playStreamSmart(initialQuestion, handleChunkDisplay, {
+      firstChunkViaWebAudio: true,
+    });
   }, [initialQuestion, playStreamSmart, handleChunkDisplay]);
 
   const resetUI = useCallback(() => {
     console.log(
-      `[TalkSession] 대화 종료. ${`/child/${childId}/talk`} 경로로 이동합니다.`,
+      `[TalkSession] 대화 종료. ${`/child/${childId}/home`} 경로로 이동합니다.`,
     );
-    window.location.href = `/child/${childId}/talk`;
+    window.location.href = `/child/${childId}/home`;
   }, [childId]);
 
   const handleAIResponse = useCallback(
@@ -222,7 +207,7 @@ export default function TalkSession({
                 계속할래
               </button>
               <button
-                onClick={() => router.push(`/child/${childId}/talk`)}
+                onClick={() => router.push(`/child/${childId}/home`)}
                 className="px-8 py-3 bg-orange-400 text-white font-semibold rounded-lg hover:bg-orange-500 transition-colors"
               >
                 그만할래
@@ -234,27 +219,23 @@ export default function TalkSession({
 
       {/* 2) 콘텐츠 */}
       <div className="relative z-10 p-6 flex items-center justify-center">
-        {/* 캐릭터 */}
-        <motion.div
-          className={`relative z-10 translate-y-[20px] transition-all duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
-          animate={{ scale: isSpeaking ? 1.03 : 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Image
-            src={
-              mouthOpen
-                ? '/images/characterTalking.png'
-                : '/images/characterDefault.png'
-            }
-            alt="캐릭터"
-            width={500}
-            height={500}
-            priority
-            onLoad={() => setIsImageLoaded(true)}
-          />
-        </motion.div>
-        {/* ✅ [수정] isQuestionVisible이 항상 true이므로, isFinalMessage와 함께 묶어 조건부 렌더링을 단순화합니다. */}
+        {/* 캐릭터 (부리 스프라이트) */}
 
+        <div
+          className={`transition-transform duration-300 ${isSpeaking ? 'scale-[1.03]' : 'scale-100'}`}
+        >
+          <TalkingCharacter
+            isSpeaking={isSpeaking}
+            width={468}
+            height={481} // 화면에서 보이는 크기
+            baseSize={{ w: 931.99, h: 958.33 }} // 바디 원본(px)
+            frameSize={{ w: 1000, h: 1000 }} // 프레임 원본(px) = 2000x1000의 1프레임
+            beakAnchorPct={{ x: 0.5, y: 0.56 }} // 대략 값 → DevTools로 미세조정
+            bodySrc="/images/talking-owlly.webp"
+            beakSpriteSrc="/images/mouth-sprite.webp" // 2000x1000
+          />
+        </div>
+        {/* ✅ [수정] isQuestionVisible이 항상 true이므로, isFinalMessage와 함께 묶어 조건부 렌더링을 단순화합니다. */}
         {/* 말풍선 */}
         <div className="relative z-10 w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
           <motion.div
@@ -305,9 +286,7 @@ export default function TalkSession({
             </div>
           </motion.div>
         </div>
-
         {/* VideoRecorder */}
-
         <div className="relative z-10 ml-32 flex flex-col gap-8 text-center">
           {initialSubjectId ? ( // subjectId가 초기화되지 않았을 때만 렌더링
             <VideoRecorder

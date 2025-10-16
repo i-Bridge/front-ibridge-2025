@@ -1,6 +1,6 @@
 import { Fetcher } from '@/lib/fetcher';
 import { API } from '@/constants/api';
-import TalkSession from '../_components/TalkSession';
+import TalkSession from '../talk/_components/TalkSession';
 import { ChildPageParams } from '@/types/page-props';
 
 type QuestionItem = {
@@ -46,7 +46,7 @@ export default async function QuestionTalkPage({ params }: ChildPageParams) {
     }
   } catch (error) {
     // 네트워크 에러 등 API 호출 자체가 실패한 경우
-    console.error('[/talk/question] Fetch Error:', error);
+    console.error('[/question] Fetch Error:', error);
     return <div>서버와 통신하는 중 오류가 발생했습니다.</div>;
   }
 }

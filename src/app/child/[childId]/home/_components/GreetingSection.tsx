@@ -1,7 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { unlockAudio } from '@/lib/audio';
 
 type Props = {
   childId: string;
@@ -9,6 +11,9 @@ type Props = {
 };
 
 export default function GreetingSection({ childId, specifiedDone }: Props) {
+  const router = useRouter();
+  const [isNavigating, setIsNavigating] = useState(false);
+
   const ButtonContent = ({ children }: { children: React.ReactNode }) => (
     <div className="flex items-center w-full h-full md:w-[160px] md:h-[68px]">
       <p className="w-full text-lg sm:text-xl md:text-2xl font-extrabold leading-[140%] text-left">
@@ -16,6 +21,18 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
       </p>
     </div>
   );
+
+  const go = async (path: string) => {
+    if (isNavigating) return;
+    setIsNavigating(true);
+    try {
+      // ✅ 사용자 제스처 안에서 호출되도록 onClick → go 로직
+      await unlockAudio(); // 오디오 언락
+      router.push(path); // 클라이언트 사이드 내비게이션
+    } finally {
+      // push 후에는 보통 이 컴포넌트가 교체되므로 굳이 false로 되돌릴 필요는 없음
+    }
+  };
 
   return (
     <div className="relative rounded-[40px] shadow-md overflow-hidden">
@@ -32,12 +49,10 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
         <div className="w-[300px] h-[250px] md:w-[500px] md:h-[400px] relative flex-shrink-0 order-last md:order-first">
           <div
             className="absolute w-[417.44px] h-[410.58px] top-[45.22px] left-[26.74px] rotate-[4.22deg] scale-[0.6] md:scale-100 origin-top-left"
-            style={{
-              filter: 'drop-shadow(-30px 10px 0px rgba(0,0,0,0.2))',
-            }}
+            style={{ filter: 'drop-shadow(-30px 10px 0px rgba(0,0,0,0.2))' }}
           >
             <Image
-              src="/images/talking-owlly.webp"
+              src="/images/owlly.webp"
               alt="올리 캐릭터"
               fill
               style={{ objectFit: 'contain' }}
@@ -65,27 +80,34 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
                 </ButtonContent>
               </div>
             ) : (
-              <Link
-                href={`/child/${childId}/talk/question`}
-                className="flex-1 md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-primary flex items-center justify-center p-5 md:py-7 md:px-10 text-white hover:bg-primary/90 transition-colors"
+              <button
+                type="button"
+                onClick={() => go(`/child/${childId}/question`)}
+                disabled={isNavigating}
+                className="flex-1 md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-primary flex items-center justify-center p-5 md:py-7 md:px-10 text-white hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-wait"
+                aria-label="오늘의 질문에 대답하러 가기"
               >
                 <ButtonContent>
                   오늘의 질문에
                   <br />
                   대답할게!
                 </ButtonContent>
-              </Link>
+              </button>
             )}
-            <Link
-              href={`/child/${childId}/talk/free`}
-              className="flex-1 md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-gray-90 flex items-center justify-center p-5 md:py-7 md:px-10 text-white hover:bg-gray-80 transition-colors"
+
+            <button
+              type="button"
+              onClick={() => go(`/child/${childId}/free`)}
+              disabled={isNavigating}
+              className="flex-1 md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-gray-90 flex items-center justify-center p-5 md:py-7 md:px-10 text-white hover:bg-gray-80 transition-colors disabled:opacity-60 disabled:cursor-wait"
+              aria-label="하고 싶은 말 하러 가기"
             >
               <ButtonContent>
                 하고싶은
                 <br />
                 말이 있어!
               </ButtonContent>
-            </Link>
+            </button>
           </div>
         </div>
       </div>
