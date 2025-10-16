@@ -40,7 +40,7 @@ export default function DashboardCards({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
       {/* 감정 상태 카드 */}
-      <div className="bg-secondary/30 h-[284px] rounded-[40px] shadow-lg py-10 px-12 flex flex-col justify-between gap-10">
+      <div className="bg-secondary/30 h-[284px] rounded-[40px] py-10 px-12 flex flex-col justify-between gap-10">
         <div className="flex items-center gap-5">
           <div className="w-[100px] h-[100px] bg-white rounded-full flex-shrink-0 flex items-center justify-center text-5xl relative">
             {emotionDone ? (
@@ -87,7 +87,7 @@ export default function DashboardCards({
       </div>
 
       {/* 보상 카드 */}
-      <div className="bg-purple/15 h-[284px] rounded-[40px] shadow-lg py-10 px-12 flex flex-col justify-between gap-10">
+      <div className="bg-purple/15 h-[284px] rounded-[40px] py-10 px-12 flex flex-col justify-between gap-10">
         <div className="flex items-center gap-5">
           <div className="w-[100px] h-[100px] relative">
             <Image

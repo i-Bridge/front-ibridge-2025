@@ -90,7 +90,7 @@ export default function HomePageClient({ childId }: Props) {
   }
 
   return (
-    <div className="max-w-[1260px] mx-auto flex flex-col gap-2.5">
+    <div className="max-w-[1340px] mx-auto flex flex-col gap-2.5">
       <GreetingSection childId={childId} specifiedDone={specifiedDone} />
       <DashboardCards
         emotionDone={emotionDone}
