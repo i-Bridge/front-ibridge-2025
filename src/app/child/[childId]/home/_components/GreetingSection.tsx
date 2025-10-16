@@ -37,7 +37,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
             }}
           >
             <Image
-              src="/images/talking-owlly.webp"
+              src="/images/owlly.webp"
               alt="올리 캐릭터"
               fill
               style={{ objectFit: 'contain' }}

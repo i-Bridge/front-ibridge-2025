@@ -62,6 +62,36 @@
   }
 }
 
+@keyframes beak-2f {
+  from {
+    background-position: 0px 0;
+  }
+  to {
+    /* 수정된 부분: 
+        스프라이트 이미지의 전체 너비(2 * 프레임 너비)만큼 
+        왼쪽으로 이동시킵니다.
+      */
+    background-position: calc(-2 * var(--bw, 0px)) 0;
+  }
+}
+
+/* .beak-sprite 와 .beak-play 클래스는 그대로 사용하시면 됩니다. */
+.beak-sprite {
+  background-repeat: no-repeat;
+  background-size: calc(2 * var(--bw, 0px)) var(--bh, 0px);
+}
+.beak-play {
+  animation-name: beak-2f;
+  animation-duration: 0.45s;
+  animation-timing-function: steps(2);
+  animation-iteration-count: infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .beak-play {
+    animation: none;
+  }
+}
+
 html {
   overflow-y: scroll;
 }
