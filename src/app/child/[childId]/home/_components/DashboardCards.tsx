@@ -113,20 +113,20 @@ export default function DashboardCards({
           <button
             onClick={onClaimReward}
             disabled={!rewardAvailable || isClaiming}
-            className="flex-1 h-16 rounded-full bg-purple/15 flex items-center justify-center py-5 px-10 disabled:bg-purple-600/5 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 h-16 rounded-full bg-purple flex items-center justify-center py-5 px-10 disabled:bg-purple disabled:cursor-not-allowed transition-colors"
           >
             <div className="h-8 flex items-center justify-center">
-              <p className="text-xl font-extrabold leading-[160%] text-purple">
-                {isClaiming ? '처리 중...' : '한 송이 받기'}
+              <p className="text-xl font-extrabold leading-[160%] text-white">
+                {isClaiming ? '받는 중..' : '한 송이 받기'}
               </p>
             </div>
           </button>
           <button
             disabled
-            className="flex-1 h-16 rounded-full bg-purple flex items-center justify-center py-5 px-10 disabled:bg-purple disabled:cursor-not-allowed transition-colors"
+            className="flex-1 h-16 rounded-full bg-purple/15 flex items-center justify-center py-5 px-10 disabled:bg-purple-600/5 disabled:cursor-not-allowed transition-colors"
           >
             <div className="h-8 flex items-center justify-center">
-              <p className="text-xl font-extrabold leading-[160%] text-white">
+              <p className="text-xl font-extrabold leading-[160%] text-purple">
                 상점 준비 중
               </p>
             </div>
