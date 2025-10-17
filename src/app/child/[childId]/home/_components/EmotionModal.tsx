@@ -24,88 +24,97 @@ export default function EmotionModal({
   onSelect,
   emotions = EMOTIONS,
 }: EmotionModalProps) {
-  const [submittingEmotionId, setSubmittingEmotionId] = useState<number | null>(
+  // --- 상태 관리 로직 변경 ---
+  // 1. 현재 '선택된' 감정을 관리하는 상태 추가
+  const [selectedEmotionId, setSelectedEmotionId] = useState<EmotionId | null>(
     null,
   );
+  // 2. '제출 중' 상태를 boolean으로 관리
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   if (!open) return null;
 
-  const busy = submittingEmotionId !== null;
+  /** 감정 아이콘 클릭 핸들러: 클릭 시 선택된 감정 상태만 변경 */
+  const handleEmotionClick = (emotionId: EmotionId) => {
+    if (isSubmitting) return; // 제출 중에는 선택 변경 불가
+    // 이미 선택된 감정을 다시 클릭하면 선택 해제
+    setSelectedEmotionId((prev) => (prev === emotionId ? null : emotionId));
+  };
 
-  const handleClick = async (emotionId: EmotionId) => {
-    if (busy) return; // 중복 클릭 방지
+  /** '선택 완료' 버튼 클릭 핸들러: onSelect API 호출 */
+  const handleSubmit = async () => {
+    // 선택된 감정이 없거나, 이미 제출 중이면 중복 실행 방지
+    if (!selectedEmotionId || isSubmitting) return;
+
     try {
-      console.log('📝 [EmotionModal] 감정 전송 클릭:', emotionId);
-      setSubmittingEmotionId(emotionId);
-      const ok = await onSelect(emotionId);
+      console.log('📝 [EmotionModal] 감정 전송 시작:', selectedEmotionId);
+      setIsSubmitting(true);
+      const ok = await onSelect(selectedEmotionId);
+
       if (ok) {
         console.log('✅ [EmotionModal] 감정 저장 성공 → 모달 닫기');
         onClose();
       } else {
-        console.warn('❌ [EmotionModal] 감정 저장 실패(서버 응답)');
+        console.warn('❌ [EmotionModal] 감정 저장 실패 (서버 응답)');
+        // 필요하다면 여기에 사용자에게 실패 피드백을 주는 UI를 추가할 수 있습니다.
       }
     } catch (e) {
-      console.error('⚠️ [EmotionModal] 감정 저장 예외:', e);
+      console.error('⚠️ [EmotionModal] 감정 저장 중 예외 발생:', e);
     } finally {
-      setSubmittingEmotionId(null);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-[92vw] max-w-[420px] rounded-2xl bg-white p-6 shadow-xl">
-        <h3 className="text-xl text-gray-600 font-bold text-center mb-1">
-          오늘의 감정은?
-        </h3>
-        <p className="text-sm text-gray-500 text-center mb-4">
-          지금 느끼는 감정을 선택해 주세요.
-        </p>
+    // --- 디자인 시스템 반영 ---
+    // 전체적인 레이아웃과 스타일을 시안에 맞게 수정
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="w-full max-w-[480px] rounded-[40px] bg-white p-10 shadow-xl flex flex-col space-y-8">
+        {/* 헤더 */}
+        <div className="pt-2">
+          <h3 className="text-[28px] font-extrabold text-gray-800 text-center leading-[1.4]">
+            오늘의 감정은?
+          </h3>
+        </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        {/* 감정 선택 그리드 */}
+        <div className="grid grid-cols-3 gap-5">
           {emotions.map((e) => {
-            const isThisSubmitting = submittingEmotionId === e.id;
+            const isSelected = selectedEmotionId === e.id;
             return (
               <button
                 key={e.id}
-                onClick={() => handleClick(e.id)}
-                disabled={busy}
-                className={`h-20 rounded-xl border flex flex-col items-center justify-center gap-1 transition relative
-                  ${isThisSubmitting ? 'border-orange-400 ring-2 ring-orange-200 opacity-70' : 'border-gray-200 hover:border-gray-300'}
-                  ${busy && !isThisSubmitting ? 'opacity-50' : ''}`}
+                onClick={() => handleEmotionClick(e.id)}
+                disabled={isSubmitting}
+                className={`
+                  aspect-square rounded-full border-2 flex items-center justify-center transition-all duration-200 transform
+                  ${isSelected ? 'border-orange-500 ring-4 ring-orange-100 scale-105' : 'border-gray-200 hover:border-gray-400'}
+                  ${isSubmitting ? 'opacity-60 cursor-not-allowed' : 'hover:scale-105 active:scale-100'}
+                `}
               >
-                <span className="text-2xl">{e.emoji}</span>
-                <span className="text-sm">{e.labelKo}</span>
-
-                {isThisSubmitting && (
-                  <span className="absolute -bottom-2 text-[10px] text-orange-500">
-                    저장 중...
-                  </span>
-                )}
+                <span className="text-5xl">{e.emoji}</span>
               </button>
             );
           })}
         </div>
 
-        <div className="mt-5 flex justify-end">
+        {/* 액션 버튼 */}
+        <div className="flex w-full gap-3">
           <button
-            onClick={() => {
-              console.log('❌ [EmotionModal] 감정 선택 취소');
-              onClose();
-            }}
-            disabled={busy}
-            className="h-11 px-5 rounded-xl text-base font-semibold
-                       border border-gray-300 bg-white text-gray-800
-                       hover:bg-gray-100 active:bg-gray-200
-                       focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-1
-                       disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:opacity-100"
+            onClick={onClose}
+            disabled={isSubmitting}
+            className="w-full h-16 rounded-full text-xl font-bold bg-gray-100 text-gray-70 hover:bg-gray-200 transition-colors disabled:opacity-60"
           >
-            나중에
+            나중에 선택하기
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={!selectedEmotionId || isSubmitting}
+            className="w-full h-16 rounded-full text-xl font-bold bg-primary text-white hover:bg-orange-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? '저장 중...' : '선택 완료'}
           </button>
         </div>
-
-        <p className="mt-3 text-xs text-gray-500 text-center">
-          감정을 선택하면 바로 저장돼요.
-        </p>
       </div>
     </div>
   );
