@@ -540,10 +540,7 @@ export default function VideoRecorder({
 
   /** ===== UI ===== */
   return (
-    <div
-      className="flex flex-col justify-between items-center min-w-[300px] max-w-[400px] h-[580px] py-24 px-10 bg-contain bg-center bg-no-repeat"
-      style={{ backgroundImage: `url('/images/영상박스_점선.png')` }}
-    >
+    <div className="flex flex-col justify-between items-center min-w-[300px] max-w-[400px] h-[580px] py-24 px-10 bg-contain bg-center bg-no-repeat">
       {/* 비디오 영역 */}
       <div
         className={`relative transition-all duration-300 rounded-lg ${
