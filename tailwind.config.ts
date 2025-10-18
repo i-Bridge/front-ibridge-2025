@@ -54,6 +54,29 @@ export default {
           0: '#FFFFFF',
         },
 
+        // Other colors
+        pink: {
+          DEFAULT: '#FF3064',
+        },
+        red: {
+          DEFAULT: '#FF5E5E',
+        },
+        orange: {
+          DEFAULT: '#FF7700',
+        },
+        yellow: {
+          DEFAULT: '#FAB107',
+        },
+        mint: {
+          DEFAULT: '#00B29A',
+        },
+        blue: {
+          DEFAULT: '#168AFF',
+        },
+        purple: {
+          DEFAULT: '#595CFF',
+        },
+
         // --- 기타 색상 ---
         'i-orange': '#FF662D',
         'i-skyblue': '#57b5ce',

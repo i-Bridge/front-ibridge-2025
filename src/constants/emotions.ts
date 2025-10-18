@@ -13,12 +13,12 @@ export type EmotionId = EmotionOption['id'];
 export type EmotionKey = EmotionOption['key'];
 
 export const EMOTIONS = [
-  { id: 1, key: 'happy', labelKo: '기쁨', emoji: '😊' },
-  { id: 2, key: 'sad', labelKo: '슬픔', emoji: '😢' },
-  { id: 3, key: 'angry', labelKo: '화남', emoji: '😠' },
-  { id: 4, key: 'surprised', labelKo: '놀람', emoji: '😮' },
-  { id: 5, key: 'worried', labelKo: '걱정', emoji: '😟' },
-  { id: 6, key: 'confused', labelKo: '혼란', emoji: '😕' },
+  { id: 1, key: 'happy', labelKo: '기쁜', emoji: '😊' },
+  { id: 2, key: 'sad', labelKo: '슬픈', emoji: '😢' },
+  { id: 3, key: 'angry', labelKo: '화난', emoji: '😠' },
+  { id: 4, key: 'surprised', labelKo: '놀란', emoji: '😮' },
+  { id: 5, key: 'worried', labelKo: '걱정스러운', emoji: '😟' },
+  { id: 6, key: 'confused', labelKo: '혼란스러운', emoji: '😕' },
 ] as const satisfies readonly EmotionOption[];
 
 // id → option 빠른 조회
@@ -33,6 +33,3 @@ export const EMOTION_BY_ID: Record<EmotionId, EmotionOption> = EMOTIONS.reduce(
 // 타입 가드
 export const isEmotionId = (x: unknown): x is EmotionId =>
   typeof x === 'number' && EMOTIONS.some((e) => e.id === x);
-
-
-

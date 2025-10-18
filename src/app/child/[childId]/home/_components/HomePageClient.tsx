@@ -23,6 +23,7 @@ export default function HomePageClient({ childId }: Props) {
     emotionDone,
     rewardAvailable,
     grapePieces,
+    emotion,
     setEmotionDone,
     setGrapeState,
   } = useChildStore();
@@ -89,15 +90,16 @@ export default function HomePageClient({ childId }: Props) {
   }
 
   return (
-    <div className="max-w-[1260px] mx-auto flex flex-col gap-2.5">
+    <div className="max-w-[1340px] mx-auto flex flex-col gap-2.5">
       <GreetingSection childId={childId} specifiedDone={specifiedDone} />
       <DashboardCards
         emotionDone={emotionDone}
         rewardAvailable={rewardAvailable}
-        grapePieces={grapePieces} // ✅ [수정] prop으로 전달
+        grapePieces={grapePieces}
         onEmotionSelectClick={() => setIsEmotionModalOpen(true)}
         onClaimReward={handleClaimReward}
         isClaiming={isClaiming}
+        emotion={emotion}
       />
       <EmotionModal
         open={isEmotionModalOpen}

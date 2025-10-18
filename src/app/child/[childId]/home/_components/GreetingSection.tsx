@@ -58,6 +58,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
               style={{ objectFit: 'contain' }}
               sizes="(max-width: 768px) 250px, 418px"
               quality={100}
+              priority
             />
           </div>
         </div>
