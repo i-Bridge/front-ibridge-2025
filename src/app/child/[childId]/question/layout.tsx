@@ -1,4 +1,4 @@
-import Header, { SettingsIcon, CloseIcon } from '../_components/Header';
+import Header, { ChatHistoryIcon, CloseIcon } from '../_components/Header';
 
 export default function QuestionLayout({
   children,
@@ -12,7 +12,7 @@ export default function QuestionLayout({
         right={
           <>
             <button aria-label="설정">
-              <SettingsIcon />
+              <ChatHistoryIcon />
             </button>
             <button aria-label="닫기">
               <CloseIcon />
