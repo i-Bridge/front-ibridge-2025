@@ -1,6 +1,6 @@
 import { Fetcher } from '@/lib/fetcher';
 import { API } from '@/constants/api';
-import TalkSession from '../talk/_components/TalkSession';
+import TalkSession from '../_components/TalkSession';
 import { ChildPageParams } from '@/types/page-props';
 
 // 서버 컴포넌트로, 페이지에 진입하기 전에 데이터를 미리 가져옵니다.
@@ -16,12 +16,16 @@ export default async function FreeTalkPage({ params }: ChildPageParams) {
     );
 
     if (isSuccess && data) {
-      // 2. 성공 시, subjectId와 고정된 첫 멘트를 props로 전달합니다.
+      // 2. 성공 시, TalkSession이 필요로 하는 모든 props를 전달합니다.
       return (
         <TalkSession
           childId={childId}
           initialSubjectId={data.subjectId}
           initialQuestion={firstPrompt}
+          // ✅ [수정] 'history' prop을 빈 배열로 전달합니다.
+          history={[]}
+          // ✅ [수정] 'mode' prop을 'free'로 전달합니다.
+          mode="free"
         />
       );
     } else {

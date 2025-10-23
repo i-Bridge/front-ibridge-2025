@@ -26,12 +26,14 @@ export type ChildData = {
 type State = ChildData & {
   /** 서버에서 받은 데이터로 스토어 전체 또는 일부를 업데이트합니다 (주로 초기화 시 사용). */
   setOverview: (overview: Partial<ChildData>) => void;
+
   /** '한 송이 받기' 성공 후 포도 관련 상태만 업데이트합니다. */
   setGrapeState: (grapeState: {
     grapeBunches: number;
     grapePieces: number;
     rewardAvailable: boolean;
   }) => void;
+
   /** 감정 선택 완료 후 상태를 업데이트합니다. */
   setEmotionDone: (isDone: boolean) => void;
 };

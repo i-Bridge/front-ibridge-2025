@@ -71,36 +71,28 @@ export const CloseIcon = () => (
     />
   </svg>
 );
-export const SettingsIcon = () => (
+export const ChatHistoryIcon = () => (
   <svg
-    width="40"
-    height="40"
-    viewBox="0 0 40 40"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <rect width="40" height="40" rx="12" fill="white" />
-    <g clipPath="url(#clip0_146_7029)">
-      <path
-        d="M20 30C25.5228 30 30 25.5228 30 20C30 14.4772 25.5228 10 20 10C14.4772 10 10 14.4772 10 20C10 25.5228 14.4772 30 20 30Z"
-        stroke="#4E5968"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M20 14V20L24 22"
-        stroke="#4E5968"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-    <defs>
-      <clipPath id="clip0_146_7029">
-        <rect width="24" height="24" fill="white" transform="translate(8 8)" />
-      </clipPath>
-    </defs>
+    <path
+      d="M11.303 19.9547C10.052 19.8694 8.829 19.5452 7.7 18.9997L3 19.9997L4.3 16.0997C1.976 12.6627 2.874 8.22772 6.4 5.72572C9.926 3.22472 14.99 3.42972 18.245 6.20572C19.975 7.68172 20.91 9.64072 21.005 11.6387"
+      stroke="#4E5968"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M18 16.8202V18.3242L19 19.3242M14 18.3242C14 19.3851 14.4214 20.4025 15.1716 21.1526C15.9217 21.9028 16.9391 22.3242 18 22.3242C19.0609 22.3242 20.0783 21.9028 20.8284 21.1526C21.5786 20.4025 22 19.3851 22 18.3242C22 17.2634 21.5786 16.2459 20.8284 15.4958C20.0783 14.7456 19.0609 14.3242 18 14.3242C16.9391 14.3242 15.9217 14.7456 15.1716 15.4958C14.4214 16.2459 14 17.2634 14 18.3242Z"
+      stroke="#4E5968"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 

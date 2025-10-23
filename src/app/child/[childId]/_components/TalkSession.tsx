@@ -9,17 +9,28 @@ import VideoRecorder from './VideoRecorder'; // VideoRecorder 경로에 맞게 �
 import { Fetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';
 import TalkingCharacter from './TalkingCharacter';
+import HistoryModal from './HistoryModal';
+
+import { ChatHistoryIcon, CloseIcon } from '../_components/Header';
+
+type TalkMode = 'question' | 'free';
+
+type QuestionItem = { ai: string; user: string | null };
 
 type Props = {
   childId: string;
   initialSubjectId: number;
   initialQuestion: string;
+  history: QuestionItem[];
+  mode: TalkMode;
 };
 
 export default function TalkSession({
   childId,
   initialSubjectId,
   initialQuestion,
+  history,
+  mode,
 }: Props) {
   const router = useRouter();
 
@@ -31,7 +42,15 @@ export default function TalkSession({
   const [question, setQuestion] = useState<string>(initialQuestion);
   const [displayText, setDisplayText] = useState('');
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const { isSpeaking, playStreamSmart, cancel, play } = useMinimaxTTS();
+
+  useEffect(() => {
+    // "question" 모드이고, history 배열에 항목이 1개 이상 있을 때만 모달을 엽니다.
+    if (mode === 'question' && history.length > 0) {
+      setIsHistoryModalOpen(true);
+    }
+  }, [mode, history]);
 
   // ✅ [수정] sendFinished를 useCallback으로 감싸고, 중복 호출 방지 로직을 강화했습니다.
   const sendFinished = useCallback(async () => {
@@ -146,45 +165,44 @@ export default function TalkSession({
   );
   return (
     <div className="relative isolate grid min-h-screen supports-[min-height:100dvh]:min-h-dvh place-items-center overflow-hidden">
-      {/* 1) 배경 */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <Image
           src="/images/child-bg.webp"
           alt=""
           fill
-          priority // 위폴드 배경이면 꼭!
+          priority
           sizes="100vw"
           className="object-cover object-center"
         />
       </div>
-
-      {/* 3) 헤더/액션: 콘텐츠 바깥에 분리 */}
-      <div className="absolute top-6 right-6 z-40">
+      {/* ✅ [수정] 모든 제어 버튼을 TalkSession 내부에 배치합니다. */}
+      <div className="absolute top-6 right-6 z-40 flex items-center gap-4">
+        {/* '오늘의 질문' 모드일 때만 '이전 기록' 버튼을 보여줍니다. */}
+        {mode === 'question' && (
+          <button
+            onClick={() => setIsHistoryModalOpen(true)}
+            className="p-3 bg-white/70 rounded-full shadow-lg hover:bg-white active:scale-95 transition-all"
+            aria-label="이전 대화 기록"
+            title="이전 대화 기록"
+          >
+            <ChatHistoryIcon />
+          </button>
+        )}
+        {/* '나가기' 버튼 (CloseIcon) */}
         <button
           onClick={() => setIsExitModalOpen(true)}
-          className="absolute top-6 right-6 z-50 p-3 bg-white/70 rounded-full shadow-lg hover:bg-white active:scale-95 transition-all"
+          className="p-3 bg-white/70 rounded-full shadow-lg hover:bg-white active:scale-95 transition-all"
           aria-label="대화 그만하기"
           title="대화 그만하기"
         >
-          {/* 집 아이콘 SVG */}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-8 h-8 text-gray-700"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5"
-            />
-          </svg>
+          <CloseIcon />
         </button>
       </div>
-
-      {/* 4) 모달 오버레이 */}
+      <HistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        history={history}
+      />
       {isExitModalOpen && (
         <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-sm">
           <motion.div
@@ -196,9 +214,11 @@ export default function TalkSession({
             <h3 className="text-xl font-bold text-gray-800">
               잠깐! 벌써 가는 거야?
             </h3>
+
             <p className="mt-2 text-gray-600">
               괜찮아, 언제든 다시 돌아와서 이야기를 이어갈 수 있어!
             </p>
+
             <div className="mt-6 flex justify-center gap-4">
               <button
                 onClick={() => setIsExitModalOpen(false)}
@@ -206,8 +226,12 @@ export default function TalkSession({
               >
                 계속할래
               </button>
+
               <button
-                onClick={() => router.push(`/child/${childId}/home`)}
+                onClick={() => {
+                  setIsExitModalOpen(false);
+                  router.push(`/child/${childId}/home`);
+                }}
                 className="px-8 py-3 bg-orange-400 text-white font-semibold rounded-lg hover:bg-orange-500 transition-colors"
               >
                 그만할래
@@ -216,7 +240,6 @@ export default function TalkSession({
           </motion.div>
         </div>
       )}
-
       {/* 2) 콘텐츠 */}
       <div className="relative z-10 p-6 flex items-center justify-center">
         {/* 캐릭터 (부리 스프라이트) */}

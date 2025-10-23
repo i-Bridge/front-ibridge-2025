@@ -9,18 +9,10 @@ type Percent = { x: number; y: number };
 
 type Props = {
   isSpeaking: boolean;
-
-  /** 화면에 보일 최종 크기(px) */
   width?: number;
   height?: number;
-
-  /** 바디 원본 크기(px) — 디자이너가 준 원본(@1x/@2x 어떤 것이든 '원본 픽셀 그대로') */
   baseSize?: Size;
-
-  /** 스프라이트 한 프레임의 원본 크기(px) — 2프레임 시 1000x1000 */
   frameSize?: Size;
-
-  /** 바디 원본 좌표계 기준 '부리 중심' 위치(퍼센트) — 처음엔 대략 0.5, 0.56로 시작해서 미세조정 */
   beakAnchorPct?: Percent;
   bodySrc?: string;
   beakSpriteSrc?: string;
@@ -28,11 +20,11 @@ type Props = {
 
 export default function TalkingCharacter({
   isSpeaking,
-  width = 468, // 화면에서 보일 크기 (예시)
-  height = 481, // 화면에서 보일 크기 (예시)
-  baseSize = { w: 931.99, h: 958.33 }, // ★ 네가 준 바디 원본
-  frameSize = { w: 1000, h: 1000 }, // ★ 2000x1000의 1프레임
-  beakAnchorPct = { x: 0.5, y: 0.56 }, // ★ 대략 중앙 살짝 아래 — 필요 시 0.01 단위로 조정
+  width = 468,
+  height = 481,
+  baseSize = { w: 931.99, h: 958.33 },
+  frameSize = { w: 1000, h: 1000 },
+  beakAnchorPct = { x: 0.5, y: 0.56 },
   bodySrc = '/images/talking-owlly.webp',
   beakSpriteSrc = '/images/mouth-sprite.webp',
 }: Props) {
@@ -60,10 +52,21 @@ export default function TalkingCharacter({
       <Image
         src={bodySrc}
         alt="캐릭터"
-        width={width}
-        height={height}
+        // ✅ [수정] width/height prop에는 원본 이미지의 크기(baseSize)를 전달해야 합니다.
+        width={baseSize.w}
+        height={baseSize.h}
         priority
+        quality={100}
+        // ✅ [수정] Next.js 경고를 해결하고 부리 위치를 올바르게 맞춥니다.
+        // 이미지가 부모 div의 너비(width)에 100% 맞춰지고,
+        // 높이(height)는 가로세로 비율에 맞게 'auto'로 설정됩니다.
+        style={{
+          width: '100%',
+          height: 'auto',
+          objectFit: 'contain',
+        }}
       />
+
       <span
         className={`absolute pointer-events-none beak-sprite ${
           isSpeaking ? 'beak-play' : ''
