@@ -24,9 +24,6 @@ export type ChildData = {
  * 스토어의 전체 상태 타입 (데이터 + 액션)
  */
 type State = ChildData & {
-  isHistoryModalOpen: boolean;
-  isExitModalOpen: boolean;
-
   /** 서버에서 받은 데이터로 스토어 전체 또는 일부를 업데이트합니다 (주로 초기화 시 사용). */
   setOverview: (overview: Partial<ChildData>) => void;
 
@@ -39,8 +36,6 @@ type State = ChildData & {
 
   /** 감정 선택 완료 후 상태를 업데이트합니다. */
   setEmotionDone: (isDone: boolean) => void;
-  setHistoryModalOpen: (isOpen: boolean) => void;
-  setExitModalOpen: (isOpen: boolean) => void;
 };
 
 export const useChildStore = create<State>((set) => ({
@@ -52,8 +47,6 @@ export const useChildStore = create<State>((set) => ({
   emotion: 0,
   emotionDone: false,
   specifiedDone: false,
-  isHistoryModalOpen: false,
-  isExitModalOpen: false,
 
   // --- ACTIONS ---
   setOverview: (newState) => set(newState),
@@ -61,6 +54,4 @@ export const useChildStore = create<State>((set) => ({
   setGrapeState: (grapeState) => set(grapeState),
 
   setEmotionDone: (isDone) => set({ emotionDone: isDone }),
-  setHistoryModalOpen: (isOpen) => set({ isHistoryModalOpen: isOpen }),
-  setExitModalOpen: (isOpen) => set({ isExitModalOpen: isOpen }),
 }));
