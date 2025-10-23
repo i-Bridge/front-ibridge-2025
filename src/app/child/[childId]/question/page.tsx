@@ -24,6 +24,7 @@ export default async function QuestionTalkPage({ params }: ChildPageParams) {
     );
 
     if (isSuccess && data && data.questions.length > 0) {
+      console.log(data);
       // ✅ [수정] API 응답을 '이전 기록'과 '현재 질문'으로 분리합니다.
       // 1. user가 null인 마지막 항목이 '현재 질문'입니다.
       const lastQuestion = data.questions[data.questions.length - 1];

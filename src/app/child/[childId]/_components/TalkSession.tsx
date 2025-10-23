@@ -50,11 +50,10 @@ export default function TalkSession({
 
   // ✅ [추가] 페이지에 처음 진입했을 때 모달을 자동으로 열어주는 로직입니다.
   useEffect(() => {
-    // '/question' 모드일 때만 페이지 진입 시 자동으로 엽니다.
-    if (mode === 'question') {
+    if (mode === 'question' && history.length > 0) {
       setHistoryModalOpen(true);
     }
-  }, [mode, setHistoryModalOpen]);
+  }, [mode, setHistoryModalOpen, history]);
 
   // ✅ [수정] sendFinished를 useCallback으로 감싸고, 중복 호출 방지 로직을 강화했습니다.
   const sendFinished = useCallback(async () => {
