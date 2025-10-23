@@ -87,7 +87,7 @@ export default function DashboardCards({
       </div>
 
       {/* 보상 카드 */}
-      <div className="bg-purple/15 h-[284px] rounded-[40px] py-10 px-12 flex flex-col justify-between gap-10">
+      <div className="bg-purple-100/50 h-[284px] rounded-[40px] py-10 px-12 flex flex-col justify-between gap-10">
         <div className="flex items-center gap-5">
           <div className="w-[100px] h-[100px] relative">
             <Image
@@ -101,32 +101,53 @@ export default function DashboardCards({
             />
           </div>
           <div className="flex flex-col">
-            <p className="text-2xl font-extrabold leading-[150%] text-gray-90">
+            <p className="text-[28px] font-extrabold leading-[150%] text-gray-90">
               지금 바로
             </p>
-            <p className="text-2xl font-extrabold leading-[150%]">
+            <p className="text-[28px] font-extrabold leading-[150%]">
               <span className="text-purple">포도송이</span>를 받을 수 있어!
             </p>
           </div>
         </div>
+
         <div className="flex w-full gap-3">
           <button
             onClick={onClaimReward}
             disabled={!rewardAvailable || isClaiming}
-            className="flex-1 h-16 rounded-full bg-purple flex items-center justify-center py-5 px-10 disabled:bg-purple disabled:cursor-not-allowed transition-colors"
+            className="flex-1 h-16 rounded-full bg-purple/15 flex items-center justify-center py-5 px-10 disabled:bg-purple-600/5 disabled:cursor-not-allowed transition-colors"
           >
+            {/* ✅ [수정] 3가지 상태(로딩, 활성, 완료)를 모두 처리하도록 로직을 변경합니다. */}
             <div className="h-8 flex items-center justify-center">
-              <p className="text-xl font-extrabold leading-[160%] text-white">
-                {isClaiming ? '받는 중..' : '한 송이 받기'}
-              </p>
+              {isClaiming ? (
+                // State 2: 로딩 인디케이터 (w-[30px] h-[20px] gap-1.5(6px))
+                <div className="flex w-[30px] h-[20px] items-center justify-center gap-1.5">
+                  <span className="w-2.5 h-2.5 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="w-2.5 h-2.5 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="w-2.5 h-2.5 bg-white rounded-full animate-bounce"></span>
+                </div>
+              ) : rewardAvailable ? (
+                // State 1: 한 송이 받기 (h-[22px], 16px, 140%)
+                <div className="w-full h-[22px] flex items-center justify-center">
+                  <p className="text-base font-extrabold leading-[140%] text-purple-600">
+                    한 송이 받기
+                  </p>
+                </div>
+              ) : (
+                // State 3: 한 송이 받기 완료 (h-[22px], 16px, 140%)
+                <div className="w-full h-[22px] flex items-center justify-center">
+                  <p className="text-base font-extrabold leading-[140%] text-purple-600/40">
+                    한 송이 받기 완료
+                  </p>
+                </div>
+              )}
             </div>
           </button>
           <button
             disabled
-            className="flex-1 h-16 rounded-full bg-purple/15 flex items-center justify-center py-5 px-10 disabled:bg-purple-600/5 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 h-16 rounded-full bg-purple flex items-center justify-center py-5 px-10 disabled:bg-purple disabled:cursor-not-allowed transition-colors"
           >
             <div className="h-8 flex items-center justify-center">
-              <p className="text-xl font-extrabold leading-[160%] text-purple">
+              <p className="text-xl font-extrabold leading-[160%] text-white">
                 상점 준비 중
               </p>
             </div>

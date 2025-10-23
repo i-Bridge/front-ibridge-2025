@@ -1,13 +1,11 @@
 'use client';
 
 import Header, { ChatHistoryIcon, CloseIcon } from '../_components/Header';
-import { useRouter, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useChildStore } from '@/store/useChildStore';
 import type { ReactNode } from 'react';
 
 export default function QuestionLayout({ children }: { children: ReactNode }) {
-  const params = useParams();
-
   // ✅ [추가] 스토어에서 모달을 여는 함수를 가져옵니다.
   const setHistoryModalOpen = useChildStore((s) => s.setHistoryModalOpen);
   const setExitModalOpen = useChildStore((s) => s.setExitModalOpen);
