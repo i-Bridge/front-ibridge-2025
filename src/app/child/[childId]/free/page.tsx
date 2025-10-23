@@ -1,6 +1,6 @@
 import { Fetcher } from '@/lib/fetcher';
 import { API } from '@/constants/api';
-import TalkSession from '../talk/_components/TalkSession';
+import TalkSession from '../_components/TalkSession';
 import { ChildPageParams } from '@/types/page-props';
 
 // 서버 컴포넌트로, 페이지에 진입하기 전에 데이터를 미리 가져옵니다.

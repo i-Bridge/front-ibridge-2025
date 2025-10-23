@@ -9,17 +9,27 @@ import VideoRecorder from './VideoRecorder'; // VideoRecorder 경로에 맞게 �
 import { Fetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';
 import TalkingCharacter from './TalkingCharacter';
+import HistoryModal from './HistoryModal';
+import { useChildStore } from '@/store/useChildStore';
+
+type TalkMode = 'question' | 'free';
+
+type QuestionItem = { ai: string; user: string | null };
 
 type Props = {
   childId: string;
   initialSubjectId: number;
   initialQuestion: string;
+  history: QuestionItem[];
+  mode: TalkMode;
 };
 
 export default function TalkSession({
   childId,
   initialSubjectId,
   initialQuestion,
+  history,
+  mode,
 }: Props) {
   const router = useRouter();
 
@@ -31,7 +41,19 @@ export default function TalkSession({
   const [question, setQuestion] = useState<string>(initialQuestion);
   const [displayText, setDisplayText] = useState('');
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+
+  const isHistoryModalOpen = useChildStore((s) => s.isHistoryModalOpen);
+  const setHistoryModalOpen = useChildStore((s) => s.setHistoryModalOpen);
+
   const { isSpeaking, playStreamSmart, cancel, play } = useMinimaxTTS();
+
+  // ✅ [추가] 페이지에 처음 진입했을 때 모달을 자동으로 열어주는 로직입니다.
+  useEffect(() => {
+    // '/question' 모드일 때만 페이지 진입 시 자동으로 엽니다.
+    if (mode === 'question') {
+      setHistoryModalOpen(true);
+    }
+  }, [mode, setHistoryModalOpen]);
 
   // ✅ [수정] sendFinished를 useCallback으로 감싸고, 중복 호출 방지 로직을 강화했습니다.
   const sendFinished = useCallback(async () => {
@@ -183,6 +205,13 @@ export default function TalkSession({
           </svg>
         </button>
       </div>
+
+      {/* 이전 대화 기록 모달 렌더링 */}
+      <HistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setHistoryModalOpen(false)}
+        history={history}
+      />
 
       {/* 4) 모달 오버레이 */}
       {isExitModalOpen && (
