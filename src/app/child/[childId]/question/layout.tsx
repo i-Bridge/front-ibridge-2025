@@ -1,4 +1,4 @@
-'use client'; // ✅ [수정] 훅을 사용하기 위해 클라이언트 컴포넌트로 전환합니다.
+'use client';
 
 import Header, { ChatHistoryIcon, CloseIcon } from '../_components/Header';
 import { useRouter, useParams } from 'next/navigation';
@@ -12,6 +12,7 @@ export default function QuestionLayout({ children }: { children: ReactNode }) {
 
   // ✅ [추가] 스토어에서 모달을 여는 함수를 가져옵니다.
   const setHistoryModalOpen = useChildStore((s) => s.setHistoryModalOpen);
+  const setExitModalOpen = useChildStore((s) => s.setExitModalOpen);
 
   return (
     <div>
@@ -28,11 +29,7 @@ export default function QuestionLayout({ children }: { children: ReactNode }) {
               <ChatHistoryIcon />
             </button>
             {/* ✅ [수정] 닫기 버튼에도 onClick 이벤트를 추가하여 /talk 페이지로 이동시킵니다. */}
-
-            <button
-              aria-label="닫기"
-              onClick={() => router.push(`/child/${childId}/talk`)}
-            >
+            <button aria-label="닫기" onClick={() => setExitModalOpen(true)}>
               <CloseIcon />
             </button>
           </>

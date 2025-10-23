@@ -40,8 +40,9 @@ export default function TalkSession({
 
   const [question, setQuestion] = useState<string>(initialQuestion);
   const [displayText, setDisplayText] = useState('');
-  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
 
+  const isExitModalOpen = useChildStore((s) => s.isExitModalOpen);
+  const setExitModalOpen = useChildStore((s) => s.setExitModalOpen);
   const isHistoryModalOpen = useChildStore((s) => s.isHistoryModalOpen);
   const setHistoryModalOpen = useChildStore((s) => s.setHistoryModalOpen);
 
@@ -180,32 +181,6 @@ export default function TalkSession({
         />
       </div>
 
-      {/* 3) 헤더/액션: 콘텐츠 바깥에 분리 */}
-      <div className="absolute top-6 right-6 z-40">
-        <button
-          onClick={() => setIsExitModalOpen(true)}
-          className="absolute top-6 right-6 z-50 p-3 bg-white/70 rounded-full shadow-lg hover:bg-white active:scale-95 transition-all"
-          aria-label="대화 그만하기"
-          title="대화 그만하기"
-        >
-          {/* 집 아이콘 SVG */}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-8 h-8 text-gray-700"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5"
-            />
-          </svg>
-        </button>
-      </div>
-
       {/* 이전 대화 기록 모달 렌더링 */}
       <HistoryModal
         isOpen={isHistoryModalOpen}
@@ -230,13 +205,16 @@ export default function TalkSession({
             </p>
             <div className="mt-6 flex justify-center gap-4">
               <button
-                onClick={() => setIsExitModalOpen(false)}
+                onClick={() => setExitModalOpen(false)}
                 className="px-8 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
               >
                 계속할래
               </button>
               <button
-                onClick={() => router.push(`/child/${childId}/home`)}
+                onClick={() => {
+                  setExitModalOpen(false);
+                  router.push(`/child/${childId}/home`);
+                }}
                 className="px-8 py-3 bg-orange-400 text-white font-semibold rounded-lg hover:bg-orange-500 transition-colors"
               >
                 그만할래
