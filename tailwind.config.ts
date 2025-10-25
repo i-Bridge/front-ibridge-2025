@@ -19,39 +19,53 @@ export default {
 
       //light는 DEFAULT의 15% 투명도이므로 DEFAULT/15로 사용
       colors: {
+
         // --- 브랜드 색상 ---
-        // 사용 예: bg-primary, text-secondary, border-tertiary-light
-        primary: {
-          DEFAULT: '#FF6B31', // 기본 Primary 색상
+        // 사용 예: bg-primary, text-secondary/30, border-tertiary-light
+        // primary100: 100%, primaryMedium: 30%, primaryLight: 15% opacity
+        Primary: {
+          DEFAULT: '#FF6B31', 
         },
-        secondary: {
+        Secondary: {
           DEFAULT: '#FFDE72',
         },
-        tertiary: {
+        Tertiary: {
           DEFAULT: '#7D4B37',
         },
 
         // --- 상태 색상 ---
         // 사용 예: bg-success, text-error-light
-        success: {
-          DEFAULT: '#03B26C',
+        // success: 100%, successLight: 10% opacity
+        // error: 100%, errorLight: 10% opacity
+        Success: {
+          DEFAULT: '#00B29A',
         },
-        error: {
+        Error: {
           DEFAULT: '#FF5E5E',
         },
 
-        // --- 회색조 (Grayscale) ---
-        // 사용 예: bg-gray-900, text-gray-500, border-gray-100
-        gray: {
-          90: '#191F28',
-          80: '#333D4B',
-          70: '#4E5968',
-          60: '#6B7684',
-          50: '#8B95A1',
-          30: '#E2E7EB',
-          10: '#EEF0F2',
-          5: '#F9FAFB',
-          0: '#FFFFFF',
+        // ---  검/흰  ---
+        // 사용 예: bg-Black/90, text-White/10
+        // 90, 80, 70, ..., 10, 5% opacity
+        Black: {
+          DEFAULT: '#000000',
+        },
+        White: {
+          DEFAULT: '#FFFFFF',
+        },
+
+        // --- 회색조 ---
+        // 사용 예: bg-Grayscale-gray90, text-Grayscale-gray50, border-Grayscale-gray10
+        Grayscale: {
+          gray90: '#191F28',
+          gray80: '#333D4B',
+          gray70: '#4E5968',
+          gray60: '#6B7684',
+          gray50: '#8B95A1',
+          gray30: '#E2E7EB',
+          gray10: '#EEF0F2',
+          gray5: '#F9FAFB',
+          gray0: '#FFFFFF',
         },
 
         // --- 기타 색상 ---
