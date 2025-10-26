@@ -1,63 +1,81 @@
-import { ButtonHTMLAttributes, ReactNode } from "react";
-import clsx from "clsx";
+import { ElementType, ReactNode } from 'react';
+import { cva, VariantProps } from 'class-variance-authority';
+import { twMerge } from 'tailwind-merge';
+import { Text } from '@/components/UI/Text';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+// 1. cva 정의 
+const buttonVariants = cva(
+  // ---  기본 스타일  ---
+  [
+    'inline-flex w-full items-center justify-center text-center', // self-stretch, justify-center
+    'h-16 px-10 py-5', // h-16, px-10, py-5
+    'rounded-[999px]', // rounded-[999px]
+    'transition-colors', // 부드러운 호버 효과
+    'disabled:opacity-50 disabled:cursor-not-allowed', // 비활성화 스타일
+  ],
+  {
+    variants: {
+      // --- 종류(Variant) ---
+      variant: {
+        // 1. Primary 버튼 
+        primary:
+          'bg-primary-primary text-primary-primary hover:bg-primary-primaryLight',
+        
+        // 2. Grayscale 버튼 
+        grayscale:
+          'bg-grayscale-gray10 text-grayscale-gray70 hover:bg-grayscale-gray20', // (hover 색상은 임의로 20으로 지정)
+      },
+    },
+    // --- 기본값 ---
+    defaultVariants: {
+      variant: 'primary',
+    },
+  }
+);
+
+// 2. 컴포넌트 Props 타입 정의 (이전과 동일)
+type ButtonProps<T extends ElementType> = {
+  as?: T;
   children: ReactNode;
-  size?: "sm" | "md" | "lg";
-  variant?: "Primary" | "Secondary";
-}
+  className?: string;
+} & VariantProps<typeof buttonVariants> &
+  Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className'>;
 
-const baseStyles =
-  "rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2";
-
-const sizeStyles = {
-  sm: "px-3 py-1.5 text-sm",
-  md: "px-4 py-2 text-base",
-  lg: "px-6 py-3 text-lg",
-};
-
-const variantStyles = {
-  
-  Primary: "bg-Primary text-white hover:bg-blue-700 focus:ring-blue-400",
-  Secondary: "bg-Secondary text-white hover:bg-purple-700 focus:ring-purple-400",
-};
-
-// 자주 쓰는 조합 2개 export
-export function PrimaryButton({ children, ...props }: ButtonProps) {
-  return (
-    <Button variant="Primary" size="md" {...props}>
-      {children}
-    </Button>
-  );
-}
-
-export function SecondaryButton({ children, ...props }: ButtonProps) {
-  return (
-    <Button variant="Secondary" size="md" {...props}>
-      {children}
-    </Button>
-  );
-}
-
-// 기본 버튼
-export function Button({
-  children,
-  size = "md",
-  variant = "Primary",
+/**
+ * 디자인 시스템의 버튼 컴포넌트입니다.
+ * 내부적으로 'Text' 컴포넌트의 'caption02' 스타일을 사용합니다.
+ *
+ * @example
+ * // 1. 기본 버튼 (primary variant)
+ * <Button onClick={() => ...}>로그아웃</Button>
+ *
+ * // 2. grayscale variant
+ * <Button variant="grayscale">수정하기</Button>
+ *
+ * // 3. Next.js 내부 링크로 사용 (새로고침 없음)
+ * // import Link from 'next/link';
+ * <Button as={Link} href="/profile" variant="grayscale">
+ * 내 프로필
+ * </Button>
+ */
+export function Button<T extends ElementType = 'button'>({
+  as,
+  variant,
   className,
+  children,
   ...props
-}: ButtonProps) {
+}: ButtonProps<T>) {
+  const Component = as || 'button';
+
   return (
-    <button
-      className={clsx(
-        baseStyles,
-        sizeStyles[size],
-        variantStyles[variant],
-        className
-      )}
+    <Component
+      className={twMerge(buttonVariants({ variant }), className)}
       {...props}
     >
-      {children}
-    </button>
+      {/* 3. 타이포그래피는 Text 컴포넌트에 위임 (caption02) */}
+      <Text as="span" variant="caption02">
+        {children}
+      </Text>
+    </Component>
   );
 }
