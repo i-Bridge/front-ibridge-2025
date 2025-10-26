@@ -11,7 +11,7 @@ export default function Skeleton({ className }: { className?: string }) {
     >
       {/* 반짝이는 그라데이션을 'gray-10'의 50% 투명도로 변경합니다. */}
 
-      <div className="shimmer absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-gray-30 to-transparent"></div>
+      <div className="shimmer absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-gray-20 to-transparent"></div>
     </div>
   );
 }
