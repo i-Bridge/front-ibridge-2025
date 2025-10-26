@@ -1,5 +1,4 @@
 import type { Config } from 'tailwindcss';
-import { DEFAULT_CIPHERS } from 'tls';
 
 export default {
   content: [
