@@ -1,10 +1,9 @@
-@import url('https://hangeul.pstatic.net/hangeul_static/css/nanum-square-round.css');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @font-face {
-    font-family: 'TMoneyDungunbaram';
+    font-family: 'TMoneyDungunbaram'; 
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-07@1.0/TmoneyRoundWindRegular.woff') format('woff');
     font-weight: 400; /* normal(400) 굵기는 이 파일을 사용 */
     font-style: normal;
@@ -24,9 +23,9 @@
     /* ✅ [수정] 색상과 글꼴은 CSS 변수를 사용하여 직접 설정합니다. */
     background-color: var(--background);
     color: var(--foreground);
-
+    
     /* ✅ [수정] @apply는 Tailwind 유틸리티 클래스에만 사용합니다. */
-   
+   @apply antialiased;
   }
 }
 
