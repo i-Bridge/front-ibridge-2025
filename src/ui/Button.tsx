@@ -20,7 +20,7 @@ const buttonVariants = cva(
     "after:content-['']", // 가상 요소 필수 속성
     'after:absolute',
     'after:inset-0', // 부모(버튼) 크기에 꽉 차게
-    'after:bg-black/5', // 요청하신 black 10%
+    'after:bg-black/5', // black 10%
     'after:opacity-0', // 평소에는 투명
     'after:transition-opacity', // 부드러운 효과를 위해 transition 추가
 
@@ -31,11 +31,9 @@ const buttonVariants = cva(
     variants: {
       // --- 종류(Variant) ---
       variant: {
-        // 1. Primary 버튼
         primary: 'bg-primary-primary text-primary-primary ',
-
-        // 2. Grayscale 버튼
         grayscale: 'bg-grayscale-gray10 text-grayscale-gray70 ',
+        secondary: 'bg-secondary-secondary text-secondary-secondary ',
       },
     },
     // --- 기본값 ---
