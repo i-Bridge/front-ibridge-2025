@@ -2,7 +2,7 @@
 
 import { signOut } from 'next-auth/react';
 import { ReactNode } from 'react';
-import { Button } from '@/components/UI/Button';
+import { Button } from '@/ui/Button';
 
 export const handleLogout = async () => {
   sessionStorage.clear();
@@ -15,12 +15,10 @@ interface LogoutButtonProps {
   className?: string;
 }
 
-
 export default function LogoutButton({
   children,
   className = '',
 }: LogoutButtonProps) {
-
   return (
     <Button variant="grayscale" onClick={handleLogout} className={className}>
       {children}

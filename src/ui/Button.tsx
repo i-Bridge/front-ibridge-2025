@@ -1,9 +1,9 @@
 import { ElementType, ReactNode } from 'react';
 import { cva, VariantProps } from 'class-variance-authority';
 import { twMerge } from 'tailwind-merge';
-import { Text } from '@/components/UI/Text';
+import { Text } from '@/ui/Text';
 
-// 1. cva 정의 
+// 1. cva 정의
 const buttonVariants = cva(
   // ---  기본 스타일  ---
   [
@@ -11,26 +11,38 @@ const buttonVariants = cva(
     'h-16 px-10 py-5', // h-16, px-10, py-5
     'rounded-[999px]', // rounded-[999px]
     'transition-colors', // 부드러운 호버 효과
-    'disabled:opacity-50 disabled:cursor-not-allowed', // 비활성화 스타일
+    'disabled:opacity-50 ', // 비활성화 스타일
+
+    'relative', // 1. pseudo-element 포지셔닝의 기준점
+    'overflow-hidden', // 2. pseudo-element가 rounded 코너 밖으로 나가지 않도록 함
+    'isolate', // 3. (선택) 새로운 스태킹 컨텍스트를 만들어 z-index 문제를 방지
+    // 4. ::after pseudo-element를 오버레이로 사용
+    "after:content-['']", // 가상 요소 필수 속성
+    'after:absolute',
+    'after:inset-0', // 부모(버튼) 크기에 꽉 차게
+    'after:bg-black/5', // 요청하신 black 10%
+    'after:opacity-0', // 평소에는 투명
+    'after:transition-opacity', // 부드러운 효과를 위해 transition 추가
+
+    // 5. 버튼에 hover시 ::after(오버레이)를 보이게 함
+    'hover:after:opacity-100',
   ],
   {
     variants: {
       // --- 종류(Variant) ---
       variant: {
-        // 1. Primary 버튼 
-        primary:
-          'bg-primary-primary text-primary-primary hover:bg-primary-primaryLight',
-        
-        // 2. Grayscale 버튼 
-        grayscale:
-          'bg-grayscale-gray10 text-grayscale-gray70 hover:bg-grayscale-gray20', // (hover 색상은 임의로 20으로 지정)
+        // 1. Primary 버튼
+        primary: 'bg-primary-primary text-primary-primary ',
+
+        // 2. Grayscale 버튼
+        grayscale: 'bg-grayscale-gray10 text-grayscale-gray70 ',
       },
     },
     // --- 기본값 ---
     defaultVariants: {
       variant: 'primary',
     },
-  }
+  },
 );
 
 // 2. 컴포넌트 Props 타입 정의 (이전과 동일)

@@ -1,4 +1,4 @@
-import Skeleton from '@/components/UI/Skeleton'; // Skeleton 컴포넌트 경로를 확인해주세요.
+import Skeleton from '@/ui/Skeleton'; // Skeleton 컴포넌트 경로를 확인해주세요.
 
 /**
  * /home 페이지의 메인 콘텐츠가 로드되는 동안(데이터 페칭 중)

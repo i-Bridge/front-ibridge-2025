@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useScheduledSubjects } from '@/hooks/parentHome/useScheduledSubjects';
 import SubjectTitleEdit from './SubjectTitleEdit';
-import Loading from '../UI/LoadingAnim';
+import Loading from '../../ui/LoadingAnim';
 
 export default function ScheduledList() {
   const { subjects, loading, refetch } = useScheduledSubjects();
