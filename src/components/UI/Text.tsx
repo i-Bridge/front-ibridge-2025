@@ -51,7 +51,7 @@ type TextProps<T extends ElementType> = {
 } & VariantProps<typeof textVariants> &
   Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className'>;
 
-  /**
+/**
  * 디자인 시스템의 타이포그래피를 적용하는 다형성 컴포넌트입니다.
  *
  * @example
@@ -61,16 +61,24 @@ type TextProps<T extends ElementType> = {
  * // 2. 'as' prop으로 HTML 태그 변경 (시맨틱 마크업)
  * <Text as="h1" variant="title01">H1 태그</Text>
  *
- * // 3. className 덮어쓰기 (twMerge가 충돌을 안전하게 처리)
+ * // 3. className 덮어쓰기
  * <Text variant="body02" className="text-red-500">빨간색 텍스트</Text>
  *
- * // 4. 기본값 사용 (props 생략 시 'p' 태그, 'body04' 스타일)
+ * // 4. 기본값 사용 ('p' 태그, 'body04' 스타일)
  * <Text>기본 본문 스타일 (body04)</Text>
  *
- * // 5. 다형성 활용 (<a> 태그의 'href' 속성 전달)
- * <Text as="a" variant="body05" href="/link">이것은 링크입니다</Text>
+ * // 5. 다형성 활용 (Next.js 내부 링크)
+ * // import Link from 'next/link';
+ * <Text as={Link} variant="body05" href="/my-page">
+ * 내부 페이지로 이동 (Link)
+ * </Text>
  *
- * // 6. 다형성 활용 (<button> 태그의 'onClick' 속성 전달)
+ * // 6. 다형성 활용 (외부 링크)
+ * <Text as="a" variant="body05" href="https://google.com" target="_blank">
+ * 외부 사이트로 이동 (a 태그)
+ * </Text>
+ *
+ * // 7. 다형성 활용 (<button> 태그의 'onClick' 속성 전달)
  * <Text as="button" variant="body02" onClick={() => alert('클릭!')}>
  * 클릭 가능한 버튼
  * </Text>
