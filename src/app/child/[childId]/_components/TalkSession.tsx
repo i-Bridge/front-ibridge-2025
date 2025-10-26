@@ -227,7 +227,7 @@ export default function TalkSession({
           {/* 1-1. 말풍선 컨테이너
           spec: flow vertical w fill 590 h fixed 180
           */}
-          <div className="flex flex-col justify-center items-center w-full h-[180px]">
+          <div className="flex flex-col justify-start items-center w-full h-[180px]">
             {/* 1-2. 실제 말풍선*/}
             <div
               className="relative flex flex-col justify-center 
