@@ -1,5 +1,6 @@
 import type { Config } from 'tailwindcss';
 
+
 export default {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -9,7 +10,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-nanum)', 'sans-serif'],
+        'tmoney': ['TMoneyDungunbaram', 'sans-serif'],
       },
       keyframes: {
         shimmer: {
