@@ -16,19 +16,23 @@ export default async function FreeTalkPage({ params }: ChildPageParams) {
     );
 
     if (isSuccess && data) {
-      // 2. 성공 시, subjectId와 고정된 첫 멘트를 props로 전달합니다.
+      // 2. 성공 시, TalkSession이 필요로 하는 모든 props를 전달합니다.
       return (
         <TalkSession
           childId={childId}
           initialSubjectId={data.subjectId}
           initialQuestion={firstPrompt}
+          // ✅ [수정] 'history' prop을 빈 배열로 전달합니다.
+          history={[]}
+          // ✅ [수정] 'mode' prop을 'free'로 전달합니다.
+          mode="free"
         />
       );
     } else {
       return <div>대화를 시작하는 데 실패했습니다.</div>;
     }
   } catch (error) {
-    console.error('[/talk/free] Fetch Error:', error);
+    console.error('[/free] Fetch Error:', error);
     return <div>서버와 통신하는 중 오류가 발생했습니다.</div>;
   }
 }

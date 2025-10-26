@@ -18,34 +18,33 @@ export default async function QuestionTalkPage({ params }: ChildPageParams) {
   const { childId } = await params;
 
   try {
-    // 1. 서버에서 '/predesigned' API를 호출하여 질문과 subjectId를 가져옵니다.
     const { data, isSuccess } = await Fetcher<PredesignedData>(
       API.predesigned(childId),
       { method: 'GET' },
     );
-    console.log(data);
-    if (isSuccess && data) {
-      const lastQuestionItem = data.questions?.[data.questions.length - 1];
 
-      if (lastQuestionItem) {
-        // ✅ [수정] 마지막 항목의 'ai' 텍스트를 initialQuestion으로 전달합니다.
-        return (
-          <TalkSession
-            childId={childId}
-            initialSubjectId={data.subjectId}
-            initialQuestion={lastQuestionItem.ai}
-          />
-        );
-      } else {
-        // questions 배열이 비어있는 경우
-        return <div>질문 목록을 찾을 수 없습니다.</div>;
-      }
+    if (isSuccess && data && data.questions.length > 0) {
+      console.log(data);
+      // ✅ [수정] API 응답을 '이전 기록'과 '현재 질문'으로 분리합니다.
+      // 1. user가 null인 마지막 항목이 '현재 질문'입니다.
+      const lastQuestion = data.questions[data.questions.length - 1];
+
+      // 2. 그 외의 모든 항목이 '이전 대화 기록'입니다.
+      const history = data.questions.slice(0, data.questions.length - 1);
+
+      return (
+        <TalkSession
+          childId={childId}
+          initialSubjectId={data.subjectId}
+          initialQuestion={lastQuestion.ai} // ✅ 현재 질문 전달
+          history={history} // ✅ 이전 기록 전달
+          mode="question" // ✅ 모달 문구 분기를 위해 mode 전달
+        />
+      );
     } else {
-      // API 호출은 성공했으나, data가 없는 경우 (논리적 에러)
       return <div>오늘의 질문을 불러오는 데 실패했습니다.</div>;
     }
   } catch (error) {
-    // 네트워크 에러 등 API 호출 자체가 실패한 경우
     console.error('[/talk/question] Fetch Error:', error);
     return <div>서버와 통신하는 중 오류가 발생했습니다.</div>;
   }

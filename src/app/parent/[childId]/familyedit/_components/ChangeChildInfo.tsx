@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Fetcher } from '@/lib/fetcher';
 import Image from 'next/image';
+import {useRouter} from 'next/navigation';
 
 interface ParentInfo {
   parentId: number;
@@ -31,6 +32,7 @@ export default function ChangeChildInfo() {
   >({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchFamilyInfo = async () => {
@@ -119,7 +121,7 @@ export default function ChangeChildInfo() {
           );
 
           setEditMode((prev) => prev.filter((id) => id !== -1));
-          window.location.reload();
+          router.refresh();
         }
       } else {
         await Fetcher(`/parent/mypage/edit/${child.childId}`, {
@@ -169,7 +171,7 @@ export default function ChangeChildInfo() {
           children: prev.children.filter((c) => c !== child),
         };
       });
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       console.error('삭제 실패:', error);
     }

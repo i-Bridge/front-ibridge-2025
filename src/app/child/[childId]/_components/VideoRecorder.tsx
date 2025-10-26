@@ -541,75 +541,104 @@ export default function VideoRecorder({
   /** ===== UI ===== */
   return (
     <div
-      className="flex flex-col justify-between items-center min-w-[300px] max-w-[400px] h-[580px] py-24 px-10 bg-contain bg-center bg-no-repeat"
-      style={{ backgroundImage: `url('/images/영상박스_점선.png')` }}
+      className={`relative flex flex-col justify-center items-center 
+                 w-full h-full bg-black rounded-full 
+                 border-4 ${isUserSpeaking ? 'border-orange-400 animate-pulse' : 'border-orange-500'} 
+                 shadow-2xl transition-all duration-300
+               `}
     >
-      {/* 비디오 영역 */}
-      <div
-        className={`relative transition-all duration-300 rounded-lg ${
-          isUserSpeaking
-            ? 'ring-4 ring-green-400 ring-offset-2 animate-pulse'
-            : ''
-        }`}
-      >
-        <video
-          ref={videoRef}
-          className="w-80 h-60 bg-black rounded shadow-sm"
-          autoPlay
-          muted
-          playsInline
-        />
-      </div>
+      {/* ==============================================
+      1. 비디오 및 캔버스 (기능을 위해 숨겨진 상태로 유지)
+    =============================================== */}
+      <video ref={videoRef} className="hidden" autoPlay muted playsInline />
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* 안내 문구 + 버튼 */}
-      <div className="flex flex-col items-center gap-5">
-        <div className="text-gray-700 w-80 p-2 bg-orange-200 rounded shadow-sm text-sm h-10 flex items-center justify-center">
-          <strong className="transition-opacity duration-300">
-            🎙️ {feedbackText}
-          </strong>
-        </div>
+      {/* ==============================================
+      2. 안내 문구 (기존 feedbackText 상태 재사용)
+    =============================================== */}
+      <div className="text-white text-center px-10">
+        <strong className="text-3xl font-bold transition-opacity duration-300">
+          {feedbackText}
+        </strong>
+      </div>
 
+      {/* ==============================================
+      3. 녹음 버튼 (기존 isRecording 상태로 분기)
+    =============================================== */}
+      <div className="absolute bottom-4 right-4">
         {!isRecording ? (
           <button
             onClick={startRecording}
             disabled={isCharacterSpeaking || isStarting || isWaitingForAI}
-            className="p-4 bg-i-lightgreen text-white rounded-full shadow-sm hover:scale-105 transition-transform disabled:bg-gray-400 disabled:cursor-not-allowed disabled:scale-100"
+            className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center
+                   shadow-lg transition-all 
+                   hover:scale-105 active:scale-95
+                   disabled:bg-gray-300 disabled:opacity-70 disabled:scale-100"
             title={disabledReason || '녹음 시작'}
           >
+            {/* Mic Icon (제공해주신 SVG의 path만 사용) */}
             <svg
-              xmlns="http://www.w3.org/2000/svg"
+              width="40"
+              height="40"
+              viewBox="25 25 40 40"
               fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-6 h-6"
+              xmlns="http://www.w3.org/2000/svg"
             >
               <path
+                d="M45 26.6699C43.6739 26.6699 42.4021 27.1967 41.4645 28.1344C40.5268 29.0721 40 30.3438 40 31.6699V45.0033C40 46.3293 40.5268 47.6011 41.4645 48.5388C42.4021 49.4765 43.6739 50.0033 45 50.0033C46.3261 50.0033 47.5979 49.4765 48.5355 48.5388C49.4732 47.6011 50 46.3293 50 45.0033V31.6699C50 30.3438 49.4732 29.0721 48.5355 28.1344C47.5979 27.1967 46.3261 26.6699 45 26.6699Z"
+                fill="#FF6B31"
+                stroke="#FF6B31"
+                strokeWidth="3.33333"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z"
+              />
+              <path
+                d="M56.6673 41.668V45.0013C56.6673 48.0955 55.4382 51.063 53.2502 53.2509C51.0623 55.4388 48.0948 56.668 45.0007 56.668C41.9065 56.668 38.939 55.4388 36.7511 53.2509C34.5631 51.063 33.334 48.0955 33.334 45.0013V41.668"
+                stroke="#FF6B31"
+                strokeWidth="3.33333"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M45 56.668V63.3346"
+                stroke="#FF6B31"
+                strokeWidth="3.33333"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M38.334 63.3301H51.6673"
+                stroke="#FF6B31"
+                strokeWidth="3.33333"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </svg>
           </button>
         ) : (
           <button
             onClick={stopRecording}
-            className="p-4 bg-i-orange text-white rounded-full shadow-sm hover:scale-105 transition-transform"
+            className="w-20 h-20 bg-white rounded-full flex items-center justify-center
+                     shadow-lg transition-all animate-pulse
+                     hover:scale-105 active:scale-95"
             title="녹음 종료"
           >
+            {/* Stop Icon (녹음 중일 때) */}
             <svg
-              xmlns="http://www.w3.org/2000/svg"
+              width="90"
+              height="90"
+              viewBox="0 0 90 90"
               fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="w-6 h-6"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z"
+              <rect width="90" height="90" rx="45" fill="white" />
+              <rect
+                x="31"
+                y="31"
+                width="28"
+                height="28"
+                rx="6"
+                fill="#FF6B31"
               />
             </svg>
           </button>
