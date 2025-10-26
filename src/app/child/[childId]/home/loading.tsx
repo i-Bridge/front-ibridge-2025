@@ -13,8 +13,8 @@ export default function HomeLoading() {
         <Skeleton className="w-full h-[400px] rounded-[40px] shadow-md" />
         {/* DashboardCards 스켈레톤 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Skeleton className="h-[284px] rounded-[40px] shadow-lg" />
-          <Skeleton className="h-[284px] rounded-[40px] shadow-lg" />
+          <Skeleton className="h-[284px] rounded-[40px]" />
+          <Skeleton className="h-[284px] rounded-[40px]" />
         </div>
       </div>
     </main>

@@ -1,7 +1,7 @@
 'use client';
 
 // React를 import해야 CSSProperties 타입을 정확히 참조할 수 있습니다.
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 
 type Size = { w: number; h: number };
@@ -28,6 +28,8 @@ export default function TalkingCharacter({
   bodySrc = '/images/talking-owlly.webp',
   beakSpriteSrc = '/images/mouth-sprite.webp',
 }: Props) {
+  const [isBodyLoaded, setIsBodyLoaded] = useState(false);
+
   const s = width / baseSize.w;
   const bw = Math.round(frameSize.w * s);
   const bh = bw;
@@ -45,6 +47,7 @@ export default function TalkingCharacter({
     backgroundPosition: '0px 0px',
     '--bw': `${bw}px`,
     '--bh': `${bh}px`,
+    opacity: isBodyLoaded ? 1 : 0,
   };
 
   return (
@@ -65,6 +68,7 @@ export default function TalkingCharacter({
           height: 'auto',
           objectFit: 'contain',
         }}
+        onLoad={() => setIsBodyLoaded(true)}
       />
 
       <span

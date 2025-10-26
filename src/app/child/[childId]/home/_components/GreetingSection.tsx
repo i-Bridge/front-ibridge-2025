@@ -39,11 +39,15 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
             <Image
               src="/images/owlly.webp"
               alt="올리 캐릭터"
-              fill
-              style={{ objectFit: 'contain' }}
+              width={1000}
+              height={1000}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+              }}
               sizes="(max-width: 768px) 250px, 418px"
               quality={100}
-              priority
             />
           </div>
         </div>
