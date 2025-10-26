@@ -15,8 +15,8 @@
 
 :root {
   --font-nanum: 'NanumSquareRound', sans-serif;
-  --background: theme('colors.gray.0');
-  --foreground: theme('colors.gray.90');
+  /* --background: theme('colors.Grayscale-gray5');
+  --foreground: theme('colors.Grayscale-gray90'); */
 }
 
 @layer base {

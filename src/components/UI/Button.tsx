@@ -4,7 +4,7 @@ import clsx from "clsx";
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   size?: "sm" | "md" | "lg";
-  variant?: "primary" | "secondary";
+  variant?: "Primary" | "Secondary";
 }
 
 const baseStyles =
@@ -17,14 +17,15 @@ const sizeStyles = {
 };
 
 const variantStyles = {
-  primary: "bg-primary text-white hover:bg-blue-700 focus:ring-blue-400",
-  secondary: "bg-secondary text-white hover:bg-purple-700 focus:ring-purple-400",
+  
+  Primary: "bg-Primary text-white hover:bg-blue-700 focus:ring-blue-400",
+  Secondary: "bg-Secondary text-white hover:bg-purple-700 focus:ring-purple-400",
 };
 
 // 자주 쓰는 조합 2개 export
 export function PrimaryButton({ children, ...props }: ButtonProps) {
   return (
-    <Button variant="primary" size="md" {...props}>
+    <Button variant="Primary" size="md" {...props}>
       {children}
     </Button>
   );
@@ -32,7 +33,7 @@ export function PrimaryButton({ children, ...props }: ButtonProps) {
 
 export function SecondaryButton({ children, ...props }: ButtonProps) {
   return (
-    <Button variant="secondary" size="md" {...props}>
+    <Button variant="Secondary" size="md" {...props}>
       {children}
     </Button>
   );
@@ -42,7 +43,7 @@ export function SecondaryButton({ children, ...props }: ButtonProps) {
 export function Button({
   children,
   size = "md",
-  variant = "primary",
+  variant = "Primary",
   className,
   ...props
 }: ButtonProps) {
