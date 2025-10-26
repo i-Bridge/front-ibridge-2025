@@ -48,7 +48,6 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
               }}
               sizes="(max-width: 768px) 250px, 418px"
               quality={100}
-              priority
             />
           </div>
         </div>
