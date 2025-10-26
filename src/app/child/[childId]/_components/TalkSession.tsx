@@ -10,6 +10,7 @@ import { Fetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';
 import TalkingCharacter from './TalkingCharacter';
 import HistoryModal from './HistoryModal';
+import ExitModal from './ExitModal';
 
 import { ChatHistoryIcon, CloseIcon } from '../_components/Header';
 
@@ -135,6 +136,11 @@ export default function TalkSession({
     window.location.href = `/child/${childId}/home`;
   }, [childId]);
 
+  const handleExitConfirm = () => {
+    setIsExitModalOpen(false);
+    router.push(`/child/${childId}/home`);
+  };
+
   const handleAIResponse = useCallback(
     async (ai: string, isFinished: boolean) => {
       // 1. 다음 질문(ai)을 상태에 설정합니다.
@@ -175,6 +181,7 @@ export default function TalkSession({
           className="object-cover object-center"
         />
       </div>
+
       {/* ✅ [수정] 모든 제어 버튼을 TalkSession 내부에 배치합니다. */}
       <div className="absolute top-6 right-6 z-40 flex items-center gap-4">
         {/* '오늘의 질문' 모드일 때만 '이전 기록' 버튼을 보여줍니다. */}
@@ -188,6 +195,7 @@ export default function TalkSession({
             <ChatHistoryIcon />
           </button>
         )}
+
         {/* '나가기' 버튼 (CloseIcon) */}
         <button
           onClick={() => setIsExitModalOpen(true)}
@@ -203,43 +211,14 @@ export default function TalkSession({
         onClose={() => setIsHistoryModalOpen(false)}
         history={history}
       />
-      {isExitModalOpen && (
-        <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.2 }}
-            className="w-[90vw] max-w-sm p-6 bg-white rounded-2xl shadow-xl text-center"
-          >
-            <h3 className="text-xl font-bold text-gray-800">
-              잠깐! 벌써 가는 거야?
-            </h3>
 
-            <p className="mt-2 text-gray-600">
-              괜찮아, 언제든 다시 돌아와서 이야기를 이어갈 수 있어!
-            </p>
+      {/* ExitModal 컴포넌트 사용 */}
+      <ExitModal
+        isOpen={isExitModalOpen}
+        onClose={() => setIsExitModalOpen(false)}
+        onConfirm={handleExitConfirm}
+      />
 
-            <div className="mt-6 flex justify-center gap-4">
-              <button
-                onClick={() => setIsExitModalOpen(false)}
-                className="px-8 py-3 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
-              >
-                계속할래
-              </button>
-
-              <button
-                onClick={() => {
-                  setIsExitModalOpen(false);
-                  router.push(`/child/${childId}/home`);
-                }}
-                className="px-8 py-3 bg-orange-400 text-white font-semibold rounded-lg hover:bg-orange-500 transition-colors"
-              >
-                그만할래
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
       {/* 2) 콘텐츠 */}
       <div className="relative z-10 p-6 flex items-center justify-center">
         {/* 캐릭터 (부리 스프라이트) */}

@@ -41,16 +41,16 @@ export default function HistoryModal({ isOpen, onClose, history }: Props) {
               {/* AI 대화 (왼쪽) */}
               <div className="flex items-start gap-3">
                 <AvatarAiIcon className="w-16 h-16 rounded-full flex-shrink-0 text-primary" />
-                <div className="bg-gray-100 p-4 rounded-lg rounded-tl-none">
-                  <p className="text-gray-800">{item.ai}</p>
+                <div className="bg-primary p-4 rounded-[20px]">
+                  <p className="text-white">{item.ai}</p>
                 </div>
               </div>
 
               {/* 사용자 대화 (오른쪽) */}
               {item.user && (
                 <div className="flex items-start justify-end gap-3">
-                  <div className="bg-blue-100 p-4 rounded-lg rounded-tr-none">
-                    <p className="text-gray-800">{item.user}</p>
+                  <div className="bg-gray-80 p-4 rounded-[20px]">
+                    <p className="text-white">{item.user}</p>
                   </div>
                   <AvatarUserIcon className="w-16 h-16 rounded-full flex-shrink-0 text-gray-600" />
                 </div>
