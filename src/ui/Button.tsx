@@ -1,7 +1,10 @@
 import { ElementType, ReactNode } from 'react';
 import { cva, VariantProps } from 'class-variance-authority';
 import { twMerge } from 'tailwind-merge';
-import { Text } from '@/ui/Text';
+import { Text, textVariants } from '@/ui/Text';
+
+// Text 컴포넌트의 variant 타입을 정확하게 추출합니다.
+type TextVariantType = VariantProps<typeof textVariants>['variant'];
 
 // 1. cva 정의
 const buttonVariants = cva(
@@ -48,22 +51,26 @@ type ButtonProps<T extends ElementType> = {
   as?: T;
   children: ReactNode;
   className?: string;
+
+  textVariant?: TextVariantType;
+  textColor?: string;
 } & VariantProps<typeof buttonVariants> &
   Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className'>;
-
 /**
  * 디자인 시스템의 버튼 컴포넌트입니다.
- * 내부적으로 'Text' 컴포넌트의 'caption02' 스타일을 사용합니다.
+ * 내부적으로 'Text' 컴포넌트의 'caption02' 스타일을 기본으로 사용하며,
+ * 'textVariant' prop을 통해 다른 타이포그래피 스타일을 적용할 수 있습니다.
  *
  * @example
- * // 1. 기본 버튼 (primary variant)
+ * // 1. 기본 사용 (Text: caption02)
  * <Button onClick={() => ...}>로그아웃</Button>
  *
- * // 2. grayscale variant
- * <Button variant="grayscale">수정하기</Button>
+ * // 2. Text variant와 색상 지정
+ * <Button variant="grayscale" textVariant="body01" textColor="text-error-error">
+ * 큰 글씨 에러 버튼
+ * </Button>
  *
- * // 3. Next.js 내부 링크로 사용 (새로고침 없음)
- * // import Link from 'next/link';
+ * // 3. Next.js 내부 링크로 사용
  * <Button as={Link} href="/profile" variant="grayscale">
  * 내 프로필
  * </Button>
@@ -73,17 +80,37 @@ export function Button<T extends ElementType = 'button'>({
   variant,
   className,
   children,
+  textVariant = 'caption02' as TextVariantType, 
+  textColor,
   ...props
 }: ButtonProps<T>) {
   const Component = as || 'button';
 
+   let defaultTextColorClass = '';
+  switch (variant) {
+    case 'primary':
+      defaultTextColorClass = 'text-white';
+      break;
+    case 'grayscale':
+      defaultTextColorClass = 'text-grayscale-gray70'; 
+      break;
+    case 'secondary':
+    default:
+      defaultTextColorClass = 'text-grayscale-gray90'; 
+      break;
+  }
+const textClass = twMerge(defaultTextColorClass, textColor);
   return (
     <Component
       className={twMerge(buttonVariants({ variant }), className)}
       {...props}
     >
-      {/* 3. 타이포그래피는 Text 컴포넌트에 위임 (caption02) */}
-      <Text as="span" variant="caption02">
+      {/* 3. 타이포그래피는 Text 컴포넌트에 위임*/}
+      <Text 
+        as="span" 
+        variant={textVariant} // Button의 textVariant prop 사용
+        className={textClass} // 색상 클래스 적용
+      > 
         {children}
       </Text>
     </Component>
