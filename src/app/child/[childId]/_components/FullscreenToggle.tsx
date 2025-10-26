@@ -9,9 +9,15 @@ import { useState, useEffect, useCallback } from 'react';
 export default function FullscreenToggle() {
   // 현재 전체 화면 상태를 추적하는 state
   const [isFullscreen, setIsFullscreen] = useState(false);
-
+  // ✅ [추가] 컴포넌트가 클라이언트에서 마운트되었는지 확인하는 상태입니다.
+  const [isMounted, setIsMounted] = useState(false);
   // 전체 화면 상태가 변경될 때마다(Esc 키 포함) state를 업데이트하는 useEffect
   useEffect(() => {
+    // 이 useEffect는 클라이언트에서만 실행됩니다.
+    // 마운트가 완료되었음을 알리고, 현재의 실제 전체 화면 상태를 즉시 확인하여 동기화합니다.
+    setIsMounted(true);
+    setIsFullscreen(!!document.fullscreenElement);
+
     const onFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
@@ -20,7 +26,6 @@ export default function FullscreenToggle() {
       document.removeEventListener('fullscreenchange', onFullscreenChange);
   }, []);
 
-  // ✅ [수정] 이제 함수는 전체 화면으로 '진입'하는 역할만 담당합니다.
   const enterFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch((err) => {
@@ -30,7 +35,7 @@ export default function FullscreenToggle() {
   }, []);
 
   // ✅ [수정] isFullscreen 상태가 true이면, 아무것도 렌더링하지 않습니다(null).
-  if (isFullscreen) {
+  if (!isMounted || isFullscreen) {
     return null;
   }
 

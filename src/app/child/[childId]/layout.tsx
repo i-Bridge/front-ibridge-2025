@@ -1,65 +1,53 @@
-// app/child/[childId]/layout.tsx
 import type { ReactNode } from 'react';
-import ChildShell from './ChildShell';
 import HydrateChildStore from './hydrate/HydrateChildStore';
 import { Fetcher, type ApiResponse } from '@/lib/fetcher';
+import { redirect } from 'next/navigation';
 
-// API가 내려주는 data 형태
 type HomeData = {
-  emotion: boolean;
-  completed: boolean;
-  grape: number; // 알 개수
-};
-
-type Overview = {
-  grapes: number; // 알(원장 단위)
+  childName: string;
+  grapeBunches: number;
+  grapePieces: number;
+  rewardAvailable: boolean;
+  emotion: number;
   emotionDone: boolean;
   specifiedDone: boolean;
 };
-
+type Overview = HomeData;
 type Params = { childId: string };
 
+function redirectToLogin(childId: string): never {
+  redirect(`/login?next=/child/${childId}/home`);
+}
+
 async function getOverview(childId: string): Promise<Overview> {
-  // ✅ 네가 만든 Fetcher 사용 (서버에서 getServerSession → Authorization 주입)
-
-  const res: ApiResponse<HomeData> = await Fetcher<HomeData>(
-    `/child/${childId}/home`,
-    { method: 'GET' },
-  );
-  console.log('getoverview 호출');
-  console.log(`[Layout SSR] /home API 응답 데이터:`, res.data);
-  // 백엔드 표준 응답(code/message/isSuccess) 처리
-  if (res.isSuccess !== true || !res.data) {
-    console.warn('[overview] API logical failure:', res);
-    return { grapes: 0, emotionDone: false, specifiedDone: false };
+  try {
+    const res: ApiResponse<HomeData> = await Fetcher<HomeData>(
+      `/child/${childId}/home`,
+      { method: 'GET' },
+    );
+    if (res.isSuccess && res.data) return res.data;
+    throw new Error('Failed to fetch overview data or data is missing');
+  } catch (e: unknown) {
+    console.warn('getOverview error:', e);
+    redirectToLogin(childId); // never 반환
   }
-
-  const { emotion, completed, grape } = res.data;
-  return {
-    grapes: Number(grape ?? 0),
-    emotionDone: !!emotion,
-    specifiedDone: !!completed,
-  };
 }
 
 export default async function ChildLayout({
   children,
-  // 최신 Next는 params가 비동기일 수 있음 → 유니온으로 받고 항상 await
   params,
 }: {
   children: ReactNode;
-  params: Params;
+  // ✅ Promise만 받도록 타입 고정 (union 제거)
+  params: Promise<Params>;
 }) {
+  // ✅ Next가 요구하는 방식: params를 await
   const { childId } = await params;
-
   const overview = await getOverview(childId);
 
-  // 1) SSR로 overview 로드
-  // 2) 클라이언트에서 zustand로 1회 하이드레이트
-  // 3) ChildShell에서 pathname 보고 사이드바/HUD 제어
   return (
     <HydrateChildStore overview={overview}>
-      <ChildShell>{children}</ChildShell>
+      <div className="select-none">{children}</div>
     </HydrateChildStore>
   );
 }
