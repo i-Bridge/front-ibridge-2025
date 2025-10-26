@@ -23,12 +23,13 @@ export default {
         // 사용 예: bg-primary, text-secondary, border-tertiary-light
         primary: {
           DEFAULT: '#FF6B31', // 기본 Primary 색상
+          medium: '#FFD3C1', // primaryMedium
+          light: '#FFE9E0', // primaryLight
         },
         secondary: {
           DEFAULT: '#FFDE72',
-        },
-        tertiary: {
-          DEFAULT: '#7D4B37',
+          medium: '#FFF5D5', // secondaryMedium
+          light: '#FFFAEA', // secondaryLight
         },
 
         // --- 상태 색상 ---

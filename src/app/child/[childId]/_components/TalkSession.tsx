@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 import { API } from '@/constants/api';
 import { useMinimaxTTS } from '@/hooks/useMinimaxTTS';
 import VideoRecorder from './VideoRecorder'; // VideoRecorder 경로에 맞게 수정
@@ -218,92 +217,169 @@ export default function TalkSession({
         onClose={() => setIsExitModalOpen(false)}
         onConfirm={handleExitConfirm}
       />
-
-      {/* 2) 콘텐츠 */}
-      <div className="relative z-10 p-6 flex items-center justify-center">
-        {/* 캐릭터 (부리 스프라이트) */}
-
-        <div
-          className={`transition-transform duration-300 ${isSpeaking ? 'scale-[1.03]' : 'scale-100'}`}
-        >
-          <TalkingCharacter
-            isSpeaking={isSpeaking}
-            width={468}
-            height={481} // 화면에서 보이는 크기
-            baseSize={{ w: 931.99, h: 958.33 }} // 바디 원본(px)
-            frameSize={{ w: 1000, h: 1000 }} // 프레임 원본(px) = 2000x1000의 1프레임
-            beakAnchorPct={{ x: 0.5, y: 0.56 }} // 대략 값 → DevTools로 미세조정
-            bodySrc="/images/talking-owlly.webp"
-            beakSpriteSrc="/images/mouth-sprite.webp" // 2000x1000
-          />
-        </div>
-        {/* ✅ [수정] isQuestionVisible이 항상 true이므로, isFinalMessage와 함께 묶어 조건부 렌더링을 단순화합니다. */}
-        {/* 말풍선 */}
-        <div className="relative z-10 w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
-          <motion.div
-            className="relative w-full h-full"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Image
-              src="/images/speechBubbleBg.png"
-              alt="말풍선 배경"
-              fill
-              className="object-contain"
-              priority
-            />
-
-            <div className="relative z-10 flex flex-col items-center justify-center gap-4 h-full p-6">
-              <p className="text-xl text-gray-900 text-center break-words whitespace-pre-wrap px-10 leading-relaxed">
+      <div className="relative z-10 p-6 flex flex-row items-center justify-center w-full gap-8">
+        {/* =================================
+        1. 왼쪽 DIV (말풍선 + 캐릭터)
+        spec: flow vertical w fixed 590 h fill 736
+        =================================
+        */}
+        <div className="flex flex-col items-center justify-center w-[590px] h-[736px]">
+          {/* 1-1. 말풍선 컨테이너
+          spec: flow vertical w fill 590 h fixed 180
+          */}
+          <div className="flex flex-col justify-center items-center w-full h-[180px]">
+            {/* 1-2. 실제 말풍선*/}
+            <div
+              className="relative flex flex-col justify-center 
+                         w-[456px] min-h-[88px] max-w-[480px] 
+                         rounded-[28px] pt-[28px] pr-[40px] pb-[28px] pl-[40px] 
+                         gap-[5.05px] bg-gray-80 text-white shadow-lg 
+                         
+                         after:content-[''] after:absolute 
+                         after:left-1/2 after:-translate-x-1/2 
+                         
+                         after:w-5 after:h-5 /*  사각형 */
+                         after:bg-gray-80   /* 말풍선과 동일한 배경색 */
+                         after:bottom-[-8px] /* 사각형의 중심을 하단 경계에서 4px 아래로 */
+                         after:rotate-45     /* 45도 회전 */
+                         after:rounded-[4px] /* 4px 만큼 모서리를 둥글게 */
+                         "
+            >
+              <p className="font-bold text-xl leading-[1.6] tracking-normal text-center break-words whitespace-pre-wrap">
                 {displayText}
               </p>
-
-              <button
-                onClick={() => void play(question)}
-                className="absolute right-6 top-1/2 -translate-y-1/2 transition-transform hover:scale-110"
-                style={{
-                  background: 'transparent',
-                  padding: 0,
-                  border: 'none',
-                }}
-                aria-label="다시 듣기"
-                title="다시 듣기"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-6 h-6 text-orange-400"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                  />
-                </svg>
-              </button>
             </div>
-          </motion.div>
-        </div>
-        {/* VideoRecorder */}
-        <div className="relative z-10 ml-32 flex flex-col gap-8 text-center">
-          {initialSubjectId ? ( // subjectId가 초기화되지 않았을 때만 렌더링
-            <VideoRecorder
-              childId={childId}
-              subjectId={initialSubjectId}
-              isCharacterSpeaking={isSpeaking}
-              onAIResponse={handleAIResponse}
-              onFinished={() => console.log('✅ 녹화 완료')}
+          </div>
+          {/* 1-3. 캐릭터 */}
+          <div
+            className={`transition-transform duration-300 ${isSpeaking ? 'scale-[1.03]' : 'scale-100'}`}
+          >
+            <TalkingCharacter
+              isSpeaking={isSpeaking}
+              width={468}
+              height={481} // 화면에서 보이는 크기
+              baseSize={{ w: 931.99, h: 958.33 }} // 바디 원본(px)
+              frameSize={{ w: 1000, h: 1000 }} // 프레임 원본(px) = 2000x1000의 1프레임
+              beakAnchorPct={{ x: 0.5, y: 0.56 }} // 대략 값 → DevTools로 미세조정
+              bodySrc="/images/talking-owlly.webp"
+              beakSpriteSrc="/images/mouth-sprite.webp" // 2000x1000
             />
-          ) : (
-            // subjectId가 없는 경우를 대비한 UI (예: 로딩 스피너)
-            <div>대화 세션을 준비 중입니다...</div>
-          )}
+          </div>
+        </div>
+
+        {/* =================================
+        2. 오른쪽 DIV (비디오 레코더)
+        spec: flow vertical w fixed 590 h fill 736 gap 40
+        =================================
+        */}
+        <div className="flex flex-col items-center justify-center w-[590px] h-[736px] gap-10">
+          {/* ✅ [추가] VideoRecorder를 감싸는 div (요청하신 스타일 적용)
+              spec: w 360, h 360, gap 10px
+          */}
+          <div className="flex flex-col items-center justify-center w-[360px] h-[360px] gap-[10px]">
+            {initialSubjectId ? (
+              <VideoRecorder
+                childId={childId}
+                subjectId={initialSubjectId}
+                isCharacterSpeaking={isSpeaking}
+                onAIResponse={handleAIResponse}
+                onFinished={() => console.log('✅ 녹화 완료')}
+              />
+            ) : (
+              // subjectId가 없는 경우를 대비한 UI (예: 로딩 스피너)
+              <div>대화 세션을 준비 중입니다...</div>
+            )}
+          </div>
+          {/* ✅ [추가] VideoRecorder 래퍼 div 종료 */}
         </div>
       </div>
+      {/* ✅ [수정] 콘텐츠 영역 종료 */}
     </div>
   );
 }
+
+// {/* 2) 콘텐츠 */}
+// <div className="relative z-10 p-6 flex items-center justify-center">
+//   {/* 캐릭터 (부리 스프라이트) */}
+
+//   <div
+//     className={`transition-transform duration-300 ${isSpeaking ? 'scale-[1.03]' : 'scale-100'}`}
+//   >
+//     <TalkingCharacter
+//       isSpeaking={isSpeaking}
+//       width={468}
+//       height={481} // 화면에서 보이는 크기
+//       baseSize={{ w: 931.99, h: 958.33 }} // 바디 원본(px)
+//       frameSize={{ w: 1000, h: 1000 }} // 프레임 원본(px) = 2000x1000의 1프레임
+//       beakAnchorPct={{ x: 0.5, y: 0.56 }} // 대략 값 → DevTools로 미세조정
+//       bodySrc="/images/talking-owlly.webp"
+//       beakSpriteSrc="/images/mouth-sprite.webp" // 2000x1000
+//     />
+//   </div>
+//   {/* ✅ [수정] isQuestionVisible이 항상 true이므로, isFinalMessage와 함께 묶어 조건부 렌더링을 단순화합니다. */}
+//   {/* 말풍선 */}
+//   <div className="relative z-10 w-full max-w-[460px] min-w-[280px] h-[280px] -top-32 ml-8 flex-shrink-0">
+//     <motion.div
+//       className="relative w-full h-full"
+//       initial={{ opacity: 0, scale: 0.9 }}
+//       animate={{ opacity: 1, scale: 1 }}
+//       transition={{ duration: 0.5 }}
+//     >
+//       <Image
+//         src="/images/speechBubbleBg.png"
+//         alt="말풍선 배경"
+//         fill
+//         className="object-contain"
+//         priority
+//       />
+
+//       <div className="relative z-10 flex flex-col items-center justify-center gap-4 h-full p-6">
+//         <p className="text-xl text-gray-900 text-center break-words whitespace-pre-wrap px-10 leading-relaxed">
+//           {displayText}
+//         </p>
+
+//         <button
+//           onClick={() => void play(question)}
+//           className="absolute right-6 top-1/2 -translate-y-1/2 transition-transform hover:scale-110"
+//           style={{
+//             background: 'transparent',
+//             padding: 0,
+//             border: 'none',
+//           }}
+//           aria-label="다시 듣기"
+//           title="다시 듣기"
+//         >
+//           <svg
+//             xmlns="http://www.w3.org/2000/svg"
+//             fill="none"
+//             viewBox="0 0 24 24"
+//             strokeWidth="1.5"
+//             stroke="currentColor"
+//             className="w-6 h-6 text-orange-400"
+//           >
+//             <path
+//               strokeLinecap="round"
+//               strokeLinejoin="round"
+//               d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+//             />
+//           </svg>
+//         </button>
+//       </div>
+//     </motion.div>
+//   </div>
+//   {/* VideoRecorder */}
+//   <div className="relative z-10 ml-32 flex flex-col gap-8 text-center">
+//     {initialSubjectId ? ( // subjectId가 초기화되지 않았을 때만 렌더링
+//       <VideoRecorder
+//         childId={childId}
+//         subjectId={initialSubjectId}
+//         isCharacterSpeaking={isSpeaking}
+//         onAIResponse={handleAIResponse}
+//         onFinished={() => console.log('✅ 녹화 완료')}
+//       />
+//     ) : (
+//       // subjectId가 없는 경우를 대비한 UI (예: 로딩 스피너)
+//       <div>대화 세션을 준비 중입니다...</div>
+//     )}
+//   </div>
+// </div>
