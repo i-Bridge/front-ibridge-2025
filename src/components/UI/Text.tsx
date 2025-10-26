@@ -10,30 +10,30 @@ const textVariants = cva(
       variant: {
         // Titles
         title01:
-          'text-[2.5rem] font-extrabold leading-[3.75rem] tracking-[-0.025rem]',
+          'text-[2.5rem] font-nanum-eb leading-[3.75rem] tracking-[-0.025rem]',
         title02:
-          'text-[1.75rem] font-extrabold leading-[2.45rem] tracking-[0rem]',
+          'text-[1.75rem] font-nanum-eb leading-[2.45rem] tracking-[0rem]',
         title03:
-          'text-[1.5rem] font-extrabold leading-[2.1rem] tracking-[0rem]',
+          'text-[1.5rem] font-nanum-eb leading-[2.1rem] tracking-[0rem]',
         title04:
-          'text-[1.25rem] font-extrabold leading-[1.75rem] tracking-[0rem]',
+          'text-[1.25rem] font-nanum-eb leading-[1.75rem] tracking-[0rem]',
 
         // Bodies
-        body01: 'text-[1.75rem] font-extrabold leading-[2.625rem] tracking-[0rem]',
-        body02: 'text-[1.25rem] font-bold leading-[2rem] tracking-[0rem]',
-        body03: 'text-[1.125rem] font-bold leading-[1.8rem] tracking-[0rem]',
-        body04: 'text-[1rem] font-normal leading-[1.6rem] tracking-[0rem]',
-        body05: 'text-[0.875rem] font-normal leading-[1.4rem] tracking-[0rem]',
+        body01: 'text-[1.75rem] font-nanum-eb leading-[2.625rem] tracking-[0rem]',
+        body02: 'text-[1.25rem] font-nanum-b leading-[2rem] tracking-[0rem]',
+        body03: 'text-[1.125rem] font-nanum-b leading-[1.8rem] tracking-[0rem]',
+        body04: 'text-[1rem] font-nanum-r leading-[1.6rem] tracking-[0rem]',
+        body05: 'text-[0.875rem] font-nanum-r leading-[1.4rem] tracking-[0rem]',
 
         // Captions
         caption01:
-          'text-[1.5rem] font-extrabold leading-[2.1rem] tracking-[0rem]',
+          'text-[1.5rem] font-nanum-eb leading-[2.1rem] tracking-[0rem]',
         caption02:
-          'text-[1.25rem] font-extrabold leading-[1.875rem] tracking-[0rem]',
+          'text-[1.25rem] font-nanum-eb leading-[1.875rem] tracking-[0rem]',
         caption03:
-          'text-[1.0rem] font-extrabold leading-[1.5rem] tracking-[0rem]', 
+          'text-[1.0rem] font-nanum-eb leading-[1.5rem] tracking-[0rem]',
         caption04:
-          'text-[0.875rem] font-extrabold leading-[1.3125rem] tracking-[0rem]',
+          'text-[0.875rem] font-nanum-eb leading-[1.3125rem] tracking-[0rem]',
       },
     },
     defaultVariants: {

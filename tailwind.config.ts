@@ -1,5 +1,6 @@
 import type { Config } from 'tailwindcss';
 
+
 export default {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -9,7 +10,24 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-nanum)', 'sans-serif'],
+        // [수정] 
+        // 4개의 폰트 이름을 각각 다른 클래스로 만듭니다.
+
+        // 1. 'NanumSquareRoundL' (Light) 폰트를 
+        //    'font-nanum-l' 클래스로 만듭니다.
+        'nanum-l': ['NanumSquareRoundL', 'sans-serif'],
+
+        // 2. 'NanumSquareRound' (Regular) 폰트를
+        //    'font-nanum-r' 클래스로 만듭니다.
+        'nanum-r': ['NanumSquareRound', 'sans-serif'],
+        
+        // 3. 'NanumSquareRoundB' (Bold) 폰트를
+        //    'font-nanum-b' 클래스로 만듭니다.
+        'nanum-b': ['NanumSquareRoundB', 'sans-serif'],
+        
+        // 4. 'NanumSquareRoundEB' (ExtraBold) 폰트를
+        //    'font-nanum-eb' 클래스로 만듭니다.
+        'nanum-eb': ['NanumSquareRoundEB', 'sans-serif'],
       },
       keyframes: {
         shimmer: {
