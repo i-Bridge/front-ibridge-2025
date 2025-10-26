@@ -32,7 +32,7 @@ export default function ExitModal({ isOpen, onClose, onConfirm }: Props) {
         <div className="w-full h-[207px] flex flex-col items-center gap-5 pt-[48px] pb-5">
           {/* ✅ [수정] 아이콘을 감싸던 배경 div 제거 */}
           {/* 아이콘 크기를 w-20 h-20으로 조정하고, text-orange-500 적용 */}
-          <AvatarAiIcon className="w-20 h-20 text-orange-500 flex-shrink-0" />
+          <AvatarAiIcon className="w-20 h-20 flex-shrink-0" />
 
           {/* 1.2. 텍스트 */}
           <h3 className="font-extrabold text-[28px] leading-[140%] text-gray-90 text-center">
@@ -46,13 +46,13 @@ export default function ExitModal({ isOpen, onClose, onConfirm }: Props) {
           <div className="w-full flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-5 bg-gray-10 text-gray-70 font-extrabold rounded-full hover:bg-gray-200 transition-colors text-base"
+              className="flex-1 px-4 py-5 bg-grayscale-gray10 text-gray-70 font-extrabold rounded-full hover:bg-grayscale-gray20 transition-colors text-base"
             >
               계속 대화하기
             </button>
             <button
               onClick={onConfirm}
-              className="flex-1 px-4 py-5 bg-primary text-white font-extrabold rounded-full hover:bg-orange-600 transition-colors text-base"
+              className="flex-1 px-4 py-5 bg-primary-primary text-white font-extrabold rounded-full hover:bg-orange-600 transition-colors text-base"
             >
               종료하기
             </button>

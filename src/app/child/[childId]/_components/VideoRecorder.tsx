@@ -573,7 +573,7 @@ export default function VideoRecorder({
             className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center
                    shadow-lg transition-all 
                    hover:scale-105 active:scale-95
-                   disabled:bg-gray-300 disabled:opacity-70 disabled:scale-100"
+                   disabled:bg-grayscale-gray30 disabled:opacity-70 disabled:scale-100"
             title={disabledReason || '녹음 시작'}
           >
             {/* Mic Icon (제공해주신 SVG의 path만 사용) */}

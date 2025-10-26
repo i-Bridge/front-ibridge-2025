@@ -233,13 +233,13 @@ export default function TalkSession({
               className="relative flex flex-col justify-center 
                          w-[456px] min-h-[88px] max-w-[480px] 
                          rounded-[28px] pt-[28px] pr-[40px] pb-[28px] pl-[40px] 
-                         gap-[5.05px] bg-gray-80 text-white shadow-lg 
+                         gap-[5.05px] bg-grayscale-gray80 text-white shadow-lg 
                          
                          after:content-[''] after:absolute 
                          after:left-1/2 after:-translate-x-1/2 
                          
                          after:w-5 after:h-5 /*  사각형 */
-                         after:bg-gray-80   /* 말풍선과 동일한 배경색 */
+                         after:bg-grayscale-gray80   /* 말풍선과 동일한 배경색 */
                          after:bottom-[-8px] /* 사각형의 중심을 하단 경계에서 4px 아래로 */
                          after:rotate-45     /* 45도 회전 */
                          after:rounded-[4px] /* 4px 만큼 모서리를 둥글게 */

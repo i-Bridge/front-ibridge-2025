@@ -72,7 +72,7 @@ export default function EmotionModal({
       <div className="w-full max-w-[480px] rounded-[40px] bg-white p-10 shadow-xl flex flex-col space-y-8">
         {/* 헤더 */}
         <div className="pt-2">
-          <h3 className="text-[28px] font-extrabold text-gray-800 text-center leading-[1.4]">
+          <h3 className="text-[28px] font-extrabold text-grayscale-gray90 text-center leading-[1.4]">
             오늘의 감정은?
           </h3>
         </div>

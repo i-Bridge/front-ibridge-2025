@@ -100,7 +100,7 @@ export const ChatHistoryIcon = () => (
 export const ChildName = () => {
   const { childName } = useChildStore();
   return (
-    <p className="text-xl font-extrabold leading-[160%] text-gray-800">
+    <p className="text-xl font-extrabold leading-[160%] text-grayscale-gray80">
       {childName}
     </p>
   );
@@ -109,7 +109,7 @@ export const ChildName = () => {
 export const GrapeInfo = () => {
   const { grapeBunches, grapePieces } = useChildStore();
   return (
-    <div className="flex items-center gap-5 text-sm font-semibold text-gray-700">
+    <div className="flex items-center gap-5 text-sm font-semibold text-grayscale-gray70">
       <div className="flex items-center gap-1">
         <Image
           src="/images/grape-bunch-icon.webp"
@@ -159,7 +159,7 @@ export default function Header({
 
   return (
     <header
-      className={`w-full h-16 px-10 flex items-center fixed top-0 z-50 bg-transparent text-gray-800 ${className}`}
+      className={`w-full h-16 px-10 flex items-center fixed top-0 z-50 bg-transparent text-grayscale-gray-80 ${className}`}
     >
       {/* ✅ [수정] 레이아웃을 원래 코드와 거의 동일하게 단순화했습니다. */}
       <div className="w-full max-w-[1260px] mx-auto flex items-center justify-between relative">

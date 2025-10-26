@@ -41,8 +41,7 @@ export default function DashboardCards({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
       {/* 감정 상태 카드 */}
-      <div className="bg-secondary/30 h-[284px] rounded-[40px] py-10 px-12 flex flex-col justify-between gap-10">
-
+      <div className="bg-secondary-secondaryMedium h-[284px] rounded-[40px] py-10 px-12 flex flex-col justify-between gap-10">
         <div className="flex items-center gap-5">
           <div className="w-[100px] h-[100px] bg-white rounded-full flex-shrink-0 flex items-center justify-center text-5xl relative">
             {emotionDone ? (
@@ -57,19 +56,22 @@ export default function DashboardCards({
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <p className="text-lg font-bold leading-[140%] text-gray-90">
+            <p className="text-lg font-bold leading-[140%] text-grayscale-gray90">
               {formattedDate}
             </p>
             {/* ✅ [수정] emotionDone 상태에 따라 다른 텍스트와 스타일을 렌더링합니다. */}
             {emotionDone ? (
-              <p className="text-2xl font-bold text-gray-90">
+              <p className="text-2xl font-bold text-grayscale-gray90">
                 오늘은
-                <span className="text-primary">{currentEmotion.labelKo}</span>
+                <span className="text-primary-primary">
+                  {currentEmotion.labelKo}
+                </span>
                 날이야
               </p>
             ) : (
-              <p className="text-2xl font-bold text-gray-90">
-                <span className="text-primary">오늘의 감정</span>을 알려줘!
+              <p className="text-2xl font-bold text-grayscale-gray90">
+                <span className="text-primary-primary">오늘의 감정</span>을
+                알려줘!
               </p>
             )}
           </div>
@@ -78,10 +80,10 @@ export default function DashboardCards({
         <button
           onClick={onEmotionSelectClick}
           disabled={emotionDone}
-          className="w-full h-16 rounded-full bg-Secondary flex items-center justify-center py-5 px-10 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+          className="w-full h-16 rounded-full bg-secondary-secondary flex items-center justify-center py-5 px-10 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
         >
           <div className="w-full h-8 flex items-center justify-center">
-            <p className="text-xl font-extrabold leading-[160%] text-gray-90">
+            <p className="text-xl font-extrabold leading-[160%] text-grayscale-gray90">
               {emotionDone ? '감정 선택 완료' : '감정 선택하기'}
             </p>
           </div>
@@ -89,7 +91,7 @@ export default function DashboardCards({
       </div>
 
       {/* 보상 카드 */}
-      <div className="bg-purple/15 h-[284px] rounded-[40px] py-10 px-12 flex flex-col justify-between gap-10">
+      <div className="bg-other-purple-light h-[284px] rounded-[40px] py-10 px-12 flex flex-col justify-between gap-10">
         <div className="flex items-center gap-5">
           <div className="w-[100px] h-[100px] relative">
             <Image
@@ -105,7 +107,7 @@ export default function DashboardCards({
           <div className="flex flex-col">
             {rewardAvailable ? (
               <>
-                <p className="text-[28px] font-extrabold leading-[150%] text-gray-90">
+                <p className="text-[28px] font-extrabold leading-[150%] text-grayscale-gray90">
                   지금 바로
                 </p>
                 <p className="text-[28px] font-extrabold leading-[150%]">
@@ -118,7 +120,7 @@ export default function DashboardCards({
                   <span className="text-purple">{grapesNeeded}알</span> 더
                   모으면
                 </p>
-                <p className="text-[28px] font-extrabold leading-[150%] text-gray-90">
+                <p className="text-[28px] font-extrabold leading-[150%] text-grayscale-gray90">
                   포도송이를 받을 수 있어!
                 </p>
               </>
@@ -131,7 +133,7 @@ export default function DashboardCards({
             onClick={onClaimReward}
             disabled={!rewardAvailable || isClaiming}
             // ✅ [수정] 'disabled:bg-purple-600/5'를 'disabled:opacity-15'로 변경하여 버튼 전체에 투명도를 적용합니다.
-            className="flex-1 h-16 rounded-full bg-purple flex items-center justify-center py-5 px-10 disabled:opacity-15 disabled:cursor-not-allowed transition-all"
+            className="flex-1 h-16 rounded-full bg-other-purple flex items-center justify-center py-5 px-10 disabled:opacity-15 disabled:cursor-not-allowed transition-all"
           >
             <div className="h-8 flex items-center justify-center">
               {isClaiming ? (
@@ -153,10 +155,10 @@ export default function DashboardCards({
           <button
             disabled
             // ✅ [수정] 'disabled:bg-purple/15'와 'text-purple-600'을 'disabled:opacity-15'로 변경하여 버튼 전체에 투명도를 적용합니다.
-            className="flex-1 h-16 rounded-full bg-purple/15 flex items-center justify-center py-5 px-10 disabled:opacity-15 cursor-not-allowed transition-all"
+            className="flex-1 h-16 rounded-full bg-other-purple/15 flex items-center justify-center py-5 px-10 disabled:opacity-15 cursor-not-allowed transition-all"
           >
             <div className="h-8 flex items-center justify-center">
-              <p className="text-base font-extrabold leading-6 text-purple">
+              <p className="text-base font-extrabold leading-6 text-other-purple">
                 상점 준비 중
               </p>
             </div>
