@@ -180,104 +180,104 @@ export default function MailBox() {
 
     const visibleMails = mails.slice(startIdx, startIdx + MAX_VISIBLE);
 
-    return (
-      <div className="mb-4">
-        {label && (
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-sm text-gray-500">{label}</div>
-            {label === '답변 열람' && (
-              <button
-                onClick={handleReadAll}
-                disabled={mails.length === 0} // 🔹 메일 없으면 비활성화
-                className={`text-xs px-2 py-1 rounded border 
-          ${
-            mails.length === 0
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-          }`}
-              >
-                모두 열람
-              </button>
-            )}
-          </div>
-        )}
-
-        <div className="flex flex-col gap-2 border border-gray-200 rounded-lg ">
-          {loading ? (
-            <div className=" text-sm text-gray-500 p-6">로딩 중...</div>
-          ) : error ? (
-            <div className="p-2 text-sm text-red-500">{error}</div>
-          ) : mails.length === 0 ? (
-            <div className=" text-sm text-gray-500 p-6">
-              새로운 알림이 없습니다.
-            </div>
-          ) : (
-            visibleMails.map((mail) => {
-              switch (mail.type) {
-                case 1:
-                  return (
-                    <Type1Notice
-                      key={mail.noticeId}
-                      mail={mail}
-                      onView={() =>
-                        handleView(
-                          mail.noticeId,
-                          mail.senderId,
-                          mail.subject,
-                          mail.time,
-                        )
-                      }
-                    />
-                  );
-                case 2:
-                  return (
-                    <Type2Notice
-                      key={mail.noticeId}
-                      mail={mail}
-                      onAccept={() => handleAccept(mail.senderId)}
-                      onDecline={() => handleDecline(mail.senderId)}
-                    />
-                  );
-                case 3:
-                  return <Type3Notice key={mail.noticeId} mail={mail} />;
-                case 4:
-                  return <Type4Notice key={mail.noticeId} mail={mail} />;
-                default:
-                  return null;
-              }
-            })
-          )}
+return (
+    <div className="mb-4">
+      {label && (
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-sm text-gray-500">{label}</div>
+          {/* '모두 열람' 버튼은 이제 아래로 이동했습니다. */}
         </div>
+      )}
 
-        {mails.length > MAX_VISIBLE && (
-          <div className="flex justify-center mt-2 gap-2">
-            <button
-              onClick={handlePrev}
-              disabled={startIdx === 0}
-              className={`w-8 h-6 flex items-center justify-center rounded-full border  bg-gray-100 hover:bg-gray-200 ${
-                startIdx === 0
-                  ? 'text-gray-300 cursor-not-allowed'
-                  : 'text-black'
-              }`}
-            >
-              {'<'}
-            </button>
-            <button
-              onClick={handleNext}
-              disabled={startIdx >= mails.length - MAX_VISIBLE}
-              className={`w-8 h-6 flex items-center justify-center rounded-full border  bg-gray-100 hover:bg-gray-200 ${
-                startIdx >= mails.length - MAX_VISIBLE
-                  ? 'text-gray-300 cursor-not-allowed'
-                  : 'text-black'
-              }`}
-            >
-              {'>'}
-            </button>
+      <div className="flex flex-col gap-2 border border-gray-200 rounded-lg ">
+        {loading ? (
+          <div className=" text-sm text-gray-500 p-6">로딩 중...</div>
+        ) : error ? (
+          <div className="p-2 text-sm text-red-500">{error}</div>
+        ) : mails.length === 0 ? (
+          <div className=" text-sm text-gray-500 p-6">
+            새로운 알림이 없습니다.
           </div>
+        ) : (
+          visibleMails.map((mail) => {
+            switch (mail.type) {
+              case 1:
+                return (
+                  <Type1Notice
+                    key={mail.noticeId}
+                    mail={mail}
+                    onView={() =>
+                      handleView(
+                        mail.noticeId,
+                        mail.senderId,
+                        mail.subject,
+                        mail.time,
+                      )
+                    }
+                  />
+                );
+              case 2:
+                return (
+                  <Type2Notice
+                    key={mail.noticeId}
+                    mail={mail}
+                    onAccept={() => handleAccept(mail.senderId)}
+                    onDecline={() => handleDecline(mail.senderId)}
+                  />
+                );
+              case 3:
+                return <Type3Notice key={mail.noticeId} mail={mail} />;
+              case 4:
+                return <Type4Notice key={mail.noticeId} mail={mail} />;
+              default:
+                return null;
+            }
+          })
         )}
       </div>
-    );
-  };
+
+      {/* '모두 열람' 버튼 */}
+      {label === '답변 열람' && mails.length >= 0 && (
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={handleReadAll}
+            className={`text-sm px-4 py-2 rounded-lg border bg-gray-100 hover:bg-gray-200 text-gray-700`}
+          >
+            모두 열람
+          </button>
+        </div>
+      )}
+
+      {/* 기존의 페이지네이션 컨트롤 */}
+      {mails.length > MAX_VISIBLE && (
+        <div className="flex justify-center mt-2 gap-2">
+          <button
+            onClick={handlePrev}
+            disabled={startIdx === 0}
+            className={`w-8 h-6 flex items-center justify-center rounded-full border bg-gray-100 hover:bg-gray-200 ${
+              startIdx === 0
+                ? 'text-gray-300 cursor-not-allowed'
+                : 'text-black'
+            }`}
+          >
+            {'<'}
+          </button>
+          <button
+            onClick={handleNext}
+            disabled={startIdx >= mails.length - MAX_VISIBLE}
+            className={`w-8 h-6 flex items-center justify-center rounded-full border bg-gray-100 hover:bg-gray-200 ${
+              startIdx >= mails.length - MAX_VISIBLE
+                ? 'text-gray-300 cursor-not-allowed'
+                : 'text-black'
+            }`}
+          >
+            {'>'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
   return (
     <div className="relative inline-block text-left">
@@ -304,7 +304,7 @@ export default function MailBox() {
 
       {open && (
         <div className="absolute z-49 mt-2 w-96 right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold text-center ">메일함</h3>
             <button
               onClick={() => setOpen(false)}

@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import { DEFAULT_CIPHERS } from 'tls';
 
 export default {
   content: [
@@ -17,69 +18,92 @@ export default {
         },
       },
 
-      //light는 DEFAULT의 15% 투명도이므로 DEFAULT/15로 사용
       colors: {
         // --- 브랜드 색상 ---
-        // 사용 예: bg-primary, text-secondary, border-tertiary-light
+        // 사용 예: bg-primary-primary
         primary: {
-          DEFAULT: '#FF6B31', // 기본 Primary 색상
-          medium: '#FFD3C1', // primaryMedium
-          light: '#FFE9E0', // primaryLight
+          primary: '#FF6B31', // 기본
+          primaryMedium: '#FFD3C1',
+          primaryLight: '#FFE9E0',
         },
         secondary: {
-          DEFAULT: '#FFDE72',
-          medium: '#FFF5D5', // secondaryMedium
-          light: '#FFFAEA', // secondaryLight
+          secondary: '#FFDE72',
+          secondaryMedium: '#FFF5D5',
+          secondaryLight: '#FFFAEA',
         },
 
         // --- 상태 색상 ---
-        // 사용 예: bg-success, text-error-light
+        // 사용 예: bg-success-successLight
         success: {
-          DEFAULT: '#03B26C',
+          success: '#03B26C',
+          successLight: '#D9F3F0',
         },
         error: {
-          DEFAULT: '#FF5E5E',
+          error: '#FF5E5E',
+          errorLight: '#FFE7E7',
         },
 
         // --- 회색조 (Grayscale) ---
-        // 사용 예: bg-gray-900, text-gray-500, border-gray-100
-        gray: {
-          90: '#191F28',
-          80: '#333D4B',
-          70: '#4E5968',
-          60: '#6B7684',
-          50: '#8B95A1',
-          40: '#B0B8C1',
-          30: '#E2E7EB',
-          20: '#E2E7EB',
-          10: '#EEF0F2',
-          5: '#F9FAFB',
-          0: '#FFFFFF',
+        // 사용 예: bg-grayscale-gray90
+        grayscale: {
+          gray90: '#191F28',
+          gray80: '#333D4B',
+          gray70: '#4E5968',
+          gray60: '#6B7684',
+          gray50: '#8B95A1',
+          gray40: '#B0B8C1',
+          gray30: '#E2E7EB',
+          gray20: '#E2E7EB',
+          gray10: '#EEF0F2',
+          gray5: '#F9FAFB',
+          gray0: '#FFFFFF',
         },
 
-        // Other colors
-        pink: {
-          DEFAULT: '#FF3064',
+        black: {
+          DEFAULT: '#000000',
         },
-        red: {
-          DEFAULT: '#FF5E5E',
-        },
-        orange: {
-          DEFAULT: '#FF7700',
-        },
-        yellow: {
-          DEFAULT: '#FAB107',
-        },
-        mint: {
-          DEFAULT: '#00B29A',
-        },
-        blue: {
-          DEFAULT: '#168AFF',
-        },
-        purple: {
-          DEFAULT: '#595CFF',
+        white: {
+          DEFAULT: '#FFFFFF',
         },
 
+        other: {
+          red: {
+            DEFAULT: '#FF5E5E',
+            light: '#FFE7E7',
+          },
+          orange: {
+            DEFAULT: '#FF7700',
+            light: '#FFEBD9',
+          },
+          yellow: {
+            DEFAULT: '#FAB107',
+            light: '#FEF3DA',
+          },
+          skyblue: {
+            DEFAULT: '#51C2FF',
+            light: '#E5F6FF',
+          },
+          mint: {
+            DEFAULT: '#00B29A',
+            light: '#D9F3F0',
+          },
+          blue: {
+            DEFAULT: '#168AFF',
+            light: '#DCEDFF',
+          },
+          purple: {
+            DEFAULT: '#595CFF',
+            light: '#E6E7FF',
+          },
+          pink: {
+            DEFAULT: '#FF3064',
+            light: '#FFE0E8',
+          },
+          gray: {
+            DEFAULT: '#576578',
+          light: '#E6E8EB',
+            },    
+        },
         // --- 기타 색상 ---
         'i-orange': '#FF662D',
         'i-skyblue': '#57b5ce',
