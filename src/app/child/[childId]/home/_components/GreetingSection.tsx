@@ -74,6 +74,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
               <Link
                 href={`/child/${childId}/question`}
                 className="md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-primary flex items-center justify-center p-5 md:py-7 md:px-10 text-white hover:bg-primary/90 transition-colors"
+
               >
                 <ButtonContent>
                   오늘의 질문에

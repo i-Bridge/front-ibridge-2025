@@ -42,6 +42,7 @@ export default function DashboardCards({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
       {/* 감정 상태 카드 */}
       <div className="bg-secondary/30 h-[284px] rounded-[40px] py-10 px-12 flex flex-col justify-between gap-10">
+
         <div className="flex items-center gap-5">
           <div className="w-[100px] h-[100px] bg-white rounded-full flex-shrink-0 flex items-center justify-center text-5xl relative">
             {emotionDone ? (
@@ -77,7 +78,7 @@ export default function DashboardCards({
         <button
           onClick={onEmotionSelectClick}
           disabled={emotionDone}
-          className="w-full h-16 rounded-full bg-secondary flex items-center justify-center py-5 px-10 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+          className="w-full h-16 rounded-full bg-Secondary flex items-center justify-center py-5 px-10 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
         >
           <div className="w-full h-8 flex items-center justify-center">
             <p className="text-xl font-extrabold leading-[160%] text-gray-90">
