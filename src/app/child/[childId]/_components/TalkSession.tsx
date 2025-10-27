@@ -129,11 +129,10 @@ export default function TalkSession({
   }, [initialQuestion, playStreamSmart, handleChunkDisplay]);
 
   const resetUI = useCallback(() => {
-    console.log(
-      `[TalkSession] 대화 종료. ${`/child/${childId}/home`} 경로로 이동합니다.`,
-    );
-    window.location.href = `/child/${childId}/home`;
-  }, [childId]);
+    const completePath = `/child/${childId}/complete`; // ✅ 새 완료 페이지 경로
+    console.log(`[TalkSession] 대화 종료. ${completePath} 경로로 이동합니다.`);
+    router.push(completePath); // ✅ router.push로 변경
+  }, [childId, router]); // ✅ router를 의존성 배열에 추가
 
   const handleExitConfirm = () => {
     setIsExitModalOpen(false);
@@ -157,10 +156,10 @@ export default function TalkSession({
         await playStreamSmart(ai, handleChunkDisplay);
 
         console.log(
-          '[AI 응답] 마지막 TTS 재생 완료. 3초 후 페이지를 이동합니다.',
+          '[AI 응답] 마지막 TTS 재생 완료. 2초 후 완료 페이지로 이동합니다.',
         );
-        // 2-3. TTS 재생이 모두 끝나면, 3초 후 페이지를 이동시킵니다.
-        setTimeout(resetUI, 3000);
+        // 2-3. TTS 재생이 모두 끝나면, 2초 후 페이지를 이동시킵니다.
+        setTimeout(resetUI, 2000);
       } else {
         // 마지막 응답이 아니라면, 그냥 다음 TTS를 재생합니다.
         await playStreamSmart(ai, handleChunkDisplay);
