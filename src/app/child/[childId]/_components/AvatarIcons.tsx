@@ -9,7 +9,7 @@ type Props = {
 /**
  * AI 캐릭터 아바타 (올빼미) SVG 아이콘입니다.
  */
-export function AvatarAiIcon({ className }: Props) {
+export default function AvatarIcon({ className }: Props) {
   return (
     <svg
       viewBox="0 0 64 64"

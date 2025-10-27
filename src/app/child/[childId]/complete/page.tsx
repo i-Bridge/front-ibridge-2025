@@ -2,9 +2,8 @@
 
 'use client';
 
-import Image from 'next/image';
 import { useRouter, useParams } from 'next/navigation';
-
+import AvatarIcon from '../_components/AvatarIcons';
 /**
  * 말풍선 꼬리표 아이콘 (직접 SVG로 만듦)
  */
@@ -71,7 +70,7 @@ export default function ConversationCompletePage() {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-[#FEECEC] p-6">
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-primary-primaryLight p-6">
       {/* 1. 좌상단 로고 */}
       <div className="absolute top-6 left-6">
         <LeafLogo />
@@ -79,16 +78,7 @@ export default function ConversationCompletePage() {
 
       <div className="flex flex-col items-center text-center">
         {/* 2. 캐릭터 이미지 */}
-        <div className="w-40 h-40 rounded-full bg-[#FDD9CC] flex items-center justify-center overflow-hidden">
-          <Image
-            src="/images/talking-owlly.webp" // TalkSession과 동일한 에셋 경로
-            alt="캐릭터"
-            width={140}
-            height={140}
-            className="object-contain -mb-3" // 캐릭터 에셋에 맞게 미세조정
-          />
-        </div>
-
+        <AvatarIcon className="w-60 h-60" />
         {/* 3. 완료 텍스트 */}
         <h1 className="text-4xl font-bold text-[#333] mt-8 leading-snug">
           오늘의 질문
