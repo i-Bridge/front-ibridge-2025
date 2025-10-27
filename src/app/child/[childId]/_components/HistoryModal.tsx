@@ -1,8 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-// ✅ [수정] 하나의 파일에서 두 아이콘을 함께 임포트합니다.
-import { AvatarAiIcon, AvatarUserIcon } from './AvatarIcons';
+import { AvatarAiIcon } from './AvatarIcons';
 
 type QuestionItem = {
   ai: string;
@@ -31,7 +30,7 @@ export default function HistoryModal({ isOpen, onClose, history }: Props) {
         className="w-[90vw] max-w-lg h-[70vh] bg-white rounded-2xl shadow-xl flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-xl font-bold text-grayscale-gray-80 text-center py-5 flex-shrink-0 border-b">
+        <h3 className="text-xl font-bold text-grayscale-gray80 text-center py-5 flex-shrink-0 border-b">
           이전 대화 기록
         </h3>
 
@@ -41,7 +40,7 @@ export default function HistoryModal({ isOpen, onClose, history }: Props) {
               {/* AI 대화 (왼쪽) */}
               <div className="flex items-start gap-3">
                 <AvatarAiIcon className="w-16 h-16 rounded-full flex-shrink-0 text-primary" />
-                <div className="bg-primary p-4 rounded-[20px]">
+                <div className="bg-primary-primary p-4 rounded-[20px]">
                   <p className="text-white">{item.ai}</p>
                 </div>
               </div>
@@ -52,7 +51,6 @@ export default function HistoryModal({ isOpen, onClose, history }: Props) {
                   <div className="bg-grayscale-gray80 p-4 rounded-[20px]">
                     <p className="text-white">{item.user}</p>
                   </div>
-                  <AvatarUserIcon className="w-16 h-16 rounded-full flex-shrink-0 text-gray-600" />
                 </div>
               )}
             </div>

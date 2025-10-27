@@ -540,30 +540,52 @@ export default function VideoRecorder({
 
   /** ===== UI ===== */
   return (
-    <div
-      className={`relative flex flex-col justify-center items-center 
-                 w-full h-full bg-black rounded-full 
-                 border-4 ${isUserSpeaking ? 'border-orange-400 animate-pulse' : 'border-orange-500'} 
-                 shadow-2xl transition-all duration-300
-               `}
-    >
-      {/* ==============================================
-      1. 비디오 및 캔버스 (기능을 위해 숨겨진 상태로 유지)
-    =============================================== */}
-      <video ref={videoRef} className="hidden" autoPlay muted playsInline />
-      <canvas ref={canvasRef} className="hidden" />
+    // 1. 최상위 래퍼: 'relative'만 적용. 버튼의 기준점. (A)
+    // 여기에는 overflow-hidden이 없습니다.
+    <div className="relative w-full h-full">
+      {/* 2. 내부 컨테이너: 비디오와 텍스트를 감싸고 'overflow-hidden'으로 잘라냄 (B)
+       */}
+      <div
+        className={`relative flex flex-col justify-center items-center 
+                  w-full h-full bg-black rounded-full 
+                  border-4 ${isUserSpeaking ? 'border-orange-400 animate-pulse' : 'border-orange-500'} 
+                  shadow-2xl transition-all duration-300
+                  overflow-hidden // 비디오만 잘라내기 위함
+                `}
+      >
+        {/* ==============================================
+      1. 비디오 및 캔버스 (내부 div 안)
+      =============================================== */}
+        <video
+          ref={videoRef}
+          className={
+            isRecording
+              ? 'w-full h-full object-cover' // 녹화 중: 비디오 표시
+              : 'hidden' // 녹화 전: 숨김
+          }
+          autoPlay
+          muted
+          playsInline
+        />
+        <canvas ref={canvasRef} className="hidden" />
 
+        {/* ==============================================
+      2. 안내 문구 (내부 div 안, 녹화 중이 아닐 때만 표시)
+      =============================================== */}
+        <div
+          className={`text-white text-center px-10 absolute ${
+            isRecording ? 'hidden' : 'block' // 녹화 중: 숨김
+          }`}
+        >
+          <strong className="text-3xl font-bold transition-opacity duration-300">
+            {feedbackText}
+          </strong>
+        </div>
+      </div>{' '}
+      {/* <-- (B) 비디오/텍스트를 감싸는 div 종료 */}
       {/* ==============================================
-      2. 안내 문구 (기존 feedbackText 상태 재사용)
-    =============================================== */}
-      <div className="text-white text-center px-10">
-        <strong className="text-3xl font-bold transition-opacity duration-300">
-          {feedbackText}
-        </strong>
-      </div>
-
-      {/* ==============================================
-      3. 녹음 버튼 (기존 isRecording 상태로 분기)
+    3. 녹음 버튼 (최상위 래퍼 안) (C)
+       'overflow-hidden'의 영향을 받지 않고 (B) 위에 얹혀짐
     =============================================== */}
       <div className="absolute bottom-4 right-4">
         {!isRecording ? (
@@ -571,12 +593,12 @@ export default function VideoRecorder({
             onClick={startRecording}
             disabled={isCharacterSpeaking || isStarting || isWaitingForAI}
             className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center
-                   shadow-lg transition-all 
-                   hover:scale-105 active:scale-95
-                   disabled:bg-grayscale-gray30 disabled:opacity-70 disabled:scale-100"
+                     shadow-lg transition-all 
+                     hover:scale-105 active:scale-95
+                     disabled:bg-grayscale-gray30 disabled:opacity-70 disabled:scale-100"
             title={disabledReason || '녹음 시작'}
           >
-            {/* Mic Icon (제공해주신 SVG의 path만 사용) */}
+            {/* Mic Icon (SVG ... ) */}
             <svg
               width="40"
               height="40"
@@ -623,7 +645,7 @@ export default function VideoRecorder({
                      hover:scale-105 active:scale-95"
             title="녹음 종료"
           >
-            {/* Stop Icon (녹음 중일 때) */}
+            {/* Stop Icon (SVG ... ) */}
             <svg
               width="90"
               height="90"
@@ -644,6 +666,6 @@ export default function VideoRecorder({
           </button>
         )}
       </div>
-    </div>
+    </div> // <-- (A) 최상위 래퍼 div 종료
   );
 }
