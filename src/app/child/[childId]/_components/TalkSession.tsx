@@ -248,6 +248,45 @@ export default function TalkSession({
               <p className="font-bold text-xl leading-[1.6] tracking-normal text-center break-words whitespace-pre-wrap">
                 {displayText}
               </p>
+
+              <button
+                onClick={() => void play(question)}
+                className="absolute bottom-0 right-0 translate-y-1/2 
+                         p-4 bg-white rounded-full
+                         transition-all hover:scale-105 active:scale-95"
+                aria-label="다시 듣기"
+                title="다시 듣기"
+              >
+                <svg
+                  width="22"
+                  height="18"
+                  viewBox="0 0 22 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1.3335 2.16992V7.19972H6.36329"
+                    stroke="#FF6B31"
+                    stroke-width="2.66667"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M19.7759 15.5825V10.5527H14.7461"
+                    stroke="#FF6B31"
+                    stroke-width="2.66667"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M17.6719 6.3618C17.2468 5.16033 16.5242 4.08615 15.5716 3.23948C14.619 2.39281 13.4675 1.80125 12.2244 1.52C10.9814 1.23874 9.68735 1.27696 8.46307 1.63108C7.23879 1.98521 6.12416 2.6437 5.2232 3.54511L1.3335 7.20009M19.7761 10.5533L15.8864 14.2083C14.9854 15.1097 13.8708 15.7682 12.6465 16.1223C11.4222 16.4764 10.1282 16.5146 8.88513 16.2334C7.64209 15.9521 6.49054 15.3606 5.53796 14.5139C4.58537 13.6672 3.86278 12.5931 3.43763 11.3916"
+                    stroke="#FF6B31"
+                    stroke-width="2.66667"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
           {/* 1-3. 캐릭터 */}
