@@ -39,7 +39,7 @@
     "next-env.d.ts",
     "src/app/head.js",
     ".next/types/**/*.ts"
-  ],
+, "src/constants/icon.tsx"  ],
   "exclude": [
     "node_modules"
   ]
