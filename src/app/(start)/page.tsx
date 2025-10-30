@@ -3,9 +3,9 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Fetcher } from '@/lib/fetcher';
-import LoginButton from '@/components/Auth/LoginButton';
-import ModalCard from '@/components/ModalCard';
-
+import ModalCard from '@/ui/Modal/ModalCard';
+import LoginSessionCheck from './_components/LoginSessionCheck';
+import AccountCheckingForm from './_components/AccountCheckingForm';
 
 export default function StartPage() {
   const { data: session } = useSession();
@@ -17,7 +17,7 @@ export default function StartPage() {
         try {
           const result = await Fetcher<{ accepted: boolean }>('/start/login');
           if (result?.data?.accepted) {
-            router.replace('/profile');
+            //router.replace('/profile');
           }
         } catch {}
       }
@@ -25,15 +25,14 @@ export default function StartPage() {
 
     checkAccepted();
   }, [session, router]);
-  
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[url('/images/LoginPageBG.png')] bg-cover bg-no-repeat bg-center">
-      
-      <ModalCard>
-        <LoginButton />
-        
+    <div className="flex items-center justify-center  ">
+      <ModalCard hasBorder={true}>
+        <LoginSessionCheck />
       </ModalCard>
-      
     </div>
   );
 }
+//<LoginSessionCheck />
+//<AccountCheckingForm userName=''/>
