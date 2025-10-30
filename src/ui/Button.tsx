@@ -15,7 +15,7 @@ const buttonVariants = cva(
     'rounded-[999px]', // rounded-[999px]
     'transition-colors', // 부드러운 호버 효과
     'disabled:opacity-50 ', // 비활성화 스타일
-
+   'disabled:hover:after:opacity-0',
     'relative', // 1. pseudo-element 포지셔닝의 기준점
     'overflow-hidden', // 2. pseudo-element가 rounded 코너 밖으로 나가지 않도록 함
     'isolate', // 3. (선택) 새로운 스태킹 컨텍스트를 만들어 z-index 문제를 방지
