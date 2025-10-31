@@ -41,7 +41,7 @@ export default function Header({
     };
     
     return (
-        <header className="bg-white flex fixed items-center justify-center top-0 left-0 w-full h-16  overflow-hidden whitespace-nowrap z-50 ">
+        <header className="bg-white flex fixed items-center justify-center top-0 left-0 w-full h-16 px-10 overflow-hidden whitespace-nowrap z-50 ">
             <div className="flex justify-between items-center w-full max-w-7xl mx-auto"> 
                 {/* 좌측: 로고 그룹 (클릭 가능하도록 수정) */}
                 <button 
