@@ -4,19 +4,13 @@ import { useState } from 'react';
 import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
 import CommonModal from '@/ui/Modal/CommonModalPopup';
-
-// 부모 컴포넌트가 요구하는 자녀 정보 타입
-interface ChildInfo {
-  name: string;
-  gender: number; // 0 (남자) 또는 1 (여자)
-  birth: string; // 'YYYY-MM-DD' 형식의 문자열
-}
+import { ChildWithoutId } from '@/types';
 
 // 부모 컴포넌트에서 받을 props
 interface AddChildFormProps {
   onClose: () => void;
-  onSubmit: (childData: ChildInfo) => void;
-  initialData?: ChildInfo; // 💡 optional prop으로 initialData 추가
+  onSubmit: (childData: ChildWithoutId) => void;
+  initialData?: ChildWithoutId; // 💡 optional prop으로 initialData 추가
 }
 
 export default function AddChildForm({
@@ -27,9 +21,9 @@ export default function AddChildForm({
   // --- 상태 및 로직 (원본과 동일) ---
   const [name, setName] = useState(initialData?.name || '');
   const [birthday, setBirthday] = useState<Date | null>(
-    initialData ? new Date(initialData.birth) : null,
+    initialData ? new Date(initialData.birthday) : null,
   );
-  const [selectedGender, setSelectedGender] = useState<number | null>(
+  const [selectedGender, setSelectedGender] = useState<string | null>(
     initialData?.gender ?? null,
   );
 
@@ -43,7 +37,7 @@ export default function AddChildForm({
     const birthString = birthday!.toISOString().split('T')[0];
     onSubmit({
       name: name.trim(),
-      birth: birthString,
+      birthday: birthString,
       gender: selectedGender!,
     });
   };
@@ -114,16 +108,16 @@ export default function AddChildForm({
           <div className="self-stretch inline-flex gap-2">
             <div
               className={`flex-1 h-14 px-5 rounded-xl border flex justify-center items-center cursor-pointer ${
-                selectedGender === 1
+                selectedGender === 'Female'
                   ? 'border-primary-primary'
                   : 'border-gray-300'
               }`}
-              onClick={() => setSelectedGender(1)}
+              onClick={() => setSelectedGender('Female')}
             >
               <Text
                 variant="body03"
                 className={
-                  selectedGender === 1
+                  selectedGender === 'Female'
                     ? 'text-primary-primary'
                     : 'text-gray-500'
                 }
@@ -133,16 +127,16 @@ export default function AddChildForm({
             </div>
             <div
               className={`flex-1 h-14 px-5 rounded-xl border flex justify-center items-center cursor-pointer ${
-                selectedGender === 0
+                selectedGender === 'Male'
                   ? 'border-primary-primary'
                   : 'border-gray-300'
               }`}
-              onClick={() => setSelectedGender(0)}
+              onClick={() => setSelectedGender('Male')}
             >
               <Text
                 variant="body03"
                 className={
-                  selectedGender === 0
+                  selectedGender === 'Male'
                     ? 'text-primary-primary'
                     : 'text-gray-500'
                 }

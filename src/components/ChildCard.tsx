@@ -1,22 +1,16 @@
 import { Text } from '@/ui/Text';
 import CustomCard from '@/ui/CustomCard';
 import { GirlIcon,BoyIcon,EditIcon,DeleteIcon } from '@/constants/icon';
-
-
-interface ChildInfo {
-  name: string;
-  gender: number;
-  birth: string;
-}
+import { ChildWithoutId } from '@/types';
 
 interface ChildListItemProps {
-  child: ChildInfo;
+  child: ChildWithoutId;
   onEdit: () => void;
   onDelete: () => void;
 }
 
 export function ChildCard({ child, onEdit, onDelete }: ChildListItemProps) {
-  const isFemale = child.gender === 1;
+  const isFemale = child.gender === 'Female';
   const bgColor = isFemale ? 'bg-secondary-secondaryMedium' : 'bg-other-mint-light';
 
   return (
@@ -33,7 +27,7 @@ export function ChildCard({ child, onEdit, onDelete }: ChildListItemProps) {
               {child.name}
             </Text>
             <Text variant="body03" className="text-grayscale-gray60 ">
-              {child.birth}
+              {child.birthday}
             </Text>
           </div>
         </div>

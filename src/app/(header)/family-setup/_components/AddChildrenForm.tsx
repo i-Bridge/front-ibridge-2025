@@ -10,11 +10,7 @@ import { useRouter } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 import { ChildCard } from '@/components/ChildCard';
 import CarouselStepper from '@/components/CarouselStepper';
-interface ChildInfo {
-  name: string;
-  gender: number;
-  birth: string;
-}
+import { ChildWithoutId } from '@/types';
 export default function AddChildrenForm() {
   const router = useRouter();
   const {
@@ -76,7 +72,7 @@ export default function AddChildrenForm() {
   };
 
   // [신규] 모달에서 '추가/수정' 버튼 클릭 (공통)
-  const handleSubmitModal = (childData: ChildInfo) => {
+  const handleSubmitModal = (childData: ChildWithoutId) => {
     if (editingIndex !== null) {
       updateChild(editingIndex, childData); // 수정
     } else {

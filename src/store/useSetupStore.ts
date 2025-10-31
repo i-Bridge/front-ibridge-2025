@@ -1,23 +1,19 @@
 // store/setup/setupStore.ts
 
 import { create } from 'zustand';
+import { ChildWithoutId } from '@/types';
 
-interface ChildInfo {
-  name: string;
-  gender: number;
-  birth: string;
-}
 
 interface SetupState {
   step: number;
   familyName: string;
-  childrenInfo: ChildInfo[];
+  childrenInfo:  ChildWithoutId [];
 
   setStep: (step: number) => void;
   setFamilyName: (name: string) => void;
-  addChild: (child: ChildInfo) => void;
+  addChild: (child:  ChildWithoutId ) => void;
   removeChild: (index: number) => void;
-  updateChild: (index: number, child: ChildInfo) => void;
+  updateChild: (index: number, child:  ChildWithoutId ) => void;
 }
 
 export const useSetupStore = create<SetupState>((set) => ({
