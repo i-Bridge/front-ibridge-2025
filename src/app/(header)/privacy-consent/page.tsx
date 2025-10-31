@@ -10,8 +10,6 @@ interface ConsentContent {
   consentToMarketing: string; // 마케팅 정보 수신 동의(선택) 약관
 }
 
-
-
 /**
  * 개인정보 동의 층 Page (Server Component)
  * 약관 내용을 서버에서 미리 가져와 클라이언트 컴포넌트에 전달합니다.
@@ -55,11 +53,5 @@ export default async function PrivacyConsentPage() {
   }
 
   // 성공 시 클라이언트 컴포넌트에 데이터 전달
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <ModalCard hasBorder={false} >
-        <PrivacyConsentForm content={consentContent} />
-      </ModalCard>
-    </div>
-  );
+  return <PrivacyConsentForm content={consentContent} />;
 }

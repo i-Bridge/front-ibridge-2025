@@ -8,6 +8,7 @@ import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
 import PrivacyDetailModal from '@/app/(header)/privacy-consent/_components/PrivacyDetailModal'; // 경로 확인 필요
 import PopupOverlay from '@/ui/Modal/PopupOverlay';
+import ModalCard from '@/ui/Modal/ModalCard';
 
 // 서버에서 받은 약관 상세 내용 타입
 interface ConsentContent {
@@ -175,6 +176,7 @@ export default function PrivacyConsentForm({ content }: PrivacyConsentFormProps)
     linkUrl,
     isDetail = false,
   }: AgreementItem & { isDetail?: boolean }) => (
+    
     <div className="self-stretch inline-flex justify-between items-center">
       <div
         className="flex justify-start items-center gap-2 cursor-pointer"
@@ -224,6 +226,7 @@ export default function PrivacyConsentForm({ content }: PrivacyConsentFormProps)
         </button>
       )}
     </div>
+    
   );
 
   const modalContent = activeModalId ? content[activeModalId] : "";
@@ -231,7 +234,7 @@ export default function PrivacyConsentForm({ content }: PrivacyConsentFormProps)
 
 
   return (
-    <>
+    <ModalCard hasBorder={false} >
       <div className="self-stretch flex flex-col justify-start items-center gap-10 ">
         {/* 1. 제목 및 설명 */}
         <div className="self-stretch flex flex-col justify-start items-start gap-3">
@@ -277,6 +280,6 @@ export default function PrivacyConsentForm({ content }: PrivacyConsentFormProps)
           />
         </PopupOverlay>
       )}
-    </>
+    </ModalCard>
   );
 }

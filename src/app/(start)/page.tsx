@@ -3,9 +3,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Fetcher } from '@/lib/fetcher';
-import ModalCard from '@/ui/Modal/ModalCard';
 import LoginSessionCheck from './_components/LoginSessionCheck';
-import AccountCheckingForm from './_components/AccountCheckingForm';
 
 export default function StartPage() {
   const { data: session } = useSession();
@@ -27,11 +25,8 @@ export default function StartPage() {
   }, [session, router]);
 
   return (
-    <div className="flex items-center justify-center  ">
-      <ModalCard hasBorder={true}>
         <LoginSessionCheck />
-      </ModalCard>
-    </div>
+
   );
 }
 //<LoginSessionCheck />

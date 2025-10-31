@@ -3,10 +3,11 @@ import { OwlIcon } from '@/ui/icon/OwlIcon';
 import { Logo } from '@/ui/icon/Logo';
 import { Text } from '@/ui/Text';
 import { NaverIcon, GoogleIcon } from '@/constants/icon';
+import ModalCard from '@/ui/Modal/ModalCard';
 
 export default function PreLoginForm() {
   return (
-    <>
+    <ModalCard hasBorder={true}>
       <div className=" inline-flex flex-col justify-start items-start gap-5">
         <OwlIcon />
         <div className="inline-flex flex-col justify-start items-start gap-2">
@@ -41,6 +42,6 @@ export default function PreLoginForm() {
           </Text>
         </button>
       </div>
-    </>
+    </ModalCard>
   );
 }

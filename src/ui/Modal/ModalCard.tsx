@@ -27,22 +27,21 @@ const ModalCard = ({ children, className = '', hasBorder = true }: ModalCardProp
   
   // 🔑 hasBorder가 true일 때만 테두리 클래스를 적용
   const borderClasses = hasBorder
-    ? 'outline outline-1 outline-offset-[-1px] outline-grayscale-gray20 p-10 gap-10'
+    ? 'outline outline-1 outline-offset-[-1px] outline-grayscale-gray20 p-10 '
     : '';
 
   return (
+    <div className='w-[480px]'>
     <div
       className={`
-        w-[480px] bg-white
-        ${borderClasses} 
-         flex flex-col justify-start items-start   rounded-[40px]
+       w-full bg-blue-300
+        flex self-stretch flex-col justify-start items-start  rounded-[40px] gap-10
+         ${borderClasses} 
         ${className} 
       `}
     >
-      {/* 이 컴포넌트의 자식 요소(children)들은
-        자동으로 flex-col(세로 정렬)과 gap-10(40px 간격)이 적용됩니다.
-      */}
       {children}
+    </div>
     </div>
   );
 };

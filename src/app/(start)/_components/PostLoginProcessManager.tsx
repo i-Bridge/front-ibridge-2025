@@ -111,25 +111,15 @@ export default function PostLoginProcessManager({
 
     switch (status) {
       case 'checking':
-        // 'checking' 상태일 때만 AccountCheckingForm 렌더링
-        return <AccountCheckingForm userName={userName} />;
-
-      // 'idle'이거나 리디렉션 대기 중일 때는 null 반환
-      case 'idle':
       case 'needsConsent':
       case 'needsFamily':
       case 'hasFamilyUser':
+        return <AccountCheckingForm userName={userName} />;
+      case 'idle':
       default:
         return null;
     }
   };
 
-  // 10. 💡 [핵심] 리턴 구문 수정
-  // 모든 레이아웃 스타일링(배경, 헤더) 로직 제거
-  // 부모인 (start) layout이 배경을 처리하므로 이 컴포넌트는 투명해야 함.
-  return (
-    <div className="flex flex-col items-center gap-10 bg-black">
-      {renderStatusView()}
-    </div>
-  );
+  return <div>{renderStatusView()}</div>;
 }

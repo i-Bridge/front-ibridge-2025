@@ -56,7 +56,7 @@ export default function CreateFamilyForm() {
 
   return (
     <>
-      <ModalCard hasBorder={false} className="gap-10">
+      <ModalCard hasBorder={false} className=" gap-10">
         <button
           onClick={() => setStep(0)}
           className="w-10 h-10 relative overflow-hidden stroke-grayscale-gray40"
