@@ -3,3 +3,4 @@ export * from './child.types';
 export * from './question.types';
 export * from './subject.types';
 export * from './parent.types';
+export * from './api.types';
