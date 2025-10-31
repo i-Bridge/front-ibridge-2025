@@ -39,8 +39,8 @@ export default function Header({
           className="flex justify-start items-center gap-2 cursor-pointer focus:outline-none"
           aria-label="홈으로 이동"
         >
-          <OwlIcon className="w-6 h-6 text-indigo-600" />
-          <Logo className="w-auto h-[28px] text-indigo-800" />
+          <OwlIcon className="w-6 h-6" />
+          <Logo className="w-auto h-[28px]" />
         </button>
 
         {/* 우측: 버튼 그룹 (관리자 페이지, 로그아웃) */}
@@ -49,18 +49,17 @@ export default function Header({
           {showAdmin && (
             <Button
               onClick={onAdminClick}
-              className="h-10 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 transition"
+              className="h-10 px-4 py-2.5 bg-gray-100 "
             >
-              <Text variant="caption04" className="text-gray-700">
+              <Text variant="caption04" className="text-grayscale-gray70">
                 관리자 페이지
               </Text>
             </Button>
           )}
 
           {/* 2. 로그아웃 버튼 */}
-          {/* LogoutButton은 자체적으로 signOut 로직을 포함한다고 가정합니다. */}
-          <LogoutButton className="h-10 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 transition">
-            <Text variant="caption04" className="text-indigo-600">
+          <LogoutButton className="h-10 px-4 py-2.5 bg-grayscale-gray5">
+            <Text variant="caption04" className="text-grayscale-gray70">
               로그아웃
             </Text>
           </LogoutButton>
