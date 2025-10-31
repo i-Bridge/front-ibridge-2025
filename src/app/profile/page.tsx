@@ -3,13 +3,16 @@ import { LoginData } from '@/types';
 import Header from '@/components/Header/Header';
 import ModalCard from '@/ui/Modal/ModalCard';
 import { Text } from '@/ui/Text';
-import { ChildCard } from '@/components/ChildCard';
+import ChildProfileLink from '@/app/profile/_components/ChildProfileLink';
+
 export const dynamic = 'force-dynamic';
 
 export default async function Profile() {
   const res = await Fetcher<LoginData>('/start/login');
   const profileData = res.data;
 
+
+  // --- 데이터 상태에 따른 분기 (이전과 동일) ---
   if (!profileData) {
     return <div>로딩 중...</div>;
   }
@@ -19,9 +22,11 @@ export default async function Profile() {
   if (profileData.send && !profileData.accepted) {
     return <div> 가족 요청이 수락되지 않았습니다. </div>;
   }
+  // --- ---
 
   return (
     <>
+      {/* Header, ModalCard, Text 등은 서버 컴포넌트에서 렌더링 가능합니다 */}
       <Header firstchildId={profileData.children[0].id} />
       <ModalCard hasBorder={false}>
         <div className="flex flex-col gap-3">
@@ -35,13 +40,9 @@ export default async function Profile() {
             너의 프로필을 선택해줘!
           </Text>
         </div>
-        <div className="flex flex-col gap-5 self-stretch ">
+        <div className="w-full flex flex-col gap-5 self-stretch ">
           {profileData.children.map((child) => (
-            <ChildCard
-              key={child.id} // 💡 필수: 배열을 렌더링할 때는 고유한 key를 사용해야 합니다.
-              child={child} // 💡 단수(child) 인자를 ChildCard에 전달합니다.
-              showActions ={false}
-            />
+            <ChildProfileLink key={child.id} child={child} />
           ))}
         </div>
       </ModalCard>

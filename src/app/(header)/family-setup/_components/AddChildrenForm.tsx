@@ -130,7 +130,7 @@ export default function AddChildrenForm() {
         <div className="self-stretch flex flex-col justify-start items-center gap-5 ">
           {visibleChild ? (
             <ChildCard
-            key={visibleChild.id}
+            childId={visibleChild.id}
               child={visibleChild}
               onEdit={() => handleOpenEditModal(currentChildIndex)} // 수정
               onDelete={() => handleRemoveChild(currentChildIndex)} // 삭제
