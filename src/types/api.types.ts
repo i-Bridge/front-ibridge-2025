@@ -3,6 +3,5 @@ export interface LoginData {
     accepted: boolean;
     send: boolean
     familyName: string;
-    
     children: Child[];
   }
