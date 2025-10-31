@@ -29,5 +29,3 @@ export default function StartPage() {
 
   );
 }
-//<LoginSessionCheck />
-//<AccountCheckingForm userName=''/>

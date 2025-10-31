@@ -34,7 +34,7 @@ const ModalCard = ({ children, className = '', hasBorder = true }: ModalCardProp
     <div className='w-[480px]'>
     <div
       className={`
-       w-full bg-blue-300
+       w-full bg-white
         flex self-stretch flex-col justify-start items-start  rounded-[40px] gap-10
          ${borderClasses} 
         ${className} 
