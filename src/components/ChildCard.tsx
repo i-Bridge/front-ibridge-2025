@@ -1,18 +1,42 @@
 import { Text } from '@/ui/Text';
 import CustomCard from '@/ui/CustomCard';
 import { GirlIcon,BoyIcon,EditIcon,DeleteIcon } from '@/constants/icon';
-import { ChildWithoutId } from '@/types';
+import { Child } from '@/types';
 
 interface ChildListItemProps {
-  child: ChildWithoutId;
-  onEdit: () => void;
-  onDelete: () => void;
+  key:number | undefined;
+  child: Child;
+  onEdit?: (childId: number | undefined) => void;
+  onDelete?: (childId: number | undefined) => void;
+  showActions: boolean;
 }
 
-export function ChildCard({ child, onEdit, onDelete }: ChildListItemProps) {
+// ----------------------------------------------------
+// ChildCard Component (수정: 편집/삭제 기능 포함 및 조건부 렌더링)
+// ----------------------------------------------------
+// showActions의 기본값을 true로 설정합니다.
+export function ChildCard({ key, child, onEdit, onDelete, showActions = true }: ChildListItemProps) {
   const isFemale = child.gender === 'Female';
   const bgColor = isFemale ? 'bg-secondary-secondaryMedium' : 'bg-other-mint-light';
-
+// showActions가 true일 때만 onEdit과 onDelete가 존재함이 보장되므로,
+  // 함수 호출 시 해당 핸들러의 존재 여부를 확인합니다.
+  const handleEdit = () => {
+    // showActions가 true이고 onEdit 함수가 실제로 존재할 때만 호출
+    if (showActions && onEdit) {
+      onEdit(key);
+    } else {
+      console.warn("Edit action requested but showActions is false or onEdit is undefined.");
+    }
+  };
+  
+  const handleDelete = () => {
+    // showActions가 true이고 onDelete 함수가 실제로 존재할 때만 호출
+    if (showActions && onDelete) {
+      onDelete(key);
+    } else {
+      console.warn("Delete action requested but showActions is false or onDelete is undefined.");
+    }
+  };
   return (
     <CustomCard
       className={` self-stretch flex justify-between items-start ${bgColor}`}
@@ -33,21 +57,22 @@ export function ChildCard({ child, onEdit, onDelete }: ChildListItemProps) {
         </div>
 
         {/* 오른쪽: 버튼 */}
+        {showActions && (
         <div className="flex self-stretch justify-start items-start gap-2">
           <button
-            onClick={onEdit}
+            onClick={handleEdit}
             className="w-10 h-10 p-1 bg-white rounded-full flex justify-center items-center"
           >
             <EditIcon />
           </button>
           <button
-            onClick={onDelete}
+            onClick={handleDelete}
             className="w-10 h-10 p-1 bg-white rounded-full flex justify-center items-center"
           >
             <DeleteIcon />
           </button>
         </div>
-      
+      )}
     </CustomCard>
   );
 }
