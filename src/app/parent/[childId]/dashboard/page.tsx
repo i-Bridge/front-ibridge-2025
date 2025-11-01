@@ -1,82 +1,92 @@
 import { Fetcher } from '@/lib/fetcher';
-import HomeHeader from '@/components/Header/HomeHeader';
 import AiComment from './_components/AiComment';
-import ContentSwitcher from './_components/ContentSwitcher';
 import { ChildPageParams } from '@/types/page-props';
 import NotFound from '@/components/Exception/not-found';
 import { Subject } from '@/types/index';
-
+import PageLayout from '@/components/Layout/ParentLayout';
+import { Text } from '@/ui/Text';
+import CumulateChart from '@/app/parent/[childId]/dashboard/_components/CumulateChart';
+import CategoryChart from './_components/CategoryChart';
 interface HomeData {
   hasNext: boolean;
   subjects: Subject[];
 }
 
-interface BannerData {
-  cumulativeAnswerCount: number;
-  mostTalkedCategory: string;
-  positiveCategory: string;
-  negativeCategory: string;
-  emotion: number;
-  name: string;
-  newGrape: number;
+interface KeywordData {
+  keywords: Keyword[]; // 키워드 배열
 }
-export default async function HomePage({ params }: ChildPageParams) {
+
+interface Keyword {
+  keyword: string;
+  count: number;
+  positiveScore: number;
+}
+
+interface CumulativeData {
+  cumulative: number; // 누적 응답 수
+  cumList: number[]; // 일별 응답 수 (오늘 포함 7일)
+}
+
+export default async function DashBoardPage({ params }: ChildPageParams) {
   // params가 Promise이므로, await를 사용해 값을 추출
   const { childId } = await params;
 
   if (!childId) return <NotFound message="자녀 ID가 존재하지 않습니다." />;
 
   const homeRes = await Fetcher<HomeData>(`/parent/${childId}/home`);
-  const bannerRes = await Fetcher<BannerData>(`/parent/${childId}/banner`);
 
   if (!homeRes || !homeRes.data) {
     return <NotFound message="데이터를 불러오지 못했습니다." />;
   }
 
   const homeData = homeRes.data;
-  const bannerData = bannerRes?.data ?? {
-    cumulativeAnswerCount: 0,
-    mostTalkedCategory: '',
-    positiveCategory: '',
-    negativeCategory: '',
-    emotion: 0,
-    name: '',
-    newGrape: 0,
-  };
 
-  if (!homeData || !bannerData) {
+  if (!homeData) {
     return <NotFound message="데이터가 존재하지 않습니다." />;
   }
   console.log('/home', homeData);
-  console.log('/banner', bannerData);
+
+  const keywordRes = await Fetcher<KeywordData>(`/parent/${childId}/keywords`);
+    const keywordData = keywordRes.data;
+    console.log('분석 /stat api 호출 ', keywordData);
+    if (!keywordData) {
+      return <div>분석 데이터 불러오기 실패...</div>;
+    }
+
+    
+  const cumulativeRes = await Fetcher<CumulativeData>(`/parent/${childId}/stat/cumulative?periodType='day'`);
+    const cumulativeData = cumulativeRes.data;
+    console.log('분석 /stat api 호출 ', cumulativeData);
+    if (!cumulativeData) {
+      return <div>분석 데이터 불러오기 실패...</div>;
+    }
+
+
+  const pageTitle = (
+    <div className="self-stretch px-10 pt-14 pb-5 inline-flex flex-col justify-start items-start gap-3">
+      <Text variant={'body03'} className='text-grayscale-gray60'>
+        2025년 11월 1일 업데이트됨
+      </Text>
+      <Text variant={'title01'}> 아이가 자주 느낀<br/>감정들을 들여다볼까요?</Text>
+      
+    </div>
+  );
+
 
   return (
-    <div>
+    <PageLayout title={pageTitle}>
       {/* 헤더에 알림 개수 정보 전달 필요 */}
-      <div className="flex flex-col space-y-14">
-        <HomeHeader childId={childId} />
-        <div className="flex flex-col items-center justify-center">
-          <AiComment
-            childname={bannerData.name}
-            cumulativeAnswerCount={bannerData.cumulativeAnswerCount}
-            mostTalkedCategory={bannerData.mostTalkedCategory}
-            positiveCategory={bannerData.positiveCategory}
-            negativeCategory={bannerData.negativeCategory}
-            emotion={bannerData.emotion}
-            newGrape={bannerData.newGrape}
+          <AiComment childId={childId}
           />
-          <div className="mt-4">
-            <ContentSwitcher
-              initialSubjects={homeData.subjects ?? []}
-              childname={bannerData.name}
-            />
-          </div>
-        </div>
-      </div>
 
-      <footer className="bg-gray-200 text-white text-center py-10">
-        ⓒ 2025 i-Bridge. All rights reserved.
-      </footer>
-    </div>
+          <CumulateChart
+                      childId={childId}
+                      defaultCumList={cumulativeData}
+                    />
+                    <div className="flex-1 flex flex-col gap-6 ml-20">
+                            <CategoryChart categories={keywordData.keywords} childId={childId} />
+                          </div>
+
+    </PageLayout>
   );
 }
