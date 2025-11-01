@@ -4,62 +4,34 @@
 
 import { useRouter, useParams } from 'next/navigation';
 import AvatarIcon from '../_components/AvatarIcons';
-/**
- * 말풍선 꼬리표 아이콘 (직접 SVG로 만듦)
- */
-function LeafLogo() {
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M19.2209 13.7915C19.2209 13.7915 17.653 10.0213 14.288 8.01997C14.288 8.01997 12.3553 11.5947 13.7371 14.591C15.1189 17.5873 17.4164 19.3444 19.2209 19.7826C19.2209 19.7826 21.0567 17.9157 19.2209 13.7915Z"
-        fill="#FF6B31"
-        opacity="0.6"
-      />
-      <path
-        d="M17.0707 10.963C17.0707 10.963 14.4332 7.74934 11.5303 7.82029C11.5303 7.82029 10.1611 10.8258 12.0622 13.7547C13.9633 16.6836 16.208 17.9573 17.4851 17.5898C17.4851 17.5898 18.7303 15.6558 17.0707 10.963Z"
-        fill="#FF6B31"
-      />
-      <path
-        d="M7.70834 5.34176C7.70834 5.34176 9.80735 7.18223 9.40939 10.2372C9.40939 10.2372 7.14389 9.94632 5.67139 7.76993C4.19889 5.59354 4.09315 3.52834 4.8876 2.89014C4.8876 2.89014 6.13621 3.96874 7.70834 5.34176Z"
-        fill="#FF6B31"
-      />
-    </svg>
-  );
-}
-
-/**
- * 홈 아이콘 SVG
- */
-function HomeIcon() {
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M3 9.75L12 3L21 9.75V21H15V15H9V21H3V9.75Z"
-        fill="white"
-        stroke="white"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
+import FullscreenToggle from '../_components/FullscreenToggle';
 export default function ConversationCompletePage() {
   const router = useRouter();
   const params = useParams();
   const childId = params.childId as string;
+
+  /**
+   * 홈 아이콘 SVG
+   */
+  function HomeIcon() {
+    return (
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M3 9.75L12 3L21 9.75V21H15V15H9V21H3V9.75Z"
+          fill="white"
+          stroke="white"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
 
   const handleGoHome = () => {
     if (childId) {
@@ -70,12 +42,13 @@ export default function ConversationCompletePage() {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-primary-primaryLight p-6">
-      {/* 1. 좌상단 로고 */}
-      <div className="absolute top-6 left-6">
-        <LeafLogo />
-      </div>
-
+    <div className="relative flex flex-col items-center justify-center w-full min-h-screen bg-primary-primaryLight p-6">
+      {/* ============================================== */}
+      {/* ✅ [추가] 헤더 */}
+      {/* ============================================== */}
+      <header className="absolute top-6 left-6 z-10">
+        <FullscreenToggle />
+      </header>
       <div className="flex flex-col items-center text-center">
         {/* 2. 캐릭터 이미지 */}
         <AvatarIcon className="w-60 h-60" />

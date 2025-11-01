@@ -39,27 +39,49 @@ export default function FullscreenToggle() {
     return null;
   }
 
-  // ✅ [수정] 전체 화면이 아닐 때만 버튼을 렌더링합니다.
   return (
     <button
       onClick={enterFullscreen}
-      className="p-3 bg-white/70 rounded-full shadow-lg hover:bg-white active:scale-95 transition-all"
+      className="w-10 h-10 px-3.5 py-1 bg-white rounded-[10px] 
+                 inline-flex justify-center items-center gap-3 overflow-hidden
+                 transition-all hover:scale-105 active:scale-95"
       aria-label="전체 화면으로 보기"
       title="전체 화면으로 보기"
     >
-      {/* 항상 '확대' 아이콘만 보여줍니다. */}
       <svg
-        xmlns="http://www.w3.org/2000/svg"
+        width="17"
+        height="17"
+        viewBox="0 0 17 17"
         fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth={1.5}
-        stroke="currentColor"
-        className="w-8 h-8 text-gray-700"
+        xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9M20.25 20.25h-4.5m4.5 0v-4.5m0 4.5L15 15"
+          d="M1.83301 10.168H6.83301V15.168"
+          stroke="#4E5968"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M15.167 6.83203H10.167V1.83203"
+          stroke="#4E5968"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M10.167 6.83333L16.0003 1"
+          stroke="#4E5968"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M1 16.0013L6.83333 10.168"
+          stroke="#4E5968"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
         />
       </svg>
     </button>
