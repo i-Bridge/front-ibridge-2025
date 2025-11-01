@@ -20,7 +20,7 @@ export default function FamilySelectionForm() {
       <div className="flex flex-col item-center gap-5 justify-center self-stretch">
         <CustomCard
           onClick={() => setStep(1)}
-          className="bg-primary-primary self-stretch"
+          className="bg-primary-primary items-start "
         >
           <div className="gap-3">
             <Text variant="title02" className="text-white">
@@ -33,7 +33,7 @@ export default function FamilySelectionForm() {
         </CustomCard>
         <CustomCard
           onClick={() => setStep(3)}
-          className="bg-primary-primaryLight "
+          className="bg-primary-primaryLight items-start "
         >
           <div className="gap-3">
             <Text variant="title02" className="text-primary-primary">

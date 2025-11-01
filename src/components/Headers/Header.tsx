@@ -44,11 +44,11 @@ export default function Header({ firstchildId }: HeaderProps) {
         {/* 좌측: 로고 그룹 (클릭 가능하도록 수정) */}
         <button
           onClick={handleLogoClick}
-          className="flex justify-start items-center gap-2 cursor-pointer focus:outline-none"
+          className="flex justify-center items-start gap-2 cursor-pointer focus:outline-none"
           aria-label="홈으로 이동"
         >
           <OwlIcon className="w-6 h-6" />
-          <Logo className="w-auto h-[28px]" />
+          <Logo className="w-[73px] h-[28px]" />
         </button>
 
         {/* 우측: 버튼 그룹 (관리자 페이지, 로그아웃) */}

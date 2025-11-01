@@ -99,7 +99,7 @@ export default function CommonModalPopup({
 }: CommonModalProps) {
   return (
     <PopupOverlay onClose={onClose}>
-      <ModalCard hasBorder={false}>
+      <ModalCard hasBorder={false} className='flex flex-col gap-0'>
         {/* 헤더 영역 */}
         <ModalHeader>
           {/* 첫 번째 제목 줄 */}
