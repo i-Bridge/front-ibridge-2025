@@ -12,7 +12,7 @@ export default function StartLayout({
   return (
     // 전체 화면을 꽉 채우고, 배경색을 설정합니다.
     // children (PostLoginProcessManager) 내부의 ModalCard가 이 배경 위에 중앙에 배치됩니다.
-    <div className="bg-[url('/images/StartPageBG.png')] bg-cover bg-center min-h-screen  flex items-center justify-center px-10 ">
+    <div className="bg-[url('/images/parent-bg.webp')] bg-cover bg-center min-h-screen  flex items-center justify-center px-10 ">
       {/* 자식 컴포넌트(LoginSessionCheck -> PostLoginProcessManager) 렌더링 영역
         PostLoginProcessManager는 여기서 상태를 확인하고, 층 분리 리디렉션이 일어나면 
         이 레이아웃에서 벗어나 /privacy-consent 등의 (app) 레이아웃으로 이동하게 됩니다. 
