@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { EMOTION_BY_ID } from '@/constants/emotions';
+import { EMOTION_BY_ID, isEmotionId } from '@/constants/emotions';
 
 type Props = {
   emotionDone: boolean;
@@ -33,58 +33,82 @@ export default function DashboardCards({
 
   const grapeIconSrc = getGrapeIconPath(grapePieces);
   const currentEmotion =
-    typeof emotion === 'number' ? EMOTION_BY_ID[emotion] : undefined;
+    typeof emotion === 'number' && isEmotionId(emotion)
+      ? EMOTION_BY_ID[emotion]
+      : undefined;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
       {/* 감정 상태 카드 */}
-      <div className="bg-secondary-secondaryMedium h-[284px] rounded-[40px] py-10 px-12 flex flex-col justify-between gap-10">
-        <div className="flex items-center gap-5">
-          <div className="w-[100px] h-[100px] bg-white rounded-full flex-shrink-0 flex items-center justify-center relative overflow-hidden">
-            {emotionDone && currentEmotion ? (
-              <currentEmotion.icon className="w-14 h-14" />
-            ) : (
-              <Image
-                src="/images/emotion-blank.webp"
-                alt="감정 선택 전"
-                fill
-                style={{ objectFit: 'contain' }}
-                sizes="100px"
-              />
-            )}
-          </div>
+      <div className="p-10 bg-secondary-secondaryMedium rounded-[40px] inline-flex flex-col justify-center items-start gap-7 overflow-hidden">
+        {/* 상단 영역 */}
+        <div className="w-full flex flex-col justify-center items-start gap-5">
+          <div className="inline-flex justify-start items-center gap-5">
+            {/* 아이콘/빈상태 썸네일 */}
+            <div
+              className={[
+                'w-20 h-20 relative rounded-[40px] overflow-hidden flex items-center justify-center',
+                // 미선택 상태: 배경+아웃라인 노출
+                !emotionDone
+                  ? 'bg-secondary-secondaryLight outline outline-[2.5px] outline-offset-[-1.25px] outline-primary-primary'
+                  : 'bg-transparent outline-none',
+              ].join(' ')}
+            >
+              {emotionDone && currentEmotion ? (
+                <currentEmotion.icon className="w-20 h-20" />
+              ) : (
+                <Image
+                  src="/images/emotion-blank.webp"
+                  alt="감정 선택 전"
+                  fill
+                  style={{ objectFit: 'contain' }}
+                  sizes="80px"
+                  priority={false}
+                />
+              )}
+            </div>
 
-          <div className="flex flex-col gap-2">
-            <p className="text-lg font-bold leading-[140%] text-grayscale-gray90">
-              {formattedDate}
-            </p>
+            {/* 날짜 + 문구 */}
+            <div className="inline-flex flex-col justify-center items-start gap-2">
+              <div className="text-grayscale-gray90 text-base leading-6">
+                {formattedDate}
+              </div>
 
-            {emotionDone ? (
-              <p className="text-2xl font-bold text-grayscale-gray90">
-                오늘은{' '}
-                <span className="text-primary-primary">
-                  {currentEmotion?.labelKo ?? '특별한'}
-                </span>{' '}
-                날이야
-              </p>
-            ) : (
-              <p className="text-2xl font-bold text-grayscale-gray90">
-                <span className="text-primary-primary">오늘의 감정</span>을
-                알려줘!
-              </p>
-            )}
+              {emotionDone ? (
+                <div className="inline-flex justify-start items-center">
+                  <div className="text-grayscale-gray90 text-xl font-extrabold leading-8">
+                    오늘은{' '}
+                  </div>
+                  <div className="text-primary-primary text-xl font-extrabold leading-8">
+                    {currentEmotion?.labelKo ?? '특별한'}
+                  </div>
+                  <div className="text-grayscale-gray90 text-xl font-extrabold leading-8">
+                    {' '}
+                    날이야
+                  </div>
+                </div>
+              ) : (
+                <div className="inline-flex justify-start items-center">
+                  <div className="text-primary-primary text-xl font-extrabold leading-8">
+                    오늘의 감정
+                  </div>
+                  <div className="text-grayscale-gray90 text-xl font-extrabold leading-8">
+                    을 알려줘!
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
+        {/* 버튼 영역 */}
         <button
           onClick={onEmotionSelectClick}
           disabled={emotionDone}
           className="w-full h-16 rounded-full bg-secondary-secondary flex items-center justify-center py-5 px-10 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
         >
-          <div className="w-full h-8 flex items-center justify-center">
-            <p className="text-xl font-extrabold leading-[160%] text-grayscale-gray90">
-              {emotionDone ? '감정 선택 완료' : '감정 선택하기'}
-            </p>
+          <div className="w-full text-center text-grayscale-gray90 text-base font-extrabold leading-6">
+            {emotionDone ? '감정 선택 완료' : '감정 선택하기'}
           </div>
         </button>
       </div>
