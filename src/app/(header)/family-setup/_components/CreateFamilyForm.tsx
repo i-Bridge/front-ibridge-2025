@@ -5,7 +5,7 @@ import { Fetcher } from '@/lib/fetcher';
 import CommonModalPopup from '@/ui/Modal/CommonModalPopup';
 import { useState } from 'react';
 import { useSetupStore } from '@/store/useSetupStore';
-import { LeftArrow } from '@/constants/icon';
+import { LeftArrow } from '@/ui/icon/icon';
 
 interface DupFamilyNameData {
   exist: boolean;

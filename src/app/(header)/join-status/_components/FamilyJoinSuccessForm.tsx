@@ -5,7 +5,7 @@ import ModalCard from '@/ui/Modal/ModalCard';
 import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
 import CustomCard from '@/ui/CustomCard';
-import { AbledCheckCircleIcon } from '@/constants/icon'; // 아이콘 경로가 constants로 가정
+import { AbledCheckCircleIcon } from '@/ui/icon/icon'; // 아이콘 경로가 constants로 가정
 
 // 1. props 인터페이스 수정: 불필요한 props(onCancelSuccess, loading) 제거
 interface FamilyJoinSuccessProps {
@@ -38,7 +38,7 @@ export default function FamilyJoinSuccessForm({
       className="flex flex-col gap-10 text-center items-center "
     >
       <div className="flex flex-col gap-7 text-center items-center">
-          <AbledCheckCircleIcon />
+        <AbledCheckCircleIcon />
 
         <div className="flex flex-col gap-3">
           <Text as="div" variant="title01">
@@ -55,7 +55,7 @@ export default function FamilyJoinSuccessForm({
       {/* 합류한 가족 정보 카드 */}
       <CustomCard className="bg-grayscale-gray5 ">
         <div className="flex flex-col justify-start items-start gap-2">
-          <Text as="div" variant="title02" >
+          <Text as="div" variant="title02">
             {displayName}
           </Text>
           {/* 3. '관리자:' 부분에 'adminNames' 변수 사용 */}
@@ -65,11 +65,7 @@ export default function FamilyJoinSuccessForm({
         </div>
       </CustomCard>
 
-      <Button
-        onClick={() => router.push('/profile')}
-        variant="primary"
-        
-      >
+      <Button onClick={() => router.push('/profile')} variant="primary">
         서비스 이용하기
       </Button>
     </ModalCard>

@@ -8,13 +8,13 @@ import { Button } from '@/ui/Button';
 import { Fetcher } from '@/lib/fetcher';
 import { useSetupStore } from '@/store/useSetupStore';
 import CommonModalPopup from '@/ui/Modal/CommonModalPopup';
-import { LeftArrow } from '@/constants/icon';
+import { LeftArrow } from '@/ui/icon/icon';
 
 interface DupFamilyNameData {
   exist: boolean;
 }
 export default function FindFamilyForm() {
-  const router=useRouter();
+  const router = useRouter();
   const { setStep, familyName, setFamilyName } = useSetupStore();
 
   const [loading, setLoading] = useState(false);
@@ -71,7 +71,7 @@ export default function FindFamilyForm() {
       });
 
       if (!res?.data?.exist) {
-        // 존재하지 않을 시 
+        // 존재하지 않을 시
         setIsRequestSentModalOpen(false);
         setIsNotExistModalOpen(true);
         setFamilyName('');

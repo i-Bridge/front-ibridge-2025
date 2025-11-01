@@ -2,7 +2,7 @@ import { signIn } from 'next-auth/react';
 import { OwlIcon } from '@/ui/icon/OwlIcon';
 import { Logo } from '@/ui/icon/Logo';
 import { Text } from '@/ui/Text';
-import { NaverIcon, GoogleIcon } from '@/constants/icon';
+import { NaverIcon, GoogleIcon } from '@/ui/icon/icon';
 import ModalCard from '@/ui/Modal/ModalCard';
 
 export default function PreLoginForm() {

@@ -58,7 +58,7 @@ type ButtonProps<T extends ElementType> = {
   Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className'>;
 /**
  * 디자인 시스템의 버튼 컴포넌트입니다.
- * 내부적으로 'Text' 컴포넌트의 'caption02' 스타일을 기본으로 사용하며,
+ * 내부적으로 'Text' 컴포넌트의 'caption02' 스타일, 'h-16 px-10 py-5' 스타일을 기본으로 사용하며,
  * 'textVariant' prop을 통해 다른 타이포그래피 스타일을 적용할 수 있습니다.
  *
  * @example

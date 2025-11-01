@@ -1,6 +1,6 @@
 import { Text } from '@/ui/Text';
 import CustomCard from '@/ui/CustomCard';
-import { GirlIcon, BoyIcon, EditIcon, DeleteIcon } from '@/constants/icon';
+import { GirlIcon, BoyIcon, EditIcon, DeleteIcon } from '@/ui/icon/icon';
 import { Child } from '@/types';
 import { twMerge } from 'tailwind-merge';
 
@@ -23,7 +23,6 @@ export function ChildCard({
   showActions = true,
   cardClassName,
 }: ChildListItemProps) {
-
   console.log(child);
   const isFemale = child.gender === 'FEMALE';
   const bgColor = isFemale
@@ -53,16 +52,14 @@ export function ChildCard({
     }
   };
 
-  const formattedBirthday = child.birth
-    ? child.birth.replace(/-/g, '.')
-    : '';
+  const formattedBirthday = child.birth ? child.birth.replace(/-/g, '.') : '';
 
   return (
     <CustomCard
       className={twMerge(
-        'self-stretch flex justify-between items-start', 
+        'self-stretch flex justify-between items-start',
         bgColor,
-        cardClassName // 💡 외부에서 받은 호버/커스텀 클래스
+        cardClassName, // 💡 외부에서 받은 호버/커스텀 클래스
       )}
     >
       {/* 왼쪽: 아이콘 + 정보 */}
