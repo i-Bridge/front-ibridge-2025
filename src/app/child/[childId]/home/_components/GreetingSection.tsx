@@ -73,8 +73,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
               // ✅ [수정] 'flex-1'을 제거합니다.
               <Link
                 href={`/child/${childId}/question`}
-                className="md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-primary flex items-center justify-center p-5 md:py-7 md:px-10 text-white hover:bg-primary/90 transition-colors"
-
+                className="md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-primary-primary flex items-center justify-center p-5 md:py-7 md:px-10 text-white hover:bg-primary/90 transition-colors"
               >
                 <ButtonContent>
                   오늘의 질문에
@@ -86,7 +85,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
             {/* ✅ [수정] 'flex-1'을 제거합니다. */}
             <Link
               href={`/child/${childId}/free`}
-              className="md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-gray-90 flex items-center justify-center p-5 md:py-7 md:px-10 text-white hover:bg-gray-80 transition-colors"
+              className="md:flex-none md:w-[240px] md:h-[124px] rounded-[40px] bg-grayscale-gray80 flex items-center justify-center p-5 md:py-7 md:px-10 text-white hover:bg-gray-80 transition-colors"
             >
               <ButtonContent>
                 하고싶은

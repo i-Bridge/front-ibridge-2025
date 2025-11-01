@@ -129,11 +129,10 @@ export default function TalkSession({
   }, [initialQuestion, playStreamSmart, handleChunkDisplay]);
 
   const resetUI = useCallback(() => {
-    console.log(
-      `[TalkSession] 대화 종료. ${`/child/${childId}/home`} 경로로 이동합니다.`,
-    );
-    window.location.href = `/child/${childId}/home`;
-  }, [childId]);
+    const completePath = `/child/${childId}/complete`; // ✅ 새 완료 페이지 경로
+    console.log(`[TalkSession] 대화 종료. ${completePath} 경로로 이동합니다.`);
+    router.push(completePath); // ✅ router.push로 변경
+  }, [childId, router]); // ✅ router를 의존성 배열에 추가
 
   const handleExitConfirm = () => {
     setIsExitModalOpen(false);
@@ -157,10 +156,10 @@ export default function TalkSession({
         await playStreamSmart(ai, handleChunkDisplay);
 
         console.log(
-          '[AI 응답] 마지막 TTS 재생 완료. 3초 후 페이지를 이동합니다.',
+          '[AI 응답] 마지막 TTS 재생 완료. 2초 후 완료 페이지로 이동합니다.',
         );
-        // 2-3. TTS 재생이 모두 끝나면, 3초 후 페이지를 이동시킵니다.
-        setTimeout(resetUI, 3000);
+        // 2-3. TTS 재생이 모두 끝나면, 2초 후 페이지를 이동시킵니다.
+        setTimeout(resetUI, 2000);
       } else {
         // 마지막 응답이 아니라면, 그냥 다음 TTS를 재생합니다.
         await playStreamSmart(ai, handleChunkDisplay);
@@ -227,19 +226,19 @@ export default function TalkSession({
           {/* 1-1. 말풍선 컨테이너
           spec: flow vertical w fill 590 h fixed 180
           */}
-          <div className="flex flex-col justify-center items-center w-full h-[180px]">
+          <div className="flex flex-col justify-start items-center w-full h-[180px]">
             {/* 1-2. 실제 말풍선*/}
             <div
               className="relative flex flex-col justify-center 
                          w-[456px] min-h-[88px] max-w-[480px] 
                          rounded-[28px] pt-[28px] pr-[40px] pb-[28px] pl-[40px] 
-                         gap-[5.05px] bg-gray-80 text-white shadow-lg 
+                         gap-[5.05px] bg-grayscale-gray80 text-white shadow-lg 
                          
                          after:content-[''] after:absolute 
                          after:left-1/2 after:-translate-x-1/2 
                          
                          after:w-5 after:h-5 /*  사각형 */
-                         after:bg-gray-80   /* 말풍선과 동일한 배경색 */
+                         after:bg-grayscale-gray80   /* 말풍선과 동일한 배경색 */
                          after:bottom-[-8px] /* 사각형의 중심을 하단 경계에서 4px 아래로 */
                          after:rotate-45     /* 45도 회전 */
                          after:rounded-[4px] /* 4px 만큼 모서리를 둥글게 */
@@ -248,6 +247,45 @@ export default function TalkSession({
               <p className="font-bold text-xl leading-[1.6] tracking-normal text-center break-words whitespace-pre-wrap">
                 {displayText}
               </p>
+
+              <button
+                onClick={() => void play(question)}
+                className="absolute bottom-0 right-0 translate-y-1/2 
+                         p-4 bg-white rounded-full
+                         transition-all hover:scale-105 active:scale-95"
+                aria-label="다시 듣기"
+                title="다시 듣기"
+              >
+                <svg
+                  width="22"
+                  height="18"
+                  viewBox="0 0 22 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1.3335 2.16992V7.19972H6.36329"
+                    stroke="#FF6B31"
+                    stroke-width="2.66667"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M19.7759 15.5825V10.5527H14.7461"
+                    stroke="#FF6B31"
+                    stroke-width="2.66667"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M17.6719 6.3618C17.2468 5.16033 16.5242 4.08615 15.5716 3.23948C14.619 2.39281 13.4675 1.80125 12.2244 1.52C10.9814 1.23874 9.68735 1.27696 8.46307 1.63108C7.23879 1.98521 6.12416 2.6437 5.2232 3.54511L1.3335 7.20009M19.7761 10.5533L15.8864 14.2083C14.9854 15.1097 13.8708 15.7682 12.6465 16.1223C11.4222 16.4764 10.1282 16.5146 8.88513 16.2334C7.64209 15.9521 6.49054 15.3606 5.53796 14.5139C4.58537 13.6672 3.86278 12.5931 3.43763 11.3916"
+                    stroke="#FF6B31"
+                    stroke-width="2.66667"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
           {/* 1-3. 캐릭터 */}

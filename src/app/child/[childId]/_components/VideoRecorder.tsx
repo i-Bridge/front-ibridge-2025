@@ -43,6 +43,7 @@ export default function VideoRecorder({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
 
   const recognizedTextRef = useRef('');
   const subjectIdRef = useRef(subjectId);
@@ -63,8 +64,71 @@ export default function VideoRecorder({
   /** ===== state ===== */
   const [isRecording, setIsRecording] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
-  const [isWaitingForAI, setIsWaitingForAI] = useState(false); // 기본 false
+  const [isWaitingForAI, setIsWaitingForAI] = useState(false);
   const [isUserSpeaking, setIsUserSpeaking] = useState(false);
+  const [isCameraLoading, setIsCameraLoading] = useState(true);
+
+  /** ===== 카메라 미리 켜기 (On Mount) ===== */
+  const setupCamera = useCallback(async () => {
+    if (mediaStreamRef.current) {
+      setIsCameraLoading(false);
+      return; // 이미 스트림이 있으면 중복 실행 방지
+    }
+
+    setIsCameraLoading(true);
+
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      mediaStreamRef.current = mediaStream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+        await videoRef.current.play().catch(() => {});
+      }
+      setIsCameraLoading(false); // ✅ [추가] 성공 시 로딩 해제
+    } catch (err) {
+      console.error('❌ 카메라/마이크 시작 실패:', err);
+      if (err instanceof Error) {
+        switch (err.name) {
+          case 'NotAllowedError':
+            showError(
+              '카메라와 마이크 권한을 허용해야 대화를 시작할 수 있어요.',
+            );
+            break;
+          case 'NotFoundError':
+            showError(
+              '연결된 카메라나 마이크를 찾을 수 없어요. 기기를 확인해주세요.',
+            );
+            break;
+          case 'NotReadableError':
+            showError(
+              '카메라나 마이크를 사용할 수 없어요. 다른 프로그램이 사용 중인지 확인해주세요.',
+            );
+            break;
+          default:
+            showError(
+              '카메라를 시작하는 중 문제가 발생했습니다. 페이지를 새로고침 해주세요.',
+            );
+            break;
+        }
+      }
+      setIsCameraLoading(false);
+    }
+  }, []); // showError는 stable하므로 의존성 배열 비워둠
+
+  /** ===== 마운트 시 카메라 셋업 ===== */
+  useEffect(() => {
+    setupCamera();
+  }, [setupCamera]);
+
+  /** ===== 언마운트 시 스트림 정리 ===== */
+  useEffect(() => {
+    return () => {
+      mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+    };
+  }, []);
 
   /** ===== subjectId 최신화 ===== */
   useEffect(() => {
@@ -389,6 +453,18 @@ export default function VideoRecorder({
 
   /** ===== 녹화 제어 ===== */
   const startRecording = useCallback(async () => {
+    // 스트림이 없으면 셋업 재시도
+    if (!mediaStreamRef.current) {
+      await setupCamera();
+      if (!mediaStreamRef.current) {
+        console.error(
+          '⚠️ 미디어 스트림을 가져올 수 없어 녹화를 시작할 수 없습니다.',
+        );
+        return;
+      }
+    }
+
+    // 이미 녹화 중이거나 시작 중이면 중단
     if (isRecording || isStarting || mediaRecorderRef.current) return;
 
     setIsStarting(true);
@@ -399,20 +475,12 @@ export default function VideoRecorder({
 
     try {
       console.log('🎬 녹화 시작 요청됨');
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
+      const mediaStream = mediaStreamRef.current; // 미리 켜둔 스트림 사용
 
       recognizedTextRef.current = '';
       answerSentRef.current = false;
       pendingUploadsRef.current = [];
       postedSetRef.current.clear();
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        await videoRef.current.play().catch(() => {});
-      }
 
       const chunks: BlobPart[] = [];
       const preferred = 'video/webm;codecs=vp9,opus';
@@ -436,7 +504,6 @@ export default function VideoRecorder({
 
       recorder.onstop = async () => {
         console.log('🛑 [MediaRecorder] 녹화 종료됨');
-        mediaStream.getTracks().forEach((track) => track.stop());
         mediaRecorderRef.current = null;
 
         // Blob 생성 & 보관
@@ -461,35 +528,21 @@ export default function VideoRecorder({
       setIsRecording(true);
       startSTT();
     } catch (err) {
-      console.error('❌ 녹화 시작 실패:', err);
-      if (err instanceof Error) {
-        switch (err.name) {
-          case 'NotAllowedError':
-            showError(
-              '카메라와 마이크 권한을 허용해야 대화를 시작할 수 있어요.',
-            );
-            break;
-          case 'NotFoundError':
-            showError(
-              '연결된 카메라나 마이크를 찾을 수 없어요. 기기를 확인해주세요.',
-            );
-            break;
-          case 'NotReadableError':
-            showError(
-              '카메라나 마이크를 사용할 수 없어요. 다른 프로그램이 사용 중인지 확인해주세요.',
-            );
-            break;
-          default:
-            showError(
-              '녹화를 시작하는 중 문제가 발생했습니다. 페이지를 새로고침 해주세요.',
-            );
-            break;
-        }
-      }
+      // [수정] 권한 오류는 setupCamera에서 처리되므로, 여기서는 MediaRecorder 오류만 처리
+      console.error('❌ 녹화 시작 실패 (MediaRecorder):', err);
+      showError(
+        '녹화를 시작하는 중 문제가 발생했습니다. 페이지를 새로고침 해주세요.',
+      );
     } finally {
       setIsStarting(false);
     }
-  }, [isRecording, isStarting, processFinalSubmission, startSTT]);
+  }, [
+    isRecording,
+    isStarting,
+    processFinalSubmission,
+    startSTT,
+    setupCamera, // setupCamera 의존성 추가
+  ]);
 
   const stopRecording = useCallback(async () => {
     console.log('🛑 사용자가 종료 버튼 클릭. 녹화 및 음성 인식을 중단합니다.');
@@ -540,43 +593,112 @@ export default function VideoRecorder({
 
   /** ===== UI ===== */
   return (
-    <div
-      className={`relative flex flex-col justify-center items-center 
-                 w-full h-full bg-black rounded-full 
-                 border-4 ${isUserSpeaking ? 'border-orange-400 animate-pulse' : 'border-orange-500'} 
-                 shadow-2xl transition-all duration-300
-               `}
-    >
-      {/* ==============================================
-      1. 비디오 및 캔버스 (기능을 위해 숨겨진 상태로 유지)
-    =============================================== */}
-      <video ref={videoRef} className="hidden" autoPlay muted playsInline />
-      <canvas ref={canvasRef} className="hidden" />
+    // 1. 최상위 래퍼: 'relative'만 적용 (버튼 기준점)
+    <div className="relative w-full h-full">
+      {/* 2. 내부 컨테이너: 비디오/오버레이를 둥글게 자르기 (overflow-hidden)
+       */}
+      <div
+        className={`relative flex flex-col justify-center items-center 
+                    w-full h-full bg-black rounded-full 
+                    border-4 ${isUserSpeaking ? 'border-orange-400 animate-pulse' : 'border-orange-500'} 
+                    shadow-2xl transition-all duration-300
+                    overflow-hidden // 비디오와 오버레이를 잘라냄
+                  `}
+      >
+        {/* ==============================================
+        1. 비디오 및 캔버스 (항상 켜짐)
+        =============================================== */}
+        <video
+          ref={videoRef}
+          className="w-full h-full object-cover" // 'hidden' 클래스 제거
+          autoPlay
+          muted
+          playsInline
+        />
+        <canvas ref={canvasRef} className="hidden" />
 
+        {/* ==============================================
+        2. 오버레이 + 안내 문구 (✅ 수정됨)
+        =============================================== */}
+        <div
+          className={`absolute inset-0 bg-black 
+                      transition-opacity duration-300
+                      flex flex-col justify-center items-center
+                      ${
+                        isCameraLoading
+                          ? 'opacity-100' // 로딩 중: 100% 불투명
+                          : isRecording
+                            ? 'opacity-0' // 녹화 중: 투명
+                            : 'opacity-50' // 대기 중: 70% 불투명
+                      } 
+                    `}
+        >
+          {isCameraLoading ? (
+            // (A) 카메라 로딩 중일 때
+            <div className="text-white text-center px-10">
+              {/* Tailwind 스피너 예시 */}
+              <svg
+                className="animate-spin h-10 w-10 text-white mx-auto"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              <strong className="text-2xl font-bold mt-4 block">
+                카메라 켜는 중...
+              </strong>
+              <p className="text-lg opacity-80 mt-1">권한을 허용해주세요</p>
+            </div>
+          ) : (
+            // (B) 카메라 로딩 완료 후 (기존 로직)
+            <div
+              className={`text-white text-center px-10 transition-opacity duration-300
+                          ${isRecording ? 'opacity-0' : 'opacity-100'}
+                        `}
+            >
+              <strong className="text-3xl font-bold">{feedbackText}</strong>
+            </div>
+          )}
+        </div>
+      </div>{' '}
+      {/* <-- 비디오/오버레이 컨테이너 종료 */}
       {/* ==============================================
-      2. 안내 문구 (기존 feedbackText 상태 재사용)
-    =============================================== */}
-      <div className="text-white text-center px-10">
-        <strong className="text-3xl font-bold transition-opacity duration-300">
-          {feedbackText}
-        </strong>
-      </div>
-
-      {/* ==============================================
-      3. 녹음 버튼 (기존 isRecording 상태로 분기)
-    =============================================== */}
+      3. 녹음 버튼 (✅ 수정됨: disabled, title)
+      =============================================== */}
       <div className="absolute bottom-4 right-4">
         {!isRecording ? (
           <button
             onClick={startRecording}
-            disabled={isCharacterSpeaking || isStarting || isWaitingForAI}
+            // ✅ [수정] 카메라 로딩 중에도 비활성화
+            disabled={
+              isCharacterSpeaking ||
+              isStarting ||
+              isWaitingForAI ||
+              isCameraLoading
+            }
             className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center
-                   shadow-lg transition-all 
-                   hover:scale-105 active:scale-95
-                   disabled:bg-gray-300 disabled:opacity-70 disabled:scale-100"
-            title={disabledReason || '녹음 시작'}
+                       shadow-lg transition-all 
+                       hover:scale-105 active:scale-95
+                       disabled:bg-grayscale-gray30 disabled:opacity-70 disabled:scale-100"
+            // ✅ [수정] 로딩 상태일 때 title 변경
+            title={
+              isCameraLoading ? '카메라 준비 중' : disabledReason || '녹음 시작'
+            }
           >
-            {/* Mic Icon (제공해주신 SVG의 path만 사용) */}
+            {/* Mic Icon (SVG ... ) */}
             <svg
               width="40"
               height="40"
@@ -623,7 +745,7 @@ export default function VideoRecorder({
                      hover:scale-105 active:scale-95"
             title="녹음 종료"
           >
-            {/* Stop Icon (녹음 중일 때) */}
+            {/* Stop Icon (SVG ... ) */}
             <svg
               width="90"
               height="90"
@@ -644,6 +766,6 @@ export default function VideoRecorder({
           </button>
         )}
       </div>
-    </div>
+    </div> // <-- (A) 최상위 래퍼 div 종료
   );
 }

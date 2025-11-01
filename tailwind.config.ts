@@ -20,6 +20,7 @@ export default {
       },
 
       colors: {
+
         // --- 브랜드 색상 ---
         // 사용 예: bg-primary-primary
         primary: {

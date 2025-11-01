@@ -8,41 +8,33 @@ import { useChildStore } from '@/store/useChildStore';
 // --- 아이콘 컴포넌트들 (Named Export) ---
 export const BackIcon = () => (
   <svg
-    width="32"
-    height="32"
-    viewBox="0 0 32 32"
+    width="40"
+    height="40"
+    viewBox="0 0 40 40"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" fill="white" />
-    <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" stroke="#E2E7EB" />
+    <rect width="40" height="40" rx="10" fill="#FFE9E0" />
     <path
-      d="M10.6665 17.334H14.6665V21.334"
-      stroke="#4E5968"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      d="M17.75 26.75H14.75C14.3522 26.75 13.9706 26.592 13.6893 26.3107C13.408 26.0294 13.25 25.6478 13.25 25.25V14.75C13.25 14.3522 13.408 13.9706 13.6893 13.6893C13.9706 13.408 14.3522 13.25 14.75 13.25H17.75"
+      stroke="#FF6B31"
+      stroke-width="1.875"
+      stroke-linecap="round"
+      stroke-linejoin="round"
     />
     <path
-      d="M21.3335 14.666H17.3335V10.666"
-      stroke="#4E5968"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      d="M23 23.75L26.75 20L23 16.25"
+      stroke="#FF6B31"
+      stroke-width="1.875"
+      stroke-linecap="round"
+      stroke-linejoin="round"
     />
     <path
-      d="M17.3335 14.6667L22.0002 10"
-      stroke="#4E5968"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M10 22.0007L14.6667 17.334"
-      stroke="#4E5968"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      d="M26.75 20H17.75"
+      stroke="#FF6B31"
+      stroke-width="1.875"
+      stroke-linecap="round"
+      stroke-linejoin="round"
     />
   </svg>
 );
@@ -100,7 +92,7 @@ export const ChatHistoryIcon = () => (
 export const ChildName = () => {
   const { childName } = useChildStore();
   return (
-    <p className="text-xl font-extrabold leading-[160%] text-gray-800">
+    <p className="text-xl font-extrabold leading-[160%] text-grayscale-gray80">
       {childName}
     </p>
   );
@@ -109,7 +101,7 @@ export const ChildName = () => {
 export const GrapeInfo = () => {
   const { grapeBunches, grapePieces } = useChildStore();
   return (
-    <div className="flex items-center gap-5 text-sm font-semibold text-gray-700">
+    <div className="flex items-center gap-5 text-sm font-semibold text-grayscale-gray70">
       <div className="flex items-center gap-1">
         <Image
           src="/images/grape-bunch-icon.webp"
@@ -159,7 +151,7 @@ export default function Header({
 
   return (
     <header
-      className={`w-full h-16 px-10 flex items-center fixed top-0 z-50 bg-transparent text-gray-800 ${className}`}
+      className={`w-full h-16 px-10 flex items-center fixed top-0 z-50 bg-transparent text-grayscale-gray-80 ${className}`}
     >
       {/* ✅ [수정] 레이아웃을 원래 코드와 거의 동일하게 단순화했습니다. */}
       <div className="w-full max-w-[1260px] mx-auto flex items-center justify-between relative">
