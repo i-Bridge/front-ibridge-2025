@@ -81,7 +81,8 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
 
           <CumulateChart
                       childId={childId}
-                      defaultCumList={cumulativeData}
+                      cumulative={cumulativeData.cumulative}
+                      defaultCumList={cumulativeData.cumList}
                     />
                     <div className="flex-1 flex flex-col gap-6 ml-20">
                             <CategoryChart categories={keywordData.keywords} childId={childId} />
