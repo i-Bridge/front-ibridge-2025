@@ -52,14 +52,14 @@ export default function EmotionModal({
         onClick={(e) => e.stopPropagation()} // 모달 클릭 시 닫히지 않도록
       >
         {/* ✅ [수정] Figma 스타일에 맞게 타이틀 섹션 변경 */}
-        <div className="self-stretch px-10 pt-12 pb-5 bg-white">
+        <div className="px-10 pt-12 pb-5 bg-white">
           <h3 className="text-center text-gray-900 text-3xl font-extrabold leading-10">
             오늘의 감정은?
           </h3>
         </div>
 
         {/* ✅ [수정] Figma 스타일에 맞게 아이콘 그리드 래퍼 변경 (px-10 py-5) */}
-        <div className="self-stretch px-10 py-5 bg-white">
+        <div className="px-10 py-5 bg-white">
           <div className="grid grid-cols-3 gap-5">
             {EMOTIONS.map((emotion) => {
               const EmotionIcon = emotion.icon;
@@ -70,13 +70,14 @@ export default function EmotionModal({
                   onClick={() => handleEmotionClick(emotion.id)}
                   disabled={isSubmitting}
                   className={`
-                    w-28 h-28 rounded-full flex items-center justify-center 
-                    transition-all duration-200 transform
-                    ${isSelected ? 'ring-4 ring-primary-primary' : 'ring-2 ring-transparent'}
-                    ${isSubmitting ? 'opacity-60 cursor-not-allowed' : 'hover:scale-105 active:scale-100'}
-                  `}
+            w-28 h-28 rounded-full flex items-center justify-center
+            transition-opacity duration-200
+            ${isSelected ? 'ring-4 ring-primary-primaryLight' : 'ring-2 ring-transparent'}
+            ${isSubmitting ? 'opacity-60 cursor-not-allowed' : 'hover:opacity-90'}
+            focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary-primaryLight
+          `}
                 >
-                  <EmotionIcon className={`w-full h-full`} />
+                  <EmotionIcon className="w-full h-full" />
                 </button>
               );
             })}

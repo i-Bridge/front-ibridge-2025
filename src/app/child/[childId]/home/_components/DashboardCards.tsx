@@ -32,40 +32,39 @@ export default function DashboardCards({
   };
 
   const grapeIconSrc = getGrapeIconPath(grapePieces);
-  const currentEmotion = EMOTION_BY_ID[emotion] || {
-    labelKo: '특별한',
-    emoji: '🍀',
-    color: 'text-gray-800',
-  };
+  const currentEmotion =
+    typeof emotion === 'number' ? EMOTION_BY_ID[emotion] : undefined;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
       {/* 감정 상태 카드 */}
       <div className="bg-secondary-secondaryMedium h-[284px] rounded-[40px] py-10 px-12 flex flex-col justify-between gap-10">
         <div className="flex items-center gap-5">
-          <div className="w-[100px] h-[100px] bg-white rounded-full flex-shrink-0 flex items-center justify-center text-5xl relative">
-            {emotionDone ? (
-              <span className="text-6xl">{currentEmotion.emoji}</span>
+          <div className="w-[100px] h-[100px] bg-white rounded-full flex-shrink-0 flex items-center justify-center relative overflow-hidden">
+            {emotionDone && currentEmotion ? (
+              <currentEmotion.icon className="w-14 h-14" />
             ) : (
               <Image
                 src="/images/emotion-blank.webp"
                 alt="감정 선택 전"
                 fill
                 style={{ objectFit: 'contain' }}
+                sizes="100px"
               />
             )}
           </div>
+
           <div className="flex flex-col gap-2">
             <p className="text-lg font-bold leading-[140%] text-grayscale-gray90">
               {formattedDate}
             </p>
-            {/* ✅ [수정] emotionDone 상태에 따라 다른 텍스트와 스타일을 렌더링합니다. */}
+
             {emotionDone ? (
               <p className="text-2xl font-bold text-grayscale-gray90">
-                오늘은
+                오늘은{' '}
                 <span className="text-primary-primary">
-                  {currentEmotion.labelKo}
-                </span>
+                  {currentEmotion?.labelKo ?? '특별한'}
+                </span>{' '}
                 날이야
               </p>
             ) : (
@@ -132,7 +131,6 @@ export default function DashboardCards({
           <button
             onClick={onClaimReward}
             disabled={!rewardAvailable || isClaiming}
-            // ✅ [수정] 'disabled:bg-purple-600/5'를 'disabled:opacity-15'로 변경하여 버튼 전체에 투명도를 적용합니다.
             className="flex-1 h-16 rounded-full bg-other-purple flex items-center justify-center py-5 px-10 disabled:opacity-15 disabled:cursor-not-allowed transition-all"
           >
             <div className="h-8 flex items-center justify-center">

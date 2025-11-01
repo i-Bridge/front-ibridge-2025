@@ -716,8 +716,8 @@ export function IconWorried({ className }: IconProps) {
       className={className}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_830_12635)">
-        <g clip-path="url(#clip1_830_12635)">
+      <g clipPath="url(#clip0_830_12635)">
+        <g clipPath="url(#clip1_830_12635)">
           <rect width="120" height="120" rx="60" fill="#E2E7EB" />
           <path
             d="M97.3938 35.0763C99.7243 40.6917 103.186 45.9169 104.978 51.7263C107.996 61.5048 108.855 75.793 108.855 83.0089C108.855 134.748 76.5845 139.946 60.0024 139.946C43.4204 139.946 11.3311 134.25 11.3311 83.0089C11.3311 75.5938 12.1091 62.6224 15.1411 53.2094C17.2307 46.7222 21.3223 40.9569 23.9514 34.669L27.8528 25.3379L38.9647 28.9068C41.9172 29.8551 44.9991 30.3379 48.1 30.3379C51.9225 30.3379 55.8497 30.3379 60.0024 30.3379C64.3202 30.3379 68.5546 30.4574 72.4922 30.5274C75.6254 30.5831 78.7393 30.0839 81.7197 29.1159L93.3523 25.3379L97.3938 35.0763Z"
@@ -726,7 +726,7 @@ export function IconWorried({ className }: IconProps) {
           <path
             d="M97.3938 35.0763C99.7243 40.6917 103.186 45.9169 104.978 51.7263C107.996 61.5048 108.855 75.793 108.855 83.0089C108.855 134.748 76.5845 139.946 60.0024 139.946C43.4204 139.946 11.3311 134.25 11.3311 83.0089C11.3311 75.5938 12.1091 62.6224 15.1411 53.2094C17.2307 46.7222 21.3223 40.9569 23.9514 34.669L27.8528 25.3379L38.9647 28.9068C41.9172 29.8551 44.9991 30.3379 48.1 30.3379C51.9225 30.3379 55.8497 30.3379 60.0024 30.3379C64.3202 30.3379 68.5546 30.4574 72.4922 30.5274C75.6254 30.5831 78.7393 30.0839 81.7197 29.1159L93.3523 25.3379L97.3938 35.0763Z"
             fill="url(#paint0_linear_830_12635)"
-            fill-opacity="0.2"
+            fillOpacity="0.2"
           />
           <ellipse
             cx="60.0008"
@@ -741,7 +741,7 @@ export function IconWorried({ className }: IconProps) {
             rx="33.3992"
             ry="31.6128"
             fill="white"
-            fill-opacity="0.2"
+            fillOpacity="0.2"
           />
           <path
             d="M41.7061 43.2422C44.9988 43.2422 48.1262 43.9495 50.9449 45.2202C56.2476 47.6108 63.7555 47.6117 69.0588 45.2224C71.8772 43.9527 75.004 43.2461 78.2959 43.2461C90.7277 43.2463 100.805 53.324 100.806 65.7559C100.806 78.1879 90.7278 88.2664 78.2959 88.2666C75.0026 88.2666 71.8747 87.5592 69.0555 86.2883C63.7527 83.8976 56.2444 83.8969 50.9411 86.2865C48.1234 87.5561 44.9973 88.2626 41.7061 88.2627C29.2741 88.2627 19.1955 78.1849 19.1953 65.7529C19.1953 53.3208 29.2739 43.2422 41.7061 43.2422Z"
@@ -810,8 +810,8 @@ export function IconWorried({ className }: IconProps) {
           y2="139.946"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="white" />
-          <stop offset="1" stop-color="white" stop-opacity="0" />
+          <stop stopColor="white" />
+          <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_830_12635"
@@ -821,8 +821,8 @@ export function IconWorried({ className }: IconProps) {
           y2="127.758"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="white" stop-opacity="0.6" />
-          <stop offset="1" stop-color="white" stop-opacity="0.3" />
+          <stop stopColor="white" stopOpacity="0.6" />
+          <stop offset="1" stopColor="white" stopOpacity="0.3" />
         </linearGradient>
         <linearGradient
           id="paint2_linear_830_12635"
@@ -832,8 +832,8 @@ export function IconWorried({ className }: IconProps) {
           y2="127.75"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="white" stop-opacity="0.6" />
-          <stop offset="1" stop-color="white" stop-opacity="0.3" />
+          <stop stopColor="white" stopOpacity="0.6" />
+          <stop offset="1" stopColor="white" stopOpacity="0.3" />
         </linearGradient>
         <linearGradient
           id="paint3_linear_830_12635"
@@ -843,8 +843,8 @@ export function IconWorried({ className }: IconProps) {
           y2="86.8908"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="white" stop-opacity="0.4" />
-          <stop offset="1" stop-color="white" stop-opacity="0" />
+          <stop stopColor="white" stopOpacity="0.4" />
+          <stop offset="1" stopColor="white" stopOpacity="0" />
         </linearGradient>
         <linearGradient
           id="paint4_linear_830_12635"
@@ -854,8 +854,8 @@ export function IconWorried({ className }: IconProps) {
           y2="65.0137"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="white" stop-opacity="0" />
-          <stop offset="1" stop-color="white" stop-opacity="0.4" />
+          <stop stopColor="white" stopOpacity="0" />
+          <stop offset="1" stopColor="white" stopOpacity="0.4" />
         </linearGradient>
         <clipPath id="clip0_830_12635">
           <rect width="120" height="120" rx="60" fill="white" />
