@@ -3,8 +3,11 @@ import { cva, VariantProps } from 'class-variance-authority';
 import { twMerge } from 'tailwind-merge'; 
 
 // 1. cva로 스타일 변형(variants) 정의 
-const textVariants = cva(
-  'font-normal', // 기본 스타일 (body04 기준)
+export const textVariants = cva(
+  [
+  'font-tmoney', // 기본 스타일 
+  'text-grayscale-gray90',
+  ],
   {
     variants: {
       variant: {

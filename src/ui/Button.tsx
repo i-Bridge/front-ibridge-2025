@@ -15,7 +15,7 @@ const buttonVariants = cva(
     'rounded-[999px]', // rounded-[999px]
     'transition-colors', // 부드러운 호버 효과
     'disabled:opacity-50 ', // 비활성화 스타일
-
+   'disabled:hover:after:opacity-0',
     'relative', // 1. pseudo-element 포지셔닝의 기준점
     'overflow-hidden', // 2. pseudo-element가 rounded 코너 밖으로 나가지 않도록 함
     'isolate', // 3. (선택) 새로운 스태킹 컨텍스트를 만들어 z-index 문제를 방지
@@ -58,7 +58,7 @@ type ButtonProps<T extends ElementType> = {
   Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className'>;
 /**
  * 디자인 시스템의 버튼 컴포넌트입니다.
- * 내부적으로 'Text' 컴포넌트의 'caption02' 스타일을 기본으로 사용하며,
+ * 내부적으로 'Text' 컴포넌트의 'caption02' 스타일, 'h-16 px-10 py-5' 스타일을 기본으로 사용하며,
  * 'textVariant' prop을 통해 다른 타이포그래피 스타일을 적용할 수 있습니다.
  *
  * @example

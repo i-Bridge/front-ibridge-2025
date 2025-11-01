@@ -3,9 +3,8 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { Fetcher } from '@/lib/fetcher';
-import LoginButton from '@/components/Auth/LoginButton';
-import ModalCard from '@/components/ModalCard';
-
+import LoginSessionCheck from './_components/LoginSessionCheck';
+import { LoginData } from '@/types';
 
 export default function StartPage() {
   const { data: session } = useSession();
@@ -15,9 +14,11 @@ export default function StartPage() {
     const checkAccepted = async () => {
       if (session?.accessToken) {
         try {
-          const result = await Fetcher<{ accepted: boolean }>('/start/login');
-          if (result?.data?.accepted) {
+          const result = await Fetcher<LoginData>('/start/login');
+          if (result?.data?.status==='ACTIVE') {
+            
             router.replace('/profile');
+            console.log("login",result);
           }
         } catch {}
       }
@@ -25,15 +26,9 @@ export default function StartPage() {
 
     checkAccepted();
   }, [session, router]);
-  
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[url('/images/LoginPageBG.png')] bg-cover bg-no-repeat bg-center">
-      
-      <ModalCard>
-        <LoginButton />
-        
-      </ModalCard>
-      
-    </div>
+        <LoginSessionCheck />
+
   );
 }
