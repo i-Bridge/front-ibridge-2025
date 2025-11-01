@@ -42,6 +42,17 @@ function SidebarSkeleton() {
 // 비동기 데이터를 불러오는 실제 사이드바
 async function Sidebar({ childId }: { childId: string }) {
   const session = await getServerSession(authOptions);
+
+  if (!session) {
+    // 세션이 없으면 로그인 페이지로 리다이렉트 (또는 에러 UI)
+    // return redirect('/login'); // 혹은 아래처럼 에러 UI 표시
+    return (
+      <aside className="w-60 fixed top-0 left-0 h-full bg-grayscale-gray5 border-r border-grayscale-gray20 flex flex-col">
+        <div className="p-4">로그인이 필요합니다.</div>
+      </aside>
+    );
+  }
+
   let mypageData: MyPageData | undefined = undefined;
 
   try {
