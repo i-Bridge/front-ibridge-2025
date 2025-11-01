@@ -15,7 +15,7 @@ export default function StartPage() {
       if (session?.accessToken) {
         try {
           const result = await Fetcher<LoginData>('/start/login');
-          if (result?.data?.status===3) {
+          if (result?.data?.status==='ACTIVE') {
             
             router.replace('/profile');
             console.log("login",result);

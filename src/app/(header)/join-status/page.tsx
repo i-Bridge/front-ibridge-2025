@@ -4,7 +4,6 @@ import { LoginData } from '@/types/index';
 import FamilyJoinWaitingForm from '@/app/(header)/join-status/_components/FamilyJoinWaitingForm';
 import FamilyJoinSuccessForm from '@/app/(header)/join-status/_components/FamilyJoinSuccessForm';
 import ModalCard from '@/ui/Modal/ModalCard';
-
 /**
  * 가족 합류 상태 층 (/join-status) - Async Server Component
  * 1. 서버에서 /start/login API를 호출합니다.
@@ -25,7 +24,7 @@ export default async function JoinStatusPage() {
     }
 
     // [핵심] status 3은 서버에서 즉시 처리
-    if (data.status === 2) {
+    if (data.status === 'ACTIVE') {
       console.log('🚀 [SC] status 3 확인: /profile로 즉시 리디렉션');
       redirect('/profile');
     }
@@ -38,7 +37,7 @@ export default async function JoinStatusPage() {
   // --- LoginStatusRenderer 로직 시작 ---
 
   // 에러가 발생했거나, status 3이 아닌데 data가 없는 비정상적 상황
-  if (hasError || !data || (data.status !== 0 && data.status !== 1)) {
+  if (hasError || !data || (data.status !== 'PENDING' && data.status !== 'FIRST_LOGIN')) {
     return (
       <ModalCard
         hasBorder={false}
@@ -54,8 +53,8 @@ export default async function JoinStatusPage() {
   const { status, familyName, parents } = data;
   const parentNames = parents.map((p) => p.name);
 
-  if (status === 0) {
-    // status: 0 (대기)
+  if (status === 'PENDING') {
+    // status: 'PENDING' (대기)
     return (
       <FamilyJoinWaitingForm
         familyName={familyName || '가족'}
@@ -64,7 +63,7 @@ export default async function JoinStatusPage() {
     );
   }
 
-  if (status === 1) {
+  if (status === 'FIRST_LOGIN') {
     // status: 1 (수락 성공)
     return (
       <FamilyJoinSuccessForm

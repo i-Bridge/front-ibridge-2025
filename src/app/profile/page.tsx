@@ -9,17 +9,15 @@ export const dynamic = 'force-dynamic';
 
 export default async function Profile() {
   const res = await Fetcher<LoginData>('/start/login');
+  
   const profileData = res.data;
-
+  console.log('login', profileData);
   // --- 데이터 상태에 따른 분기 (이전과 동일) ---
   if (!profileData) {
     return <div>로딩 중...</div>;
   }
-  if (!profileData.send) {
+  if (profileData.status !== 'ACTIVE') {
     return <div> 가족이 등록되지 않았습니다.</div>;
-  }
-  if (profileData.send && !profileData.accepted) {
-    return <div> 가족 요청이 수락되지 않았습니다. </div>;
   }
   // --- ---
 
