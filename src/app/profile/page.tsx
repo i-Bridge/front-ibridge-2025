@@ -1,6 +1,6 @@
 import { Fetcher } from '@/lib/fetcher';
 import { LoginData } from '@/types';
-import Header from '@/components/Header/Header';
+import Header from '@/components/Headers/Header';
 import ModalCard from '@/ui/Modal/ModalCard';
 import { Text } from '@/ui/Text';
 import ChildProfileLink from '@/app/profile/_components/ChildProfileLink';
@@ -10,7 +10,6 @@ export const dynamic = 'force-dynamic';
 export default async function Profile() {
   const res = await Fetcher<LoginData>('/start/login');
   const profileData = res.data;
-
 
   // --- 데이터 상태에 따른 분기 (이전과 동일) ---
   if (!profileData) {
