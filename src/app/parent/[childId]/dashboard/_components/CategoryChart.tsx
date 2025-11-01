@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import CategorySubjectList from '@/components/Question/CategorySubjectList';
+import CategorySubjectList from '@/app/parent/[childId]/_components/Question/CategorySubjectList';
 
 interface Keyword {
   keyword: string;

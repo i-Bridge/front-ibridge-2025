@@ -1,6 +1,6 @@
-import CumulateChart from '@/app/parent/[childId]/statistics/_components/CumulateChart';
-import CategoryChart from '@/app/parent/[childId]/statistics/_components/CategoryChart';
-import Calendar from '@/app/parent/[childId]/statistics/_components/Calendar';
+import CumulateChart from '@/app/parent/[childId]/dashboard/_components/CumulateChart';
+import CategoryChart from '@/app/parent/[childId]/dashboard/_components/CategoryChart';
+import Calendar from '@/app/parent/[childId]/calendar/_components/Calendar';
 import HomeHeader from '@/components/Header/HomeHeader';
 import { ChildPageParams } from '@/types/page-props';
 import { Fetcher } from '@/lib/fetcher';

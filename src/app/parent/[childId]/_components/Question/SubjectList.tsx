@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSubjectStore } from '@/store/useSubjectStore';
-import SubjectTitleEdit from './SubjectTitleEdit';
+import SubjectTitleEdit from '@/app/parent/[childId]/scheduled/_components/SubjectTitleEdit';
 import AnalysisList from './AnalysisList';
-import Loading from '../../ui/LoadingAnim';
+import Loading from '@/ui/LoadingAnim';
 import DateFormatter from '@/hooks/dateFormatter';
 import { useSubjectsInfinite } from '@/hooks/parentHome/useSubjectsInfinite';
 import { Subject } from '@/types/index';
