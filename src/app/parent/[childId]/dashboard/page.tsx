@@ -3,7 +3,7 @@ import AiComment from './_components/AiComment';
 import { ChildPageParams } from '@/types/page-props';
 import NotFound from '@/components/Exception/not-found';
 import { Subject } from '@/types/index';
-import PageLayout from '@/components/Layout/ParentLayout';
+import PageLayout from '@/app/parent/[childId]/_components/Layout/ParentLayout';
 import { Text } from '@/ui/Text';
 import CumulateChart from '@/app/parent/[childId]/dashboard/_components/CumulateChart';
 import CategoryChart from './_components/CategoryChart';

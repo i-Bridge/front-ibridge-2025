@@ -23,7 +23,6 @@ export function ChildCard({
   showActions = true,
   cardClassName,
 }: ChildListItemProps) {
-  console.log(child);
   const isFemale = child.gender === 'FEMALE';
   const bgColor = isFemale
     ? 'bg-secondary-secondaryMedium'

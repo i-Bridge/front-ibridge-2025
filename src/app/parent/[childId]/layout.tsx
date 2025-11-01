@@ -50,7 +50,7 @@ async function Sidebar({ childId }: { childId: string }) {
   } catch (err) {
     console.error('API 호출 중 오류 발생:', err);
     return (
-      <aside className="w-60 fixed top-0 left-0 h-full bg-Grayscale-gray5 border-r border-Grayscale-gray20 flex flex-col">
+      <aside className="w-60 fixed top-0 left-0 h-full bg-grayscale-gray5 border-r border-grayscale-gray20 flex flex-col">
         <div className="p-4">데이터 로드 실패</div>
       </aside>
     );
@@ -89,13 +89,14 @@ export default function ParentLayout({ children, params }: ParentLayoutProps) {
   const childId = params.childId;
 
   return (
-    <div >
+    <div className=''>
       <Suspense fallback={<SidebarSkeleton />}>
         <Sidebar childId={childId} />
       </Suspense>
 
-      {/* [수정] 메인 콘텐츠의 ml-64를 w-60에 맞게 ml-60으로 변경 */}
-      <main>{children}</main>
+      <main className="ml-60">
+        {children}
+      </main>
     </div>
   );
 }
