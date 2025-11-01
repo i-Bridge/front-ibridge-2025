@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { EmotionId, EMOTIONS } from '@/constants/emotions';
+import { EmotionId, EMOTIONS } from '@/constants/emotions'; // EMOTIONS 상수 사용
 import { Fetcher } from '@/lib/fetcher';
 import {
   addMonths,
@@ -37,7 +37,7 @@ export default function Calendar({
     defaultemotions.map((e) => Number(e)),
   );
 
-  // ✅ useRef로 이전 연/월 추적
+  // useRef로 이전 연/월 추적
   const prevYearMonthRef = useRef({ year: today.getFullYear(), month: today.getMonth() + 1 });
 
   const year = currentDate.getFullYear();
@@ -51,7 +51,7 @@ export default function Calendar({
   const isCurrentMonth = startMonth.getTime() === currentMonthStart.getTime();
   const isSignupMonth = startMonth.getTime() === signupMonthStart.getTime();
 
-  // ✅ 연/월 변경 시 감정 데이터 다시 불러오기
+  // 연/월 변경 시 감정 데이터 다시 불러오기
   useEffect(() => {
     const prev = prevYearMonthRef.current;
     if (year !== prev.year || month !== prev.month) {
@@ -75,7 +75,7 @@ export default function Calendar({
       }
 
       fetchEmotions();
-      prevYearMonthRef.current = { year, month }; // ✅ 이전 값 갱신
+      prevYearMonthRef.current = { year, month }; // 이전 값 갱신
     }
   }, [year, month, childId]);
 
@@ -114,10 +114,11 @@ export default function Calendar({
       </div>
 
       {/* 요일 표시 */}
-      <div className="grid grid-cols-7 text-center font-medium mb-2 gap-5">
+      {/* [!!] 수정: gap-5 -> gap-2, w-8 h-8 -> w-10 h-10 (날짜와 정렬 맞춤) */}
+      <div className="grid grid-cols-7 text-center font-medium mb-2 gap-2">
         {WEEKDAYS.map((d) => (
           <div
-            className="bg-gray-200 rounded-full w-8 h-8 flex items-center justify-center text-sm"
+            className="bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center text-sm"
             key={d}
           >
             {d}
@@ -146,18 +147,22 @@ export default function Calendar({
           } else {
             const emotionID = emotions[dayNumber - 1] ?? null;
             const emotion = EMOTIONS.find((e) => e.id === emotionID);
+
+            // [!!] 수정: emotion.icon을 컴포넌트로 렌더링
             if (emotion) {
+              const EmotionIcon = emotion.icon; // 아이콘 컴포넌트 가져오기
               content = (
                 <>
-                  <span className="text-xl group-hover:opacity-20">
-                    {emotion.emoji}
-                  </span>
-                  <span className="absolute opacity-0 group-hover:opacity-100 text-sm">
+                  {/* 요청하신대로 아이콘 컴포넌트 사용 */}
+                  <EmotionIcon className="w-8 h-8 transition-opacity duration-200 group-hover:opacity-20" />
+                  {/* 호버 시 날짜 표시 (기존 로직 유지) */}
+                  <span className="absolute opacity-0 transition-opacity duration-200 group-hover:opacity-100 text-sm font-semibold">
                     {dayNumber}
                   </span>
                 </>
               );
             }
+            
             const isWeekend = getDay(day) === 0 || getDay(day) === 6;
             dayColorClass = isWeekend ? 'text-red-500' : '';
           }

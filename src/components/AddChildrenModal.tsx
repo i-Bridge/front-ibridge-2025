@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
 import CommonModal from '@/ui/Modal/CommonModalPopup';
-import { ChildWithoutId } from '@/types';
+import { Child } from '@/types';
 
 // 부모 컴포넌트에서 받을 props
 interface AddChildFormProps {
   onClose: () => void;
-  onSubmit: (childData: ChildWithoutId) => void;
-  initialData?: ChildWithoutId; // 💡 optional prop으로 initialData 추가
+  onSubmit: (childData: Child) => void;
+  initialData?: Child; // 💡 optional prop으로 initialData 추가
 }
 
 export default function AddChildForm({
@@ -21,7 +21,7 @@ export default function AddChildForm({
   // --- 상태 및 로직 (원본과 동일) ---
   const [name, setName] = useState(initialData?.name || '');
   const [birthday, setBirthday] = useState<Date | null>(
-    initialData ? new Date(initialData.birthday) : null,
+    initialData ? new Date(initialData.birth) : null,
   );
   const [selectedGender, setSelectedGender] = useState<string | null>(
     initialData?.gender ?? null,
@@ -37,7 +37,7 @@ export default function AddChildForm({
     const birthString = birthday!.toISOString().split('T')[0];
     onSubmit({
       name: name.trim(),
-      birthday: birthString,
+      birth: birthString,
       gender: selectedGender!,
     });
   };

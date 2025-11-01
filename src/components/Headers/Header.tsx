@@ -66,10 +66,11 @@ export default function Header({ firstchildId }: HeaderProps) {
           )}
 
           {/* 2. 로그아웃 버튼 */}
-          <LogoutButton className="h-10 px-4 py-2.5 bg-gray-50">
-            <Text variant="caption04" className="text-gray-700">
-              로그아웃
-            </Text>
+          <LogoutButton
+            className="h-10 px-4 py-2.5 bg-gray-50"
+            textVariant="caption04" // [!!] textVariant prop을 직접 사용
+          >
+            로그아웃 {/* [!!] children으로는 순수 텍스트만 전달 */}
           </LogoutButton>
         </div>
       </div>
