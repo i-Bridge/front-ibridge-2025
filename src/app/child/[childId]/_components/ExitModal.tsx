@@ -3,8 +3,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-// ✅ AvatarAiIcon의 실제 경로로 수정해 주세요.
-import { AvatarIcon } from './AvatarIcons';
+import AvatarIcon from './AvatarIcons';
 
 type Props = {
   isOpen: boolean;

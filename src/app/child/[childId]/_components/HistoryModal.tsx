@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { AvatarAiIcon } from './AvatarIcons';
+import AvatarIcon from './AvatarIcons';
 
 type QuestionItem = {
   ai: string;
@@ -39,7 +39,7 @@ export default function HistoryModal({ isOpen, onClose, history }: Props) {
             <div key={index} className="flex flex-col gap-4">
               {/* AI 대화 (왼쪽) */}
               <div className="flex items-start gap-3">
-                <AvatarAiIcon className="w-16 h-16 rounded-full flex-shrink-0 text-primary" />
+                <AvatarIcon className="w-16 h-16 rounded-full flex-shrink-0 text-primary" />
                 <div className="bg-primary-primary p-4 rounded-[20px]">
                   <p className="text-white">{item.ai}</p>
                 </div>
