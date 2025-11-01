@@ -15,21 +15,29 @@ export default function CreateFamilyForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const { setStep, familyName, setFamilyName } = useSetupStore();
-
+  
+  const { setStep, familyName: storedFamilyName , setFamilyName,resetChildrenInfo, } = useSetupStore();
+  const [inputFamilyName, setInputFamilyName] = useState(storedFamilyName || '')
   // 3. '생성하기' 버튼 클릭 핸들러
   const handleFamilyExist = async () => {
-    if (!familyName) {
+    if (!inputFamilyName) {
       setError('가족 이름을 입력해 주세요.');
       return;
     }
     setError(null);
     setLoading(true);
 
+    if (inputFamilyName === storedFamilyName) {
+      console.log('기존 이름과 동일. API 호출 건너뛰고 2단계로 이동.');
+      setStep(2);
+      setLoading(false);
+      return; // 여기서 함수 종료
+    }
+
     try {
       const res = await Fetcher<DupFamilyNameData>('/start/signup/dup', {
         method: 'POST',
-        data: { familyName },
+        data: { familyName: inputFamilyName },
       });
 
       if (res.data?.exist) {
@@ -37,7 +45,8 @@ export default function CreateFamilyForm() {
         setIsModalOpen(true);
       } else {
         // 중복 없음: Zustand에 저장하고 다음 단계로
-        setFamilyName(familyName);
+        setFamilyName(inputFamilyName);
+        resetChildrenInfo();
         setStep(2);
       }
     } catch (err) {
@@ -51,7 +60,7 @@ export default function CreateFamilyForm() {
   // 6. 팝업 닫기 핸들러
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setFamilyName(''); // 입력창 비우기
+    setInputFamilyName('');
   };
 
   return (
@@ -78,9 +87,9 @@ export default function CreateFamilyForm() {
           <input
             type="text"
             placeholder="ex) 도란도란 우리집"
-            value={familyName}
+             value={inputFamilyName}
             onChange={(e) => {
-              setFamilyName(e.target.value);
+              setInputFamilyName(e.target.value); // 👈 로컬 state 업데이트
               if (error) setError(null); // 입력 시 오류 메시지 초기화
             }}
             onKeyDown={(e) => {

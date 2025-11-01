@@ -23,7 +23,9 @@ export function ChildCard({
   showActions = true,
   cardClassName,
 }: ChildListItemProps) {
-  const isFemale = child.gender === 'FEMALE';
+  console.log(child);
+
+  const isFemale = child.gender === 'Female';
   const bgColor = isFemale
     ? 'bg-secondary-secondaryMedium'
     : 'bg-other-mint-light';
@@ -56,7 +58,7 @@ export function ChildCard({
   return (
     <CustomCard
       className={twMerge(
-        'self-stretch flex justify-between items-start',
+        'self-stretch flex flex-row justify-between items-start',
         bgColor,
         cardClassName, // 💡 외부에서 받은 호버/커스텀 클래스
       )}

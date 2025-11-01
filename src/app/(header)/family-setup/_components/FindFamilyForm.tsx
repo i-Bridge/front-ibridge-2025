@@ -166,16 +166,18 @@ export default function FindFamilyForm() {
 
       {isRequestSentModalOpen && (
         <CommonModalPopup
-          title="가족이름"
+          title={`{${familyName}}`}
           titleLine2="집에 참여할까요?"
           subtitle="해당 집 관리자에게 승인 요청이 전송됩니다."
           onClose={handleCloseRequestSentModal}
+          footerClassName=''
           footerContent={
-            <div>
-              <Button variant="primary" onClick={handleCloseRequestSentModal}>
+            
+            <div className='w-full flex gap-3 self-stretch'>
+              <Button variant="grayscale" textVariant="caption02" onClick={handleCloseRequestSentModal}>
                 취소
               </Button>
-              <Button variant="primary" onClick={handleRequestSentModal}>
+              <Button variant="primary" textVariant="caption02" className='whitespace-nowrap' onClick={handleRequestSentModal}>
                 승인 요청 보내기
               </Button>
             </div>
