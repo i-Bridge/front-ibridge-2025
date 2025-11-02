@@ -9,6 +9,8 @@ import { Fetcher } from '@/lib/fetcher';
 import { useSetupStore } from '@/store/useSetupStore';
 import CommonModalPopup from '@/ui/Modal/CommonModalPopup';
 import { LeftArrow } from '@/ui/icon/icon';
+import { showSuccess, showError } from '@/lib/toast';
+import * as Sentry from "@sentry/nextjs";
 
 interface DupFamilyNameData {
   exist: boolean;
@@ -18,17 +20,15 @@ export default function FindFamilyForm() {
   const { setStep, familyName, setFamilyName } = useSetupStore();
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isNotExistModalOpen, setIsNotExistModalOpen] = useState(false);
   const [isRequestSentModalOpen, setIsRequestSentModalOpen] = useState(false);
 
   // 3. '참여하기' 버튼 클릭 핸들러
   const handleFamilyExist = async () => {
     if (!familyName) {
-      setError('가족 이름을 입력해 주세요.');
+      showError('가족 이름을 입력해 주세요.');
       return;
     }
-    setError(null);
     setLoading(true);
 
     try {
@@ -46,8 +46,9 @@ export default function FindFamilyForm() {
         setIsNotExistModalOpen(true);
       }
     } catch (err) {
+       Sentry.captureException(err); 
       console.error('집 존재 여부 확인 중 오류 발생:', err);
-      setError('집 존재 여부 확인 중 오류가 발생했습니다.');
+      showError('집 존재 여부 확인 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -55,9 +56,8 @@ export default function FindFamilyForm() {
 
   // 2. 가족 이름 제출 및 가입 요청
   const handleRequestSentModal = async () => {
-    setError(null);
     if (!familyName) {
-      setError('가족 이름을 입력해주세요!');
+      showError('가족 이름을 입력해주세요!');
       return;
     }
     if (loading) return;
@@ -78,11 +78,13 @@ export default function FindFamilyForm() {
         return;
       } else {
         //요청 성공
+        showSuccess('집 합류 요청이 성공적으로 보내졌어요!')
         router.replace('/join-status');
       }
     } catch (err) {
+       Sentry.captureException(err); 
       console.error('❌ 가족 이름 등록 실패:', err);
-      setError('가족 이름 등록 중 오류가 발생했습니다.');
+      showError('가족 이름 등록 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -123,20 +125,12 @@ export default function FindFamilyForm() {
           value={familyName}
           onChange={(e) => {
             setFamilyName(e.target.value);
-            setError(null);
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleFamilyExist();
           }}
           className="self-stretch h-14 px-5 rounded-xl outline outline-1 outline-offset-[-1px] outline-grayscale-gray20 inline-flex justify-start items-center gap-2.5"
         />
-
-        {/* 에러 메시지 표시 */}
-        {error && (
-          <Text as="div" variant="body03" className="text-red-500">
-            {error}
-          </Text>
-        )}
 
         <Button
           onClick={handleFamilyExist}

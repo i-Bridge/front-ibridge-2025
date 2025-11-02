@@ -6,6 +6,9 @@ import CommonModalPopup from '@/ui/Modal/CommonModalPopup';
 import { useState } from 'react';
 import { useSetupStore } from '@/store/useSetupStore';
 import { LeftArrow } from '@/ui/icon/icon';
+import { showError } from '@/lib/toast';
+import * as Sentry from "@sentry/nextjs";
+
 
 interface DupFamilyNameData {
   exist: boolean;
@@ -13,7 +16,6 @@ interface DupFamilyNameData {
 
 export default function CreateFamilyForm() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   
   const { setStep, familyName: storedFamilyName , setFamilyName,resetChildrenInfo, } = useSetupStore();
@@ -21,10 +23,9 @@ export default function CreateFamilyForm() {
   // 3. '생성하기' 버튼 클릭 핸들러
   const handleFamilyExist = async () => {
     if (!inputFamilyName) {
-      setError('가족 이름을 입력해 주세요.');
+      showError('집 이름을 입력해 주세요.');
       return;
     }
-    setError(null);
     setLoading(true);
 
     if (inputFamilyName === storedFamilyName) {
@@ -50,8 +51,9 @@ export default function CreateFamilyForm() {
         setStep(2);
       }
     } catch (err) {
+      Sentry.captureException(err);
       console.error('중복 확인 중 오류 발생:', err);
-      setError('중복 확인 중 오류가 발생했습니다.');
+      showError('중복 확인 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -90,18 +92,14 @@ export default function CreateFamilyForm() {
              value={inputFamilyName}
             onChange={(e) => {
               setInputFamilyName(e.target.value); // 👈 로컬 state 업데이트
-              if (error) setError(null); // 입력 시 오류 메시지 초기화
+             
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleFamilyExist();
             }}
             className="self-stretch h-14 px-5 rounded-xl outline outline-1 outline-offset-[-1px] outline-grayscale-gray20 inline-flex justify-start items-center gap-2.5"
           />
-          {error && (
-            <Text as="div" variant="body03" className="text-red-500 px-2">
-              {error}
-            </Text>
-          )}
+         
         </div>
 
         <Button
