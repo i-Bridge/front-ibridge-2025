@@ -3,6 +3,9 @@ import PrivacyConsentForm from './_components/PrivacyConsentForm';
 import { Text } from '@/ui/Text';
 import ModalCard from '@/ui/Modal/ModalCard'; // ModalCard가 UI 컨테이너 역할을 하므로 유지
 
+
+export const dynamic = 'force-dynamic';
+
 // API 응답 데이터 (payload) 타입
 interface ConsentContent {
   consentToCollection: string; // 개인정보 수집 및 이용 동의(필수) 약관
