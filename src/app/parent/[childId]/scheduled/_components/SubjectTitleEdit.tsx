@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 import { useScheduledSubjects } from '@/hooks/parentHome/useScheduledSubjects';
-import { showWarning, showError } from '@/lib/toast';
+import {  showError } from '@/lib/toast';
 
 interface Props {
   subjectId: number;
@@ -66,7 +66,7 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
 
   const handleReroll = async () => {
     if (refreshCount >= MAX_REFRESH_COUNT) {
-      showWarning('이 주제는 더 이상 새로고침할 수 없습니다!');
+     // showWarning('이 주제는 더 이상 새로고침할 수 없습니다!');
       return;
     }
 
