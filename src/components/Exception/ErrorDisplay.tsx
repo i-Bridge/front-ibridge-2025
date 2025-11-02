@@ -4,6 +4,7 @@
 
 import type { ReactNode } from 'react';
 import { ErrorPageIcon } from '@/ui/icon/icon';
+import { Text } from '@/ui/Text';
 
 interface ErrorDisplayProps {
   /**
@@ -38,12 +39,12 @@ export default function ErrorDisplay({
 
         {/* 2. 동적 텍스트 */}
         <div className="flex flex-col justify-start items-center gap-2">
-          <div className="justify-start text-Primary-primary text-4xl font-extrabold font-['Tmoney_RoundWind'] leading-[60px]">
+          <Text variant='title01'className="justify-center text-primary-primary">
             {title}
-          </div>
-          <div className="justify-start text-Grayscale-gray60 text-base font-normal font-['Tmoney_RoundWind'] leading-6">
+          </Text>
+          <Text variant='body04' className="justify-center text-grayscale-gray60 ">
             {message}
-          </div>
+          </Text>
         </div>
       </div>
 

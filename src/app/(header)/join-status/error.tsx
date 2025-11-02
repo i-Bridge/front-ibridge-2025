@@ -34,7 +34,7 @@ export default function Error({
           <Button variant="grayscale" onClick={() => reset()}>
             다시 시도하기
           </Button>
-          <Button variant="primary" onClick={() => router.push('/')}>
+          <Button variant="primary" className='whitespace-nowrap' onClick={() => router.push('/')}>
             메인으로 이동하기
           </Button>
         </>
