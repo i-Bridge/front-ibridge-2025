@@ -14,7 +14,7 @@ import { Parent } from "./parent.types";
  * }
  *
  */
-export interface SigninData {
+export interface SigninResponse {
   first: boolean;
   requiredPIIConsent: boolean;
   send: boolean;
@@ -44,7 +44,7 @@ export type LoginStatus = 'PENDING' | 'FIRST_LOGIN' | 'ACTIVE';
  * children: []
  * }
  */
-export interface LoginData {
+export interface LoginResponse {
   familyName: string;
   /**
    * (JSDoc 태그로도 타입 정보를 명시)

@@ -3,176 +3,164 @@
 
 import { toast } from 'sonner';
 import type { ReactNode } from 'react';
+import { Text } from '@/ui/Text';
 
-const successIcon = (
+// --- 1. 아이콘 정의 ---
+
+// 1-1. 성공 아이콘 
+const SuccessIcon = (
   <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
+    width="24"
+    height="24"
     viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className="size-6"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+      d="M17 3.33989C18.5083 4.21075 19.7629 5.46042 20.6398 6.96519C21.5167 8.46997 21.9854 10.1777 21.9994 11.9192C22.0135 13.6608 21.5725 15.3758 20.72 16.8946C19.8676 18.4133 18.6332 19.6831 17.1392 20.5782C15.6452 21.4733 13.9434 21.9627 12.2021 21.998C10.4608 22.0332 8.74055 21.6131 7.21155 20.7791C5.68256 19.9452 4.39787 18.7264 3.48467 17.2434C2.57146 15.7604 2.06141 14.0646 2.005 12.3239L2 11.9999L2.005 11.6759C2.061 9.94888 2.56355 8.26585 3.46364 6.79089C4.36373 5.31592 5.63065 4.09934 7.14089 3.25977C8.65113 2.42021 10.3531 1.98629 12.081 2.00033C13.8089 2.01437 15.5036 2.47589 17 3.33989ZM15.707 9.29289C15.5348 9.12072 15.3057 9.01729 15.0627 9.002C14.8197 8.98672 14.5794 9.06064 14.387 9.20989L14.293 9.29289L11 12.5849L9.707 11.2929L9.613 11.2099C9.42058 11.0607 9.18037 10.9869 8.9374 11.0022C8.69444 11.0176 8.46541 11.121 8.29326 11.2932C8.12112 11.4653 8.01768 11.6943 8.00235 11.9373C7.98702 12.1803 8.06086 12.4205 8.21 12.6129L8.293 12.7069L10.293 14.7069L10.387 14.7899C10.5624 14.926 10.778 14.9998 11 14.9998C11.222 14.9998 11.4376 14.926 11.613 14.7899L11.707 14.7069L15.707 10.7069L15.79 10.6129C15.9393 10.4205 16.0132 10.1802 15.9979 9.93721C15.9826 9.69419 15.8792 9.46509 15.707 9.29289Z"
+      fill="#00B29A"
     />
   </svg>
 );
 
-const errorIcon = (
+// 1-2. 에러 아이콘 
+const ErrorIcon = (
   <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
+    width="24"
+    height="24"
     viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className="size-6"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+      d="M17 3.33989C18.5083 4.21075 19.7629 5.46042 20.6398 6.96519C21.5167 8.46997 21.9854 10.1777 21.9994 11.9192C22.0135 13.6608 21.5725 15.3758 20.72 16.8946C19.8676 18.4133 18.6332 19.6831 17.1392 20.5782C15.6452 21.4733 13.9434 21.9627 12.2021 21.998C10.4608 22.0332 8.74055 21.6131 7.21155 20.7791C5.68256 19.9452 4.39787 18.7264 3.48467 17.2434C2.57146 15.7604 2.06141 14.0646 2.005 12.3239L2 11.9999L2.005 11.6759C2.061 9.94888 2.56355 8.26585 3.46364 6.79089C4.36373 5.31592 5.63065 4.09934 7.14089 3.25977C8.65113 2.42021 10.3531 1.98629 12.081 2.00033C13.8089 2.01437 15.5036 2.47589 17 3.33989ZM10.511 9.13989C10.3015 9.01517 10.0536 8.9713 9.81401 9.01652C9.57441 9.06175 9.35959 9.19296 9.20995 9.38547C9.06031 9.57799 8.98617 9.81854 9.00146 10.0619C9.01675 10.3052 9.12043 10.5346 9.293 10.7069L10.585 11.9999L9.293 13.2929L9.21 13.3869C9.05459 13.5879 8.98151 13.8405 9.0056 14.0934C9.02969 14.3463 9.14916 14.5806 9.33972 14.7486C9.53029 14.9167 9.77767 15.0059 10.0316 14.9981C10.2856 14.9904 10.527 14.8862 10.707 14.7069L12 13.4149L13.293 14.7069L13.387 14.7899C13.588 14.9453 13.8406 15.0184 14.0935 14.9943C14.3464 14.9702 14.5807 14.8507 14.7488 14.6602C14.9168 14.4696 15.006 14.2222 14.9982 13.9683C14.9905 13.7143 14.8863 13.4728 14.707 13.2929L13.415 11.9999L14.707 10.7069L14.79 10.6129C14.9454 10.4119 15.0185 10.1593 14.9944 9.90637C14.9703 9.65344 14.8508 9.41917 14.6603 9.25114C14.4697 9.08311 14.2223 8.99391 13.9684 9.00166C13.7144 9.00942 13.473 9.11354 13.293 9.29289L12 10.5849L10.707 9.29289L10.613 9.20989L10.511 9.13989Z"
+      fill="#FF5E5E"
     />
   </svg>
 );
 
-const infoIcon = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className="size-6"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-    />
-  </svg>
-);
+// --- 2. 공통 토스트 UI 컴포넌트 ---
+// (Figma 디자인 기반. 내부 전용)
 
-const warningIcon = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-    className="size-6"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
-    />
-  </svg>
-);
+interface FigmaToastProps {
+  icon: ReactNode;
+  message: ReactNode; // [수정] title/message 통합
+}
 
-type ToastType = 'success' | 'error' | 'warning' | 'info';
+/**
+ * Figma 디자인을 기반으로 하는 공통 토스트 UI
+ */
+function FigmaToast({ icon, message }: FigmaToastProps) {
+  return (
+    // Figma 디자인: 그림자, 흰색 배경, 둥근 모서리
+    <div className="shadow-[0px_0px_20px_0px_rgba(0,0,0,0.12)] inline-flex">
+      {/* Figma 디자인: 패딩, 갭, 정렬 */}
+      <div className="px-6 py-3 bg-grayscale-white rounded-2xl inline-flex justify-start items-center gap-4 w-auto min-w-[300px] max-w-[400px]">
+        
+        {/* 1. 아이콘 (전달받은 아이콘 사용) */}
+        {icon}
 
-const toastIcons: Record<ToastType, ReactNode> = {
-  success: successIcon,
-  error: errorIcon,
-  warning: warningIcon,
-  info: infoIcon,
-};
-
-const toastColors: Record<
-  ToastType,
-  { text: string; border: string; hex: string }
-> = {
-  success: {
-    text: 'text-green-700',
-    border: 'border-green-200',
-
-    hex: '#f0fdf4',
-  },
-  error: {
-    text: 'text-red-700',
-    border: 'border-red-200',
-
-    hex: '#fef2f2',
-  },
-  warning: {
-    text: 'text-yellow-800',
-    border: 'border-yellow-300',
-
-    hex: '#fef9c3',
-  },
-  info: {
-    text: 'text-blue-800',
-    border: 'border-blue-200',
-
-    hex: '#eff6ff',
-  },
-};
-
-export const showSuccess = (message: string | ReactNode) =>
-  createToast('success', message);
-
-export const showError = (message: string | ReactNode) =>
-  createToast('error', message);
-
-export const showWarning = (message: string | ReactNode) =>
-  createToast('warning', message);
-
-export const showInfo = (message: string | ReactNode) =>
-  createToast('info', message);
-
-const createToast = (type: ToastType, message: string | ReactNode) => {
-  const { text, border, hex } = toastColors[type];
-  const icon = toastIcons[type];
-
-  toast.custom((t) => (
-    <div
-      style={{ backgroundColor: hex }}
-      className={`w-72 shadow-md rounded-lg px-4 py-3 text-sm font-medium flex items-start justify-between gap-3 ${text} ${border} border`}
-    >
-      <div className="flex items-start gap-2">
-        <span className="mt-[2px]">{icon}</span>
-        <div className="text-sm">{message}</div>
+        {/* 2. 통합 메시지 (Figma 디자인의 Title 폰트 스타일 적용) */}
+        <Text variant="body02" className="flex-1 text-grayscale-gray90 break-keep">
+          {message}
+        </Text>
       </div>
-      <button
-        onClick={() => toast.dismiss(t)}
-        className="text-gray-400 hover:text-gray-600 mt-1"
-      >
-        ✕
-      </button>
     </div>
-  ));
+  );
+}
+
+// --- 3. 외부 노출 함수 ---
+
+/**
+ * [성공] 토스트를 띄웁니다.
+ *
+ * @param message 표시할 단일 메시지
+ *
+ * @example
+ * // 컴포넌트 내부에서
+ * import { showSuccess } from '@/lib/toast';
+ *
+ * const handleSignup = () => {
+ * // ... (회원가입 로직) ...
+ * showSuccess('회원가입을 환영합니다!');
+ * }
+ */
+export const showSuccess = (message: string | ReactNode) => {
+  toast.custom(
+    (t) => (
+      <FigmaToast
+        key={t}
+        icon={SuccessIcon}
+        message={message} // [수정] message만 전달
+      />
+    ),
+    { duration: 3000 }, // 3초 (조정 가능)
+  );
 };
 
-export const showConfirmToast = ({
+/**
+ * [오류] 토스트를 띄웁니다.
+ *
+ * @param message 표시할 단일 메시지
+ *
+ * @example
+ * // 컴포넌트 내부에서 (try...catch)
+ * import { showError } from '@/lib/toast';
+ *
+ * const handleSubmit = async () => {
+ * try {
+ * await api.submitForm();
+ * } catch (error) {
+ * showError('오류가 발생했습니다. 다시 시도해주세요.');
+ * }
+ * }
+ */
+export const showError = (message: string | ReactNode) => {
+  toast.custom(
+    (t) => (
+      <FigmaToast
+        key={t}
+        icon={ErrorIcon}
+        message={message} // [수정] message만 전달
+      />
+    ),
+    { duration: 5000 }, // 오류는 5초 (조정 가능)
+  );
+};
+
+/**
+ * [커스텀] 아이콘과 메시지를 직접 지정하는 토스트를 띄웁니다.
+ *
+ * @param icon React 아이콘 노드 (예: <MyIcon />)
+ * @param message 표시할 단일 메시지
+ *
+ * @example
+ * // 컴포넌트 내부에서
+ * import { showCustom } from '@/lib/toast';
+ * import { Info } from 'icon.tsx'; 
+ *
+ * const handleInfo = () => {
+ * showCustom({
+ * icon: <Info/>,
+ * message: '이메일 인증이 필요합니다.'
+ * });
+ * }
+ */
+export const showCustom = ({
+  icon,
   message,
-  onConfirm,
 }: {
-  message: string | ReactNode;
-  onConfirm: () => void;
+  icon: ReactNode;
+  message: ReactNode;
 }) => {
-  toast.custom((t) => (
-    <div className="w-72 bg-white border border-gray-300 rounded-lg px-4 py-3 shadow-md text-sm font-medium flex flex-col items-center gap-4">
-      <div className="text-gray-800 text-center">{message}</div>
-      <div className="flex justify-center gap-3">
-        <button
-          onClick={() => {
-            toast.dismiss(t);
-            onConfirm();
-          }}
-          className="px-4 py-1.5 bg-orange-400 text-white rounded-md hover:bg-orange-500 text-sm"
-        >
-          예
-        </button>
-        <button
-          onClick={() => toast.dismiss(t)}
-          className="px-4 py-1.5 bg-gray-100 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-200 text-sm"
-        >
-          아니오
-        </button>
-      </div>
-    </div>
-  ));
+  toast.custom(
+    (t) => (
+      <FigmaToast 
+        key={t} 
+        icon={icon} 
+        message={message} // [수정] message만 전달
+      />
+    ),
+    { duration: 3000 }, // 3초 (조정 가능)
+  );
 };

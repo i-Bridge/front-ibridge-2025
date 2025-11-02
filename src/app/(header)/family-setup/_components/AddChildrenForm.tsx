@@ -11,6 +11,8 @@ import { Fetcher } from '@/lib/fetcher';
 import { ChildCard } from '@/components/ChildCard';
 import CarouselStepper from '@/components/CarouselStepper';
 import { Child } from '@/types';
+import { showSuccess, showError } from '@/lib/toast';
+import * as Sentry from "@sentry/nextjs";
 export default function AddChildrenForm() {
   const router = useRouter();
   const {
@@ -101,10 +103,12 @@ export default function AddChildrenForm() {
           children: childrenInfo,
         },
       });
+      showSuccess('집이 만들어졌어요!');
       router.push('/profile');
     } catch (err: unknown) {
+      Sentry.captureException(err);
       console.error('자녀 정보 저장 실패:', err);
-      setError('자녀 정보 저장 중 문제가 발생했습니다.');
+      showError('자녀 정보 저장 중 문제가 발생했습니다. 다시 시도해주세요.');
       setIsLoading(false);
     }
   };

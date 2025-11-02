@@ -1,9 +1,13 @@
 import { redirect } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
-import { LoginData } from '@/types/index';
+import { LoginResponse } from '@/types/index';
 import FamilyJoinWaitingForm from '@/app/(header)/join-status/_components/FamilyJoinWaitingForm';
 import FamilyJoinSuccessForm from '@/app/(header)/join-status/_components/FamilyJoinSuccessForm';
-import ModalCard from '@/ui/Modal/ModalCard';
+import * as Sentry from "@sentry/nextjs";
+
+//서버 컴포넌트에서 클라이언트 함수(toast)를 호출할 수 없습니다.
+
+
 /**
  * 가족 합류 상태 층 (/join-status) - Async Server Component
  * 1. 서버에서 /start/login API를 호출합니다.
@@ -11,77 +15,62 @@ import ModalCard from '@/ui/Modal/ModalCard';
  * 3. status 1 또는 2일 경우 이 페이지에서 직접 렌더링합니다.
  */
 export default async function JoinStatusPage() {
-  let data: LoginData | null = null;
-  let hasError = false;
+  let loginData: LoginResponse | null = null;
 
+  // --- 1. 데이터 페칭 ---
   try {
-    const res = await Fetcher<LoginData>('/start/login');
-    data = res?.data || null;
-    console.log("login", data);
+    const res = await Fetcher<LoginResponse>('/start/login');
+    loginData = res?.data || null;
+    console.log("login", loginData);
 
-    if (!data) {
-      throw new Error('/start/login에서 유효한 데이터를 받지 못했습니다.');
-    }
+  } catch (err) {
+    Sentry.captureException(err); 
+    console.error('❌ [SC] 가족 상태 확인 실패:', err);
 
-    // [핵심] status 3은 서버에서 즉시 처리
-    if (data.status === 'ACTIVE') {
-      console.log('🚀 [SC] status 3 확인: /profile로 즉시 리디렉션');
-      redirect('/profile');
-    }
-
-  } catch (e) {
-    console.error('❌ [SC] 가족 상태 확인 실패:', e);
-    hasError = true;
+    throw new Error(`[JoinStatusPage] API Fetch Error: ${(err as Error).message}`);
   }
 
-  // --- LoginStatusRenderer 로직 시작 ---
-
-  // 에러가 발생했거나, status 3이 아닌데 data가 없는 비정상적 상황
-  if (hasError || !data || (data.status !== 'PENDING' && data.status !== 'FIRST_LOGIN')) {
-    return (
-      <ModalCard
-        hasBorder={false}
-        className="h-[400px] items-center justify-center"
-      >
-        가족 정보를 불러오는 데 실패했습니다.
-        <br />
-        다시 시도해 주세요.
-      </ModalCard>
-    );
+  // --- 2. 데이터 유효성 검사 ---
+  // loginData가 null이면(API 응답이 비었거나 실패), 
+  // TypeError를 내는 대신 error.tsx를 트리거합니다.
+  if (!loginData) {
+    const err = new Error('[JoinStatusPage] No loginData received from API.');
+    Sentry.captureException(err);
+    throw err;
   }
 
-  const { status, familyName, parents } = data;
-  const parentNames = parents.map((p) => p.name);
+  // --- 3. 정상 로직 수행 ---
+  // 이 시점에는 loginData가 null이 아님이 보장됩니다.
+  const { status, familyName, parents } = loginData;
 
+  // 3-1. status: 'ACTIVE' ( 프로필 )
+  if (status === 'ACTIVE') {
+    console.log('🚀 [SC] status 3 확인: /profile로 즉시 리디렉션');
+    redirect('/profile'); 
+  }
+
+  // 3-2. status: 'PENDING' (대기)
   if (status === 'PENDING') {
-    // status: 'PENDING' (대기)
     return (
       <FamilyJoinWaitingForm
         familyName={familyName || '가족'}
-        parentNames={parentNames}
+        parents={parents}
       />
     );
   }
 
+  // 3-3. status: 'FIRST_LOGIN' (수락 성공)
   if (status === 'FIRST_LOGIN') {
-    // status: 1 (수락 성공)
     return (
       <FamilyJoinSuccessForm
         familyName={familyName || '가족'}
-        parentNames={parentNames}
+        parents={parents}
       />
     );
   }
 
-  // --- LoginStatusRenderer 로직 종료 ---
-
-  // (이 코드는 실행되지 않지만, TypeScript를 위한 안전 장치)
-  return (
-    <ModalCard
-      hasBorder={false}
-      className="h-[400px] items-center justify-center"
-    >
-      알 수 없는 상태입니다.
-    </ModalCard>
-  );
+  // 3-4. 예외 케이스 (e.g. PENDING, FIRST_LOGIN, ACTIVE가 아닌 다른 상태값)
+  const err = new Error(`[JoinStatusPage] Unknown status received: ${status}`);
+  Sentry.captureException(err);
+  throw err; 
 }

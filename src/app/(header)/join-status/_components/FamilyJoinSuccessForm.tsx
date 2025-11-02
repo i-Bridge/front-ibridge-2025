@@ -6,29 +6,30 @@ import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
 import CustomCard from '@/ui/CustomCard';
 import { AbledCheckCircleIcon } from '@/ui/icon/icon'; // 아이콘 경로가 constants로 가정
+import { Parent } from '@/types';
 
 // 1. props 인터페이스 수정: 불필요한 props(onCancelSuccess, loading) 제거
 interface FamilyJoinSuccessProps {
   familyName: string;
-  parentNames: string[]; // 부모 이름 목록
+  parents: Parent[]; // 부모 이름 목록
 }
 
 /**
  * 가족 합류 성공 (Status 2) 시 렌더링되는 폼
  * @param familyName - 합류한 가족 이름
- * @param parentNames - 가족 관리자 이름 목록
+ * @param parents - 가족 관리자 이름 목록
  */
 export default function FamilyJoinSuccessForm({
   familyName,
-  parentNames,
+  parents,
 }: FamilyJoinSuccessProps) {
   const displayName = familyName || '요청한 가족';
   const router = useRouter();
 
   // 2. 'parentNames' 배열을 "이름1님, 이름2님" 형태의 문자열로 변환
   const adminNames =
-    parentNames && parentNames.length > 0
-      ? parentNames.map((name) => `${name}님`).join(', ')
+    parents && parents.length > 0
+      ? parents.map((name) => `${name}님`).join(', ')
       : `${displayName}님`; // 부모 정보가 없을 경우 familyName으로 대체
 
   return (

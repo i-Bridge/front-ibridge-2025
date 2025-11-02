@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 import { showSuccess, showError } from '@/lib/toast';
 import { Session } from 'next-auth';
-import { SigninData } from '@/types';
+import { SigninResponse } from '@/types';
 
 import AccountCheckingForm from '@/app/(start)/_components/AccountCheckingForm';
 
@@ -41,7 +41,7 @@ export default function PostLoginProcessManager({
         ? Buffer.from(session.user.name, 'utf-8').toString('base64')
         : '';
 
-      const signinRes = await Fetcher<SigninData>('/start/signin', {
+      const signinRes = await Fetcher<SigninResponse>('/start/signin', {
         method: 'POST',
         data: {
           email: session.user.email,
@@ -62,7 +62,7 @@ export default function PostLoginProcessManager({
       // 2. 'first'가 true일 경우, 회원가입 환영 토스트를 띄웁니다.
       //    상태 결정 로직과는 분리합니다.
       if (first) {
-        showSuccess('회원가입되었습니다. 처음 만나서 반가워요 😊');
+        showSuccess('회원가입되었습니다.만나서 반가워요 😊');
       }
 
       // 3. 3가지 규칙에 따라 상태(status)를 설정합니다.

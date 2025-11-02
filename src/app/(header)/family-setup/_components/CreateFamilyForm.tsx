@@ -6,6 +6,8 @@ import CommonModalPopup from '@/ui/Modal/CommonModalPopup';
 import { useState } from 'react';
 import { useSetupStore } from '@/store/useSetupStore';
 import { LeftArrow } from '@/ui/icon/icon';
+import { showError } from '@/lib/toast';
+import * as Sentry from '@sentry/nextjs';
 
 interface DupFamilyNameData {
   exist: boolean;
@@ -13,25 +15,42 @@ interface DupFamilyNameData {
 
 export default function CreateFamilyForm() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  
-  const { setStep, familyName: storedFamilyName , setFamilyName,resetChildrenInfo, } = useSetupStore();
-  const [inputFamilyName, setInputFamilyName] = useState(storedFamilyName || '')
-  // 3. '생성하기' 버튼 클릭 핸들러
+
+  const {
+    setStep,
+    familyName: storedFamilyName,
+    setFamilyName,
+    resetChildrenInfo,
+  } = useSetupStore();
+
+  const [inputFamilyName, setInputFamilyName] = useState(storedFamilyName || '');
+
+  // [신규] '뒤로가기' 버튼 핸들러
+  const handleBack = () => {
+    // 1. 로컬 입력창 비우기
+    setInputFamilyName('');
+    // 2. Zustand 스토어의 '저장된' 이름 비우기 (FindFamilyForm에 영향 X)
+    setFamilyName('');
+    // 3. (만약 있었다면) 자녀 정보도 초기화
+    resetChildrenInfo();
+    // 4. 이전 단계로 이동
+    setStep(0);
+  };
+
+  // 3. '생성하기' 버튼 클릭 핸들러 (기존과 동일)
   const handleFamilyExist = async () => {
     if (!inputFamilyName) {
-      setError('가족 이름을 입력해 주세요.');
+      showError('집 이름을 입력해 주세요.');
       return;
     }
-    setError(null);
     setLoading(true);
 
     if (inputFamilyName === storedFamilyName) {
       console.log('기존 이름과 동일. API 호출 건너뛰고 2단계로 이동.');
       setStep(2);
       setLoading(false);
-      return; // 여기서 함수 종료
+      return;
     }
 
     try {
@@ -41,33 +60,33 @@ export default function CreateFamilyForm() {
       });
 
       if (res.data?.exist) {
-        // 중복된 이름: 팝업 열기
         setIsModalOpen(true);
       } else {
-        // 중복 없음: Zustand에 저장하고 다음 단계로
         setFamilyName(inputFamilyName);
         resetChildrenInfo();
         setStep(2);
       }
     } catch (err) {
+      Sentry.captureException(err);
       console.error('중복 확인 중 오류 발생:', err);
-      setError('중복 확인 중 오류가 발생했습니다.');
+      showError('중복 확인 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
   };
 
-  // 6. 팝업 닫기 핸들러
+  // 6. 팝업 닫기 핸들러 (기존과 동일)
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setInputFamilyName('');
+    setInputFamilyName(''); // 로컬 입력창만 비우기
   };
 
   return (
     <>
       <ModalCard hasBorder={false} className=" gap-10">
+        {/* [수정] onClick에 handleBack 함수 연결 */}
         <button
-          onClick={() => setStep(0)}
+          onClick={handleBack}
           className="w-10 h-10 relative overflow-hidden stroke-grayscale-gray40"
         >
           <LeftArrow />
@@ -87,26 +106,20 @@ export default function CreateFamilyForm() {
           <input
             type="text"
             placeholder="ex) 도란도란 우리집"
-             value={inputFamilyName}
+            value={inputFamilyName}
             onChange={(e) => {
-              setInputFamilyName(e.target.value); // 👈 로컬 state 업데이트
-              if (error) setError(null); // 입력 시 오류 메시지 초기화
+              setInputFamilyName(e.target.value);
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleFamilyExist();
             }}
             className="self-stretch h-14 px-5 rounded-xl outline outline-1 outline-offset-[-1px] outline-grayscale-gray20 inline-flex justify-start items-center gap-2.5"
           />
-          {error && (
-            <Text as="div" variant="body03" className="text-red-500 px-2">
-              {error}
-            </Text>
-          )}
         </div>
 
         <Button
           onClick={handleFamilyExist}
-          disabled={loading}
+          disabled={loading || inputFamilyName.trim().length === 0} // [개선] 비어있을 때 버튼 비활성화
           variant="primary"
         >
           {loading ? '진행 중' : '생성하기'}
