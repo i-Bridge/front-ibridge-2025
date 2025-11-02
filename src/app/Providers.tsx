@@ -1,3 +1,4 @@
+// app/providers.tsx
 'use client';
 
 import { SessionProvider } from 'next-auth/react';
@@ -7,7 +8,12 @@ import type { ReactNode } from 'react';
 export default function Providers({ children }: { children: ReactNode }) {
   return (
     <SessionProvider>
-      <Toaster position="top-center" richColors /> {children}
+      <Toaster 
+        position="bottom-center" 
+        richColors 
+        duration={2500} 
+      />
+      {children}
     </SessionProvider>
   );
 }
