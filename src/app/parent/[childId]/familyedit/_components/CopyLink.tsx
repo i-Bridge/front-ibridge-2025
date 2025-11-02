@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { Button } from '@/ui/Button';
+import { PlusIcon } from '@/ui/icon/icon';
 
 export default function CopyLinkPopover({ link }: { link: string }) {
   const [showPopover, setShowPopover] = useState(false);
@@ -8,18 +10,19 @@ export default function CopyLinkPopover({ link }: { link: string }) {
   const handleCopy = async () => {
     await navigator.clipboard.writeText(link);
     setCopied(true);
-    setTimeout(() => setCopied(false), 3000);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="relative">
-      {/* + 버튼 */}
-      <button
+    <div className="">
+      {/* 초대하기  */}
+      <Button
         onClick={() => setShowPopover(!showPopover)}
-        className="text-xl w-8 h-8 rounded-xl bg-orange-400 hover:bg-orange-200 flex items-center justify-center text-white"
+        variant="grayscale" textVariant="caption03" textClass="text-grayscale-gray60 flex gap-2" className='bg-grayscale-gray5 h-14 p-8 inline-flex justify-center items-center gap-2'
       >
-        +
-      </button>
+        <PlusIcon/> 
+        <div className='flex justify-start items-center gap-2'>초대하기</div>
+      </Button>
 
       {/* Popover */}
       {showPopover && (
