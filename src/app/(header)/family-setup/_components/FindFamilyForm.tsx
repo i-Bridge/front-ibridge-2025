@@ -15,17 +15,29 @@ import * as Sentry from "@sentry/nextjs";
 interface DupFamilyNameData {
   exist: boolean;
 }
+
 export default function FindFamilyForm() {
   const router = useRouter();
   const { setStep, familyName, setFamilyName } = useSetupStore();
 
+  const [inputValue, setInputValue] = useState(familyName || '');
   const [loading, setLoading] = useState(false);
   const [isNotExistModalOpen, setIsNotExistModalOpen] = useState(false);
   const [isRequestSentModalOpen, setIsRequestSentModalOpen] = useState(false);
 
-  // 3. '참여하기' 버튼 클릭 핸들러
+  // [신규] '뒤로가기' 버튼 핸들러
+  const handleBack = () => {
+    // 1. 로컬 입력창 비우기
+    setInputValue('');
+    // 2. Zustand 스토어에도 "저장"된 이름이 있다면 비우기
+    setFamilyName('');
+    // 3. 이전 단계로 이동
+    setStep(0);
+  };
+
+  // ... (handleFamilyExist 함수는 동일) ...
   const handleFamilyExist = async () => {
-    if (!familyName) {
+    if (!inputValue) {
       showError('가족 이름을 입력해 주세요.');
       return;
     }
@@ -34,19 +46,17 @@ export default function FindFamilyForm() {
     try {
       const res = await Fetcher<DupFamilyNameData>('/start/signup/dup', {
         method: 'POST',
-        data: { familyName },
+        data: { familyName: inputValue },
       });
 
       if (res.data?.exist) {
-        // 집 이름 존재
-        setFamilyName(familyName);
+        setFamilyName(inputValue); // 스토어에 저장
         setIsRequestSentModalOpen(true);
       } else {
-        // 집 이름 없음
         setIsNotExistModalOpen(true);
       }
     } catch (err) {
-       Sentry.captureException(err); 
+      Sentry.captureException(err);
       console.error('집 존재 여부 확인 중 오류 발생:', err);
       showError('집 존재 여부 확인 중 오류가 발생했습니다.');
     } finally {
@@ -54,10 +64,10 @@ export default function FindFamilyForm() {
     }
   };
 
-  // 2. 가족 이름 제출 및 가입 요청
+  // ... (handleRequestSentModal 함수는 동일) ...
   const handleRequestSentModal = async () => {
     if (!familyName) {
-      showError('가족 이름을 입력해주세요!');
+      showError('가족 이름이 없습니다. 다시 시도해주세요.');
       return;
     }
     if (loading) return;
@@ -71,18 +81,17 @@ export default function FindFamilyForm() {
       });
 
       if (!res?.data?.exist) {
-        // 존재하지 않을 시
         setIsRequestSentModalOpen(false);
         setIsNotExistModalOpen(true);
         setFamilyName('');
+        setInputValue('');
         return;
       } else {
-        //요청 성공
-        showSuccess('집 합류 요청이 성공적으로 보내졌어요!')
+        showSuccess('집 합류 요청이 성공적으로 보내졌어요!');
         router.replace('/join-status');
       }
     } catch (err) {
-       Sentry.captureException(err); 
+      Sentry.captureException(err);
       console.error('❌ 가족 이름 등록 실패:', err);
       showError('가족 이름 등록 중 오류가 발생했습니다.');
     } finally {
@@ -93,24 +102,30 @@ export default function FindFamilyForm() {
   // Modal 2 (존재하지 않음) 닫기 핸들러
   const handleCloseNotExistModal = () => {
     setIsNotExistModalOpen(false);
+    // [수정] 스토어는 건드리지 않고, '입력값'만 비우는 것이 맞습니다.
+    setInputValue('');
   };
 
-  // [신규] Modal 1 (가입 요청 완료) 닫기 핸들러
+  // Modal 1 (가입 요청) 닫기 핸들러 (취소 버튼)
   const handleCloseRequestSentModal = () => {
     setIsRequestSentModalOpen(false);
-    setFamilyName(''); // 입력창 비우기
+    // [수정] '저장된' 이름과 '입력된' 이름 모두 초기화
+    setFamilyName('');
+    setInputValue('');
   };
-  // 가족 가입 요청 API 호출
 
   return (
     <>
       <ModalCard hasBorder={false} className="flex flex-col gap-10">
+        {/* [수정] onClick에 새로 만든 handleBack 함수 연결 */}
         <button
-          onClick={() => setStep(0)}
+          onClick={handleBack}
           className="w-10 h-10 relative overflow-hidden stroke-grayscale-gray40"
         >
           <LeftArrow />
         </button>
+        
+        {/* ... (제목, 설명 텍스트) ... */}
         <div className="flex flex-col gap-3">
           <Text as="div" variant="title01">
             집 찾기
@@ -119,12 +134,14 @@ export default function FindFamilyForm() {
             참여할 집 이름을 입력해주세요.
           </Text>
         </div>
+
+        {/* 입력창 (inputValue와 연결) */}
         <input
           type="text"
           placeholder="집 이름"
-          value={familyName}
+          value={inputValue}
           onChange={(e) => {
-            setFamilyName(e.target.value);
+            setInputValue(e.target.value);
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleFamilyExist();
@@ -132,14 +149,17 @@ export default function FindFamilyForm() {
           className="self-stretch h-14 px-5 rounded-xl outline outline-1 outline-offset-[-1px] outline-grayscale-gray20 inline-flex justify-start items-center gap-2.5"
         />
 
+        {/* 참여하기 버튼 (inputValue 기준) */}
         <Button
           onClick={handleFamilyExist}
           variant="primary"
-          disabled={loading || familyName.trim().length === 0}
+          disabled={loading || inputValue.trim().length === 0}
         >
           참여하기
         </Button>
       </ModalCard>
+
+      {/* ... (모달 2개 렌더링 부분은 동일) ... */}
 
       {/* 존재하지 않는 이름 팝업 */}
       {isNotExistModalOpen && (
@@ -158,20 +178,29 @@ export default function FindFamilyForm() {
         </CommonModalPopup>
       )}
 
+      {/* 가입 요청 팝업 (familyName 기준) */}
       {isRequestSentModalOpen && (
         <CommonModalPopup
           title={`{${familyName}}`}
           titleLine2="집에 참여할까요?"
           subtitle="해당 집 관리자에게 승인 요청이 전송됩니다."
           onClose={handleCloseRequestSentModal}
-          footerClassName=''
+          footerClassName=""
           footerContent={
-            
-            <div className='w-full flex gap-3 self-stretch'>
-              <Button variant="grayscale" textVariant="caption02" onClick={handleCloseRequestSentModal}>
+            <div className="w-full flex gap-3 self-stretch">
+              <Button
+                variant="grayscale"
+                textVariant="caption02"
+                onClick={handleCloseRequestSentModal}
+              >
                 취소
               </Button>
-              <Button variant="primary" textVariant="caption02" className='whitespace-nowrap' onClick={handleRequestSentModal}>
+              <Button
+                variant="primary"
+                textVariant="caption02"
+                className="whitespace-nowrap"
+                onClick={handleRequestSentModal}
+              >
                 승인 요청 보내기
               </Button>
             </div>
@@ -183,3 +212,4 @@ export default function FindFamilyForm() {
     </>
   );
 }
+
