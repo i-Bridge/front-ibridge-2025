@@ -13,9 +13,8 @@ interface ChildListItemProps {
 }
 
 // ----------------------------------------------------
-// ChildCard Component (수정: 편집/삭제 기능 포함 및 조건부 렌더링)
+// ChildCard Component (수정: showActions에 따른 레이아웃 변경)
 // ----------------------------------------------------
-// showActions의 기본값을 true로 설정합니다.
 export function ChildCard({
   child,
   onEdit,
@@ -23,15 +22,12 @@ export function ChildCard({
   showActions = true,
   cardClassName,
 }: ChildListItemProps) {
-
   const isFemale = child.gender === 'FEMALE';
   const bgColor = isFemale
     ? 'bg-secondary-secondaryMedium'
     : 'bg-other-mint-light';
-  // showActions가 true일 때만 onEdit과 onDelete가 존재함이 보장되므로,
-  // 함수 호출 시 해당 핸들러의 존재 여부를 확인합니다.
+
   const handleEdit = () => {
-    // showActions가 true이고 onEdit 함수가 실제로 존재할 때만 호출
     if (showActions && onEdit) {
       onEdit(child.id);
     } else {
@@ -42,7 +38,6 @@ export function ChildCard({
   };
 
   const handleDelete = () => {
-    // showActions가 true이고 onDelete 함수가 실제로 존재할 때만 호출
     if (showActions && onDelete) {
       onDelete(child.id);
     } else {
@@ -57,17 +52,30 @@ export function ChildCard({
   return (
     <CustomCard
       className={twMerge(
-        'self-stretch flex flex-row justify-between items-start',
+        'flex flex-row items-start',
+        showActions ? 'self-stretch justify-between' : 'justify-center',
         bgColor,
-        cardClassName, // 💡 외부에서 받은 호버/커스텀 클래스
+        cardClassName,
       )}
     >
       {/* 왼쪽: 아이콘 + 정보 */}
-      <div className="flex justify-start items-center gap-5">
+      {/* [수정] showActions 값에 따라 레이아웃 변경
+        - true: 'items-center' (가로 정렬, 수직 중앙)
+        - false: 'flex-col items-start' (세로 정렬, 좌측 상단)
+      */}
+      <div
+        className={twMerge(
+          'flex  gap-5',
+          showActions ? 'justify-start items-center' : 'flex-col items-center',
+        )}
+      >
         <div className="w-24 h-24 flex-shrink-0">
           {isFemale ? <GirlIcon /> : <BoyIcon />}
         </div>
-        <div className="inline-flex flex-col justify-start items-start gap-2">
+        <div className={twMerge(
+          'inline-flex flex-col  gap-2',
+          showActions ? 'justify-start items-start' : 'justify-center items-center',
+        )}>
           <Text variant="title02">{child.name}</Text>
           <Text variant="body03" className="text-grayscale-gray60 ">
             {formattedBirthday}
@@ -81,12 +89,14 @@ export function ChildCard({
           <button
             onClick={handleEdit}
             className="w-10 h-10 p-1 bg-white rounded-full flex justify-center items-center"
+            aria-label={`${child.name} 정보 수정`}
           >
             <EditIcon />
           </button>
           <button
             onClick={handleDelete}
             className="w-10 h-10 p-1 bg-white rounded-full flex justify-center items-center"
+            aria-label={`${child.name} 정보 삭제`}
           >
             <DeleteIcon />
           </button>

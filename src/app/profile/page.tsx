@@ -4,23 +4,37 @@ import Header from '@/components/Headers/Header';
 import ModalCard from '@/ui/Modal/ModalCard';
 import { Text } from '@/ui/Text';
 import ChildProfileLink from '@/app/profile/_components/ChildProfileLink';
+import * as Sentry from '@sentry/nextjs';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Profile() {
-  const res = await Fetcher<LoginResponse>('/start/login');
-  
-  const profileData = res.data;
-  console.log('login', profileData);
-  // --- 데이터 상태에 따른 분기 (이전과 동일) ---
-  if (!profileData) {
-    return <div>로딩 중...</div>;
-  }
-  if (profileData.status !== 'ACTIVE') {
-    return <div> 가족이 등록되지 않았습니다.</div>;
-  }
-  // --- ---
+  let profileData: LoginResponse | null = null;
 
+  try {
+  const res = await Fetcher<LoginResponse>('/start/login');
+
+    if (!res.data) {
+      const err = new Error('프로필 정보가 없습니다. (API data is null)');
+      Sentry.captureException(err);
+      throw err;
+    }
+
+    profileData = res.data;
+  } catch (error) {
+    console.error('❌ [SC] Profile page fetch error:', error);
+    if (!(error as Error).message.includes('프로필')) {
+      Sentry.captureException(error);
+    }
+    throw new Error(
+      `[ProfilePage] API Fetch Error: ${(error as Error).message}`,
+    );
+  }
+
+
+  
+    // 3-1-1. 자녀 정보가 없는 경우 (ACTIVE이지만 자녀 0명)
+    
   return (
     <>
       {/* Header, ModalCard, Text 등은 서버 컴포넌트에서 렌더링 가능합니다 */}
@@ -37,12 +51,9 @@ export default async function Profile() {
             너의 프로필을 선택해줘!
           </Text>
         </div>
-        <div className="w-full flex flex-col gap-5 self-stretch ">
-          {profileData.children.map((child) => (
-            <ChildProfileLink key={child.id} child={child} />
-          ))}
-        </div>
+        <ChildProfileLink childList={profileData.children} />
       </ModalCard>
     </>
   );
+
 }
