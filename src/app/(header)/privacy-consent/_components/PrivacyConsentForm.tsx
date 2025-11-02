@@ -134,7 +134,7 @@ export default function PrivacyConsentForm({ content }: PrivacyConsentFormProps)
       }
     } catch (error) {
       console.error('❌ 약관 동의 제출 실패:', error);
-      showError('약관 동의 처리 중 오류가 발생했습니다.');
+      showError('약관 동의 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
       setIsSubmitting(false); // 실패 시 버튼 재활성화
     }
   };

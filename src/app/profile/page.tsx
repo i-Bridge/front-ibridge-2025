@@ -1,5 +1,5 @@
 import { Fetcher } from '@/lib/fetcher';
-import { LoginData } from '@/types';
+import { LoginResponse } from '@/types';
 import Header from '@/components/Headers/Header';
 import ModalCard from '@/ui/Modal/ModalCard';
 import { Text } from '@/ui/Text';
@@ -8,7 +8,7 @@ import ChildProfileLink from '@/app/profile/_components/ChildProfileLink';
 export const dynamic = 'force-dynamic';
 
 export default async function Profile() {
-  const res = await Fetcher<LoginData>('/start/login');
+  const res = await Fetcher<LoginResponse>('/start/login');
   
   const profileData = res.data;
   console.log('login', profileData);
