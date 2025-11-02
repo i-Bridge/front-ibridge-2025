@@ -7,7 +7,7 @@ import * as Sentry from "@sentry/nextjs";
 
 //서버 컴포넌트에서 클라이언트 함수(toast)를 호출할 수 없습니다.
 
-
+export const dynamic = 'force-dynamic';
 /**
  * 가족 합류 상태 층 (/join-status) - Async Server Component
  * 1. 서버에서 /start/login API를 호출합니다.
