@@ -53,9 +53,9 @@ interface FigmaToastProps {
 function FigmaToast({ icon, message }: FigmaToastProps) {
   return (
     // Figma 디자인: 그림자, 흰색 배경, 둥근 모서리
-    <div className="shadow-[0px_0px_20px_0px_rgba(0,0,0,0.12)] inline-flex">
+    <div className=" inline-flex">
       {/* Figma 디자인: 패딩, 갭, 정렬 */}
-      <div className="px-6 py-3 bg-grayscale-white rounded-2xl inline-flex justify-start items-center gap-4 w-auto min-w-[300px] max-w-[400px]">
+      <div className="shadow-[0px_0px_20px_0px_rgba(0,0,0,0.12)] px-6 py-3 bg-grayscale-white rounded-2xl inline-flex justify-start items-center gap-4 w-auto min-w-[300px] max-w-[400px]">
         
         {/* 1. 아이콘 (전달받은 아이콘 사용) */}
         {icon}
