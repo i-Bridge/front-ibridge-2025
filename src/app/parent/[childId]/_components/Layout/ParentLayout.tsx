@@ -18,7 +18,7 @@ export default function PageLayout({ title, children }: PageLayoutProps) {
       {/* title prop으로 받은 내용을 여기에 렌더링합니다. 
         이렇게 하면 페이지마다 다른 제목을 보여줄 수 있습니다.
       */}
-      <header>
+      <header className="self-stretch px-10 pt-14 pb-5 inline-flex flex-col justify-start items-start gap-3">
         {title}
       </header>
 

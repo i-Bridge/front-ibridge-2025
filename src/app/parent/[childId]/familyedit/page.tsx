@@ -34,14 +34,17 @@ export default async function FamilyEditPage() {
   return (
     <PageLayout
       title={
-        <>
+        
+        <div className='flex '>
           <Text variant={'title01'}>{familyInfo.familyName} </Text>
           <EditFamilyName familyName={familyInfo.familyName} />
-        </>
+        </div>
+        
+
       }
     >
       <div className="flex flex-col w-full">
-        <div className="self-stretch px-10 py-5 flex flex-col justify-start items-start gap-5">
+        <div className="self-stretch  flex flex-col justify-start items-start gap-5">
           {/* 1. 관리자 헤더 */}
           <div className="self-stretch flex flex-col justify-center items-start gap-2">
             <div className="self-stretch inline-flex justify-start items-center gap-2">
