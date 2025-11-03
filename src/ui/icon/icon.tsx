@@ -23,6 +23,9 @@
 //AnswerLogIcon
 //ScheduledIcon
 //FamilyeditIcon
+//-----------------
+//PlusIcon
+//ErrorPageIcon
 
 // 여자 아이 아이콘
 export const GirlIcon = () => (
@@ -321,6 +324,13 @@ export const   FamilyeditIcon=()=>(
 
 );
 
+export const PlusIcon=()=>(
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.99978 2.92893V17.0711" stroke="#6B7684" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M2.92871 10H17.0708" stroke="#6B7684" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+</svg>
+
+);
 export const ErrorPageIcon=()=>(
   <svg width="249" height="249" viewBox="0 0 249 249" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g clipPath="url(#clip0_1104_9877)">
@@ -377,3 +387,4 @@ export const ErrorPageIcon=()=>(
 </svg>
 
 );
+

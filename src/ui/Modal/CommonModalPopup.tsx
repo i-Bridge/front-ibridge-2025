@@ -18,7 +18,7 @@ interface CommonModalProps {
    * 모달의 메인 바디 영역에 렌더링될 React 노드입니다.
    * `p-10` 등 내부 패딩은 이 `children`에서 직접 지정해야 합니다.
    */
-  children: ReactNode;
+  children?: ReactNode;
   /**
    * 모달 푸터 영역에 렌더링될 커스텀 React 노드입니다.
    * (예: `<Button />` 컴포넌트의 배열)

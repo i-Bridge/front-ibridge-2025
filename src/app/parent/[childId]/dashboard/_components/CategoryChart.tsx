@@ -1,246 +1,373 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import CategorySubjectList from '@/app/parent/[childId]/_components/Question/CategorySubjectList';
-
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  TooltipProps,
+} from 'recharts';
+// import SubjectPopup from './SubjectPopup'; // 1. 팝업 컴포넌트 import (오류로 인해 제거)
 interface Keyword {
   keyword: string;
   count: number;
-  positiveScore: number; // 0 ~ 1
+  positiveScore: number;
+}
+// Pie 차트 데이터 타입
+interface PieData {
+  name: string;
+  value: number;
+  // 원본 데이터를 툴팁에서 사용하기 위해 포함
+  original: Keyword | { keyword: string; count: number; positiveScore: number };
 }
 
-interface CategoryChartProps {
-  categories?: Keyword[];
-  childname: string;
-  childId: string;
+// 컴포넌트 Props
+interface CategoryRankChartProps {
+  keywords: Keyword[];
 }
 
-// count 기반 크기 계산
-const sizeScale = (count: number, maxCount: number) => {
-  const minR = 20;
-  const maxR = 80;
-  return minR + (count / maxCount) * (maxR - minR);
-};
+// 1~5위 + 기타 색상
+const PIE_COLORS = [
+  '#38bdf8', // 1위 (sky-400)
+  '#60c9f9', // 2위
+  '#89d6fa', // 3위
+  '#b2e2fb', // 4위
+  '#d8eefd', // 5위
+  '#f1f5f9', // 6. 기타 (gray-100)
+];
 
-// positiveScore 기반 색상
-const getColor = (score: number) => {
-  // 점수 0~100 범위에서만 처리
-  const s = Math.min(Math.max(score, 0), 100);
+/**
+ * Recharts 커스텀 툴팁
+ */
+const CustomTooltip = ({
+  active,
+  payload,
+  ...props
+}: TooltipProps<number, string> & { totalCount: number }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload as PieData;
+    const percent = ((data.value / props.totalCount) * 100).toFixed(0);
 
-  // 하늘색 (135, 206, 235) → 주황색 (255, 165, 0)
-  const r = Math.round(135 + (255 - 135) * (s / 100)); // 135 → 255
-  const g = Math.round(206 + (165 - 206) * (s / 100)); // 206 → 165
-  const b = Math.round(235 + (0 - 235) * (s / 100)); // 235 → 0
-
-  return `rgb(${r},${g},${b})`;
-};
-
-export default function CategoryChart({
-  categories: propCategories,
-  childname,
-  childId,
-}: CategoryChartProps) {
-  const [activeKeyword, setActiveKeyword] = useState<string | null>(null);
-  const [fullscreenMode, setFullscreenMode] = useState(false);
-
-  // ================
-  // 고정 캔버스 크기 (픽셀)
-  // ================
-  const containerWidth = 600;
-  const containerHeight = 400;
-  const centerX = containerWidth / 2;
-  const centerY = containerHeight / 2;
-
-  // 더미 데이터
-  const USE_DUMMY_DATA = false;
-  const dummyCategories: Keyword[] = [
-    { keyword: '친구들과 놀이터에서', count: 15, positiveScore: 0.8 },
-    { keyword: '공룡', count: 10, positiveScore: 0.6 },
-    { keyword: '아빠와의 갈등', count: 5, positiveScore: 0.2 },
-    { keyword: '동물의 숲 게임', count: 20, positiveScore: 0.9 },
-    { keyword: '힘든 숙제', count: 8, positiveScore: 0.4 },
-  ];
-
-  const categories = USE_DUMMY_DATA ? dummyCategories : propCategories || [];
-  if (!categories.length) {
     return (
-      <div>
-        <h3 className="text-lg font-semibold mb-1">
-          {childname || '아이'}의 분석 결과
-        </h3>
-        <p className="text-xs text-gray-400 mb-4">
-          답변 15개 쌓일 때마다 업데이트 진행됩니다.
-        </p>
-        <div className="p-16 text-sm text-gray-500 border rounded">
-          아직 군집화 결과가 존재하지 않습니다. <br />
-          아이의 답변이 더 필요합니다.
+      <div className="w-32 inline-flex flex-col justify-center items-center">
+        <div className="px-3 py-2 bg-Grayscale-gray90 rounded-md flex flex-col justify-start items-center gap-1 shadow-lg">
+          <div className="justify-center text-Grayscale-white text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5">
+            {data.name}
+          </div>
+          <div className="justify-center text-white/70 text-sm font-normal font-['Tmoney_RoundWind'] leading-6">
+            {percent}%
+          </div>
+        </div>
+        {/* 툴팁 꼬리 */}
+        <div className="w-9 px-1.5 inline-flex justify-center items-start">
+          <svg
+            width="12"
+            height="8"
+            viewBox="0 0 12 8"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6 8L0 0L12 1.19209e-06L6 8Z"
+              fill={
+                '#1f2937' /* bg-Grayscale-gray90 (gray-800) */
+              }
+            />
+          </svg>
         </div>
       </div>
     );
   }
-  const maxCount = Math.max(...categories.map((c) => c.count));
 
-  // =====================
-  // 배치 (나선형)
-  // =====================
-  const positions = (() => {
-    const radii = categories.map((c) => sizeScale(c.count, maxCount));
-    const pos: { x: number; y: number }[] = [];
+  return null;
+};
 
-    radii.forEach((r, i) => {
-      if (i === 0) {
-        pos.push({ x: centerX, y: centerY });
-      } else {
-        let angle = 0;
-        let spiralRadius = radii[0] + r;
-        let placed = false;
+// ------------------------------------------------------------------
+// 2. SubjectPopup 컴포넌트를 파일 내부로 이동
+// ------------------------------------------------------------------
+interface SubjectPopupProps {
+  keyword: string;
+  onClose: () => void;
+}
 
-        while (!placed) {
-          const x = centerX + Math.cos(angle) * spiralRadius;
-          const y = centerY + Math.sin(angle) * spiralRadius;
-
-          const overlap = pos.some((p, j) => {
-            const d = Math.hypot(x - p.x, y - p.y);
-            return d < r + radii[j] + 2;
-          });
-
-          if (
-            !overlap &&
-            x - r >= 0 &&
-            x + r <= containerWidth &&
-            y - r >= 0 &&
-            y + r <= containerHeight
-          ) {
-            pos.push({ x, y });
-            placed = true;
-          }
-
-          angle += 0.1;
-          if (angle > Math.PI * 2) {
-            angle = 0;
-            spiralRadius += 5;
-          }
-        }
-      }
-    });
-
-    // ===============
-    // 중앙 보정 추가
-    // ===============
-    const avgX = pos.reduce((sum, p) => sum + p.x, 0) / pos.length;
-    const avgY = pos.reduce((sum, p) => sum + p.y, 0) / pos.length;
-    const offsetX = centerX - avgX;
-    const offsetY = centerY - avgY;
-
-    return pos.map((p) => ({
-      x: p.x + offsetX,
-      y: p.y + offsetY,
-    }));
-  })();
-
-  const handleClick = (keyword: string) => {
-    if (fullscreenMode && activeKeyword === keyword) {
-      setFullscreenMode(false);
-      setActiveKeyword(null);
-    } else {
-      setActiveKeyword(keyword);
-      setFullscreenMode(true);
-    }
-  };
-
+/**
+ * 팝업 컴포넌트 (Placeholder)
+ * 'N개의 대화' 클릭 시 보일 팝업입니다.
+ */
+function SubjectPopup({ keyword, onClose }: SubjectPopupProps) {
   return (
-    <div>
-      <h3 className="text-lg font-semibold mb-1">
-        {childname || '아이'}의 분석 결과
-      </h3>
-      <p className="text-xs text-gray-400 mb-4">
-        답변 15개 쌓일 때마다 업데이트 진행됩니다.
-      </p>
-
-      {/* 고정 크기 컨테이너 */}
+    // 전체 화면 오버레이
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center"
+      onClick={onClose} // 배경 클릭 시 닫기
+    >
+      {/* 팝업 컨텐츠 */}
       <div
-        className="relative border"
-        style={{ width: `${containerWidth}px`, height: `${containerHeight}px` }}
+        className="bg-Grayscale-white p-8 rounded-[20px] z-50 w-[90%] max-w-[400px]"
+        onClick={(e) => e.stopPropagation()} // 팝업 내부 클릭 시 닫히지 않게
       >
-        {categories.map((cat, idx) => {
-          const radius = sizeScale(cat.count, maxCount);
-          const color = getColor(cat.positiveScore);
-          const { x, y } = positions[idx];
-          const isActive = fullscreenMode && activeKeyword === cat.keyword;
-
-          return (
-            <motion.div
-              key={cat.keyword}
-              className="absolute flex flex-col items-center justify-center text-white cursor-pointer"
-              style={{
-                backgroundColor: color,
-                zIndex: isActive ? 999 : 1,
-                borderRadius: isActive ? 0 : '50%',
-                display: fullscreenMode && !isActive ? 'none' : 'flex',
-                padding: 4,
-                boxSizing: 'border-box',
-                overflowWrap: 'break-word',
-                textAlign: 'center',
-              }}
-              whileHover={{
-                scale: !fullscreenMode ? 1.2 : 1,
-                zIndex: 1000,
-              }}
-              animate={{
-                scale: fullscreenMode && isActive ? 1 : 1,
-                width: isActive ? containerWidth : radius * 2,
-                height: isActive ? containerHeight : radius * 2,
-                left: isActive ? 0 : x - radius,
-                top: isActive ? 0 : y - radius,
-                borderRadius: isActive ? 0 : '50%',
-              }}
-              transition={{
-                type: 'spring',
-                stiffness: 300,
-                damping: 25,
-                duration: isActive ? 0.5 : 0.3,
-              }}
-              // ✅ fullscreenMode 아닐 때만 클릭 가능하게 수정
-              onClick={() => {
-                if (!fullscreenMode) handleClick(cat.keyword);
-              }}
-            >
-              {isActive && (
-                <div>
-                  <div className="absolute inset-x-0 bottom-0 bg-white shadow-md rounded-t-lg p-4">
-                    <CategorySubjectList
-                      childId={childId}
-                      keywords={cat.keyword}
-                    />
-                  </div>
-                  {/* 닫기 버튼만 닫히는 동작 */}
-                  <button
-                    className="absolute top-2 right-2 text-red-500 text-lg font-bold"
-                    onClick={(e) => {
-                      e.stopPropagation(); // ✅ 이벤트 버블링 방지
-                      setFullscreenMode(false);
-                      setActiveKeyword(null);
-                    }}
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-              <span className="text-xs font-bold break-words text-center">
-                {cat.keyword}
-              </span>
-              <span className="text-[10px] mt-1">
-                {cat.positiveScore >= 0.7
-                  ? '긍정'
-                  : cat.positiveScore <= 0.3
-                    ? '부정'
-                    : ''}
-              </span>
-            </motion.div>
-          );
-        })}
+        {/* 헤더 */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-Grayscale-gray90 text-xl font-extrabold font-['Tmoney_RoundWind'] leading-7">
+            {keyword}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-Grayscale-gray50 text-3xl font-light leading-none hover:text-Grayscale-gray90"
+          >
+            &times;
+          </button>
+        </div>
+        {/* 본문 (Placeholder) */}
+        <div className="text-Grayscale-gray80 font-['Tmoney_RoundWind'] h-48 overflow-y-auto">
+          {keyword} 
+          <br />
+          (컴포넌트 구현 필요)
+        </div>
       </div>
     </div>
   );
 }
+// ------------------------------------------------------------------
+
+/**
+ * 카테고리 랭킹 아이템 (오른쪽 리스트)
+ */
+const CategoryRankItem = ({
+  keyword,
+  rank,
+  onClick,
+}: {
+  keyword: Keyword;
+  rank: number;
+  onClick: () => void;
+}) => {
+  const isPositive = keyword.positiveScore >= 50;
+  const sentimentPercent = isPositive
+    ? keyword.positiveScore
+    : 100 - keyword.positiveScore;
+
+  const sentimentLabel = isPositive ? '긍정' : '부정';
+  const sentimentBgClass = isPositive
+    ? 'bg-Success-successLight'
+    : 'bg-Error-errorLight';
+  const sentimentTextClass = isPositive
+    ? 'text-Success-success'
+    : 'text-Error-error';
+
+  // 1~5위는 진한 회색, 6위부터는 연한 회색
+  const rankBgClass =
+    rank <= 5 ? 'bg-Grayscale-gray80' : 'bg-Grayscale-gray10';
+  const rankTextClass =
+    rank <= 5 ? 'text-Grayscale-white' : 'text-Grayscale-gray80';
+
+  return (
+    <div className="self-stretch py-3 inline-flex justify-start items-center gap-3">
+      <div className="flex-1 flex justify-start items-center gap-3">
+        {/* Rank Circle */}
+        <div
+          className={`w-6 h-6 p-2 rounded-[99px] inline-flex flex-col justify-center items-center gap-2 ${rankBgClass}`}
+        >
+          <div className="inline-flex justify-start items-start gap-1">
+            <div className="w-auto min-w-[8px] text-center pt-0.5 inline-flex flex-col justify-center items-center gap-2.5">
+              <div
+                className={`self-stretch justify-start text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5 ${rankTextClass}`}
+              >
+                {rank}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Keyword & Sentiment */}
+        <div className="flex justify-start items-center gap-3">
+          <div className="justify-start text-Grayscale-gray90 text-lg font-normal font-['Tmoney_RoundWind'] leading-7">
+            {keyword.keyword}
+          </div>
+          <div
+            className={`px-2 py-1.5 rounded-md flex justify-start items-start gap-1 ${sentimentBgClass}`}
+          >
+            <div
+              className={`justify-center text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5 ${sentimentTextClass}`}
+            >
+              {sentimentLabel} {sentimentPercent.toFixed(0)}%
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Count Button */}
+      <button
+        // onClick={onClick} -- 팝업 기능 임시 비활성화
+        className="flex justify-start items-center gap-1 cursor-pointer hover:opacity-70 transition-opacity"
+      >
+        <div className="justify-start text-Grayscale-gray50 text-lg font-normal font-['Tmoney_RoundWind'] leading-7">
+          {keyword.count}개의 대화
+        </div>
+        {/* --- 수정된 아이콘 --- */}
+        <div className="w-6 h-6 flex justify-center items-center">
+          <svg
+            width="8"
+            height="12"
+            viewBox="0 0 8 12"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M1 1L7 6L1 11"
+              stroke="#A6A6A6" // Grayscale-gray50 (figma에는 gray-50이 #A6A6A6)
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+        {/* --- 수정된 아이콘 끝 --- */}
+      </button>
+    </div>
+  );
+};
+
+/**
+ * 메인 카테고리 순위 차트 컴포넌트
+ */
+export default function CategoryRankChart({
+  keywords,
+}: CategoryRankChartProps) {
+  // const [isPopupOpen, setIsPopupOpen] = useState(false);
+  // const [selectedKeyword, setSelectedKeyword] = useState<Keyword | null>(null);
+
+  // --- 데이터 가공 ---
+  const totalCount = keywords.reduce((sum, k) => sum + k.count, 0);
+
+  // 긍정/부정 카테고리 개수 (차트 중앙)
+  const totalPositive = keywords.filter(
+    (k) => k.positiveScore >= 50,
+  ).length;
+  const totalNegative = keywords.length - totalPositive;
+
+  // 파이 차트 데이터: 1~5위 + 기타
+  const top5Keywords = keywords.slice(0, 5);
+  const otherKeywords = keywords.slice(5);
+  const otherCount = otherKeywords.reduce((sum, k) => sum + k.count, 0);
+
+  const pieData: PieData[] = top5Keywords.map((k) => ({
+    name: k.keyword,
+    value: k.count,
+    original: k,
+  }));
+
+  if (otherCount > 0) {
+    pieData.push({
+      name: '기타',
+      value: otherCount,
+      original: {
+        keyword: '기타',
+        count: otherCount,
+        positiveScore: -1, // '기타'는 긍/부정 없음
+      },
+    });
+  }
+  // --- 데이터 가공 끝 ---
+
+  // const handleOpenPopup = (keyword: Keyword) => {
+  //   setSelectedKeyword(keyword);
+  //   setIsPopupOpen(true);
+  // };
+
+  // const handleClosePopup = () => {
+  //   setIsPopupOpen(false);
+  //   setSelectedKeyword(null);
+  // };
+
+  return (
+    <>
+      <div className="w-full max-w-[960px] px-10 py-8 bg-Grayscale-white rounded-[20px] outline outline-1 outline-offset-[-1px] outline-Grayscale-gray20 inline-flex flex-col justify-center items-start gap-10">
+        {/* Title */}
+        <div className="inline-flex justify-start items-center gap-2">
+          <div className="justify-start text-Grayscale-gray90 text-xl font-extrabold font-['Tmoney_RoundWind'] leading-7">
+            카테고리 순위
+          </div>
+        </div>
+
+        {/* Chart & List */}
+        <div className="self-stretch inline-flex justify-start items-center gap-20">
+          {/* Pie Chart */}
+          <div className="w-60 h-60 relative flex justify-center items-center gap-2.5">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={120} // w-60 / 2
+                  innerRadius={80} // 도넛 차트
+                  paddingAngle={1}
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={PIE_COLORS[index % PIE_COLORS.length]}
+                      stroke="none"
+                    />
+                  ))}
+                </Pie>
+                <Tooltip
+                  content={<CustomTooltip totalCount={totalCount} />}
+                  cursor={{ fill: 'transparent' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+
+            {/* Center Text */}
+            <div className="left-[50%] top-[50%] -translate-x-1/2 -translate-y-1/2 absolute inline-flex flex-col justify-start items-start gap-[3px]">
+              <div className="self-stretch inline-flex justify-start items-start gap-1">
+                <div className="justify-start text-Grayscale-gray90 text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5">
+                  긍정
+                </div>
+                <div className="justify-start text-Grayscale-gray90 text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5">
+                  {totalPositive}
+                </div>
+              </div>
+              <div className="self-stretch inline-flex justify-start items-start gap-1">
+                <div className="justify-start text-Grayscale-gray90 text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5">
+                  부정
+                </div>
+                <div className="justify-start text-Grayscale-gray90 text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5">
+                  {totalNegative}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Rank List */}
+          <div className="flex-1 inline-flex flex-col justify-start items-start">
+            {keywords.map((keyword, index) => (
+              <CategoryRankItem
+                key={keyword.keyword}
+                keyword={keyword}
+                rank={index + 1}
+                onClick={() => {
+                  console.log('Popup feature temporarily disabled');
+                }} // 팝업 기능 임시 비활성화
+                // onClick={() => handleOpenPopup(keyword)}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Popup Modal -- 팝업 기능 임시 비활성화
+      {isPopupOpen && selectedKeyword && (
+        <SubjectPopup keyword={selectedKeyword} onClose={handleClosePopup} />
+      )}
+      */}
+    </>
+  );
+}
+
+

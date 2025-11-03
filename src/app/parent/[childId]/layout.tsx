@@ -105,7 +105,7 @@ export default function ParentLayout({ children, params }: ParentLayoutProps) {
         <Sidebar childId={childId} />
       </Suspense>
 
-      <main className="ml-60">
+      <main className="ml-60 flex justify-center">
         {children}
       </main>
     </div>

@@ -14,7 +14,7 @@ interface PageLayoutProps {
 export default function PageLayout({ title, children }: PageLayoutProps) {
   return (
     // 요청하신 공통 컨테이너 div 입니다.
-    <div className='w-full flex flex-col'>
+    <div className='w-full flex flex-col max-w-[1200px] min-w-[960px]'>
       {/* title prop으로 받은 내용을 여기에 렌더링합니다. 
         이렇게 하면 페이지마다 다른 제목을 보여줄 수 있습니다.
       */}

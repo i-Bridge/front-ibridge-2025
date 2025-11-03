@@ -6,6 +6,7 @@ import { Subject } from '@/types/index';
 import PageLayout from '@/app/parent/[childId]/_components/Layout/ParentLayout';
 import { Text } from '@/ui/Text';
 import CumulateChart from '@/app/parent/[childId]/dashboard/_components/CumulateChart';
+import CategoryRankChart from '@/app/parent/[childId]/dashboard/_components/CategoryChart';
 
 interface HomeData {
   hasNext: boolean;
@@ -47,47 +48,66 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
   console.log('/home', homeData);
 
   const keywordRes = await Fetcher<KeywordData>(`/parent/${childId}/keywords`);
-    const keywordData = keywordRes.data;
-    console.log('분석 /stat api 호출 ', keywordData);
-    if (!keywordData) {
-      return <div>분석 데이터 불러오기 실패...</div>;
-    }
+  const keywordData = keywordRes.data;
+  console.log('분석 /stat api 호출 ', keywordData);
+  if (!keywordData) {
+    return <div>분석 데이터 불러오기 실패...</div>;
+  }
 
-    
-  const cumulativeRes = await Fetcher<CumulativeData>(`/parent/${childId}/stat/cumulative?periodType='day'`);
-    const cumulativeData = cumulativeRes.data;
-    console.log('분석 /stat api 호출 ', cumulativeData);
-    if (!cumulativeData) {
-      return <div>분석 데이터 불러오기 실패...</div>;
-    }
-
+  const cumulativeRes = await Fetcher<CumulativeData>(
+    `/parent/${childId}/stat/cumulative?periodType='day'`,
+  );
+  const cumulativeData = cumulativeRes.data;
+  console.log('분석 /stat api 호출 ', cumulativeData);
+  if (!cumulativeData) {
+    return <div>분석 데이터 불러오기 실패...</div>;
+  }
 
   const pageTitle = (
     <div className="self-stretch px-10 pt-14 pb-5 inline-flex flex-col justify-start items-start gap-3">
-      <Text variant={'body03'} className='text-grayscale-gray60'>
+      <Text variant={'body03'} className="text-grayscale-gray60">
         2025년 11월 1일 업데이트됨
       </Text>
-      <Text variant={'title01'}> 아이가 자주 느낀<br/>감정들을 들여다볼까요?</Text>
-      
+      <Text variant={'title01'}>
+        {' '}
+        아이가 자주 느낀
+        <br />
+        감정들을 들여다볼까요?
+      </Text>
     </div>
   );
-
 
   return (
     <PageLayout title={pageTitle}>
       {/* 헤더에 알림 개수 정보 전달 필요 */}
-          <AiComment childId={childId}
-          />
+      <AiComment childId={childId} />
 
-          <CumulateChart
-                      childId={childId}
-                      cumulative={cumulativeData.cumulative}
-                      defaultCumList={cumulativeData.cumList}
-                    />
-                    <div className="flex-1 flex flex-col gap-6 ml-20">
-                            {/* <CategoryChart categories={keywordData.keywords} childId={childId} /> */}
-                          </div>
-
+      <CumulateChart
+        childId={childId}
+        cumulative={cumulativeData.cumulative}
+        defaultCumList={cumulativeData.cumList}
+      />
+      <div className="flex-1 flex flex-col gap-6 ml-20">
+        {/* {keywordData &&
+        keywordData.keywords &&
+        keywordData.keywords.length > 0 ? (
+          <CategoryRankChart keywords={keywordData.keywords} />
+        ) : (
+          // 데이터가 없을 경우 표시할 UI (Figma 디자인의 빈 상태 참고)
+          <div className="w-full max-w-[960px] px-10 py-8 bg-Grayscale-white rounded-[20px] outline outline-1 outline-offset-[-1px] outline-Grayscale-gray20 inline-flex flex-col justify-center items-center gap-10">
+            <div className="self-stretch inline-flex justify-start items-center gap-2">
+              <div className="justify-start text-Grayscale-gray90 text-xl font-extrabold font-['Tmoney_RoundWind'] leading-7">
+                카테고리 순위
+              </div>
+            </div>
+            <div className="py-8 text-center text-Grayscale-gray50 font-['Tmoney_RoundWind']">
+              아직 카테고리
+              <br />
+              데이터가 없어요
+            </div>
+          </div>
+        )} */}
+      </div>
     </PageLayout>
   );
 }

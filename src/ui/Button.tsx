@@ -53,7 +53,7 @@ type ButtonProps<T extends ElementType> = {
   className?: string;
 
   textVariant?: TextVariantType;
-  textColor?: string;
+  textClass?: string;
 } & VariantProps<typeof buttonVariants> &
   Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className'>;
 /**
@@ -81,7 +81,7 @@ export function Button<T extends ElementType = 'button'>({
   className,
   children,
   textVariant = 'caption02' as TextVariantType, 
-  textColor,
+  textClass,
   ...props
 }: ButtonProps<T>) {
   const Component = as || 'button';
@@ -99,7 +99,7 @@ export function Button<T extends ElementType = 'button'>({
       defaultTextColorClass = 'text-grayscale-gray90'; 
       break;
   }
-const textClass = twMerge(defaultTextColorClass, textColor);
+const textClassName = twMerge(defaultTextColorClass, textClass);
   return (
     <Component
       className={twMerge(buttonVariants({ variant }), className)}
@@ -109,7 +109,7 @@ const textClass = twMerge(defaultTextColorClass, textColor);
       <Text 
         as="span" 
         variant={textVariant} // Button의 textVariant prop 사용
-        className={textClass} // 색상 클래스 적용
+        className={textClassName} // 색상 클래스 적용
       > 
         {children}
       </Text>
