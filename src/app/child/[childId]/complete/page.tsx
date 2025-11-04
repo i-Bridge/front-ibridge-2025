@@ -1,7 +1,7 @@
 'use client';
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect } from 'react';
-import AvatarIcon from '../_components/AvatarIcons';
+import AvatarIcon from '../../../../ui/icon/AvatarIcons';
 import FullscreenToggle from '../_components/header/FullscreenToggle';
 import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';

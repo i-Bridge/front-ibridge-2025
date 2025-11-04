@@ -1,6 +1,6 @@
 import { Fetcher } from '@/lib/fetcher';
 import { LoginResponse } from '@/types';
-import Header from '@/components/Headers/ParentHeader';
+import ParentHeader from '@/components/Headers/ParentHeader';
 import ModalCard from '@/ui/Modal/ModalCard';
 import { Text } from '@/ui/Text';
 import ChildProfileLink from '@/app/profile/_components/ChildProfileLink';
@@ -36,7 +36,7 @@ export default async function Profile() {
   return (
     <>
       {/* Header, ModalCard, Text 등은 서버 컴포넌트에서 렌더링 가능합니다 */}
-      <Header firstchildId={profileData.children[0].id} />
+      < ParentHeader firstchildId={profileData.children[0].id} />
       <ModalCard hasBorder={false}>
         <div className="flex flex-col gap-3">
           <Text variant={'title03'} className="text-grayscale-gray60">
