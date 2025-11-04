@@ -34,9 +34,6 @@
 //GrapeBunchIcon
 //FullScreenIcon
 
-
-
-
 // 여자 아이 아이콘
 export const GirlIcon = () => (
   <svg
@@ -756,33 +753,47 @@ export const ChatHistoryIcon = () => (
 export const GrapeIcon = () => (
   <svg
     width="18"
-    height="18"
-    viewBox="0 0 18 18"
+    height="20"
+    viewBox="0 0 18 20"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
     <ellipse
       cx="8.75785"
-      cy="8.75863"
+      cy="10.8211"
       rx="8.75785"
       ry="8.75863"
       fill="#595CFF"
     />
     <ellipse
       cx="8.75785"
-      cy="8.75863"
+      cy="10.8211"
       rx="8.75785"
       ry="8.75863"
-      fill="url(#paint0_linear_1227_31)"
+      fill="url(#paint0_linear_1255_64)"
       fillOpacity="0.2"
+    />
+    <ellipse
+      opacity="0.2"
+      cx="8.37414"
+      cy="5.31821"
+      rx="2.90685"
+      ry="2.0604"
+      fill="black"
+    />
+    <path
+      d="M8.37451 4.91861C8.52665 3.96044 9.2875 1.79543 11.1138 0.800781"
+      stroke="#00B29A"
+      strokeWidth="1.6"
+      strokeLinecap="round"
     />
     <defs>
       <linearGradient
-        id="paint0_linear_1227_31"
+        id="paint0_linear_1255_64"
         x1="8.75785"
-        y1="0"
+        y1="2.0625"
         x2="8.75785"
-        y2="17.5173"
+        y2="19.5798"
         gradientUnits="userSpaceOnUse"
       >
         <stop stopColor="white" stopOpacity="0" />
@@ -980,41 +991,41 @@ export const GrapeBunchIcon = () => (
   </svg>
 );
 
-export const FullScreenIcon=()=>(
+export const FullScreenIcon = () => (
   <svg
-        width="17"
-        height="17"
-        viewBox="0 0 17 17"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M1.83301 10.168H6.83301V15.168"
-          stroke="#4E5968"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M15.167 6.83203H10.167V1.83203"
-          stroke="#4E5968"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M10.167 6.83333L16.0003 1"
-          stroke="#4E5968"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M1 16.0013L6.83333 10.168"
-          stroke="#4E5968"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+    width="17"
+    height="17"
+    viewBox="0 0 17 17"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M1.83301 10.168H6.83301V15.168"
+      stroke="#4E5968"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M15.167 6.83203H10.167V1.83203"
+      stroke="#4E5968"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M10.167 6.83333L16.0003 1"
+      stroke="#4E5968"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M1 16.0013L6.83333 10.168"
+      stroke="#4E5968"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
 );

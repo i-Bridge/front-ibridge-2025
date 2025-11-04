@@ -23,7 +23,7 @@ export default function HydrateChildStore({
   const setOverview = useChildStore((s) => s.setOverview);
 
   useEffect(() => {
-    setOverview(overview);
+    if (overview) setOverview(overview); // ⬅️ 이 호출로 isOverviewReady=true 됨
   }, [overview, setOverview]);
 
   return children;
