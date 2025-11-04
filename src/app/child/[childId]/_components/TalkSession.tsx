@@ -9,9 +9,9 @@ import { Fetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';
 import TalkingCharacter from './TalkingCharacter';
 import HistoryModal from './HistoryModal';
-import ExitModal from './ExitModal';
+import ExitModal from './header/ExitModal';
 
-import { ChatHistoryIcon, CloseIcon } from '../_components/Header';
+import { ChatHistoryIcon, CloseIcon } from './header/ChildHeader';
 
 type TalkMode = 'question' | 'free';
 

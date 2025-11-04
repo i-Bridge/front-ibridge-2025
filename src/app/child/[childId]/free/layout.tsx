@@ -1,4 +1,4 @@
-import Header, { CloseIcon } from '../_components/Header';
+import Header, { CloseIcon } from '../_components/header/ChildHeader';
 
 export default function FreeTalkLayout({
   children,

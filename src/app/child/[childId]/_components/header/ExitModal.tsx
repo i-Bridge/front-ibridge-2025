@@ -3,7 +3,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import AvatarIcon from './AvatarIcons';
+import AvatarIcon from '../AvatarIcons';
+import { Button } from '@/ui/Button';
+import ModalFooter from '@/ui/Modal/ModalFooter';
 
 type Props = {
   isOpen: boolean;
@@ -39,24 +41,25 @@ export default function ExitModal({ isOpen, onClose, onConfirm }: Props) {
           </h3>
         </div>
 
-        {/* ✅ 2. 밑 Div (버튼) */}
-        <div className="w-full h-[104px] flex flex-col justify-center p-5">
-          {/* 2.1. 버튼 그룹 */}
-          <div className="w-full flex gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 px-4 py-5 bg-grayscale-gray10 text-gray-70 font-extrabold rounded-full hover:bg-grayscale-gray20 transition-colors text-base"
-            >
-              계속 대화하기
-            </button>
-            <button
-              onClick={onConfirm}
-              className="flex-1 px-4 py-5 bg-primary-primary text-white font-extrabold rounded-full hover:bg-orange-600 transition-colors text-base"
-            >
-              종료하기
-            </button>
-          </div>
-        </div>
+        {/* 2.1. 버튼 그룹 */}
+        <ModalFooter className="">
+          <Button
+            onClick={onClose}
+            variant={'grayscale'}
+            className=""
+            textVariant={'caption02'}
+          >
+            계속 대화하기
+          </Button>
+          <Button
+            onClick={onConfirm}
+            variant={'primary'}
+            className=""
+            textVariant={'caption02'}
+          >
+            종료하기
+          </Button>
+        </ModalFooter>
       </motion.div>
     </div>
   );

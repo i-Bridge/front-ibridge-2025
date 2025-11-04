@@ -1,4 +1,7 @@
-import Header, { ChildName, GrapeInfo } from '../_components/Header';
+import Header, {
+  ChildName,
+  GrapeInfo,
+} from '../_components/header/ChildHeader';
 
 export default function HomeLayout({
   children,

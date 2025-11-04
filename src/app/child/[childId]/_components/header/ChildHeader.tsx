@@ -135,7 +135,7 @@ type HeaderProps = {
 /**
  * 모든 페이지에서 재사용 가능한 조합형 헤더 컴포넌트 (Default Export)
  */
-export default function Header({
+export default function ChildHeader({
   left,
   center,
   right,
