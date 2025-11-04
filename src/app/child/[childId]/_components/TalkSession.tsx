@@ -11,7 +11,9 @@ import TalkingCharacter from './TalkingCharacter';
 import HistoryModal from './HistoryModal';
 import ExitModal from './header/ExitModal';
 
-import { ChatHistoryIcon, CloseIcon } from './header/ChildHeader';
+import { ChatHistoryIcon, ExitIcon } from '@/ui/icon/icon';
+import ChildHeaderLayout from './header/ChildHeader';
+import FullscreenToggle from './header/FullscreenToggle';
 
 type TalkMode = 'question' | 'free';
 
@@ -181,29 +183,36 @@ export default function TalkSession({
       </div>
 
       {/* ✅ [수정] 모든 제어 버튼을 TalkSession 내부에 배치합니다. */}
-      <div className="absolute top-6 right-6 z-40 flex items-center gap-4">
-        {/* '오늘의 질문' 모드일 때만 '이전 기록' 버튼을 보여줍니다. */}
-        {mode === 'question' && (
-          <button
-            onClick={() => setIsHistoryModalOpen(true)}
-            className="p-3 bg-white/70 rounded-full shadow-lg hover:bg-white active:scale-95 transition-all"
-            aria-label="이전 대화 기록"
-            title="이전 대화 기록"
-          >
-            <ChatHistoryIcon />
-          </button>
-        )}
+      <ChildHeaderLayout
+        left={<FullscreenToggle />}
+        right={
+          <>
+            {mode === 'question' && (
+              <button
+                onClick={() => setIsHistoryModalOpen(true)}
+                className="w-10 h-10 max-w-52 bg-white rounded-xl inline-flex justify-center items-center gap-0.5 hover:bg-white active:scale-105 transition-all"
+                aria-label="이전 대화 기록"
+                title="이전 대화 기록"
+              >
+                <ChatHistoryIcon />
+              </button>
+            )}
 
-        {/* '나가기' 버튼 (CloseIcon) */}
-        <button
-          onClick={() => setIsExitModalOpen(true)}
-          className="p-3 bg-white/70 rounded-full shadow-lg hover:bg-white active:scale-95 transition-all"
-          aria-label="대화 그만하기"
-          title="대화 그만하기"
-        >
-          <CloseIcon />
-        </button>
-      </div>
+            {/* '나가기' 버튼 (ExitIcon) */}
+            <button
+              onClick={() => setIsExitModalOpen(true)}
+              className="w-10 h-10 max-w-52 bg-white rounded-xl inline-flex justify-center items-center gap-0.5 hover:bg-white active:scale-105 transition-all"
+              aria-label="대화 그만하기"
+              title="대화 그만하기"
+            >
+              <ExitIcon />
+            </button>
+          </>
+        }
+      />
+
+      {/* '오늘의 질문' 모드일 때만 '이전 기록' 버튼을 보여줍니다. */}
+
       <HistoryModal
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}
@@ -216,6 +225,7 @@ export default function TalkSession({
         onClose={() => setIsExitModalOpen(false)}
         onConfirm={handleExitConfirm}
       />
+
       <div className="relative z-10 p-6 flex flex-row items-center justify-center w-full gap-8">
         {/* =================================
         1. 왼쪽 DIV (말풍선 + 캐릭터)
@@ -266,23 +276,23 @@ export default function TalkSession({
                   <path
                     d="M1.3335 2.16992V7.19972H6.36329"
                     stroke="#FF6B31"
-                    stroke-width="2.66667"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="2.66667"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                   <path
                     d="M19.7759 15.5825V10.5527H14.7461"
                     stroke="#FF6B31"
-                    stroke-width="2.66667"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="2.66667"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                   <path
                     d="M17.6719 6.3618C17.2468 5.16033 16.5242 4.08615 15.5716 3.23948C14.619 2.39281 13.4675 1.80125 12.2244 1.52C10.9814 1.23874 9.68735 1.27696 8.46307 1.63108C7.23879 1.98521 6.12416 2.6437 5.2232 3.54511L1.3335 7.20009M19.7761 10.5533L15.8864 14.2083C14.9854 15.1097 13.8708 15.7682 12.6465 16.1223C11.4222 16.4764 10.1282 16.5146 8.88513 16.2334C7.64209 15.9521 6.49054 15.3606 5.53796 14.5139C4.58537 13.6672 3.86278 12.5931 3.43763 11.3916"
                     stroke="#FF6B31"
-                    stroke-width="2.66667"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="2.66667"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
               </button>
