@@ -1,5 +1,6 @@
 'use client';
 
+import { FullScreenIcon } from '@/ui/icon/icon';
 import { useState, useEffect, useCallback } from 'react';
 
 /**
@@ -48,42 +49,7 @@ export default function FullscreenToggle() {
       aria-label="전체 화면으로 보기"
       title="전체 화면으로 보기"
     >
-      <svg
-        width="17"
-        height="17"
-        viewBox="0 0 17 17"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M1.83301 10.168H6.83301V15.168"
-          stroke="#4E5968"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M15.167 6.83203H10.167V1.83203"
-          stroke="#4E5968"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M10.167 6.83333L16.0003 1"
-          stroke="#4E5968"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M1 16.0013L6.83333 10.168"
-          stroke="#4E5968"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <FullScreenIcon/>
     </button>
   );
 }

@@ -3,9 +3,13 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import AvatarIcon from '../AvatarIcons';
+import AvatarIcon from '../../../../../ui/icon/AvatarIcons';
 import { Button } from '@/ui/Button';
 import ModalFooter from '@/ui/Modal/ModalFooter';
+import ModalHeader from '@/ui/Modal/ModalHeader';
+import { Text } from '@/ui/Text';
+import PopupOverlay from '@/ui/Modal/PopupOverlay';
+import ModalCard from '@/ui/Modal/ModalCard';
 
 type Props = {
   isOpen: boolean;
@@ -18,35 +22,27 @@ export default function ExitModal({ isOpen, onClose, onConfirm }: Props) {
 
   return (
     // Backdrop
-    <div
-      className="absolute inset-0 z-[60] flex items-center justify-center bg-black/30 backdrop-blur-sm"
-      onClick={onClose} // 배경 클릭 시 닫기
-    >
+    <PopupOverlay onClose={onClose}>
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.2 }}
-        className="w-[482px] bg-white rounded-[40px] shadow-xl flex flex-col overflow-hidden"
+        className=""
         onClick={(e) => e.stopPropagation()} // 모달 내부 클릭 시 닫힘 방지
       >
-        {/* ✅ 1. 윗 Div (아이콘 + 텍스트) */}
-        <div className="w-full h-[207px] flex flex-col items-center gap-5 pt-[48px] pb-5">
-          {/* ✅ [수정] 아이콘을 감싸던 배경 div 제거 */}
-          {/* 아이콘 크기를 w-20 h-20으로 조정하고, text-orange-500 적용 */}
+        <ModalCard hasBorder={false} className='gap-0'>
+        <ModalHeader className="gap-4">
           <AvatarIcon className="w-20 h-20 flex-shrink-0" />
-
-          {/* 1.2. 텍스트 */}
-          <h3 className="font-extrabold text-[28px] leading-[140%] text-gray-90 text-center">
+          <Text variant={'title02'} className="text-center">
             대화를 종료할 거야?
-          </h3>
-        </div>
+          </Text>
+        </ModalHeader>
 
         {/* 2.1. 버튼 그룹 */}
-        <ModalFooter className="">
+        <ModalFooter >
           <Button
             onClick={onClose}
             variant={'grayscale'}
-            className=""
             textVariant={'caption02'}
           >
             계속 대화하기
@@ -54,13 +50,14 @@ export default function ExitModal({ isOpen, onClose, onConfirm }: Props) {
           <Button
             onClick={onConfirm}
             variant={'primary'}
-            className=""
             textVariant={'caption02'}
           >
             종료하기
           </Button>
         </ModalFooter>
+        </ModalCard>
       </motion.div>
-    </div>
+      
+    </PopupOverlay>
   );
 }
