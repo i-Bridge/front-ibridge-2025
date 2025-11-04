@@ -47,7 +47,7 @@ export default async function ChildLayout({
 
   return (
     <HydrateChildStore overview={overview}>
-      <div className="select-none">{children}</div>
+      <div className=" select-none ">{children}</div>
     </HydrateChildStore>
   );
 }
