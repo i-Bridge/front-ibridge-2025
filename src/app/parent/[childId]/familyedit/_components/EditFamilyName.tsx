@@ -47,6 +47,7 @@ export default function EditFamilyName({ familyName }: { familyName: string }) {
         onClick={() => setIsModalOpen(false)} // 모달 닫기
         disabled={isPending}
         textVariant="title04"
+        className='h-16'
       >
         취소
       </Button>
@@ -59,6 +60,7 @@ export default function EditFamilyName({ familyName }: { familyName: string }) {
           newFamilyName.trim() === '' // 비어있으면 비활성화
         }
         textVariant="title04"
+        className='h-16'
       >
         {isPending ? '저장 중...' : '저장하기'}
       </Button>

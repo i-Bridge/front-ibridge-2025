@@ -1,5 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import LogoutButton from '@/components/Headers/LogoutButton';
 import { HomeIcon, PrimaryCheckIcon } from '@/ui/icon/icon';
 import { Text } from '@/ui/Text';
@@ -77,7 +78,10 @@ export default function Mypage({ childId, mypageData }: MypageDataProps) {
       {/* 나가기 & 로그아웃 */}
       <div className="self-stretch p-3 inline-flex flex-col justify-center items-start gap-2.5">
         <Button
-          onClick={() => router.push(`/child/${childId}/home`)}
+        as={Link}
+        
+                href={`/child/${childId}/home`}
+         
           variant={'primary'}
           textVariant="caption04"
           className=" h-10 px-4 py-2 inline-flex justify-center items-center gap-1"

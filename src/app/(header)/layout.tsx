@@ -1,6 +1,6 @@
 // app/AppLayout.tsx
 import React from 'react';
-import Header from '@/components/Headers/Header';
+import Header from '@/components/Headers/ParentHeader';
 import { twMerge } from 'tailwind-merge';
 
 /**

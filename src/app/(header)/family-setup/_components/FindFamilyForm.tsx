@@ -88,6 +88,7 @@ export default function FindFamilyForm() {
         return;
       } else {
         showSuccess('집 합류 요청이 성공적으로 보내졌어요!');
+        setIsRequestSentModalOpen(false);
         router.replace('/join-status');
       }
     } catch (err) {
@@ -154,6 +155,7 @@ export default function FindFamilyForm() {
           onClick={handleFamilyExist}
           variant="primary"
           disabled={loading || inputValue.trim().length === 0}
+          className='h-16'
         >
           참여하기
         </Button>
@@ -169,7 +171,7 @@ export default function FindFamilyForm() {
           subtitle="다시 한 번 확인해주세요."
           onClose={handleCloseNotExistModal}
           footerContent={
-            <Button variant="primary" onClick={handleCloseNotExistModal}>
+            <Button variant="primary" onClick={handleCloseNotExistModal} className='h-16'>
               확인
             </Button>
           }
@@ -192,13 +194,14 @@ export default function FindFamilyForm() {
                 variant="grayscale"
                 textVariant="caption02"
                 onClick={handleCloseRequestSentModal}
+                className='h-16'
               >
                 취소
               </Button>
               <Button
                 variant="primary"
                 textVariant="caption02"
-                className="whitespace-nowrap"
+                className="whitespace-nowrap h-16"
                 onClick={handleRequestSentModal}
               >
                 승인 요청 보내기

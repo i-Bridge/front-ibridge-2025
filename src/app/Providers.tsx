@@ -12,6 +12,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         position="bottom-center" 
         richColors 
         duration={2500} 
+       
       />
       {children}
     </SessionProvider>

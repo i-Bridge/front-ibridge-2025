@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import ModalCard from '@/ui/Modal/ModalCard';
 import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
@@ -24,7 +24,7 @@ export default function FamilyJoinSuccessForm({
   parents,
 }: FamilyJoinSuccessProps) {
   const displayName = familyName || '요청한 가족';
-  const router = useRouter();
+
 
   // 2. 'parentNames' 배열을 "이름1님, 이름2님" 형태의 문자열로 변환
   const adminNames =
@@ -66,7 +66,7 @@ export default function FamilyJoinSuccessForm({
         </div>
       </CustomCard>
 
-      <Button onClick={() => router.push('/profile')} variant="primary">
+      <Button as={Link} href="/profile" variant="primary" className='h-16'>
         서비스 이용하기
       </Button>
     </ModalCard>

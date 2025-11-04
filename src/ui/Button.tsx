@@ -10,8 +10,8 @@ type TextVariantType = VariantProps<typeof textVariants>['variant'];
 const buttonVariants = cva(
   // ---  기본 스타일  ---
   [
-    'inline-flex w-full items-center justify-center text-center', // self-stretch, justify-center
-    'h-16 px-10 py-5', // h-16, px-10, py-5
+    'inline-flex w-full items-center justify-center text-center whitespace-', // self-stretch, justify-center
+    ' px-10 py-5', // h-16, px-10, py-5
     'rounded-[999px]', // rounded-[999px]
     'transition-colors', // 부드러운 호버 효과
     'disabled:opacity-50 ', // 비활성화 스타일
@@ -63,7 +63,7 @@ type ButtonProps<T extends ElementType> = {
  *
  * @example
  * // 1. 기본 사용 (Text: caption02)
- * <Button onClick={() => ...}>로그아웃</Button>
+ * <Button variant="grayscale">로그아웃</Button>
  *
  * // 2. Text variant와 색상 지정
  * <Button variant="grayscale" textVariant="body01" textColor="text-error-error">

@@ -16,7 +16,7 @@ interface HeaderProps {
  * 앱 전역 헤더 컴포넌트
  * @param firstchildId - 관리자 페이지로 이동할 부모 ID
  */
-export default function Header({ firstchildId }: HeaderProps) {
+export default function ParentHeader({ firstchildId }: HeaderProps) {
   const router = useRouter();
 
   // 관리자 페이지 버튼 노출 여부 (firstchildId가 유효할 때만 노출)
