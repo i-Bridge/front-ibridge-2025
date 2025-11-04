@@ -7,11 +7,9 @@ export default async function HomePage({ params }: ChildPageParams) {
   const { childId } = await params;
 
   return (
-    <div className="w-full min-h-screen">
-      <main className="flex justify-center items-center px-10 gap-5">
-        {/* HomePageClient가 메인 UI를 담당합니다. */}
-        <HomePageClient childId={childId} />
-      </main>
-    </div>
+      <main className="flex justify-center items-center px-10 gap-5 h-full"> 
+    {/* HomePageClient는 이 h-full 영역의 중앙에 위치 */}
+    <HomePageClient childId={childId} />
+</main>
   );
 }
