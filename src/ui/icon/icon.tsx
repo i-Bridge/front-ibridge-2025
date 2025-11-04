@@ -771,7 +771,7 @@ export const GrapeIcon = () => (
       rx="8.75785"
       ry="8.75863"
       fill="url(#paint0_linear_1255_64)"
-      fill-opacity="0.2"
+      fillOpacity="0.2"
     />
     <ellipse
       opacity="0.2"
@@ -784,8 +784,8 @@ export const GrapeIcon = () => (
     <path
       d="M8.37451 4.91861C8.52665 3.96044 9.2875 1.79543 11.1138 0.800781"
       stroke="#00B29A"
-      stroke-width="1.6"
-      stroke-linecap="round"
+      strokeWidth="1.6"
+      strokeLinecap="round"
     />
     <defs>
       <linearGradient
@@ -796,8 +796,8 @@ export const GrapeIcon = () => (
         y2="19.5798"
         gradientUnits="userSpaceOnUse"
       >
-        <stop stop-color="white" stop-opacity="0" />
-        <stop offset="1" stop-color="white" />
+        <stop stopColor="white" stopOpacity="0" />
+        <stop offset="1" stopColor="white" />
       </linearGradient>
     </defs>
   </svg>
