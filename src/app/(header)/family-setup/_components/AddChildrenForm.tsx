@@ -184,6 +184,7 @@ export default function AddChildrenForm() {
             onClick={handleClose}
             variant="grayscale"
             disabled={isLoading}
+            className='h-16'
           >
             이전으로
           </Button>
@@ -191,6 +192,7 @@ export default function AddChildrenForm() {
             onClick={handleComplete}
             variant="primary"
             disabled={isCompleteDisabled}
+            className='h-16'
           >
             {isLoading ? '집 생성 중...' : '완료하기'}
           </Button>

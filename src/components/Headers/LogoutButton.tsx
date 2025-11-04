@@ -35,6 +35,7 @@ export default function LogoutButton({
       onClick={handleLogout}
       className={className}
       textVariant={textVariant} // [!!] 이제 타입이 일치합니다.
+      
     >
       {children}
     </Button>

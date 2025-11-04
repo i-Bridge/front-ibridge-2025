@@ -76,7 +76,7 @@ export function ChildCard({
           'inline-flex flex-col  gap-2',
           showActions ? 'justify-start items-start' : 'justify-center items-center',
         )}>
-          <Text variant="title02">{child.name}</Text>
+          <Text variant="title02" className='group-hover:scale-100'>{child.name}</Text>
           <Text variant="body03" className="text-grayscale-gray60 ">
             {formattedBirthday}
           </Text>

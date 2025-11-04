@@ -1,6 +1,6 @@
 // app/AppLayout.tsx
 import React from 'react';
-import Header from '@/components/Headers/Header';
+import  ParentHeader from '@/components/Headers/ParentHeader';
 import { twMerge } from 'tailwind-merge';
 
 /**
@@ -18,7 +18,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     // 💡 flex flex-col: 자식 요소(Header, main)를 수직으로 배치
     <div className="min-h-screen flex flex-col">
       {/* 1. 고정 헤더 (상단에 고정) */}
-      <Header firstchildId={undefined} />
+      < ParentHeader firstchildId={undefined} />
 
       {/* 2. 메인 컨텐츠 영역 */}
       {/* 💡 flex-1: 남은 수직 공간을 모두 차지 (Header 높이 제외) */}

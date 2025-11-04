@@ -64,7 +64,7 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
   }
 
   const pageTitle = (
-    <div className="self-stretch px-10 pt-14 pb-5 inline-flex flex-col justify-start items-start gap-3">
+    <>
       <Text variant={'body03'} className="text-grayscale-gray60">
         2025년 11월 1일 업데이트됨
       </Text>
@@ -74,7 +74,7 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
         <br />
         감정들을 들여다볼까요?
       </Text>
-    </div>
+    </>
   );
 
   return (

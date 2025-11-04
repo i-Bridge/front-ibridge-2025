@@ -6,6 +6,7 @@ import ModalHeader from '@/ui/Modal/ModalHeader';
 import ModalFooter from '@/ui/Modal/ModalFooter';
 import { Text } from '@/ui/Text';
 import PopupOverlay from '@/ui/Modal/PopupOverlay';
+import { twMerge } from 'tailwind-merge';
 
 
 interface CommonModalProps {
@@ -41,6 +42,7 @@ interface CommonModalProps {
    */
   subtitle?: string;
 
+  modalCardClassName?:string;
   /**
    * (선택 사항) `ModalFooter` 컴포넌트에 적용할 추가 Tailwind CSS 클래스입니다.
    * `tailwind-merge`에 의해 기존 스타일과 병합됩니다.
@@ -93,13 +95,17 @@ export default function CommonModalPopup({
   title,
   titleLine2, // 새로 추가된 prop
   subtitle,
+  modalCardClassName,
   footerClassName,
   titleClassName,
   subtitleClassName,
 }: CommonModalProps) {
   return (
     <PopupOverlay onClose={onClose}>
-      <ModalCard hasBorder={false} className='flex flex-col gap-0'>
+      <ModalCard hasBorder={false} className={twMerge(
+    'w-[480px] flex flex-col gap-0', 
+    modalCardClassName            
+  )}>
         {/* 헤더 영역 */}
         <ModalHeader>
           {/* 첫 번째 제목 줄 */}

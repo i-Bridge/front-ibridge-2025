@@ -11,7 +11,7 @@ const ModalFooter = ({ children, className = '' }: ModalFooterProps) => {
   return (
     <div
       className={`
-        self-stretch flex justify-center items-center  w-full ]
+        self-stretch flex justify-center items-center w-full ]
         p-5 gap-2.5 overflow-hidden
         ${className} 
       `}

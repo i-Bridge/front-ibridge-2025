@@ -264,6 +264,7 @@ export default function PrivacyConsentForm({ content }: PrivacyConsentFormProps)
             variant={'primary'}
             onClick={handleSubmit}
             disabled={!isSubmitEnabled}
+            className='h-16'
           >
             {isSubmitting ? '처리 중' : '동의 완료'}
           </Button>

@@ -1,4 +1,7 @@
-import Header, { ChildName, GrapeInfo } from '../_components/Header';
+import ChildHeaderLayout, {
+  ChildName,
+  GrapeInfo,
+} from '@/app/child/[childId]/_components/header/ChildHeader';
 
 export default function HomeLayout({
   children,
@@ -8,8 +11,13 @@ export default function HomeLayout({
   return (
     <div>
       {/* Header.ChildName 대신 ChildName 컴포넌트를 직접 사용합니다. */}
-      <Header left={<ChildName />} right={<GrapeInfo />} />
-      <main className="pt-16">{children}</main>
+      <ChildHeaderLayout
+        className="bg-white"
+        left={<ChildName />}
+        right={<GrapeInfo />}
+      />
+
+      <main className="">{children}</main>
     </div>
   );
 }

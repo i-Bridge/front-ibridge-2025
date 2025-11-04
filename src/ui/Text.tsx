@@ -4,39 +4,41 @@ import { twMerge } from 'tailwind-merge';
 
 // 1. cva로 스타일 변형(variants) 정의 
 export const textVariants = cva(
-  [
-  'font-tmoney', // 기본 스타일 
-  'text-grayscale-gray90',
-  ],
+  ['font-tmoney', 'text-grayscale-gray90'],
   {
     variants: {
       variant: {
-        // Titles
+        // Titles (lg: 기준 폰트 크기를 기반으로, sm: 에서는 약간 축소)
         title01:
-          'text-[2.5rem] font-tmoney font-extrabold leading-[3.75rem] tracking-[-0.025rem]',
+          'text-[2rem] sm:text-[2.25rem] lg:text-[2.5rem] font-extrabold leading-[3rem] lg:leading-[3.75rem] tracking-[-0.025rem]', // 40px -> 36px -> 32px
         title02:
-          'text-[1.75rem] font-tmoney font-extrabold leading-[2.45rem] tracking-[0rem]',
+          'text-[1.5rem] sm:text-[1.625rem] lg:text-[1.75rem] font-extrabold leading-[2.1rem] lg:leading-[2.45rem] tracking-[0rem]', // 28px -> 26px -> 24px
         title03:
-          'text-[1.5rem] font-tmoney font-extrabold leading-[2.1rem] tracking-[0rem]',
+          'text-[1.25rem] sm:text-[1.375rem] lg:text-[1.5rem] font-extrabold leading-[1.75rem] lg:leading-[2.1rem] tracking-[0rem]', // 24px -> 22px -> 20px
         title04:
-          'text-[1.25rem] font-tmoney font-extrabold leading-[1.75rem] tracking-[0rem]',
+          'text-[1rem] sm:text-[1.125rem] lg:text-[1.25rem] font-extrabold leading-[1.4rem] lg:leading-[1.75rem] tracking-[0rem]', // 20px -> 18px -> 16px
 
-        // Bodies
-        body01: 'text-[1.75rem] font-tmoney font-normal leading-[2.625rem] tracking-[0rem]',
-        body02: 'text-[1.25rem] font-tmoney font-normal leading-[2rem] tracking-[0rem]',
-        body03: 'text-[1.125rem] font-tmoney font-normal leading-[1.8rem] tracking-[0rem]',
-        body04: 'text-[1rem] font-tmoney font-normal leading-[1.6rem] tracking-[0rem]',
-        body05: 'text-[0.875rem] font-tmoney font-normal leading-[1.4rem] tracking-[0rem]',
+        // Bodies (lg: 기준 폰트 크기)
+        body01:
+          'text-[1.5rem] sm:text-[1.625rem] lg:text-[1.75rem] font-normal leading-[2.25rem] lg:leading-[2.625rem] tracking-[0rem]', // 28px
+        body02:
+          'text-[1rem] sm:text-[1.125rem] lg:text-[1.25rem] font-normal leading-[1.6rem] lg:leading-[2rem] tracking-[0rem]', // 20px
+        body03:
+          'text-[0.9375rem] sm:text-[1rem] lg:text-[1.125rem] font-normal leading-[1.5rem] lg:leading-[1.8rem] tracking-[0rem]', // 18px
+        body04:
+          'text-[0.875rem] sm:text-[0.9375rem] lg:text-[1rem] font-normal leading-[1.4rem] lg:leading-[1.6rem] tracking-[0rem]', // 16px
+        body05:
+          'text-[0.75rem] sm:text-[0.8125rem] lg:text-[0.875rem] font-normal leading-[1.2rem] lg:leading-[1.4rem] tracking-[0rem]', // 14px
 
-        // Captions
+        // Captions (caption01은 title03과 동일, caption02는 title04와 동일하게 조정)
         caption01:
-          'text-[1.5rem] font-tmoney font-extrabold leading-[2.1rem] tracking-[0rem]',
+          'text-[1.25rem] sm:text-[1.375rem] lg:text-[1.5rem] font-extrabold leading-[1.75rem] lg:leading-[2.1rem] tracking-[0rem]',
         caption02:
-          'text-[1.25rem] font-tmoney font-extrabold leading-[1.875rem] tracking-[0rem]',
+          'text-[1rem] sm:text-[1.125rem] lg:text-[1.25rem] font-extrabold leading-[1.5rem] lg:leading-[1.875rem] tracking-[0rem]',
         caption03:
-          'text-[1.0rem] font-tmoney font-extrabold leading-[1.5rem] tracking-[0rem]',
+          'text-[0.875rem] sm:text-[0.9375rem] lg:text-[1rem] font-extrabold leading-[1.3125rem] lg:leading-[1.5rem] tracking-[0rem]',
         caption04:
-          'text-[0.875rem] font-tmoney font-extrabold leading-[1.3125rem] tracking-[0rem]',
+          'text-[0.75rem] sm:text-[0.8125rem] lg:text-[0.875rem] font-extrabold leading-[1.125rem] lg:leading-[1.3125rem] tracking-[0rem]',
       },
     },
     defaultVariants: {
@@ -100,7 +102,7 @@ export function Text<T extends ElementType = 'p'>({
   return (
     <Component
       
-      className={twMerge(textVariants({ variant }), className)}
+      className={twMerge('group-hover:scale-100',textVariants({ variant }), className)}
       {...props}
     >
       {children}

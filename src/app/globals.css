@@ -90,45 +90,4 @@
   }
 }
 
-html {
-  overflow-y: scroll;
-}
 
-/* 스크롤바 숨기기 (웹킷 기반 브라우저) */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* 스크롤바 커스텀 스타일 (트랙을 투명하게) */
-.scrollbar-custom {
-  /* Firefox: thumb 색상, track 색상(두번째) */
-  scrollbar-width: thin;
-  scrollbar-color: theme('colors.i-lightgray') transparent;
-}
-
-/* WebKit 기반 브라우저 (Chrome, Edge, Safari 등) */
-.scrollbar-custom::-webkit-scrollbar {
-  width: 8px; /* 세로 스크롤바 폭 */
-  height: 8px; /* 가로 스크롤바 높이 */
-  background: transparent; /* 트랙 배경을 투명으로 */
-}
-
-.scrollbar-custom::-webkit-scrollbar-track {
-  background: transparent; /* 트랙(배경)을 투명으로 */
-  border-radius: 10px;
-}
-
-.scrollbar-custom::-webkit-scrollbar-thumb {
-  background: theme('colors.i-lightgray'); /* 스크롤바 손잡이 색 */
-  border-radius: 10px;
-  transition: background 0.3s;
-}
-
-.scrollbar-custom::-webkit-scrollbar-thumb:hover {
-  background: rgb(180, 178, 178); /* 호버 시 색상 변경 */
-}
-
-/* 스크롤바 모서리 (가로+세로 만나는 부분)도 투명 처리 */
-.scrollbar-custom::-webkit-scrollbar-corner {
-  background: transparent;
-}

@@ -7,8 +7,8 @@ export default async function HomePage({ params }: ChildPageParams) {
   const { childId } = await params;
 
   return (
-    <div className="w-full min-h-screen bg-white">
-      <main className="p-4 sm:p-6">
+    <div className="w-full min-h-screen">
+      <main className="flex justify-center items-center px-10 gap-5">
         {/* HomePageClient가 메인 UI를 담당합니다. */}
         <HomePageClient childId={childId} />
       </main>

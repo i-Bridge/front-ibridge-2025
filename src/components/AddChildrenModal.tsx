@@ -54,13 +54,14 @@ export default function AddChildForm({
       footerContent={
         // 💡 푸터 영역에 버튼들 전달
         <>
-          <Button variant="grayscale" onClick={handleCancel}>
+          <Button variant="grayscale" onClick={handleCancel} className='h-16'>
             취소
           </Button>
           <Button
             variant="primary"
             onClick={handleSubmit}
             disabled={!isFormValid}
+            className='h-16'
           >
             {isEditing ? '수정하기' : '추가하기'}
           </Button>
