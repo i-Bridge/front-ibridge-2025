@@ -90,14 +90,14 @@ type TextProps<T extends ElementType> = {
  */
 
 // 3. 컴포넌트 구현 
-export function Text<T extends ElementType = 'p'>({
+export function Text<T extends ElementType = 'span'>({
   as,
   variant,
   className,
   children,
   ...props
 }: TextProps<T>) {
-  const Component = as || 'p'; // 기본 태그는 'p'로 설정
+  const Component = as || 'span'; // 기본 태그는 'p'로 설정
 
   return (
     <Component

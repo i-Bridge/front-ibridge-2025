@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Providers from './Providers';
+import { tmoney } from '@/lib/font';
 
 export const metadata: Metadata = {
   title: 'i-Bridge',
@@ -13,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" className={`${tmoney.variable} font-tmoney`}>
       <body>
         <Providers>{children}</Providers>
       </body>

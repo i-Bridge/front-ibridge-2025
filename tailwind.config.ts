@@ -11,7 +11,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'tmoney': ['TMoneyDungunbaram', 'sans-serif'],
+        // 'tmoney'라는 이름으로 CSS 변수를 참조하도록 설정
+        tmoney: ['var(--font-tmoney)', 'sans-serif'],
       },
       keyframes: {
         shimmer: {
