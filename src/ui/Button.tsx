@@ -10,7 +10,7 @@ type TextVariantType = VariantProps<typeof textVariants>['variant'];
 const buttonVariants = cva(
   // ---  기본 스타일  ---
   [
-    'inline-flex w-full items-center justify-center text-center whitespace-', // self-stretch, justify-center
+    'inline-flex w-full items-center justify-center text-center whitespace-nowrap', // self-stretch, justify-center
     ' px-10 py-5', // h-16, px-10, py-5
     'rounded-[999px]', // rounded-[999px]
     'transition-colors', // 부드러운 호버 효과
@@ -58,7 +58,7 @@ type ButtonProps<T extends ElementType> = {
   Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className'>;
 /**
  * 디자인 시스템의 버튼 컴포넌트입니다.
- * 내부적으로 'Text' 컴포넌트의 'caption02' 스타일, 'h-16 px-10 py-5' 스타일을 기본으로 사용하며,
+ * 내부적으로 'h-16 px-10 py-5' 스타일, 'Text' 컴포넌트의 'caption02' 스타일을 기본으로 사용하며,
  * 'textVariant' prop을 통해 다른 타이포그래피 스타일을 적용할 수 있습니다.
  *
  * @example
@@ -66,7 +66,7 @@ type ButtonProps<T extends ElementType> = {
  * <Button variant="grayscale">로그아웃</Button>
  *
  * // 2. Text variant와 색상 지정
- * <Button variant="grayscale" textVariant="body01" textColor="text-error-error">
+ * <Button variant="grayscale" textVariant="body01" textClass="text-error-error">
  * 큰 글씨 에러 버튼
  * </Button>
  *

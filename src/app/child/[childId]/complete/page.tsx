@@ -1,37 +1,48 @@
-// /app/child/[childId]/complete/page.tsx
-
 'use client';
-
 import { useRouter, useParams } from 'next/navigation';
+import { useEffect } from 'react';
 import AvatarIcon from '../_components/AvatarIcons';
-import FullscreenToggle from '../_components/FullscreenToggle';
+import FullscreenToggle from '../_components/header/FullscreenToggle';
+import { Text } from '@/ui/Text';
+import { Button } from '@/ui/Button';
+import { showCustom } from '@/lib/toast';
+
+/**
+ * 홈 아이콘 SVG 컴포넌트 (컴포넌트 외부에 정의하여 재사용성을 높였습니다)
+ */
+function HomeIcon() {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M3 9.75L12 3L21 9.75V21H15V15H9V21H3V9.75Z"
+        fill="white"
+        stroke="white"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export default function ConversationCompletePage() {
   const router = useRouter();
   const params = useParams();
   const childId = params.childId as string;
 
-  /**
-   * 홈 아이콘 SVG
-   */
-  function HomeIcon() {
-    return (
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M3 9.75L12 3L21 9.75V21H15V15H9V21H3V9.75Z"
-          fill="white"
-          stroke="white"
-          strokeWidth="1.5"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  }
+  // ✅ [수정] 컴포넌트가 마운트될 때 (페이지 로드시) 딱 한 번만 토스트를 실행합니다.
+  useEffect(() => {
+    showCustom({
+      icon: <HomeIcon />,
+      message: '포도알 1개를 받았어요!',
+    });
+    // 빈 의존성 배열은 마운트 시 한 번만 실행됨을 보장합니다.
+  }, []);
 
   const handleGoHome = () => {
     if (childId) {
@@ -53,32 +64,24 @@ export default function ConversationCompletePage() {
         {/* 2. 캐릭터 이미지 */}
         <AvatarIcon className="w-60 h-60" />
         {/* 3. 완료 텍스트 */}
-        <h1 className="text-4xl font-bold text-[#333] mt-8 leading-snug">
+        <Text variant={'title01'} className="text-primary-primary mt-10">
           오늘의 질문
           <br />
-          <span className="text-[#FF6B31]">답변 완료!</span>
-        </h1>
+          답변 완료!
+        </Text>
 
         {/* 4. 홈으로 이동하기 버튼 */}
-        <button
+        <Button
           onClick={handleGoHome}
-          className="mt-10 flex items-center justify-center gap-2
-                     px-8 py-4 bg-[#FF6B31] text-white
-                     font-bold text-lg rounded-full
-                     shadow-lg transition-transform hover:scale-105 active:scale-95"
+          variant={'primary'}
+          textVariant={'caption02'}
+          className=" flex items-center justify-center gap-2 mt-10"
         >
           <HomeIcon />
           홈으로 이동하기
-        </button>
+        </Button>
 
-        {/* 5. 포도알 획득 정보 */}
-        <div
-          className="mt-6 inline-flex items-center justify-center gap-2
-                      px-6 py-3 bg-white rounded-full shadow-md"
-        >
-          <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
-          <p className="text-gray-800 font-semibold">포도알 1개를 받았어요!</p>
-        </div>
+        {/* 5. 포도알 획득 정보 (토스트로 대체됨) */}
       </div>
     </div>
   );

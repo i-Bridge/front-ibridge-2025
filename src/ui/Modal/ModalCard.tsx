@@ -36,7 +36,7 @@ const ModalCard = ({
     : '';
 
   return (
-    <div className="w-full max-w-[480px]">
+    <div className="w-[480px]">
       <div
         // [수정] 템플릿 리터럴 대신 twMerge 함수를 사용합니다.
         // twMerge는 전달된 클래스들을 순서대로 병합합니다.
