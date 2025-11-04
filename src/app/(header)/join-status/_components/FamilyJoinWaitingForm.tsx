@@ -52,7 +52,9 @@ export default function FamilyJoinSuccessForm({
   const handleUndoRequest = async () => {
     setLoading(true);
     try {
-      const res = await Fetcher('/start/signup/undo');
+      const res = await Fetcher('/start/signup/undo', {
+        method: 'POST'
+      }); 
 
       if (res.isSuccess) {
         // 요청 취소 성공
@@ -92,7 +94,7 @@ export default function FamilyJoinSuccessForm({
         </div>
 
         {/* 합류한 가족 정보 카드 */}
-        <CustomCard className="bg-grayscale-gray5 ">
+        <CustomCard className=" bg-grayscale-gray5  items-start">
           <div className="flex flex-col justify-start items-start gap-2">
             <Text as="div" variant="title02">
               {displayName}
@@ -104,7 +106,7 @@ export default function FamilyJoinSuccessForm({
           </div>
         </CustomCard>
 
-        <Button onClick={handleOpenModal} variant="grayscale">
+        <Button onClick={handleOpenModal} variant="grayscale" className='h-16'>
           요청 취소하기
         </Button>
       </ModalCard>
@@ -116,14 +118,15 @@ export default function FamilyJoinSuccessForm({
           onClose={handleCloseModal} // 'x' 버튼이나 외부 클릭 시
           footerContent={
             
-              <div className="flex flex-row ">
-                <Button variant="grayscale" onClick={handleCloseModal}>
+              <div className="w-full flex flex-row gap-3">
+                <Button variant="grayscale" onClick={handleCloseModal} className='h-16'>
                   취소
                 </Button>
                 <Button
                   onClick={handleUndoRequest}
                   disabled={loading}
                   variant="primary"
+                  className='h-16'
                 >
                   {loading ? '요청 취소 중' : '확인'}
                 </Button>

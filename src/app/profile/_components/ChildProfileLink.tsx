@@ -52,7 +52,7 @@ export default function ChildProfileLink({ childList }: ChildProfileLinkProps) {
             // 2명일 땐(totalChildren=2) Link가 'flex-1'
             // 3명 이상(캐러셀)일 땐, Link가 'flex-1' (페이지가 2명 꽉차게)
             className={twMerge(
-              'block transition-transform duration-150 hover:scale-[1.01]',
+              'block transition-transform duration-150 group hover:scale-[1.01]',
               // 2명일 때, 또는 3명 이상 캐러셀 모드일 때
               (totalChildren === 2 || totalChildren >= 3) && 'flex-1',
             )}
@@ -60,14 +60,10 @@ export default function ChildProfileLink({ childList }: ChildProfileLinkProps) {
             <ChildCard
               child={child}
               showActions={false}
-              // [수정] 레이아웃 로직
-              // 1명일 땐 'w-56'
-              // 2명 또는 3명 이상 캐러셀일 땐 'w-full' (Link의 flex-1을 채움)
-              cardClassName={
-                totalChildren === 1
-                  ? 'w-56'
-                  : 'w-full'
-              }
+              cardClassName={twMerge(
+                'group-hover:scale-[1.01]', // 모든 경우에 적용되는 기본 클래스
+                totalChildren === 1 ? 'w-56' : 'w-full', // 조건부 클래스
+              )}
             />
           </Link>
         ))}
@@ -84,4 +80,3 @@ export default function ChildProfileLink({ childList }: ChildProfileLinkProps) {
     </div>
   );
 }
-

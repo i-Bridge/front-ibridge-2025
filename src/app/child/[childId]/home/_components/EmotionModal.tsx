@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { EMOTIONS, type EmotionId } from '@/constants/emotions';
-
+import { Text } from '@/ui/Text';
+import { Button } from '@/ui/Button';
 type EmotionModalProps = {
   open: boolean;
   onClose: () => void;
