@@ -14,7 +14,10 @@ export const ChildName = () => {
 };
 
 export const GrapeInfo = () => {
-  const { grapeBunches, grapePieces } = useChildStore();
+  const { grapeBunches, grapePieces, isOverviewReady } = useChildStore();
+  // 데이터 준비 전에는 아무것도 렌더하지 않음
+  if (!isOverviewReady) return null;
+
   return (
     <div className="flex items-center gap-5">
       <div className="inline-flex justify-start items-center gap-1">
