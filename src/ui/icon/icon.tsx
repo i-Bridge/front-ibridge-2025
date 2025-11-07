@@ -38,8 +38,10 @@
 //Type2NoticeIcon
 //Type3NoticeIcon
 //Type4NoticeIcon
-
-
+//----------------
+//RerollIcon
+//RedXIcon
+//GreenCheckIcon
 
 
 // 여자 아이 아이콘
@@ -1282,6 +1284,84 @@ export const Type4NoticeIcon = () => (
       height="17.1425"
       rx="1"
       fill="#168AFF"
+    />
+  </svg>
+);
+
+
+
+export const RerollIcon = () => (
+  <svg
+    width="17"
+    height="14"
+    viewBox="0 0 17 14"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M1 1.66504V5.66609H5.00105"
+      stroke="#6B7684"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M15.67 12.3341V8.33301H11.6689"
+      stroke="#6B7684"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M13.9968 4.99947C13.6586 4.04375 13.0838 3.18927 12.326 2.51577C11.5682 1.84227 10.6522 1.3717 9.66342 1.14797C8.67461 0.924237 7.64524 0.954638 6.67136 1.23633C5.69748 1.51803 4.81083 2.04184 4.09415 2.75889L1 5.66632M15.6705 8.33368L12.5764 11.2411C11.8597 11.9582 10.973 12.482 9.99916 12.7637C9.02528 13.0454 7.99591 13.0758 7.0071 12.852C6.0183 12.6283 5.10228 12.1577 4.34452 11.4842C3.58677 10.8107 3.01197 9.95625 2.67377 9.00053"
+      stroke="#6B7684"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+
+export const RedXIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M15 5L5 15"
+      stroke="#FF5E5E"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M5 5L15 15"
+      stroke="#FF5E5E"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const GreenCheckIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M16.6668 5L7.50016 14.1667L3.3335 10"
+      stroke="#00B29A"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 );

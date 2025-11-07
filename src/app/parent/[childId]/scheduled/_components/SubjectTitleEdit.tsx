@@ -4,16 +4,23 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Fetcher } from '@/lib/fetcher';
 import { useScheduledSubjects } from '@/hooks/parentHome/useScheduledSubjects';
-import {  showError } from '@/lib/toast';
-
+import { showError } from '@/lib/toast';
+import { Text } from '@/ui/Text';
+import { Button } from '@/ui/Button';
+import { formatDateWithDay } from '@/hooks/formatDateWithDay';
+import { EditIcon,RerollIcon,GreenCheckIcon,  RedXIcon} from '@/ui/icon/icon';
 interface Props {
   subjectId: number;
   subjectTitle: string;
+  date: string; // ✅ 날짜 prop 추가
 }
 
 const MAX_REFRESH_COUNT = 2;
 
-const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
+
+
+
+const SubjectTitleEdit = ({ subjectId, subjectTitle, date }: Props) => {
   const { childId } = useParams();
   const { refetch: refetchScheduled } = useScheduledSubjects();
 
@@ -44,17 +51,13 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
     try {
       const res = await Fetcher(
         `/parent/${childId}/questions/edit?subjectId=${subjectId}`,
-        { method: 'PATCH', data: { title: inputValue } }
+        { method: 'PATCH', data: { title: inputValue } },
       );
       console.log('편집 저장 응답:', res);
       if (res?.isSuccess) {
         setTitle(inputValue);
         setEditing(false);
-
-        // 오늘 날짜면 infiniteSubjects refetch, 아니면 scheduledSubjects refetch
-        
-          refetchScheduled();
-        
+        refetchScheduled();
       } else {
         showError('저장 실패');
       }
@@ -66,13 +69,12 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
 
   const handleReroll = async () => {
     if (refreshCount >= MAX_REFRESH_COUNT) {
-     // showWarning('이 주제는 더 이상 새로고침할 수 없습니다!');
       return;
     }
 
     try {
       const res = await Fetcher<Props>(
-        `/parent/${childId}/questions/reroll?subjectId=${subjectId}`
+        `/parent/${childId}/questions/reroll?subjectId=${subjectId}`,
       );
 
       const subjectdata = res.data;
@@ -87,8 +89,6 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
         const newCount = refreshCount + 1;
         setRefreshCount(newCount);
         localStorage.setItem(localStorageKey, String(newCount));
-
-        // 새로고침 후도 날짜 기준 refetch
         refetchScheduled();
       }
     } catch (err) {
@@ -98,68 +98,109 @@ const SubjectTitleEdit = ({ subjectId, subjectTitle }: Props) => {
   };
 
   return (
-    <div className="flex justify-between items-center gap-2">
-      {editing ? (
-        <input
-          className="border px-2 py-1 rounded w-full"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-        />
-      ) : (
-        <span>{title}</span>
-      )}
+    <div
+      // data-editable은 디버깅용으로 남겨둡니다.
+      data-editable={editing}
+      // ✅ 'editing' 상태에 따라 내부 gap을 조절합니다.
+      className={`self-stretch px-8 pt-6 pb-8 bg-white rounded-[20px] border border-1 border-grayscale-gray20 inline-flex flex-col justify-center items-start ${
+        editing ? 'gap-3' : 'gap-1'
+      }`}
+    >
+      {/* --- 상단 (날짜 + 버튼) --- */}
+      <div className="self-stretch inline-flex justify-between items-center gap-2">
+        <Text variant={'body03'} className="text-grayscale-gray60">
+          {formatDateWithDay(date)}
+        </Text>
 
-      <div className="flex gap-2">
-        {editing ? (
-          <>
-            <button
-              onClick={handleSave}
-              className="text-green-600 hover:underline"
-              aria-label="저장"
-            >
-              저장
-            </button>
-            <button
-              onClick={handleCancel}
-              className="text-gray-500 hover:underline"
-              aria-label="취소"
-            >
-              취소
-            </button>
-          </>
-        ) : (
-          <>
-            <button onClick={handleEditClick} className="text-blue-600">
-              수정
-            </button>
-
-            <div
-              className="relative"
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
-            >
-              <button
-                onClick={handleReroll}
-                disabled={refreshCount >= MAX_REFRESH_COUNT}
-                className={`text-orange-600 transition ${
-                  refreshCount >= MAX_REFRESH_COUNT
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'hover:text-orange-700'
-                }`}
+        {/* --- 버튼 그룹 --- */}
+        <div className="flex justify-start items-center gap-2">
+          {editing ? (
+            <>
+              {/* 취소(X) 버튼 */}
+              <Button
+                data-type="x"
+                onClick={handleCancel}
+                className="w-10 h-10 p-1 bg-error-errorLight rounded-full justify-center items-center"
+                aria-label="취소"
               >
-                새로고침
-              </button>
+                <RedXIcon />
+              </Button>
+              {/* 저장(Check) 버튼 */}
+              <Button
+                data-type="check"
+                onClick={handleSave}
+                className="w-10 h-10 p-1 bg-other-mint-light rounded-full  justify-center items-center"
+                aria-label="저장"
+              >
+                <GreenCheckIcon />
+              </Button>
+            </>
+          ) : (
+            <>
+              {/* 수정(Edit) 버튼 */}
+              <Button
+                data-type="edit"
+                onClick={handleEditClick}
+                className="w-10 h-10 p-1 bg-grayscale-gray5 rounded-full  justify-center items-center "
+                aria-label="수정"
+              >
+                <EditIcon />
+              </Button>
 
-              {showTooltip && (
-                <div className="absolute top-full mt-1 left-1/2 -translate-x-1/2 w-max max-w-xs bg-gray-100 text-gray-600 text-xs px-3 py-2 rounded shadow-sm z-10">
-                  새로고침하면 질문을 다시 생성할 수 있습니다.
-                  <br />
-                  새로고침 기회는{' '}
-                  <strong>{MAX_REFRESH_COUNT - refreshCount}</strong>번 남았습니다.
-                </div>
-              )}
-            </div>
-          </>
+              {/* 새로고침(Reroll) 버튼 + 툴팁 */}
+              <div
+                className="relative"
+                onMouseEnter={() => setShowTooltip(true)}
+                onMouseLeave={() => setShowTooltip(false)}
+              >
+                <Button
+                  data-type="reset"
+                  onClick={handleReroll}
+                  disabled={refreshCount >= MAX_REFRESH_COUNT}
+                  className="w-10 h-10 p-1 bg-grayscale-gray5 rounded-full justify-center items-center overflow-hidden transition"
+                  aria-label="새로고침"
+                >
+                  <RerollIcon />
+                </Button>
+
+                {/* 툴팁 (기존 로직 유지) */}
+                {showTooltip && (
+                  <Text
+                    variant={'caption04'}
+                    className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-max max-w-xs bg-grayscale-gray30 text-gray-600 text-xs px-3 py-2 rounded shadow-sm z-10"
+                  >
+                    새로고침하면 질문을 다시 생성할 수 있습니다.
+                    <br />
+                    새로고침 기회는{' '}
+                    <strong>{MAX_REFRESH_COUNT - refreshCount}</strong>번
+                    남았습니다.
+                  </Text>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* --- 하단 (질문 텍스트 / 입력창) --- */}
+      <div className="w-full self-stretch flex justify-start items-center gap-3">
+        {editing ? (
+          <div className="w-full self-stretch flex-1 h-14 px-5 rounded-xl border border-1 border-grayscale-gray20 flex justify-start items-center">
+            <Text
+              variant={'body02'}
+              className="w-full self-stretch flex justify-start items-center"
+            >
+              <input
+                className={`w-full self-stretch`}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+              />
+            </Text>
+          </div>
+        ) : (
+          <Text variant={'body03'} className="">
+            {title}
+          </Text>
         )}
       </div>
     </div>
