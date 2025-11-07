@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useScheduledSubjects } from '@/hooks/parentHome/useScheduledSubjects';
 import SubjectTitleEdit from './SubjectTitleEdit';
-import Loading from '../../../../../ui/LoadingAnim';
+import ScheduledSkeleton from './ScheduledSkeleton';
 
 export default function ScheduledList() {
   const { subjects, loading, refetch } = useScheduledSubjects();
@@ -12,34 +12,23 @@ export default function ScheduledList() {
     refetch();
   }, [refetch]);
 
-  if (loading) return <Loading />;
+  if (!subjects || loading) return <ScheduledSkeleton />;
 
-  if (!subjects || subjects.length === 0)
-    return (
-      <div className="text-center text-gray-500 mt-3 text-sm">
-        예정된 질문이 없습니다.
-      </div>
-    );
+//subject 예정된 거 없을 시 오류 처리
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-2 px-4 mt-2 mb-10">
-      {subjects.map((subject, idx) => {
-        const prevDate = idx > 0 ? subjects[idx - 1].date : null;
-        const showDateDivider = prevDate !== subject.date;
-
+    // 'space-y-4'로 카드 간의 간격을 줍니다.
+    <div className="w-full flex flex-col self-stretch gap-3">
+      {subjects.map((subject) => {
+        // 날짜 구분 로직 제거 (날짜는 이제 카드 내부에 표시)
+        // 기존 div 래퍼 제거 (SubjectTitleEdit이 카드 자체임)
         return (
-          <div key={subject.subjectId}>
-            {showDateDivider && (
-              <div className="text-gray-400 text-sm mt-4">{subject.date}</div>
-            )}
-
-            <div className="p-2 mt-2 rounded-lg bg-gray-100 transition-all hover:bg-orange-100">
-              <SubjectTitleEdit
-                subjectId={subject.subjectId}
-                subjectTitle={subject.subjectTitle}
-              />
-            </div>
-          </div>
+          <SubjectTitleEdit
+            key={subject.subjectId}
+            subjectId={subject.subjectId}
+            subjectTitle={subject.subjectTitle}
+            date={subject.date} // ✅ 날짜 prop 전달
+          />
         );
       })}
     </div>

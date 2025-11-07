@@ -1,19 +1,18 @@
 import { Fetcher } from '@/lib/fetcher';
-import FamilyTree from '@/app/parent/[childId]/familyedit/_components/FamilyTree';
 import EditFamilyName from '@/app/parent/[childId]/familyedit/_components/EditFamilyName';
-import ChildrenForm from '@/app/parent/[childId]/familyedit/_components/ChangeChildInfo';
-import { ChildPageParams } from '@/types/page-props';
 import PageLayout from '../_components/Layout/ParentLayout';
 import { Child, Parent } from '@/types';
 import { Text } from '@/ui/Text';
 import ParentProfileRow from './_components/ParentProfileRow';
-import AddChildForm from '@/components/AddChildrenModal';
 import CopyLinkButton from './_components/CopyLink';
+import ChildrenProfile from './_components/ChildrenProfile';
 
 interface FamilyData {
   familyName: string;
   parents: Parent[];
   children: Child[];
+  parentCount: number;
+  childCount: number;
 }
 
 export default async function FamilyEditPage() {
@@ -26,21 +25,15 @@ export default async function FamilyEditPage() {
   if (!familyInfo) {
     return <div>로딩 중...</div>;
   }
-  console.log(familyInfo);
-
-  const parentCount = familyInfo.parents.length;
-  const childCount = familyInfo.children.length;
+  console.log('mypage/edit', familyInfo);
 
   return (
     <PageLayout
       title={
-        
-        <div className='flex '>
+        <div className="flex ">
           <Text variant={'title01'}>{familyInfo.familyName} </Text>
           <EditFamilyName familyName={familyInfo.familyName} />
         </div>
-        
-
       }
     >
       <div className="flex flex-col w-full">
@@ -50,7 +43,7 @@ export default async function FamilyEditPage() {
             <div className="self-stretch inline-flex justify-start items-center gap-2">
               <Text variant={'title04'}>관리자</Text>
               <Text variant={'title04'} className="text-primary-primary">
-                {parentCount}
+                {familyInfo.parentCount}
               </Text>
             </div>
             <Text variant={'body04'} className="text-grayscale-gray70">
@@ -63,32 +56,34 @@ export default async function FamilyEditPage() {
             {/* 1. 이름, 수정 버튼, 이메일이 있는 첫 번째 줄 */}
             <div className="self-stretch p-8 rounded-2xl border border-gray-200 flex flex-col justify-center items-start gap-7">
               <div className="flex flex-col gap-2">
-              {familyInfo.parents.map((parent) => (
-                <ParentProfileRow
-                  key={parent.id} // React 루프에서는 고유한 key가 필수입니다.
-                  initialName={parent.name}
-                  email={parent.email}
-                  isMe={familyInfo.parents[0] === parent} // '나' 여부 전달
-                />
-              ))}
+                {familyInfo.parents.map((parent, index) => (
+                  <ParentProfileRow
+                    key={parent.id || `parent-${index}`}
+                    initialName={parent.name}
+                    email={parent.email}
+                    isMe={parent.own === true} // '나' 여부 전달
+                  />
+                ))}
               </div>
-               <CopyLinkButton link="https://ibridge.framer.website/" />
+              <CopyLinkButton link="https://ibridge.framer.website/" />
             </div>
           </div>
           {/* 2. 자녀 헤더 */}
-        <div className="self-stretch flex flex-col justify-center items-start gap-2">
-          <div className="self-stretch inline-flex justify-start items-center gap-2">
-            <Text variant={'title04'}>자녀</Text>
-            <Text variant={'title04'} className="text-primary-primary">
-              {childCount}
+          <div className="self-stretch flex flex-col justify-center items-start gap-2">
+            <div className="self-stretch inline-flex justify-start items-center gap-2">
+              <Text variant={'title04'}>자녀</Text>
+              <Text variant={'title04'} className="text-primary-primary">
+                {familyInfo.childCount}
+              </Text>
+            </div>
+            <Text variant={'body04'} className="text-grayscale-gray70">
+              자녀를 추가하면 해당 자녀의 프로필이 생성됩니다.
             </Text>
           </div>
-          <Text variant={'body04'} className="text-grayscale-gray70">
-            자녀를 추가하면 해당 자녀의 프로필이 생성됩니다.
-          </Text>
+
+          <ChildrenProfile childrenInfo={familyInfo.children} />
+          {/* 자녀 카드 */}
         </div>
-        </div>
-        
       </div>
     </PageLayout>
   );

@@ -22,6 +22,7 @@ export default async function JoinStatusPage() {
     const res = await Fetcher<LoginResponse>('/start/login');
     loginData = res?.data || null;
     console.log("login", loginData);
+    
 
   } catch (err) {
     Sentry.captureException(err); 

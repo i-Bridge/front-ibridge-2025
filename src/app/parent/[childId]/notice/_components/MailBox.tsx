@@ -1,18 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Fetcher } from '@/lib/fetcher';
-import { useRouter } from 'next/navigation';
-import { useParams } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import {
   Type1Notice,
   Type2Notice,
   Type3Notice,
   Type4Notice,
-} from './MailTypes';
+} from './MailTypes'; // MailTypes 컴포넌트 경로는 실제 위치에 맞게 수정해주세요.
 import emitter from '@/lib/eventBus';
 import { useSubjectsInfinite } from '@/hooks/parentHome/useSubjectsInfinite';
+
+// --- 레이아웃 및 UI 컴포넌트 임포트 (경로 확인 필요) ---
+import ParentLayout from '../../_components/Layout/ParentLayout';
+import { Text } from '@/ui/Text';
+import { Button } from '@/ui/Button';
+import EmptyPlaceholder from '@/ui/loading/EmptyPlaceHolder';
+
+// ✅ 스켈레톤 컴포넌트 임포트
+// (경로는 실제 MailBoxSkeleton.tsx 파일 위치에 맞게 수정해주세요)
+import MailBoxSkeleton from './MailBoxSkeleton';
 
 interface Notice {
   noticeId: number;
@@ -26,6 +35,7 @@ interface Notice {
 
 interface NoticeData {
   notices: Notice[];
+  newCount: number;
 }
 
 // 🔹Notice data Fetcher
@@ -34,6 +44,7 @@ async function fetchNoticeData(
   setError: (msg: string | null) => void,
   setLoading?: (loading: boolean) => void,
 ) {
+  if (setLoading) setLoading(true);
   try {
     const res = await Fetcher<NoticeData>('/parent/notice');
     if (res && res.data) {
@@ -41,7 +52,7 @@ async function fetchNoticeData(
     } else {
       setNoticeData(null);
     }
-    console.log('💓 NoticeData:', res); //추후 삭제 예정
+    console.log('💓 NoticeData:', res);
   } catch (err) {
     console.error('요청 중 오류 발생:', err);
     setError('⚠️ 알림을 불러오는 중 오류가 발생했습니다.');
@@ -50,71 +61,52 @@ async function fetchNoticeData(
   }
 }
 
-export default function MailBox() {
+export default function MailPage() {
   const router = useRouter();
   const params = useParams();
   const [noticeData, setNoticeData] = useState<NoticeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [open, setOpen] = useState(false); // 드롭다운 상태
-  const [fetched, setFetched] = useState(false); // 버튼 이벤트 계속 발생해도 처음 한 번만 호출하게
   const { setSelectedSubjectId, setShowPanels } = useSubjectStore();
   const { loadNext } = useSubjectsInfinite();
-  const MAX_VISIBLE = 3;
 
-  // 🔹 버튼 클릭 시 열리고, 처음 열릴 때만 fetch
-  async function handleToggleOpen() {
-    const willOpen = !open;
-    setOpen(willOpen);
-
-    if (willOpen && !fetched) {
-      setLoading(true);
+  // ✅ 컴포넌트 마운트 시 데이터 1회 호출
+  useEffect(() => {
+    const loadInitialData = async () => {
       await fetchNoticeData(setNoticeData, setError, setLoading);
-      setFetched(true); // ✅ 이미 호출함 표시
-    }
-  }
+    };
+
+    loadInitialData();
+  }, []);
 
   // 🔹 자식 답변 열람 handle
   async function handleView(
     noticeId: number,
-    senderId: number|null,
+    senderId: number | null,
     subjectId: number,
     time: string,
   ) {
     if (!noticeId || !time) return;
-
     loadNext(noticeId, subjectId);
-
-    //알람 업데이트, 알림창 닫아짐
-    await fetchNoticeData(setNoticeData, setError);
-    setOpen(false);
-
+    await fetchNoticeData(setNoticeData, setError); // 알람 업데이트
     const currentChildId = Number(params.childId);
-
     setSelectedSubjectId(subjectId);
     setShowPanels(true);
 
     if (currentChildId !== senderId) {
-      //해당 자식의 답변 열람 화면으로 이동, 자식 바뀌며 readSubject 자동 호출
-
       router.push(`/parent/${senderId}/home`);
     } else {
-      //weekly router.refresh()로 readSubject 자동 호출
       emitter.emit('reloadReadData');
     }
-
-    
   }
 
   // 🔹요청 accept handle
   async function handleAccept(senderId: number | null) {
     if (!senderId) return;
-
     const res = await Fetcher('/parent/notice/accept', {
       method: 'POST',
       data: { parentId: senderId },
     });
-
     if (res.isSuccess) {
       await fetchNoticeData(setNoticeData, setError);
     } else {
@@ -125,12 +117,10 @@ export default function MailBox() {
   // 🔹요청 decline handle
   async function handleDecline(senderId: number | null) {
     if (!senderId) return;
-
     const res = await Fetcher('/parent/notice/decline', {
       method: 'POST',
       data: { parentId: senderId },
     });
-
     if (res.isSuccess) {
       await fetchNoticeData(setNoticeData, setError);
     } else {
@@ -140,10 +130,10 @@ export default function MailBox() {
 
   // 🔹 모두 열람 버튼 핸들러
   const handleReadAll = async () => {
+    if (loading) return;
     const res = await Fetcher('/parent/notice/readAll', {
       method: 'POST',
     });
-
     if (res.isSuccess) {
       await fetchNoticeData(setNoticeData, setError, setLoading);
     } else {
@@ -151,184 +141,106 @@ export default function MailBox() {
     }
   };
 
-  const filteredNotices = noticeData?.notices?.filter((mail) => !mail.accept);
+  // 🔹 로딩, 에러, 빈 상태를 표시할 내부 컴포넌트
+  const renderMailList = () => {
+    // ✅ 1. 로딩 중일 때 스켈레톤 UI 반환
+    if (loading) {
+      // MailBoxSkeleton은 Figma의 px-10, gap-5 등 모든 래퍼를 포함합니다.
+      return <MailBoxSkeleton />;
+    }
 
-  // 🔹 카드 그룹 나누기
-  const row1Mails = filteredNotices?.filter((mail) => mail.type !== 1) || [];
-  const row2Mails = filteredNotices?.filter((mail) => mail.type === 1) || [];
-
-  // 🔹 MailRow 재사용
-  const MailRow = ({
-    mails,
-    label,
-    loading,
-    error,
-  }: {
-    mails: Notice[];
-    label?: string;
-    loading?: boolean;
-    error?: string | null;
-  }) => {
-    const [startIdx, setStartIdx] = useState(0);
-
-    const handlePrev = () =>
-      setStartIdx((prev) => Math.max(prev - MAX_VISIBLE, 0));
-    const handleNext = () =>
-      setStartIdx((prev) =>
-        Math.min(prev + MAX_VISIBLE, mails.length - MAX_VISIBLE),
-      );
-
-    const visibleMails = mails.slice(startIdx, startIdx + MAX_VISIBLE);
-
-return (
-    <div className="mb-4">
-      {label && (
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm text-gray-500">{label}</div>
-          {/* '모두 열람' 버튼은 이제 아래로 이동했습니다. */}
-        </div>
-      )}
-
-      <div className="flex flex-col gap-2 border border-gray-200 rounded-lg ">
-        {loading ? (
-          <div className=" text-sm text-gray-500 p-6">로딩 중...</div>
-        ) : error ? (
-          <div className="p-2 text-sm text-red-500">{error}</div>
-        ) : mails.length === 0 ? (
-          <div className=" text-sm text-gray-500 p-6">
-            새로운 알림이 없습니다.
+    // ✅ 2. 로딩이 끝난 후, 스켈레톤과 동일한 래퍼로 실제 콘텐츠를 감쌉니다.
+    return (
+        <div className="self-stretch flex flex-col justify-start items-start gap-4">
+          <div className="self-stretch flex flex-col justify-start items-start gap-5">
+            {/* --- 여기부터 로딩 아닐 때의 분기 --- */}
+            {error ? (
+              <div className="flex justify-center items-center h-24 self-stretch px-7 py-5 bg-red-50 rounded-xl border border-red-200">
+                <Text variant="body01" className="text-red-500">
+                  {error}
+                </Text>
+              </div>
+            ) : noticeData?.newCount === 0 ? (
+              // EmptyPlaceholder는 self-stretch가 필요할 수 있으므로 래퍼로 감쌀 수 있습니다.
+              // 혹은 EmptyPlaceholder 자체에서 너비를 100%로 설정해도 됩니다.
+              <div className="self-stretch">
+                <EmptyPlaceholder>아직 알림이 없어요!</EmptyPlaceholder>
+              </div>
+            ) : (
+              // 🔹 실제 메일 목록 렌더링
+              noticeData?.notices.map((mail) => {
+                switch (mail.type) {
+                  case 1:
+                    return (
+                      <Type1Notice
+                        key={mail.noticeId}
+                        mail={mail}
+                        onView={() =>
+                          handleView(
+                            mail.noticeId,
+                            mail.senderId,
+                            mail.subject,
+                            mail.time,
+                          )
+                        }
+                      />
+                    );
+                  case 2:
+                    return (
+                      <Type2Notice
+                        key={mail.noticeId}
+                        mail={mail}
+                        onAccept={() => handleAccept(mail.senderId)}
+                        onDecline={() => handleDecline(mail.senderId)}
+                      />
+                    );
+                  case 3:
+                    return <Type3Notice key={mail.noticeId} mail={mail} />;
+                  case 4:
+                    return <Type4Notice key={mail.noticeId} mail={mail} />;
+                  default:
+                    return null;
+                }
+              })
+            )}
+            {/* --- 분기 끝 --- */}
           </div>
-        ) : (
-          visibleMails.map((mail) => {
-            switch (mail.type) {
-              case 1:
-                return (
-                  <Type1Notice
-                    key={mail.noticeId}
-                    mail={mail}
-                    onView={() =>
-                      handleView(
-                        mail.noticeId,
-                        mail.senderId,
-                        mail.subject,
-                        mail.time,
-                      )
-                    }
-                  />
-                );
-              case 2:
-                return (
-                  <Type2Notice
-                    key={mail.noticeId}
-                    mail={mail}
-                    onAccept={() => handleAccept(mail.senderId)}
-                    onDecline={() => handleDecline(mail.senderId)}
-                  />
-                );
-              case 3:
-                return <Type3Notice key={mail.noticeId} mail={mail} />;
-              case 4:
-                return <Type4Notice key={mail.noticeId} mail={mail} />;
-              default:
-                return null;
-            }
-          })
-        )}
-      </div>
-
-      {/* '모두 열람' 버튼 */}
-      {label === '답변 열람' && mails.length >= 0 && (
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={handleReadAll}
-            className={`text-sm px-4 py-2 rounded-lg border bg-gray-100 hover:bg-gray-200 text-gray-700`}
-          >
-            모두 열람
-          </button>
         </div>
-      )}
-
-      {/* 기존의 페이지네이션 컨트롤 */}
-      {mails.length > MAX_VISIBLE && (
-        <div className="flex justify-center mt-2 gap-2">
-          <button
-            onClick={handlePrev}
-            disabled={startIdx === 0}
-            className={`w-8 h-6 flex items-center justify-center rounded-full border bg-gray-100 hover:bg-gray-200 ${
-              startIdx === 0
-                ? 'text-gray-300 cursor-not-allowed'
-                : 'text-black'
-            }`}
-          >
-            {'<'}
-          </button>
-          <button
-            onClick={handleNext}
-            disabled={startIdx >= mails.length - MAX_VISIBLE}
-            className={`w-8 h-6 flex items-center justify-center rounded-full border bg-gray-100 hover:bg-gray-200 ${
-              startIdx >= mails.length - MAX_VISIBLE
-                ? 'text-gray-300 cursor-not-allowed'
-                : 'text-black'
-            }`}
-          >
-            {'>'}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
+    );
+  };
 
   return (
-    <div className="relative inline-block text-left">
-      {/* 드롭다운 버튼 */}
-      <button onClick={handleToggleOpen} className="flex items-center gap-2 ">
-        {/* SVG 아이콘을 직접 넣은 부분 */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          className="w-10 h-10 p-1 mt-1 transition-colors duration-200 ease-in-out hover:text-orange-600"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H6.911a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661Z"
-          />
-        </svg>
-      </button>
-
-      {/* 드롭다운 내용 */}
-
-      {open && (
-        <div className="absolute z-49 mt-2 w-96 right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold text-center ">메일함</h3>
-            <button
-              onClick={() => setOpen(false)}
-              className="text-red-700 hover:text-red-900 font-bold"
-            >
-              X
-            </button>
+    <ParentLayout
+      title={
+        <div className="flex w-full items-center justify-between">
+          <div className="flex ">
+            <Text as="span" variant="title01">
+              새로운 알림이{' '}
+              <span className="text-primary-primary">
+                {/* 로딩 중일 땐 카운트가 0 또는 null일 수 있으므로 '...' 등으로 표시하는 것도 좋습니다. */}
+                {loading ? '...' : noticeData?.newCount ?? 0}개
+              </span>{' '}
+              있어요.
+            </Text>
           </div>
-
-          {/* ✅ 로딩/에러 상태를 MailRow로 넘김 */}
-          <MailRow
-            mails={row1Mails}
-            label="알림"
-            loading={loading}
-            error={error}
-          />
-          <MailRow
-            mails={row2Mails}
-            label="답변 열람"
-            loading={loading}
-            error={error}
-          />
+          <Button
+            onClick={handleReadAll}
+            disabled={(noticeData?.newCount ?? 0) === 0 || loading}
+            variant={'grayscale'}
+            className="h-10 px-4 py-2.5 w-auto bg-grayscale-gray5"
+            textVariant={'caption04'}
+            textClass="text-grayscale-gray70"
+          >
+            모두 읽음 처리
+          </Button>
         </div>
-      )}
-    </div>
+      }
+    >
+      {/* ✅ renderMailList가 이제 스켈레톤 또는
+        실제 콘텐츠 래퍼를 '직접' 반환하므로,
+        여기서는 추가 래퍼가 필요 없습니다.
+      */}
+      {renderMailList()}
+    </ParentLayout>
   );
 }

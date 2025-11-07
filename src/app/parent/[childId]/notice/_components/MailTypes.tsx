@@ -1,5 +1,6 @@
-
-
+import { Text } from '@/ui/Text';
+import { Button } from '@/ui/Button';
+import { Type1NoticeIcon, Type2NoticeIcon, Type3NoticeIcon, Type4NoticeIcon } from '@/ui/icon/icon';
 interface Notice {
   noticeId: number;
   type: 1 | 2 | 3 | 4;
@@ -10,7 +11,7 @@ interface Notice {
   accept: boolean;
 }
 
-// 🔹 type === 1 (답변 완료)
+// 🔹 type === 1 (답변 완료) - Figma 디자인 적용
 export function Type1Notice({
   mail,
   onView,
@@ -19,44 +20,37 @@ export function Type1Notice({
   onView: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between py-3 px-4 h-16">
-      <div className="flex items-center space-x-2">
-        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-600">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={3}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        </div>
-        <span className="text-sm text-gray-700">
-          {mail.senderName ?? '자녀'}(이)가 답변을 완료했어요
-        </span>
-        <span className="text-xs text-gray-300 pl-5">
-          {mail.time && formatDateKST(mail.time)}
-        </span>
+    // Figma: Outer container
+    <div className="self-stretch px-7 py-5 bg-white rounded-xl  border border-1 border-grayscale-gray20 inline-flex justify-start items-center gap-4">
+      <Type1NoticeIcon />
+
+      {/* Figma: Text block (flex-1) */}
+      <div className="flex-1 inline-flex flex-col justify-start items-start gap-1">
+        <Text variant={'body04'} className="">
+          {/* 동적 데이터 매핑 */}
+          {mail.senderName ?? '자녀'}(이)가 답변을 완료했어요.
+        </Text>
+
+        {/* 동적 데이터 매핑 */}
+        {mail.time && formatDateKST(mail.time)}
       </div>
-      <button
+
+      {/* Figma: Button (div -> button 태그로 변경) */}
+
+      <Button
         onClick={onView}
-        className="text-xs border bg-green-100 text-green-600 rounded px-1 py-1 hover:bg-blue-50"
+        variant={'grayscale'}
+        textVariant={'caption04'}
+        textClass="text-grayscale-gray70"
+        className="h-10 px-4 py-2.5 bg-grayscale-gray5 w-auto"
       >
-        답변
-        <br />
+        {/* Figma 디자인에 맞춰 '열람' 텍스트로 변경 */}
         열람
-      </button>
+      </Button>
     </div>
   );
 }
-
-// 🔹 type === 2 (가족 가입 요청)
+// 🔹 type === 2 (가족 가입 요청) - Figma 디자인 적용
 export function Type2Notice({
   mail,
   onAccept,
@@ -67,105 +61,90 @@ export function Type2Notice({
   onDecline: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between py-3 px-4">
-      <div className="flex items-center space-x-2">
-        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-pink-100 text-pink-600">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={3}
-              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-5-5.917V4a2 2 0 10-4 0v1.083A6.002 6.002 0 004 11v3.159c0 .538-.214 1.055-.595 1.436L2 17h5m5 0v1a3 3 0 11-6 0v-1m6 0a3 3 0 006 0v-1"
-            />
-          </svg>
-        </div>
-        <span className="text-sm text-gray-700">
-          {mail.senderName ?? '누군가'}님이 가족 가입을 요청했어요
-        </span>
+    // Figma: Outer container
+    <div className="self-stretch px-7 py-5 bg-white rounded-xl  border border-1 border-grayscale-gray20 inline-flex justify-start items-center gap-4">
+      {/* Figma: Icon container */}
+      <Type2NoticeIcon />
+
+      {/* Figma: Text block (flex-1) */}
+      <div className="flex-1 inline-flex flex-col justify-start items-start gap-1">
+        <Text variant={'body04'}>
+          {/* 동적 데이터 매핑 */}
+          {mail.senderName ?? '누군가'} 님이 가족 가입을 요청했어요.
+        </Text>
+
+        {/* 동적 데이터 매핑 */}
+        {mail.time && formatDateKST(mail.time)}
       </div>
-      <div className="flex space-x-2">
-        <button
-          onClick={onAccept}
-          className="text-xs border bg-blue-100 text-blue-600 rounded px-1 py-1 hover:bg-blue-50"
-        >
-          수락
-        </button>
-        <button
+
+      {/* Button container */}
+      <div className="flex justify-start items-center gap-2">
+        <Button
           onClick={onDecline}
-          className="text-xs border bg-red-100 text-red-500 rounded px-1 py-1 hover:bg-red-50"
+          variant={'grayscale'}
+          textVariant={'caption04'}
+          textClass="text-grayscale-gray70"
+          className="h-10 px-4 py-2.5 bg-grayscale-gray5"
         >
           거절
-        </button>
+        </Button>
+        <Button
+          onClick={onAccept}
+          variant={'grayscale'}
+          textVariant={'caption04'}
+          textClass="text-grayscale-gray70"
+          className="h-10 px-4 py-2.5 bg-grayscale-gray5"
+        >
+          수락
+        </Button>
       </div>
     </div>
   );
 }
 
-
-// 🔹 type === 3 (포도송이 수확)
+// 🔹 type === 3 (포도송이 수확) - Figma 디자인 적용
 export function Type3Notice({ mail }: { mail: Notice }) {
   return (
-    <div className="flex items-center justify-between py-3 px-4">
-      <div className="flex items-center space-x-2">
-        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-purple-100 text-purple-600">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 2a10 10 0 100 20 10 10 0 000-20z"
-            />
-          </svg>
-        </div>
-        <span className="text-sm text-gray-700">
-          {mail.senderName ?? '자녀'}(이)가 포도송이를 하나 수확했어요!
-        </span>
+    // Figma: Outer container (opacity-40 제거하여 일반 버전으로 변경)
+    <div className="self-stretch px-7 py-5 bg-white rounded-xl  border border-1 border-grayscale-gray20 inline-flex justify-start items-center gap-4">
+      {/* Figma: Icon container */}
+      <Type3NoticeIcon />
+
+      {/* Figma: Text block (flex-1) */}
+      <div className="flex-1 inline-flex flex-col justify-start items-start gap-1">
+        <Text variant={'body04'}>
+          {/* 동적 데이터 매핑 */}
+          {mail.senderName ?? '자녀'}(이)가 포도알 한송이를 받았어요.
+        </Text>
+        {/* 동적 데이터 매핑 */}
+        {mail.time && formatDateKST(mail.time)}
       </div>
     </div>
   );
 }
-
-// 🔹 type === 4 (분석 결과 업데이트)
+// 🔹 type === 4 (분석 결과 업데이트) - Figma 디자인 적용
 export function Type4Notice({ mail }: { mail: Notice }) {
   return (
-    <div className="flex items-center justify-between py-3 px-4">
-      <div className="flex items-center space-x-2">
-        <div className="w-6 h-6 flex items-center justify-center rounded-full bg-green-100 text-green-600">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-        </div>
-        <span className="text-sm text-gray-700">
-          {mail.senderName ?? '자녀'}의 분석 결과가 업데이트되었어요
-        </span>
+    // Figma: Outer container (opacity-40 제거하여 일반 버전으로 변경)
+    <div className="self-stretch px-7 py-5 bg-white rounded-xl  border border-1 border-grayscale-gray20 inline-flex justify-start items-center gap-4">
+      {/* Figma: Icon container */}
+      <Type4NoticeIcon />
+
+      {/* Figma: Text block (flex-1) */}
+      <div className="flex-1 inline-flex flex-col justify-start items-start gap-1">
+        <Text variant={'body04'}>
+          {/* 동적 데이터 매핑: 
+            기존 "분석 결과" 대신 Figma의 "대시보드" 텍스트를 사용하되, 
+            누구의 것인지 알 수 있도록 senderName은 유지
+          */}
+          {mail.senderName ?? '자녀'}의 대시보드가 업데이트 됐어요.
+        </Text>
+
+        {mail.time && formatDateKST(mail.time)}
       </div>
     </div>
   );
 }
-
 
 // 🔹 알림 전송된 시각
 function formatDateKST(dateStr: string) {
@@ -205,10 +184,8 @@ function formatDateKST(dateStr: string) {
   const timeText = `${hour}: ${minute}`;
 
   return (
-    <div className="text-right text-xs text-gray-300">
-      {dayText}
-      <br />
-      {timeText}
-    </div>
+    <Text variant={'body05'} className=" text-grayscale-gray50">
+      {dayText} {timeText}
+    </Text>
   );
 }

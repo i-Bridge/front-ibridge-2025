@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import AnalysisList from './AnalysisList';
-import Loading from '@/ui/LoadingAnim';
+import Loading from '@/ui/loading/LoadingAnim';
 import DateFormatter from '@/hooks/dateFormatter';
 import { Fetcher } from '@/lib/fetcher';
 

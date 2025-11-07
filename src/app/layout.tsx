@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Providers from './Providers';
+import { nps } from '@/lib/font';
 
 export const metadata: Metadata = {
   title: 'i-Bridge',
@@ -13,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
-      <body>
+    <html lang="ko" className={nps.variable}>
+      <body className="font-nps">
         <Providers>{children}</Providers>
       </body>
     </html>

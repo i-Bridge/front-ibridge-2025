@@ -1,5 +1,5 @@
 import { Text } from '@/ui/Text';
-import RotatingSpinner from '@/ui/RotatingSpinner';
+import RotatingSpinner from '@/ui/loading/RotatingSpinner';
 import LogoutButton from '@/components/Headers/LogoutButton';
 import ModalCard from '@/ui/Modal/ModalCard';
 
