@@ -90,7 +90,7 @@ async function Sidebar({ childId }: { childId: string }) {
 }
 
 
-export default function ParentLayout({ children, params }: ParentLayoutProps) {
+export default function PageLayout({ children, params }: ParentLayoutProps) {
   const childId = params.childId;
 
   return (

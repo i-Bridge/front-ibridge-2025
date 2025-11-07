@@ -35,7 +35,7 @@ export default function FamilyJoinSuccessForm({
   // 2. 'parentNames' 배열을 "이름1님, 이름2님" 형태의 문자열로 변환
   const adminNames =
     parents && parents.length > 0
-      ? parents.map((name) => `${name}`).join(', ')
+      ? parents.map((parent) => parent.name).join(', ')
       : `관리자`;
 
   //요청 취소하기

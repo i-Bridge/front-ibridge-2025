@@ -22,27 +22,23 @@ export default function FamilySelectionForm() {
           onClick={() => setStep(1)}
           className="bg-primary-primary items-start "
         >
-          <div className="gap-3">
             <Text variant="title02" className="text-white">
               집 생성하기
             </Text>
             <Text variant="body03" className="text-white/60">
               아직 집이 없어요.
             </Text>
-          </div>
         </CustomCard>
         <CustomCard
           onClick={() => setStep(3)}
           className="bg-primary-primaryLight items-start "
         >
-          <div className="gap-3">
             <Text variant="title02" className="text-primary-primary">
               집 찾기
             </Text>
             <Text variant="body03" className="text-primary-primary">
               이미 등록된 집이 있어요.
             </Text>
-          </div>
         </CustomCard>
       </div>
       
