@@ -22,11 +22,6 @@ export default function ParentHeader({ firstchildId }: HeaderProps) {
   // 관리자 페이지 버튼 노출 여부 (firstchildId가 유효할 때만 노출)
   const showAdminButton = firstchildId !== undefined && firstchildId > 0;
 
-  // 로고 클릭 시 메인 화면(/profile)으로 이동하는 핸들러
-  const handleLogoClick = () => {
-    router.push('/profile');
-  };
-
   // 관리자 페이지로 이동하는 핸들러 (동적 경로 사용)
   const handleAdminClick = () => {
     if (firstchildId) {
@@ -42,14 +37,10 @@ export default function ParentHeader({ firstchildId }: HeaderProps) {
     <header className="bg-white flex fixed items-center justify-center top-0 left-0 w-full h-16 px-10 overflow-hidden whitespace-nowrap z-50 ">
       <div className="flex justify-between items-center w-full max-w-7xl mx-auto">
         {/* 좌측: 로고 그룹 (클릭 가능하도록 수정) */}
-        <button
-          onClick={handleLogoClick}
-          className="flex justify-center items-start gap-2 cursor-pointer focus:outline-none"
-          aria-label="홈으로 이동"
-        >
+        <div className="flex justify-center items-start gap-2 cursor-pointer focus:outline-none">
           <OwlIcon className="w-6 h-6" />
           <Logo className="w-[73px] h-[28px]" />
-        </button>
+        </div>
 
         {/* 우측: 버튼 그룹 (관리자 페이지, 로그아웃) */}
         <div className="flex items-center gap-2">
