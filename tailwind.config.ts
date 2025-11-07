@@ -11,7 +11,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        nsr: ['var(--font-nps)', 'sans-serif'],
+        nps: ['var(--font-nps)', 'sans-serif'],
       },
       keyframes: {
         shimmer: {

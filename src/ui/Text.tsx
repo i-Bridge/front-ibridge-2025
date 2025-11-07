@@ -4,7 +4,7 @@ import { twMerge } from 'tailwind-merge';
 
 // 1. cva로 스타일 변형(variants) 정의 
 export const textVariants = cva(
-  ['font-tmoney', 'text-grayscale-gray90'],
+  ['font-nps', 'text-grayscale-gray90'],
   {
     variants: {
       variant: {
