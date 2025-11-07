@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { type ReactNode } from 'react';
 import { useChildStore } from '@/store/useChildStore';
 import { Text } from '@/ui/Text';
+import { Button } from '@/ui/Button';
 import { BackIcon, GrapeIcon, GrapeBunchIcon } from '@/ui/icon/icon';
 // --- 아이콘 컴포넌트들 (Named Export) ---
 
@@ -46,9 +47,10 @@ export const ToProfileButton = () => {
   const router = useRouter();
 
   return (
-    <button onClick={() => router.push('/profile')} aria-label="나가기">
+    <Button onClick={() => router.push('/profile')} className="w-10 h-10 px-3.5 py-1 bg-grayscale-gray10 rounded-[10px] 
+                 justify-center items-center"aria-label="나가기">
       <BackIcon />
-    </button>
+    </Button>
   );
 };
 
