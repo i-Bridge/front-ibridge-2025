@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { type ReactNode } from 'react';
 import { useChildStore } from '@/store/useChildStore';
 import { Text } from '@/ui/Text';
+import { Button } from '@/ui/Button';
 import { BackIcon, GrapeIcon, GrapeBunchIcon } from '@/ui/icon/icon';
 // --- 아이콘 컴포넌트들 (Named Export) ---
 
@@ -42,9 +43,21 @@ export const BackButton = () => {
   );
 };
 
+export const ToProfileButton = () => {
+  const router = useRouter();
+
+  return (
+    <Button onClick={() => router.push('/profile')} className="w-10 h-10 px-3.5 py-1 bg-grayscale-gray10 rounded-[10px] 
+                 justify-center items-center"aria-label="나가기">
+      <BackIcon />
+    </Button>
+  );
+};
+
 // --- 조합형 Header 컴포넌트 타입 정의 ---
 type HeaderProps = {
   left?: ReactNode;
+  center?: ReactNode;
   right?: ReactNode;
   className?: string;
 };
@@ -54,6 +67,7 @@ type HeaderProps = {
  */
 export default function ChildHeaderLayout({
   left,
+  center,
   right,
   className,
 }: HeaderProps) {
@@ -65,6 +79,11 @@ export default function ChildHeaderLayout({
         <div className="inline-flex justify-start items-center gap-3">
           {' '}
           {left}{' '}
+        </div>
+
+        <div className="inline-flex justify-start items-center gap-3">
+          {' '}
+          {center}{' '}
         </div>
 
         <div className="inline-flex justify-start items-center gap-3">

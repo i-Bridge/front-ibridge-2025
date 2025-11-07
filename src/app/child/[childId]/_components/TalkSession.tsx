@@ -9,7 +9,7 @@ import { Fetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';
 import TalkingCharacter from './TalkingCharacter';
 import HistoryModal from './HistoryModal';
-import ExitModal from './header/ExitModal';
+import ExitModal from './header/ChatExitModal';
 
 import { ChatHistoryIcon, ExitIcon } from '@/ui/icon/icon';
 import ChildHeaderLayout from './header/ChildHeader';

@@ -2,6 +2,7 @@
 
 import { FullScreenIcon } from '@/ui/icon/icon';
 import { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/ui/Button';
 
 /**
  * 브라우저의 Fullscreen API를 사용하여 전체 화면 모드로 진입하는 버튼입니다.
@@ -41,15 +42,14 @@ export default function FullscreenToggle() {
   }
 
   return (
-    <button
+    <Button
       onClick={enterFullscreen}
-      className="w-10 h-10 px-3.5 py-1 bg-white rounded-[10px] 
-                 inline-flex justify-center items-center gap-3 overflow-hidden
-                 transition-all hover:scale-105 active:scale-95"
+      className="w-10 h-10 px-3.5 py-1 bg-grayscale-gray10 rounded-[10px] 
+                 justify-center items-center "
       aria-label="전체 화면으로 보기"
       title="전체 화면으로 보기"
     >
       <FullScreenIcon/>
-    </button>
+    </Button>
   );
 }
