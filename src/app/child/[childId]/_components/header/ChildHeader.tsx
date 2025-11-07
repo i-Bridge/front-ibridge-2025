@@ -42,9 +42,20 @@ export const BackButton = () => {
   );
 };
 
+export const ToProfileButton = () => {
+  const router = useRouter();
+
+  return (
+    <button onClick={() => router.push('/profile')} aria-label="나가기">
+      <BackIcon />
+    </button>
+  );
+};
+
 // --- 조합형 Header 컴포넌트 타입 정의 ---
 type HeaderProps = {
   left?: ReactNode;
+  center?: ReactNode;
   right?: ReactNode;
   className?: string;
 };
@@ -54,6 +65,7 @@ type HeaderProps = {
  */
 export default function ChildHeaderLayout({
   left,
+  center,
   right,
   className,
 }: HeaderProps) {
@@ -65,6 +77,11 @@ export default function ChildHeaderLayout({
         <div className="inline-flex justify-start items-center gap-3">
           {' '}
           {left}{' '}
+        </div>
+
+        <div className="inline-flex justify-start items-center gap-3">
+          {' '}
+          {center}{' '}
         </div>
 
         <div className="inline-flex justify-start items-center gap-3">

@@ -17,7 +17,7 @@ type Props = {
   onConfirm: () => void;
 };
 
-export default function ExitModal({ isOpen, onClose, onConfirm }: Props) {
+export default function ChatExitModal({ isOpen, onClose, onConfirm }: Props) {
   if (!isOpen) return null;
 
   return (
