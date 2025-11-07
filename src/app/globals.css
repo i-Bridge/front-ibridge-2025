@@ -5,7 +5,6 @@
 @layer base {
   body {
     /* 기존 @font-face 관련 코드를 모두 제거하고, Tailwind 클래스만 적용 */
-   @apply font-tmoney antialiased; 
     
     /* 얇고 선명한 폰트 렌더링을 위한 추가 속성 */
     -webkit-font-smoothing: antialiased; /* Chrome, Safari (얇게) */
@@ -82,4 +81,11 @@
   }
 }
 
-
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
