@@ -24,6 +24,9 @@ export type ChildData = {
  * 스토어의 전체 상태 타입 (데이터 + 액션)
  */
 type State = ChildData & {
+  /** 개요 데이터가 준비됐는지 (하이드레이션 완료 플래그) */
+  isOverviewReady: boolean;
+
   /** 서버에서 받은 데이터로 스토어 전체 또는 일부를 업데이트합니다 (주로 초기화 시 사용). */
   setOverview: (overview: Partial<ChildData>) => void;
 
@@ -47,11 +50,22 @@ export const useChildStore = create<State>((set) => ({
   emotion: 0,
   emotionDone: false,
   specifiedDone: false,
+  isOverviewReady: false,
 
   // --- ACTIONS ---
-  setOverview: (newState) => set(newState),
+  setOverview: (overview) =>
+    set((prev) => ({
+      ...prev,
+      ...overview,
+      isOverviewReady: true, // 여기서 준비 완료로 전환
+    })),
 
-  setGrapeState: (grapeState) => set(grapeState),
+  setGrapeState: (grapeState) =>
+    set((prev) => ({
+      ...prev,
+      ...grapeState,
+      // 포도 상태만 갱신일 수 있으니 플래그는 건드리지 않음
+    })),
 
   setEmotionDone: (isDone) => set({ emotionDone: isDone }),
 }));

@@ -61,7 +61,7 @@ export default async function FamilyEditPage() {
                     key={parent.id || `parent-${index}`}
                     initialName={parent.name}
                     email={parent.email}
-                    isMe={familyInfo.parents[0] === parent} // '나' 여부 전달
+                    isMe={parent.own === true} // '나' 여부 전달
                   />
                 ))}
               </div>
