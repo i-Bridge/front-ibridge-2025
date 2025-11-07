@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import { useSubjectsInfinite } from '@/hooks/parentHome/useSubjectsInfinite';
 import { Subject } from '@/types/index';
@@ -30,7 +30,6 @@ export default function ScrollSubjectList({ initialSubjects }: Props) {
   const { allSubjects, loading, loadNext, hasNext, initFirstPage } =
     useSubjectsInfinite();
 
-  const [animating, setAnimating] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   // [유지] 초기 데이터 세팅 useEffect
@@ -44,9 +43,7 @@ export default function ScrollSubjectList({ initialSubjects }: Props) {
   useEffect(() => {
     if (selectedSubjectId) {
       setShowPanels(true);
-      setAnimating(true);
     } else {
-      setAnimating(true);
       setShowPanels(false);
     }
   }, [selectedSubjectId, setShowPanels]);
@@ -90,7 +87,6 @@ export default function ScrollSubjectList({ initialSubjects }: Props) {
           lastItemRef={observeLastSubject}
           isLoading={isLoading}
           isEmpty={isEmpty}
-          animating={animating}
         />
 
         {/* [유지] 무한스크롤 하단의 로딩/끝 표시는 컨테이너에 둡니다. */}

@@ -4,11 +4,11 @@
 'use client';
 
 import { Subject } from '@/types/index';
-import DateFormatter from '@/hooks/dateFormatter';
 import { Text } from '@/ui/Text';
 import SubjectCard from '@/app/parent/[childId]/answerLog/_components/SubjectCard';
 import EmptyPlaceholder from '@/ui/loading/EmptyPlaceHolder';
 import LoadingPlaceholder from '@/ui/loading/LoadingAnim';
+import { formatDateWithDay } from '@/hooks/formatDateWithDay';
 
 interface SubjectListRendererProps {
   subjects: Subject[];
@@ -17,7 +17,6 @@ interface SubjectListRendererProps {
   lastItemRef: (node: HTMLDivElement | null) => void;
   isLoading: boolean; // 초기 로딩 상태
   isEmpty: boolean; // 데이터가 없는 상태
-  animating: boolean; // 애니메이션 상태
 }
 
 /**
@@ -31,9 +30,7 @@ export default function SubjectListRenderer({
   lastItemRef,
   isLoading,
   isEmpty,
-  animating,
 }: SubjectListRendererProps) {
-  
   // [이동] 날짜별 그룹화 로직 (데이터를 어떻게 보여줄지 결정하는 렌더링 로직)
   const subjectsByDate = subjects.reduce<Record<string, Subject[]>>(
     (acc, subject) => {
@@ -72,20 +69,12 @@ export default function SubjectListRenderer({
         return (
           <div
             key={date}
-            className={`flex flex-col justify-start z-10 
-              ${animating ? 'animate-slide-in-right' : 'animate-slide-in-left'}
-              transition-transform ease-in-out`}
+            className="flex flex-col justify-start z-10 "
           >
-            <div
-              key={date}
-              className={groupIdx > 0 ? 'mt-10' : ''}
-            >
+            <div key={date} className={groupIdx > 0 ? 'mt-10' : ''}>
               <div className="mb-4">
-                <Text
-                  variant={'body03'}
-                  className="text-grayscale-gray60 "
-                >
-                  {DateFormatter(date)}
+                <Text variant={'body03'} className="text-grayscale-gray60 ">
+                  {formatDateWithDay(date)}
                 </Text>
               </div>
 
@@ -96,7 +85,7 @@ export default function SubjectListRenderer({
                     subject={subject}
                     isSelected={selectedSubjectId === subject.subjectId}
                     // [수정] prop으로 받은 핸들러 사용
-                    onClick={() => onSubjectClick(subject.subjectId)} 
+                    onClick={() => onSubjectClick(subject.subjectId)}
                     ref={
                       // [수정] prop으로 받은 ref 사용
                       groupIdx === dateGroups.length - 1 &&
