@@ -33,6 +33,11 @@
 //GrapeIcon
 //GrapeBunchIcon
 //FullScreenIcon
+//----------------
+//Type1NoticeIcon
+//Type2NoticeIcon
+//Type3NoticeIcon
+//Type4NoticeIcon
 
 
 
@@ -1017,4 +1022,266 @@ export const FullScreenIcon=()=>(
           strokeLinejoin="round"
         />
       </svg>
+);
+
+
+export const Type1NoticeIcon = () => (
+  <svg
+    width="40"
+    height="40"
+    viewBox="0 0 40 40"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="40" height="40" rx="20" fill="#FEF3DA" />
+    <path
+      d="M19.9999 12.4954C20.5998 12.4954 21.0778 12.5777 21.4339 12.7424C21.8089 12.9071 21.9869 13.1836 21.9682 13.5719L21.5183 21.6369C21.4996 22.0016 21.3309 22.2546 21.0122 22.3958C20.7123 22.537 20.3748 22.6075 19.9999 22.6075C19.625 22.6075 19.2782 22.537 18.9596 22.3958C18.6596 22.2546 18.5003 22.0016 18.4816 21.6369L18.0317 13.5719C18.0129 13.1836 18.1816 12.9071 18.5378 12.7424C18.9127 12.5777 19.4001 12.4954 19.9999 12.4954Z"
+      fill="#FAB107"
+    />
+    <circle cx="19.9697" cy="25.7258" r="1.77881" fill="#FAB107" />
+  </svg>
+);
+
+export const Type2NoticeIcon = () => (
+  <svg
+    width="40"
+    height="40"
+    viewBox="0 0 40 40"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="40" height="40" rx="20" fill="#D9F3F0" />
+    <path
+      d="M26.6668 15L17.5002 24.1667L13.3335 20"
+      stroke="#00B29A"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const Type3NoticeIcon = () => (
+  <svg
+    width="40"
+    height="40"
+    viewBox="0 0 40 40"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="40" height="40" rx="20" fill="#E6E7FF" />
+    <g clipPath="url(#clip0_1313_3044)">
+      <circle
+        cx="23.8627"
+        cy="26.0894"
+        r="4.71457"
+        transform="rotate(-13.8731 23.8627 26.0894)"
+        fill="#595CFF"
+      />
+      <circle
+        cx="23.8627"
+        cy="26.0894"
+        r="4.71457"
+        transform="rotate(-13.8731 23.8627 26.0894)"
+        fill="url(#paint0_linear_1313_3044)"
+        fillOpacity="0.4"
+      />
+      <circle
+        cx="14.0922"
+        cy="19.2186"
+        r="4.71457"
+        transform="rotate(-13.8731 14.0922 19.2186)"
+        fill="#595CFF"
+      />
+      <circle
+        cx="14.0922"
+        cy="19.2186"
+        r="4.71457"
+        transform="rotate(-13.8731 14.0922 19.2186)"
+        fill="url(#paint1_linear_1313_3044)"
+        fillOpacity="0.2"
+      />
+      <circle
+        cx="23.7602"
+        cy="15.0953"
+        r="4.71457"
+        transform="rotate(-13.8731 23.7602 15.0953)"
+        fill="#595CFF"
+      />
+      <circle
+        cx="23.7602"
+        cy="15.0953"
+        r="4.71457"
+        transform="rotate(-13.8731 23.7602 15.0953)"
+        fill="url(#paint2_linear_1313_3044)"
+        fillOpacity="0.2"
+      />
+      <circle
+        cx="18.4008"
+        cy="15.9273"
+        r="4.71457"
+        transform="rotate(-13.8731 18.4008 15.9273)"
+        fill="#595CFF"
+      />
+      <circle
+        cx="18.4008"
+        cy="15.9273"
+        r="4.71457"
+        transform="rotate(-13.8731 18.4008 15.9273)"
+        fill="url(#paint3_linear_1313_3044)"
+        fillOpacity="0.4"
+      />
+      <ellipse
+        opacity="0.2"
+        cx="17.2765"
+        cy="13.3242"
+        rx="2.02371"
+        ry="1.40233"
+        transform="rotate(-23.7507 17.2765 13.3242)"
+        fill="black"
+      />
+      <path
+        d="M17.1617 13.0859C16.9793 12.3921 16.8496 10.7005 17.7895 9.48355"
+        stroke="#00B29A"
+        strokeLinecap="round"
+      />
+      <circle
+        cx="18.5239"
+        cy="24.1344"
+        r="4.71457"
+        transform="rotate(-13.8731 18.5239 24.1344)"
+        fill="#595CFF"
+      />
+      <circle
+        cx="18.5239"
+        cy="24.1344"
+        r="4.71457"
+        transform="rotate(-13.8731 18.5239 24.1344)"
+        fill="url(#paint4_linear_1313_3044)"
+        fillOpacity="0.2"
+      />
+      <circle
+        cx="24.7036"
+        cy="21.4544"
+        r="4.71457"
+        transform="rotate(-13.8731 24.7036 21.4544)"
+        fill="#595CFF"
+      />
+      <circle
+        cx="24.7036"
+        cy="21.4544"
+        r="4.71457"
+        transform="rotate(-13.8731 24.7036 21.4544)"
+        fill="url(#paint5_linear_1313_3044)"
+        fillOpacity="0.2"
+      />
+    </g>
+    <defs>
+      <linearGradient
+        id="paint0_linear_1313_3044"
+        x1="23.8627"
+        y1="21.3749"
+        x2="23.8627"
+        y2="30.804"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopColor="white" stopOpacity="0.6" />
+        <stop offset="1" stopColor="white" stopOpacity="0.8" />
+      </linearGradient>
+      <linearGradient
+        id="paint1_linear_1313_3044"
+        x1="14.0922"
+        y1="14.504"
+        x2="14.0922"
+        y2="23.9332"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopColor="white" stopOpacity="0" />
+        <stop offset="1" stopColor="white" />
+      </linearGradient>
+      <linearGradient
+        id="paint2_linear_1313_3044"
+        x1="23.7602"
+        y1="10.3807"
+        x2="23.7602"
+        y2="19.8099"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopOpacity="0.2" />
+        <stop offset="1" stopOpacity="0.4" />
+      </linearGradient>
+      <linearGradient
+        id="paint3_linear_1313_3044"
+        x1="18.4008"
+        y1="11.2128"
+        x2="18.4008"
+        y2="20.6419"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopColor="white" stopOpacity="0.6" />
+        <stop offset="1" stopColor="white" stopOpacity="0.8" />
+      </linearGradient>
+      <linearGradient
+        id="paint4_linear_1313_3044"
+        x1="18.5239"
+        y1="19.4198"
+        x2="18.5239"
+        y2="28.8489"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopOpacity="0.2" />
+        <stop offset="1" stopOpacity="0.4" />
+      </linearGradient>
+      <linearGradient
+        id="paint5_linear_1313_3044"
+        x1="24.7036"
+        y1="16.7399"
+        x2="24.7036"
+        y2="26.169"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopColor="white" stopOpacity="0" />
+        <stop offset="1" stopColor="white" />
+      </linearGradient>
+      <clipPath id="clip0_1313_3044">
+        <rect width="24" height="24" fill="white" transform="translate(8 8)" />
+      </clipPath>
+    </defs>
+  </svg>
+);
+
+export const Type4NoticeIcon = () => (
+  <svg
+    width="40"
+    height="40"
+    viewBox="0 0 40 40"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="40" height="40" rx="20" fill="#DCEDFF" />
+    <rect
+      x="11.1069"
+      y="20"
+      width="5.08175"
+      height="8.53177"
+      rx="1"
+      fill="#168AFF"
+    />
+    <rect
+      x="17.459"
+      y="15.5505"
+      width="5.08175"
+      height="13.0206"
+      rx="1"
+      fill="#168AFF"
+    />
+    <rect
+      x="23.8115"
+      y="11.4287"
+      width="5.08175"
+      height="17.1425"
+      rx="1"
+      fill="#168AFF"
+    />
+  </svg>
 );
