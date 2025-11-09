@@ -1,6 +1,8 @@
 import CustomCard from '@/ui/CustomCard';
 import { Text } from '@/ui/Text';
 import { Fetcher } from '@/lib/fetcher'; 
+import AiCommentSkeleton from './AIBannerSkeleton';
+import { Suspense } from 'react';
 
 interface BannerData {
   cumulativeAnswerCount: number;
@@ -29,6 +31,7 @@ const bannerRes = await Fetcher<BannerData>(`/parent/${childId}/banner`);
     }
     console.log('/banner', bannerData);
   return (
+    <Suspense fallback={<AiCommentSkeleton />}>
     <div className="w-full self-stretch inline-flex flex-col justify-start items-start gap-5">
       {/* 1. 가장 많이 한 이야기 주제 */}
       {/* 피그마 레이아웃에 맞게 h-36 클래스 추가 */}
@@ -73,5 +76,6 @@ const bannerRes = await Fetcher<BannerData>(`/parent/${childId}/banner`);
         </CustomCard>
       </div>
     </div>
+    </Suspense>
   );
 }
