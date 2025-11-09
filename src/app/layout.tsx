@@ -16,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="ko" className={nps.variable}>
       <body className="font-nps">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

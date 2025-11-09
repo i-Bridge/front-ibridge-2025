@@ -5,7 +5,7 @@ import NotFound from '@/components/Exception/not-found';
 import PageLayout from '@/app/parent/[childId]/_components/Layout/ParentLayout';
 import { Text } from '@/ui/Text';
 import CumulateChart from '@/app/parent/[childId]/dashboard/_components/CumulateChart';
-import DynamicCategoryChart from './_components/DynamicCategoryChart';
+import CategoryRankChart from './_components/CategoryChart';
 interface KeywordData {
   keywords: Keyword[]; // 키워드 배열
 }
@@ -67,10 +67,9 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
         cumulative={cumulativeData.cumulative}
         defaultCumList={cumulativeData.cumList}
       />
-      <div className="flex-1 flex flex-col gap-6 ml-20">
 
-         <DynamicCategoryChart keywords={keywordData.keywords} />
-      </div>
+         <CategoryRankChart keywords={keywordData.keywords} />
+      
     </PageLayout>
   );
 }

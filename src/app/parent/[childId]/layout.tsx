@@ -46,7 +46,7 @@ async function Sidebar({ childId }: { childId: string }) {
 
   if (!session) {
     return (
-      <aside className="w-60 h-screen flex-shrink-0 bg-grayscale-gray5 border-r border-grayscale-gray20 flex flex-col">
+      <aside className="w-60 h-screen  bg-grayscale-gray5 border-r border-grayscale-gray20 flex flex-col">
         <div className="p-4">로그인이 필요합니다.</div>
       </aside>
     );
@@ -60,7 +60,7 @@ async function Sidebar({ childId }: { childId: string }) {
   } catch (err) {
     console.error('API 호출 중 오류 발생:', err);
     return (
-      <aside className="w-60 h-screen flex-shrink-0 bg-grayscale-gray5 border-r border-grayscale-gray20 flex flex-col">
+      <aside className="w-60 h-screen bg-grayscale-gray5 border-r border-grayscale-gray20 flex flex-col">
         <div className="p-4">데이터 로드 실패</div>
       </aside>
     );
@@ -76,7 +76,7 @@ async function Sidebar({ childId }: { childId: string }) {
   const currentChildName = currentChild?.childName || '아이 선택';
 
   return (
-    <aside className="w-60 h-screen flex-shrink-0 bg-grayscale-gray5 border-r border-grayscale-gray20 flex flex-col">
+    <aside className="w-60 h-screen  bg-grayscale-gray5 border-r border-grayscale-gray20 flex flex-col">
       <DropMotionMypage
         childId={childId}
         mypageData={myPageData}
