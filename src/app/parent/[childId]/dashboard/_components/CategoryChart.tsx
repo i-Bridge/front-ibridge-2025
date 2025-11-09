@@ -1,42 +1,56 @@
 'use client';
 
-import { useState } from 'react';
+import { Text } from '@/ui/Text';
+
+// 1. useState import 제거 (현재 사용되지 않음)
 import {
   ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
-  Tooltip,
-  TooltipProps,
-} from 'recharts';
-// import SubjectPopup from './SubjectPopup'; // 1. 팝업 컴포넌트 import (오류로 인해 제거)
-interface Keyword {
+  Tooltip, // 타입도 가져옵니다.
+} from './ClientRecharts';
+
+// --- 타입 정의 ---
+export interface Keyword {
   keyword: string;
   count: number;
   positiveScore: number;
 }
-// Pie 차트 데이터 타입
+
 interface PieData {
   name: string;
   value: number;
-  // 원본 데이터를 툴팁에서 사용하기 위해 포함
   original: Keyword | { keyword: string; count: number; positiveScore: number };
+  [key: string]: unknown;
 }
 
-// 컴포넌트 Props
-interface CategoryRankChartProps {
+export interface CategoryRankChartProps {
   keywords: Keyword[];
 }
 
-// 1~5위 + 기타 색상
+// --- 상수 ---
 const PIE_COLORS = [
-  '#38bdf8', // 1위 (sky-400)
-  '#60c9f9', // 2위
-  '#89d6fa', // 3위
-  '#b2e2fb', // 4위
-  '#d8eefd', // 5위
-  '#f1f5f9', // 6. 기타 (gray-100)
+  '#51C2FF', // 1위 (sky-400)
+  '#51C2FFCC', // 2위
+  '#51C2FF99', // 3위
+  '#51C2FF66', // 4위
+  '#51C2FF33', // 5위
+  '#FFFFFF', // 6. 기타 (gray-100)
 ];
+
+interface RechartsPayloadItem {
+  payload: PieData;
+}
+interface MyCustomTooltipProps {
+  active?: boolean;
+  payload?: RechartsPayloadItem[];
+  totalCount: number;
+}
+
+// ==================================================================
+// 헬퍼 컴포넌트 (Helper Components)
+// ==================================================================
 
 /**
  * Recharts 커스텀 툴팁
@@ -44,21 +58,22 @@ const PIE_COLORS = [
 const CustomTooltip = ({
   active,
   payload,
-  ...props
-}: TooltipProps<number, string> & { totalCount: number }) => {
+  totalCount, // [수정 2] props를 이 타입으로 구조 분해합니다.
+}: MyCustomTooltipProps) => {
   if (active && payload && payload.length) {
-    const data = payload[0].payload as PieData;
-    const percent = ((data.value / props.totalCount) * 100).toFixed(0);
+    // [수정 3] payload[0].payload가 PieData 타입임을 보장받습니다.
+    const data = payload[0].payload;
+    const percent = ((data.value / totalCount) * 100).toFixed(0);
 
     return (
       <div className="w-32 inline-flex flex-col justify-center items-center">
         <div className="px-3 py-2 bg-Grayscale-gray90 rounded-md flex flex-col justify-start items-center gap-1 shadow-lg">
-          <div className="justify-center text-Grayscale-white text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5">
+          <Text variant={'caption04'} className="text-white">
             {data.name}
-          </div>
-          <div className="justify-center text-white/70 text-sm font-normal font-['Tmoney_RoundWind'] leading-6">
+          </Text>
+          <Text variant={'body05'} className=" text-white/70">
             {percent}%
-          </div>
+          </Text>
         </div>
         {/* 툴팁 꼬리 */}
         <div className="w-9 px-1.5 inline-flex justify-center items-start">
@@ -84,53 +99,19 @@ const CustomTooltip = ({
   return null;
 };
 
-// ------------------------------------------------------------------
-// 2. SubjectPopup 컴포넌트를 파일 내부로 이동
-// ------------------------------------------------------------------
-interface SubjectPopupProps {
-  keyword: string;
-  onClose: () => void;
-}
-
 /**
- * 팝업 컴포넌트 (Placeholder)
- * 'N개의 대화' 클릭 시 보일 팝업입니다.
+ * 2. SubjectPopup 컴포넌트 (주석 처리됨)
  */
-function SubjectPopup({ keyword, onClose }: SubjectPopupProps) {
-  return (
-    // 전체 화면 오버레이
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center"
-      onClick={onClose} // 배경 클릭 시 닫기
-    >
-      {/* 팝업 컨텐츠 */}
-      <div
-        className="bg-Grayscale-white p-8 rounded-[20px] z-50 w-[90%] max-w-[400px]"
-        onClick={(e) => e.stopPropagation()} // 팝업 내부 클릭 시 닫히지 않게
-      >
-        {/* 헤더 */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-Grayscale-gray90 text-xl font-extrabold font-['Tmoney_RoundWind'] leading-7">
-            {keyword}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-Grayscale-gray50 text-3xl font-light leading-none hover:text-Grayscale-gray90"
-          >
-            &times;
-          </button>
-        </div>
-        {/* 본문 (Placeholder) */}
-        <div className="text-Grayscale-gray80 font-['Tmoney_RoundWind'] h-48 overflow-y-auto">
-          {keyword} 
-          <br />
-          (컴포넌트 구현 필요)
-        </div>
-      </div>
-    </div>
-  );
-}
-// ------------------------------------------------------------------
+// interface SubjectPopupProps {
+//   keyword: string;
+//   onClose: () => void;
+// }
+
+// function SubjectPopup({ keyword, onClose }: SubjectPopupProps) {
+//   return (
+//     // ... (팝업 구현 코드)
+//   );
+// }
 
 /**
  * 카테고리 랭킹 아이템 (오른쪽 리스트)
@@ -150,18 +131,18 @@ const CategoryRankItem = ({
     : 100 - keyword.positiveScore;
 
   const sentimentLabel = isPositive ? '긍정' : '부정';
-  const sentimentBgClass = isPositive
-    ? 'bg-Success-successLight'
-    : 'bg-Error-errorLight';
-  const sentimentTextClass = isPositive
-    ? 'text-Success-success'
-    : 'text-Error-error';
 
-  // 1~5위는 진한 회색, 6위부터는 연한 회색
+  const sentimentBgClass = isPositive
+    ? 'bg-success-successLight'
+    : 'bg-error-errorLight';
+  const sentimentTextClass = isPositive
+    ? 'text-success-success'
+    : 'text-error-error';
+
   const rankBgClass =
-    rank <= 5 ? 'bg-Grayscale-gray80' : 'bg-Grayscale-gray10';
+    rank <= 5 ? 'bg-grayscale-gray80' : 'bg-grayscale-gray10';
   const rankTextClass =
-    rank <= 5 ? 'text-Grayscale-white' : 'text-Grayscale-gray80';
+    rank <= 5 ? 'text-grayscale-white' : 'text-grayscale-gray80';
 
   return (
     <div className="self-stretch py-3 inline-flex justify-start items-center gap-3">
@@ -172,41 +153,38 @@ const CategoryRankItem = ({
         >
           <div className="inline-flex justify-start items-start gap-1">
             <div className="w-auto min-w-[8px] text-center pt-0.5 inline-flex flex-col justify-center items-center gap-2.5">
-              <div
-                className={`self-stretch justify-start text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5 ${rankTextClass}`}
-              >
+              <Text variant={'caption04'} className={`${rankTextClass}`}>
                 {rank}
-              </div>
+              </Text>
             </div>
           </div>
         </div>
 
         {/* Keyword & Sentiment */}
         <div className="flex justify-start items-center gap-3">
-          <div className="justify-start text-Grayscale-gray90 text-lg font-normal font-['Tmoney_RoundWind'] leading-7">
+          <Text variant={'body03'} >
             {keyword.keyword}
-          </div>
+          </Text>
           <div
             className={`px-2 py-1.5 rounded-md flex justify-start items-start gap-1 ${sentimentBgClass}`}
           >
-            <div
-              className={`justify-center text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5 ${sentimentTextClass}`}
-            >
+            <Text variant={'caption04'} className={sentimentTextClass}>
               {sentimentLabel} {sentimentPercent.toFixed(0)}%
-            </div>
+            </Text>
           </div>
         </div>
       </div>
 
       {/* Count Button */}
       <button
-        // onClick={onClick} -- 팝업 기능 임시 비활성화
+        // 3. onClick prop 연결
+        onClick={onClick}
         className="flex justify-start items-center gap-1 cursor-pointer hover:opacity-70 transition-opacity"
       >
-        <div className="justify-start text-Grayscale-gray50 text-lg font-normal font-['Tmoney_RoundWind'] leading-7">
+        <Text variant={'body03'} className=" text-grayscale-gray50 ">
           {keyword.count}개의 대화
-        </div>
-        {/* --- 수정된 아이콘 --- */}
+        </Text>
+        {/* 아이콘 */}
         <div className="w-6 h-6 flex justify-center items-center">
           <svg
             width="8"
@@ -217,22 +195,22 @@ const CategoryRankItem = ({
           >
             <path
               d="M1 1L7 6L1 11"
-              stroke="#A6A6A6" // Grayscale-gray50 (figma에는 gray-50이 #A6A6A6)
+              stroke="#A6A6A6" // Grayscale-gray50
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
           </svg>
         </div>
-        {/* --- 수정된 아이콘 끝 --- */}
       </button>
     </div>
   );
 };
 
-/**
- * 메인 카테고리 순위 차트 컴포넌트
- */
+// ==================================================================
+// 메인 컴포넌트 (Main Component)
+// ==================================================================
+
 export default function CategoryRankChart({
   keywords,
 }: CategoryRankChartProps) {
@@ -240,15 +218,14 @@ export default function CategoryRankChart({
   // const [selectedKeyword, setSelectedKeyword] = useState<Keyword | null>(null);
 
   // --- 데이터 가공 ---
+  // 'keywords'가 이미 정렬되어 있다고 가정
   const totalCount = keywords.reduce((sum, k) => sum + k.count, 0);
 
-  // 긍정/부정 카테고리 개수 (차트 중앙)
   const totalPositive = keywords.filter(
     (k) => k.positiveScore >= 50,
   ).length;
   const totalNegative = keywords.length - totalPositive;
 
-  // 파이 차트 데이터: 1~5위 + 기타
   const top5Keywords = keywords.slice(0, 5);
   const otherKeywords = keywords.slice(5);
   const otherCount = otherKeywords.reduce((sum, k) => sum + k.count, 0);
@@ -266,20 +243,20 @@ export default function CategoryRankChart({
       original: {
         keyword: '기타',
         count: otherCount,
-        positiveScore: -1, // '기타'는 긍/부정 없음
+        positiveScore: -1,
       },
     });
   }
   // --- 데이터 가공 끝 ---
 
   // const handleOpenPopup = (keyword: Keyword) => {
-  //   setSelectedKeyword(keyword);
-  //   setIsPopupOpen(true);
+  //   setSelectedKeyword(keyword);
+  //   setIsPopupOpen(true);
   // };
 
   // const handleClosePopup = () => {
-  //   setIsPopupOpen(false);
-  //   setSelectedKeyword(null);
+  //   setIsPopupOpen(false);
+  //   setSelectedKeyword(null);
   // };
 
   return (
@@ -305,12 +282,12 @@ export default function CategoryRankChart({
                   cx="50%"
                   cy="50%"
                   outerRadius={120} // w-60 / 2
-                  innerRadius={80} // 도넛 차트
-                  paddingAngle={1}
+                  innerRadius={40} // 도넛 차트
+                  paddingAngle={0}
                 >
                   {pieData.map((entry, index) => (
                     <Cell
-                      key={`cell-${index}`}
+                      key={`cell-${index}-${entry.name }`}
                       fill={PIE_COLORS[index % PIE_COLORS.length]}
                       stroke="none"
                     />
@@ -326,29 +303,30 @@ export default function CategoryRankChart({
             {/* Center Text */}
             <div className="left-[50%] top-[50%] -translate-x-1/2 -translate-y-1/2 absolute inline-flex flex-col justify-start items-start gap-[3px]">
               <div className="self-stretch inline-flex justify-start items-start gap-1">
-                <div className="justify-start text-Grayscale-gray90 text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5">
+                <Text variant={'caption04'} className="justify-start">
                   긍정
-                </div>
-                <div className="justify-start text-Grayscale-gray90 text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5">
+                </Text>
+                <Text variant={'caption04'} className="justify-start">
                   {totalPositive}
-                </div>
+                </Text>
               </div>
               <div className="self-stretch inline-flex justify-start items-start gap-1">
-                <div className="justify-start text-Grayscale-gray90 text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5">
+                <Text variant={'caption04'} className="justify-start">
                   부정
-                </div>
-                <div className="justify-start text-Grayscale-gray90 text-sm font-extrabold font-['Tmoney_RoundWind'] leading-5">
+                </Text>
+                <Text variant={'caption04'} className="justify-start">
                   {totalNegative}
-                </div>
+                </Text>
               </div>
             </div>
           </div>
 
           {/* Rank List */}
           <div className="flex-1 inline-flex flex-col justify-start items-start">
+            {/* 'keywords'가 이미 정렬되어 있으므로, index를 rank로 사용 */}
             {keywords.map((keyword, index) => (
               <CategoryRankItem
-                key={keyword.keyword}
+                key={`cell-${index}-${keyword.keyword}`}
                 keyword={keyword}
                 rank={index + 1}
                 onClick={() => {
@@ -362,12 +340,13 @@ export default function CategoryRankChart({
       </div>
 
       {/* Popup Modal -- 팝업 기능 임시 비활성화
-      {isPopupOpen && selectedKeyword && (
-        <SubjectPopup keyword={selectedKeyword} onClose={handleClosePopup} />
-      )}
-      */}
+       {isPopupOpen && selectedKeyword && (
+         <SubjectPopup
+           keyword={selectedKeyword.keyword}
+           onClose={handleClosePopup}
+         />
+       )}
+       */}
     </>
   );
 }
-
-

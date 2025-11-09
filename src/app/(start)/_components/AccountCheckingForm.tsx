@@ -26,7 +26,7 @@ export default function AccountCheckingForm({
             계정 확인 중입니다.
           </Text>
         </div>
-        <LogoutButton>로그아웃</LogoutButton>
+        <LogoutButton className='h-auto'>로그아웃</LogoutButton>
       </div>
     </ModalCard>
   );

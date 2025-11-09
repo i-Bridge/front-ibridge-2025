@@ -2,17 +2,10 @@ import { Fetcher } from '@/lib/fetcher';
 import AiComment from './_components/AiComment';
 import { ChildPageParams } from '@/types/page-props';
 import NotFound from '@/components/Exception/not-found';
-import { Subject } from '@/types/index';
 import PageLayout from '@/app/parent/[childId]/_components/Layout/ParentLayout';
 import { Text } from '@/ui/Text';
 import CumulateChart from '@/app/parent/[childId]/dashboard/_components/CumulateChart';
-import CategoryRankChart from '@/app/parent/[childId]/dashboard/_components/CategoryChart';
-
-interface HomeData {
-  hasNext: boolean;
-  subjects: Subject[];
-}
-
+import DynamicCategoryChart from './_components/DynamicCategoryChart';
 interface KeywordData {
   keywords: Keyword[]; // 키워드 배열
 }
@@ -33,19 +26,6 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
   const { childId } = await params;
 
   if (!childId) return <NotFound message="자녀 ID가 존재하지 않습니다." />;
-
-  const homeRes = await Fetcher<HomeData>(`/parent/${childId}/home`);
-
-  if (!homeRes || !homeRes.data) {
-    return <NotFound message="데이터를 불러오지 못했습니다." />;
-  }
-
-  const homeData = homeRes.data;
-
-  if (!homeData) {
-    return <NotFound message="데이터가 존재하지 않습니다." />;
-  }
-  console.log('/home', homeData);
 
   const keywordRes = await Fetcher<KeywordData>(`/parent/${childId}/keywords`);
   const keywordData = keywordRes.data;
@@ -88,25 +68,8 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
         defaultCumList={cumulativeData.cumList}
       />
       <div className="flex-1 flex flex-col gap-6 ml-20">
-        {/* {keywordData &&
-        keywordData.keywords &&
-        keywordData.keywords.length > 0 ? (
-          <CategoryRankChart keywords={keywordData.keywords} />
-        ) : (
-          // 데이터가 없을 경우 표시할 UI (Figma 디자인의 빈 상태 참고)
-          <div className="w-full max-w-[960px] px-10 py-8 bg-Grayscale-white rounded-[20px] outline outline-1 outline-offset-[-1px] outline-Grayscale-gray20 inline-flex flex-col justify-center items-center gap-10">
-            <div className="self-stretch inline-flex justify-start items-center gap-2">
-              <div className="justify-start text-Grayscale-gray90 text-xl font-extrabold font-['Tmoney_RoundWind'] leading-7">
-                카테고리 순위
-              </div>
-            </div>
-            <div className="py-8 text-center text-Grayscale-gray50 font-['Tmoney_RoundWind']">
-              아직 카테고리
-              <br />
-              데이터가 없어요
-            </div>
-          </div>
-        )} */}
+
+         <DynamicCategoryChart keywords={keywordData.keywords} />
       </div>
     </PageLayout>
   );
