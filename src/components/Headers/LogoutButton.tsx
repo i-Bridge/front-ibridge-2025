@@ -34,7 +34,8 @@ export default function LogoutButton({
       variant="grayscale"
       onClick={handleLogout}
       className={className}
-      textVariant={textVariant} // [!!] 이제 타입이 일치합니다.
+      textVariant={textVariant} 
+      
       
     >
       {children}

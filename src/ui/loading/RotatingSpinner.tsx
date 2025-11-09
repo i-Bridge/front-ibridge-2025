@@ -3,7 +3,7 @@ import React from 'react';
 // interface RotatingSpinnerProps는 이미 주어졌습니다.
 interface RotatingSpinnerProps {
   className?: string;
-  variant?: 'primary' | 'gray';
+  variant?: 'primary' | 'grayscale';
 }
 
 const RotatingSpinner = ({
