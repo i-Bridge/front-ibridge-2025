@@ -7,19 +7,14 @@ import SubjectPopup from './SubjectPopup';
 import { showError } from '@/lib/toast';
 // [1] Fetcher 대신 캐시 스토어를 import 합니다.
 import { useCategorySubjectsCache } from '@/hooks/parentHome/useCategorySubjects'; // 경로가 맞는지 확인하세요.
-
-export interface Keyword {
-  category: string;
-  count: number;
-  positiveScore: number;
-}
+import { Category } from '@/types';
 
 // [2] API 응답 타입 정의는 스토어로 이동했으므로 여기서는 제거합니다.
 // interface SubjectListResponse { ... }
 
 interface CategoryRankItemProps {
   // [3] prop 이름은 keyword로 유지하되, 내부 필드 keyword.category를 사용합니다.
-  keyword: Keyword;
+  keyword: Category;
   rank: number;
 }
 
