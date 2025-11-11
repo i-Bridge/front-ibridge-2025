@@ -1,5 +1,15 @@
-import { Child } from "./child.types";
-import { Parent } from "./parent.types";
+import { Child, Parent } from './people.types';
+
+//start api types
+// /start/signin - POST
+// /start/login - POST
+// /start/signup/exist - POST
+// /start/signup/consent - GET
+// /start/signup/isConsent - POST
+// /start/signup/dup - POST
+// /start/signup/undo - POST
+// /start/signup/new - POST
+// /start/signup/status - GET
 
 /**
  * /start/signin API의 응답 데이터 타입입니다.
@@ -50,7 +60,24 @@ export interface LoginResponse {
    * (JSDoc 태그로도 타입 정보를 명시)
    * @type {'PENDING' | 'FIRST_LOGIN' | 'ACTIVE'}
    */
-  status: LoginStatus; 
+  status: LoginStatus;
   parents: Parent[];
   children: Child[];
 }
+
+/**
+ * [/start/signup/exist,/start/signup/dup] API의 응답(Response) 데이터 타입입니다.
+ * ( 회원가입 시 가족 승인 요청 보냄 )
+ *
+ * @example
+ * // [성공 시 예시]
+ * {
+ *   exist: false
+ * }
+ *
+ * @see [관련 API 문서 링크 (선택 사항)]
+ */
+export interface SignupExistDupResponse {
+  exist: boolean; // 가족 요청 성공 여부
+}
+

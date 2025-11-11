@@ -5,3 +5,10 @@ export interface Child {
   gender: string;
   //profileImage: string;
 }
+
+export interface Parent {
+  id: number;
+  name: string;
+  email?: string;
+  own?:boolean;
+}
