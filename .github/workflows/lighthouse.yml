@@ -1,0 +1,63 @@
+# GitHub Actions 워크플로우의 이름입니다.
+name: Run Lighthouse CI
+
+# 이 워크플로우가 언제 실행될지 설정합니다.
+on:
+  # 'dev' 브랜치에 코드가 푸시(push)될 때마다 실행됩니다.
+  push:
+    branches: [dev] 
+  
+  # GitHub의 'Actions' 탭에서 수동으로 실행할 수도 있게 합니다.
+  workflow_dispatch:
+
+# 실행될 작업(job) 목록
+jobs:
+  # 'lighthouse'라는 이름의 작업을 정의합니다.
+  lighthouse:
+    # 이 작업은 '우분투(Linux)' 최신 버전 환경에서 실행됩니다.
+    runs-on: ubuntu-latest
+    
+    # 이 작업이 수행할 단계(steps)들
+    steps:
+      # 1. GitHub 저장소의 코드를 CI 환경으로 가져옵니다 (필수)
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Node.js 환경을 설정합니다.
+      # @types/node 버전이 20이므로 '20'으로 지정했습니다.
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 3. NPM 의존성을 설치합니다.
+      # 'package-lock.json'이 있으므로 'npm ci'를 사용합니다.
+      # 'npm install'보다 CI 환경에서 더 빠르고 일관성이 보장됩니다.
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Lighthouse CI 도구를 CI 환경에 (임시로) 설치합니다.
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli
+
+      # 5. Next.js 프로젝트를 빌드합니다.
+      # package.json의 "build" 스크립트를 실행합니다.
+      - name: Build Next.js project
+        run: npm run build
+
+      # 6. Lighthouse CI를 실행합니다.
+      - name: Run Lighthouse CI
+        run: |
+          # package.json의 "start" 스크립트로 서버를 백그라운드에서 실행하고,
+          # Lighthouse가 http://localhost:3000 으로 접속해 성능을 측정합니다.
+          lhci autorun --collect.startServerCommand="npm run start" --collect.url=http://localhost:3000
+
+      # 7. 생성된 Lighthouse 리포트를 GitHub 'Artifacts'에 업로드합니다.
+      # 이렇게 해야 나중에 리포트 파일을 다운로드해서 눈으로 볼 수 있습니다.
+      - name: Upload Lighthouse report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          # 업로드될 파일의 이름
+          name: lighthouse-reports
+          # Lighthouse 리포트가 저장된 폴더 경로
+          path: ./.lighthouseci/
