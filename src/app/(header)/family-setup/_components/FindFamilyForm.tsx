@@ -11,10 +11,9 @@ import CommonModalPopup from '@/ui/Modal/CommonModalPopup';
 import { LeftArrow } from '@/ui/icon/icon';
 import { showSuccess, showError } from '@/lib/toast';
 import * as Sentry from "@sentry/nextjs";
+import {SignupExistDupResponse} from '@/types/index';
 
-interface DupFamilyNameData {
-  exist: boolean;
-}
+
 
 export default function FindFamilyForm() {
   const router = useRouter();
@@ -44,12 +43,13 @@ export default function FindFamilyForm() {
     setLoading(true);
 
     try {
-      const res = await Fetcher<DupFamilyNameData>('/start/signup/dup', {
+      const res = await Fetcher<SignupExistDupResponse>('/start/signup/dup', {
         method: 'POST',
         data: { familyName: inputValue },
       });
 
       if (res.data?.exist) {
+        console.log('✅ 가족 이름 dup 확인--:', res.data);
         setFamilyName(inputValue); // 스토어에 저장
         setIsRequestSentModalOpen(true);
       } else {
@@ -75,12 +75,14 @@ export default function FindFamilyForm() {
     setLoading(true);
 
     try {
-      const res = await Fetcher<{ exist: boolean }>('/start/signup/exist', {
+      const res = await Fetcher<SignupExistDupResponse>('/start/signup/exist', {
         method: 'POST',
         data: { familyName },
       });
-
+      console.log('✅ 가족 이름 exist 확인:', res.data);
       if (!res?.data?.exist) {
+        
+
         setIsRequestSentModalOpen(false);
         setIsNotExistModalOpen(true);
         setFamilyName('');

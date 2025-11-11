@@ -68,14 +68,14 @@ export async function Fetcher<T = undefined>(
     });
 
     const responseData = res.data as ApiResponse<T>;
-
+console.log(`✅ API 호출 확인:  ${fullUrl}`, { response:  res.data } );
     if (responseData.code !== '200') {
       console.warn(
         `⚠️ API 응답 실패 [${responseData.code}] at ${fullUrl}: ${responseData.message}`,
         { response: responseData },
       );
     } else {
-      console.log(`✅ API 호출 성공: ${fullUrl}`);
+      console.log(`✅ API 호출 성공:  ${fullUrl}`, { response: res } );
     }
 
     return responseData;

@@ -8,10 +8,7 @@ import { useSetupStore } from '@/store/useSetupStore';
 import { LeftArrow } from '@/ui/icon/icon';
 import { showError } from '@/lib/toast';
 import * as Sentry from '@sentry/nextjs';
-
-interface DupFamilyNameData {
-  exist: boolean;
-}
+import { SignupExistDupResponse } from '@/types/index';
 
 export default function CreateFamilyForm() {
   const [loading, setLoading] = useState(false);
@@ -54,12 +51,14 @@ export default function CreateFamilyForm() {
     }
 
     try {
-      const res = await Fetcher<DupFamilyNameData>('/start/signup/dup', {
+      const res = await Fetcher<SignupExistDupResponse>('/start/signup/dup', {
         method: 'POST',
         data: { familyName: inputFamilyName },
       });
 
+        console.log('✅ 가족 이름 dup 확인:', res);
       if (res.data?.exist) {
+        
         setIsModalOpen(true);
       } else {
         setFamilyName(inputFamilyName);
