@@ -18,11 +18,11 @@ export default function AccountCheckingForm({
         <RotatingSpinner />
 
         <div className="flex flex-col items-center justify-start gap-2">
-          <Text variant="title01" className=" text-grayscale-gray90 ">
+          <Text variant="title02" className=" text-grayscale-gray90 ">
             {displayUserName} 님, 반가워요!
           </Text>
 
-          <Text variant="body04" className="text-grayscale-gray60 ">
+          <Text variant="body05" className="text-grayscale-gray60 ">
             계정 확인 중입니다.
           </Text>
         </div>
