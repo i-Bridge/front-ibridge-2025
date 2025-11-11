@@ -4,16 +4,10 @@ import CategoryRankItem from './CategoryRankItem';
 
 
 
-export interface Keyword {
-  category: string;
-  count: number;
-  positiveScore: number;
-}
 
 
 interface CategoryRankListProps {
   keywords: Keyword[];
-  onItemClick: (keyword: Keyword) => void;
 }
 
 /**
@@ -21,7 +15,6 @@ interface CategoryRankListProps {
  */
 export default function CategoryRankList({
   keywords,
-  onItemClick,
 }: CategoryRankListProps) {
   return (
     <div className="flex-1 inline-flex flex-col justify-start items-start">
@@ -30,7 +23,7 @@ export default function CategoryRankList({
           key={keyword.category + '-' + index}
           keyword={keyword}
           rank={index + 1}
-          onClick={() => onItemClick(keyword)}
+        
         />
       ))}
     </div>

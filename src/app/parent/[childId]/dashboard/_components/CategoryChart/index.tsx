@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import {  useMemo } from 'react';
 import CategoryPieChart from './CategoryPieChart';
 import CategoryRankList from './CategoryRankList';
 import { Text } from '@/ui/Text';
-import SubjectPopup from './SubjectPopup';
 
 export interface Keyword {
   category: string;
@@ -22,23 +21,24 @@ export interface PieData {
 
 // 컴포넌트 Props
 interface CategoryRankChartProps {
-  keywords: Keyword[];
+  categorys: Keyword[];
 }
 
 /**
  * 차트 데이터를 가공하는 함수
  * (컴포넌트가 리렌더링될 때마다 실행되지 않도록 useMemo와 함께 사용)
  */
-function processChartData(keywords: Keyword[]) {
-  const totalCount = keywords.reduce((sum, k) => sum + k.count, 0);
+function processChartData(categorys: Keyword[]) {
+  const category=categorys ?? [];
+  const totalCount = category.reduce((sum, k) => sum + k.count, 0);
 
   // 긍정/부정 카테고리 개수 (차트 중앙)
-  const totalPositive = keywords.filter((k) => k.positiveScore >= 50).length;
-  const totalNegative = keywords.length - totalPositive;
+  const totalPositive = category.filter((k) => k.positiveScore >= 50).length;
+  const totalNegative = category.length - totalPositive;
 
   // 파이 차트 데이터: 1~5위 + 기타
-  const top5Keywords = keywords.slice(0, 5);
-  const otherKeywords = keywords.slice(5);
+  const top5Keywords = category.slice(0, 5);
+  const otherKeywords = category.slice(5);
   const otherCount = otherKeywords.reduce((sum, k) => sum + k.count, 0);
 
   const pieData: PieData[] = top5Keywords.map((k) => ({
@@ -67,31 +67,16 @@ function processChartData(keywords: Keyword[]) {
  * (기존 CategoryRankChart)
  */
 export default function CategoryRankChart({
-  keywords,
+  categorys,
 }: CategoryRankChartProps) {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [selectedKeyword, setSelectedKeyword] = useState<Keyword | null>(null);
 
   // useMemo를 사용해 keywords props가 변경될 때만 데이터 재가공
   const { totalCount, totalPositive, totalNegative, pieData } = useMemo(
-    () => processChartData(keywords),
-    [keywords],
+    () => processChartData(categorys),
+    [categorys],
   );
 
-  const handleOpenPopup = (keyword: Keyword) => {
-    setSelectedKeyword(keyword);
-    setIsPopupOpen(true);
-  };
-
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
-    setSelectedKeyword(null);
-  };
-
-  const handleItemClick = (keyword: Keyword) => {
-    console.log('Popup feature temporarily disabled', keyword.category);
-    handleOpenPopup(keyword);
-  };
+ 
 
   return (
     <>
@@ -112,16 +97,11 @@ export default function CategoryRankChart({
           />
 
           {/* Rank List */}
-          <CategoryRankList keywords={keywords} onItemClick={handleItemClick} />
+          <CategoryRankList keywords={categorys} />
         </div>
       </div>
 
-      {isPopupOpen && selectedKeyword && (
-        <SubjectPopup
-          keyword={selectedKeyword.category}
-          onClose={handleClosePopup}
-        />
-      )}
+
     </>
   );
 }

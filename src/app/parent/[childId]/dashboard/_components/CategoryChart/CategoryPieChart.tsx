@@ -100,7 +100,6 @@ export default function CategoryPieChart({
               // 3. (✨ 위치 문제 해결) 
               // 툴팁을 부모의 CSS 맥락(transform)에서 분리하여
               // document.body에 직접 렌더링합니다.
-              portalTarget={portalTarget}
               
               // 4. 애니메이션 비활성화 (빠른 반응)
               isAnimationActive={false}

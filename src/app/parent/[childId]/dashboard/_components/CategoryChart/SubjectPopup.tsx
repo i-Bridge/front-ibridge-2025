@@ -1,52 +1,94 @@
 'use client';
 
-import {Button} from '@/ui/Button';
-import {Text} from '@/ui/Text';
+import { Button } from '@/ui/Button';
+import CommonModalPopup from '@/ui/Modal/CommonModalPopup';
+import SubjectListRenderer from '../../../answerLog/_components/SubjectListRenderer';
+import { Subject } from '@/types/index';
+import AnalysisList from '../../../_components/Question/AnalysisList';
+// [1] store와 useEffect를 import (showPanels 관리를 위해 필요)
+import { useSubjectStore } from '@/store/useSubjectStore';
+import { useEffect } from 'react';
 
 interface SubjectPopupProps {
-  keyword: string;
+  category: string;
+  positiveScore: number;
   onClose: () => void;
+  subjects: Subject[];
 }
 
 /**
  * 'N개의 대화' 클릭 시 보일 팝업
  */
-export default function SubjectPopup({ keyword, onClose }: SubjectPopupProps) {
+export default function SubjectPopup({
+  category,
+  positiveScore,
+  onClose,
+  subjects,
+}: SubjectPopupProps) {
+  // [2] store에서 AnalysisList를 제어하기 위한 상태와
+  //     showPanels를 설정할 setter를 가져옵니다.
+  const { selectedSubjectId, showPanels, setShowPanels } = useSubjectStore();
+
+  // [3] SubjectListRenderer가 ID를 변경하는 것을 감지하여
+  //     AnalysisList를 보여주는 'showPanels' 상태를 동기화합니다.
+  useEffect(() => {
+    if (selectedSubjectId) {
+      setShowPanels(true);
+    } else {
+      setShowPanels(false);
+    }
+  }, [selectedSubjectId, setShowPanels]);
+
+  // isEmpty일 때 오류 처리
+  const isEmpty = subjects.length === 0;
+
   return (
-    // 전체 화면 오버레이
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center"
-      onClick={onClose} // 배경 클릭 시 닫기
+    <CommonModalPopup
+      title={category}
+      
+      // [✨ 핵심 수정]
+      // 'w-full', 'flex', 'self-stretch', 'items-center', 'justify-start' 등
+      // 레이아웃을 깨뜨리는 모든 클래스를 제거합니다.
+      // PopupOverlay가 'w-[960px]' 카드 자체를 중앙 정렬할 것입니다.
+      modalCardClassName="w-[960px]"
+      
+      subtitle={`긍정 ${positiveScore}%의 카테고리`}
+      footerContent={
+        <Button variant={'grayscale'} onClick={onClose}>
+          닫기
+        </Button>
+      }
     >
       {/* 팝업 컨텐츠 */}
+      {/* [이전과 동일]
+        h-[60vh] (또는 h-[70vh])와 flex로 레이아웃을 잡습니다.
+        ModalCard(flex-col)의 자식인 이 div는 이제 
+        items-center가 없으므로 960px 너비를 꽉 채웁니다.
+      */}
       <div
-        className="bg-white p-8 rounded-[20px] z-50 w-[90%] max-w-[400px]"
-        onClick={(e) => e.stopPropagation()} // 팝업 내부 클릭 시 닫히지 않게
+        className="flex h-[60vh] overflow-hidden p-4"
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* 헤더 */}
-        <div className="flex justify-between items-center mb-4">
-          <Text
-            className="text-grayscale-gray90"
-          >
-            {keyword}
-          </Text>
-          <Button
-            onClick={onClose}
-            variant="grayscale" // Button 컴포넌트에 ghost나 icon variant가 있다고 가정
-            className="text-grayscale-gray50 text-3xl font-light leading-none hover:text-grayscale-gray90 p-0"
-          >
-            &times;
-          </Button>
+        {/* 왼쪽 패널 (SubjectList) */}
+        <div className="flex-1 h-full overflow-y-auto gap-4 pr-4">
+          <SubjectListRenderer
+            subjects={subjects}
+            isLoading={false}
+            isEmpty={isEmpty}
+            lastItemRef={undefined} // 팝업 내에서는 무한 스크롤 X
+          />
         </div>
-        {/* 본문 (Placeholder) */}
-        <div className="h-48 overflow-y-auto">
-          <Text color="gray80" as="div">
-            {keyword}
-            <br />
-            (컴포넌트 구현 필요)
-          </Text>
-        </div>
+
+        {/* 오른쪽 패널 (AnalysisList) - 이 로직은 동일 */}
+        {showPanels && selectedSubjectId && (
+          <div
+            className="h-full overflow-y-auto ml-10 flex-grow flex-1 items-stretch animate-slide-in-right
+              transition-transform duration-300 ease-in-out"
+          >
+            <AnalysisList />
+          </div>
+        )}
       </div>
-    </div>
+    </CommonModalPopup>
   );
 }
