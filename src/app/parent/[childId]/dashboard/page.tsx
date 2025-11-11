@@ -29,7 +29,7 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
 
   const keywordRes = await Fetcher<KeywordData>(`/parent/${childId}/keywords`);
   const keywordData = keywordRes.data;
-  console.log('분석 /stat api 호출 ', keywordData);
+  console.log('분석 /keywords api 호출 ', keywordRes);
   if (!keywordData) {
     return <div>분석 데이터 불러오기 실패...</div>;
   }
@@ -38,7 +38,7 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
     `/parent/${childId}/stat/cumulative?periodType='day'`,
   );
   const cumulativeData = cumulativeRes.data;
-  console.log('분석 /stat api 호출 ', cumulativeData);
+  console.log('분석 /stat/cumulative?periodType=\'day\' api 호출 ', cumulativeRes);
   if (!cumulativeData) {
     return <div>분석 데이터 불러오기 실패...</div>;
   }
@@ -68,7 +68,7 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
         defaultCumList={cumulativeData.cumList}
       />
 
-         <CategoryRankChart keywords={keywordData.keywords} />
+         <CategoryRankChart keyword={keywordData.keywords} />
       
     </PageLayout>
   );
