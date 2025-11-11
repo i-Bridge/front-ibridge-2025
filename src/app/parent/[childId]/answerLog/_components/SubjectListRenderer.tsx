@@ -9,12 +9,11 @@ import SubjectCard from '@/app/parent/[childId]/answerLog/_components/SubjectCar
 import EmptyPlaceholder from '@/ui/loading/EmptyPlaceHolder';
 import LoadingPlaceholder from '@/ui/loading/LoadingAnim';
 import { formatDateWithDay } from '@/hooks/formatDateWithDay';
+import { useSubjectStore } from '@/store/useSubjectStore'; // [5] 상태 관리를 위해 스토어 훅을 import
 
 interface SubjectListRendererProps {
   subjects: Subject[];
-  selectedSubjectId: number | null;
-  onSubjectClick: (id: number) => void;
-  lastItemRef: (node: HTMLDivElement | null) => void;
+  lastItemRef?: (node: HTMLDivElement | null) => void;
   isLoading: boolean; // 초기 로딩 상태
   isEmpty: boolean; // 데이터가 없는 상태
 }
@@ -25,12 +24,11 @@ interface SubjectListRendererProps {
  */
 export default function SubjectListRenderer({
   subjects,
-  selectedSubjectId,
-  onSubjectClick,
   lastItemRef,
   isLoading,
   isEmpty,
 }: SubjectListRendererProps) {
+  const {selectedSubjectId, setSelectedSubjectId} =  useSubjectStore();
   // [이동] 날짜별 그룹화 로직 (데이터를 어떻게 보여줄지 결정하는 렌더링 로직)
   const subjectsByDate = subjects.reduce<Record<string, Subject[]>>(
     (acc, subject) => {
@@ -85,7 +83,7 @@ export default function SubjectListRenderer({
                     subject={subject}
                     isSelected={selectedSubjectId === subject.subjectId}
                     // [수정] prop으로 받은 핸들러 사용
-                    onClick={() => onSubjectClick(subject.subjectId)}
+                    onClick={() => setSelectedSubjectId(subject.subjectId)}
                     ref={
                       // [수정] prop으로 받은 ref 사용
                       groupIdx === dateGroups.length - 1 &&

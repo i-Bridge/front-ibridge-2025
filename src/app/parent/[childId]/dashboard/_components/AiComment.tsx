@@ -5,25 +5,25 @@ import AiCommentSkeleton from './AIBannerSkeleton';
 import { Suspense } from 'react';
 
 interface BannerData {
+  date: string;
   cumulativeAnswerCount: number;
   mostTalkedCategory: string;
   positiveCategory: string;
   negativeCategory: string;
   emotion: number;
   name: string;
-  newGrape: number;
 }
 
 export default  async function AiComment({ childId }: { childId: string }) {
 const bannerRes = await Fetcher<BannerData>(`/parent/${childId}/banner`);
   const bannerData = bannerRes?.data ?? {
+    date: '',
     cumulativeAnswerCount: 0,
     mostTalkedCategory: '',
     positiveCategory: '',
     negativeCategory: '',
     emotion: 0,
     name: '',
-    newGrape: 0,
   };
 
     if ( !bannerData) {

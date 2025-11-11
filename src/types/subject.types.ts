@@ -12,3 +12,18 @@ export interface ScheduledSubject {
   answer: boolean;
   date: string; // yyyy-MM-dd
 }
+
+
+export interface Question {
+  questionId: number;
+  text: string;
+  video: string;
+  image: string;
+  answer: string;
+}
+
+export interface Analysis {
+    analysisId: number;
+    answer: string;
+    video: string;
+  }

@@ -8,37 +8,31 @@ export const textVariants = cva(
   {
     variants: {
       variant: {
-        // Titles (lg: 기준 폰트 크기를 기반으로, sm: 에서는 약간 축소)
+        // Titles
         title01:
-          'text-[2rem] sm:text-[2.25rem] lg:text-[2.5rem] font-extrabold leading-[3rem] lg:leading-[3.75rem] tracking-[-0.025rem]', // 40px -> 36px -> 32px
+          'text-[2.5rem] font-extrabold leading-[3.75rem] tracking-[-0.025rem]',
         title02:
-          'text-[1.5rem] sm:text-[1.625rem] lg:text-[1.75rem] font-extrabold leading-[2.1rem] lg:leading-[2.45rem] tracking-[0rem]', // 28px -> 26px -> 24px
+          'text-[1.75rem] font-extrabold leading-[2.45rem] tracking-[0rem]',
         title03:
-          'text-[1.25rem] sm:text-[1.375rem] lg:text-[1.5rem] font-extrabold leading-[1.75rem] lg:leading-[2.1rem] tracking-[0rem]', // 24px -> 22px -> 20px
+          'text-[1.5rem] font-extrabold leading-[2.1rem] tracking-[0rem]',
         title04:
-          'text-[1rem] sm:text-[1.125rem] lg:text-[1.25rem] font-extrabold leading-[1.4rem] lg:leading-[1.75rem] tracking-[0rem]', // 20px -> 18px -> 16px
+          'text-[1.25rem] font-extrabold leading-[1.75rem] tracking-[0rem]',
 
-        // Bodies (lg: 기준 폰트 크기)
-        body01:
-          'text-[1.5rem] sm:text-[1.625rem] lg:text-[1.75rem] font-normal leading-[2.25rem] lg:leading-[2.625rem] tracking-[0rem]', // 28px
-        body02:
-          'text-[1rem] sm:text-[1.125rem] lg:text-[1.25rem] font-normal leading-[1.6rem] lg:leading-[2rem] tracking-[0rem]', // 20px
-        body03:
-          'text-[0.9375rem] sm:text-[1rem] lg:text-[1.125rem] font-normal leading-[1.5rem] lg:leading-[1.8rem] tracking-[0rem]', // 18px
-        body04:
-          'text-[0.875rem] sm:text-[0.9375rem] lg:text-[1rem] font-normal leading-[1.4rem] lg:leading-[1.6rem] tracking-[0rem]', // 16px
-        body05:
-          'text-[0.75rem] sm:text-[0.8125rem] lg:text-[0.875rem] font-normal leading-[1.2rem] lg:leading-[1.4rem] tracking-[0rem]', // 14px
-
-        // Captions (caption01은 title03과 동일, caption02는 title04와 동일하게 조정)
+        // Bodies
+        body01: 'text-[1.75rem] font-normal leading-[2.625rem] tracking-[0rem]',
+        body02: 'text-[1.25rem] font-normal leading-[2rem] tracking-[0rem]',
+        body03: 'text-[1.125rem] font-normal leading-[1.8rem] tracking-[0rem]',
+        body04: 'text-[1rem] font-normal leading-[1.6rem] tracking-[0rem]',
+        body05: 'text-[0.875rem] font-normal leading-[1.4rem] tracking-[0rem]',
+        // Captions
         caption01:
-          'text-[1.25rem] sm:text-[1.375rem] lg:text-[1.5rem] font-extrabold leading-[1.75rem] lg:leading-[2.1rem] tracking-[0rem]',
+          'text-[1.5rem] font-extrabold leading-[2.1rem] tracking-[0rem]',
         caption02:
-          'text-[1rem] sm:text-[1.125rem] lg:text-[1.25rem] font-extrabold leading-[1.5rem] lg:leading-[1.875rem] tracking-[0rem]',
+          'text-[1.25rem] font-extrabold leading-[1.875rem] tracking-[0rem]',
         caption03:
-          'text-[0.875rem] sm:text-[0.9375rem] lg:text-[1rem] font-extrabold leading-[1.3125rem] lg:leading-[1.5rem] tracking-[0rem]',
+          'text-[1.0rem] font-extrabold leading-[1.5rem] tracking-[0rem]',
         caption04:
-          'text-[0.75rem] sm:text-[0.8125rem] lg:text-[0.875rem] font-extrabold leading-[1.125rem] lg:leading-[1.3125rem] tracking-[0rem]',
+          'text-[0.875rem] font-extrabold leading-[1.3125rem] tracking-[0rem]',
       },
     },
     defaultVariants: {
@@ -46,20 +40,35 @@ export const textVariants = cva(
     },
   }
 );
+// (1) cva의 variant 타입을 추출합니다 (예: "title01" | "body04" | ...)
+type TextVariant = VariantProps<typeof textVariants>['variant'];
 
-// 2. 컴포넌트 Props 타입 정의 
-// (1)as, children, className + (2)cva의 variant + (3)선택된 태그의 HTML 기본 속성을 모두 합친 타입
-type TextProps<T extends ElementType> = {
+// (2) variant prop에 반응형 객체를 허용하는 타입을 만듭니다.
+type ResponsiveVariant = {
+  initial: TextVariant; // 'initial'은 Tailwind의 기본(모바일)에 해당합니다.
+  md?: TextVariant;    // tailwind.config.ts의 'md' (768px)
+  lg?: TextVariant;    // tailwind.config.ts의 'lg' (1280px)
+};
+
+// (3) TextProps가 'variant: 문자열' 또는 'variant: 반응형 객체'를 모두 받도록 수정합니다.
+export type TextProps<T extends ElementType> = {
   as?: T;
   children: ReactNode;
   className?: string;
-} & VariantProps<typeof textVariants> &
-  Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className'>;
-
+  variant?: TextVariant | ResponsiveVariant; // ✨ 수정된 부분
+} & Omit<React.ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className' | 'variant'>; // Omit에 'variant' 추가
 /**
  * 디자인 시스템의 타이포그래피를 적용하는 다형성 컴포넌트입니다.
  *
  * @example
+ * //반응형 사용
+ * <Text
+ * variant={{
+ *   initial: 'body04', // 기본 (모바일)
+ *   md: 'body03',      // 768px 이상
+ *   lg: 'title04',     // 1280px 이상
+ * }}
+ * >
  * // 1. 기본 사용 (variant 지정)
  * <Text variant="title01">메인 타이틀</Text>
  *
@@ -102,7 +111,7 @@ export function Text<T extends ElementType = 'span'>({
   return (
     <Component
       
-      className={twMerge('group-hover:scale-100',textVariants({ variant }), className)}
+      className={twMerge(textVariants({ variant: variant as never }), className)}
       {...props}
     >
       {children}

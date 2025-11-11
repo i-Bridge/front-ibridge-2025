@@ -39,9 +39,9 @@ export default function Mypage({ childId, mypageData }: MypageDataProps) {
 
           // ===================== [디버깅 코드 추가] =====================
           // map 루프 안에서 각 값을 비교합니다.
-          console.log(
-            `비교: child.childId=${child.childId}(${typeof child.childId}) === childId=${childId}(${typeof childId}) => 결과: ${isThisChild}`,
-          );
+          // console.log(
+          //   `비교: child.childId=${child.childId}(${typeof child.childId}) === childId=${childId}(${typeof childId}) => 결과: ${isThisChild}`,
+          // );
           return (
             <div
               key={child.childId}

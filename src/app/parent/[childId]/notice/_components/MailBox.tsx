@@ -160,7 +160,7 @@ export default function MailPage() {
                   {error}
                 </Text>
               </div>
-            ) : noticeData?.newCount === 0 ? (
+            ) : noticeData?.notices.length === 0 ? (
               // EmptyPlaceholder는 self-stretch가 필요할 수 있으므로 래퍼로 감쌀 수 있습니다.
               // 혹은 EmptyPlaceholder 자체에서 너비를 100%로 설정해도 됩니다.
               <div className="self-stretch">

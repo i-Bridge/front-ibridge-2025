@@ -24,7 +24,7 @@ type Props = {
  */
 export default function ScrollSubjectList({ initialSubjects }: Props) {
   // [유지] 모든 훅 로직은 컨테이너가 담당합니다.
-  const { selectedSubjectId, setSelectedSubjectId, showPanels, setShowPanels } =
+  const { selectedSubjectId, showPanels, setShowPanels } =
     useSubjectStore();
 
   const { allSubjects, loading, loadNext, hasNext, initFirstPage } =
@@ -65,10 +65,7 @@ export default function ScrollSubjectList({ initialSubjects }: Props) {
     [loading, loadNext, hasNext],
   );
 
-  // [유지] 클릭 핸들러
-  const handleClick = (subjectId: number) => {
-    setSelectedSubjectId(selectedSubjectId === subjectId ? null : subjectId);
-  };
+  
 
   // [추가] 렌더러에게 전달할 상태값들을 계산합니다.
   const isLoading = loading && allSubjects.length === 0;
@@ -82,8 +79,6 @@ export default function ScrollSubjectList({ initialSubjects }: Props) {
         {/* [수정] 렌더링 로직을 SubjectListRenderer 컴포넌트로 위임합니다. */}
         <SubjectListRenderer
           subjects={allSubjects}
-          selectedSubjectId={selectedSubjectId}
-          onSubjectClick={handleClick}
           lastItemRef={observeLastSubject}
           isLoading={isLoading}
           isEmpty={isEmpty}
