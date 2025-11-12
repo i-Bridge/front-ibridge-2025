@@ -29,12 +29,14 @@ export default function VideoRecorder({
   childId,
   subjectId,
   isCharacterSpeaking,
+  onWaitingChange,
   onAIResponse,
   onFinished,
 }: {
   childId: string;
   subjectId: number | null;
   isCharacterSpeaking: boolean;
+  onWaitingChange?: (waiting: boolean) => void;
   onAIResponse: (message: string, isFinished: boolean) => void;
   onFinished: () => void;
 }) {
@@ -135,10 +137,18 @@ export default function VideoRecorder({
     subjectIdRef.current = subjectId;
   }, [subjectId]);
 
+  // 대기 상태가 바뀔 때마다 부모에 동기화
+  useEffect(() => {
+    onWaitingChange?.(isWaitingForAI);
+  }, [isWaitingForAI, onWaitingChange]);
+
   /** ===== 역할 교대: 캐릭터가 말하지 않으면 버튼 대기 해제 ===== */
   useEffect(() => {
-    if (!isCharacterSpeaking) setIsWaitingForAI(false);
-  }, [isCharacterSpeaking]);
+    if (!isCharacterSpeaking) {
+      setIsWaitingForAI(false);
+      onWaitingChange?.(false);
+    }
+  }, [isCharacterSpeaking, onWaitingChange]);
 
   /** ===== /uploaded 통지 ===== */
   const postUploaded = useCallback(
@@ -313,12 +323,14 @@ export default function VideoRecorder({
   const sendAnswer = useCallback(
     async ({ mode }: { mode: SendMode }) => {
       setIsWaitingForAI(true);
+      onWaitingChange?.(true);
 
       const currentRecognizedText = recognizedTextRef.current.trim();
       const currentSubjectId = subjectIdRef.current;
 
       if (!currentSubjectId || !childId) {
         setIsWaitingForAI(false);
+        onWaitingChange?.(true);
         return;
       }
 
@@ -334,6 +346,7 @@ export default function VideoRecorder({
         onAIResponse(randomPrompt, false);
         onFinished();
         setIsWaitingForAI(false);
+        onWaitingChange?.(false);
         return;
       }
 
@@ -369,12 +382,16 @@ export default function VideoRecorder({
             videoBlobRef.current = null;
             pendingUploadsRef.current = [];
           }
+          setIsWaitingForAI(false);
+          onWaitingChange?.(false);
         } else {
           setIsWaitingForAI(false);
+          onWaitingChange?.(false);
         }
       } catch (error) {
         console.error('❌ /answer API 호출 중 에러 발생:', error);
         setIsWaitingForAI(false);
+        onWaitingChange?.(false);
       }
     },
     [
@@ -384,6 +401,7 @@ export default function VideoRecorder({
       postUploaded,
       uploadVideo,
       captureAndUploadThumbnail,
+      onWaitingChange,
     ],
   );
 
@@ -593,54 +611,42 @@ export default function VideoRecorder({
 
   /** ===== UI ===== */
   return (
-    // 1. 최상위 래퍼: 'relative'만 적용 (버튼 기준점)
-    <div className="relative w-full h-full">
-      {/* 2. 내부 컨테이너: 비디오/오버레이를 둥글게 자르기 (overflow-hidden)
-       */}
+    // 1) 최상위 래퍼: 모바일은 180×180, md↑는 부모 크기
+    <div className="relative w-44 h-44 md:w-full md:h-full">
+      {/* 2) 비디오/오버레이 컨테이너 */}
       <div
-        className={`relative flex flex-col justify-center items-center 
-                    w-full h-full bg-black rounded-full 
-                    border-4 ${isUserSpeaking ? 'border-orange-400 animate-pulse' : 'border-orange-500'} 
-                    shadow-2xl transition-all duration-300
-                    overflow-hidden // 비디오와 오버레이를 잘라냄
-                  `}
+        className={`
+        relative flex flex-col justify-center items-center overflow-hidden shadow-2xl transition-all duration-300
+        // 모바일(기본): 흰 원형 + 프라이머리 아웃라인
+        w-44 h-44 bg-white rounded-full outline outline-8 outline-offset-[-4px] outline-primary
+        // md↑: 검정 배경 원형 + 보더(말하기 감지 색상)
+        md:w-full md:h-full md:bg-black md:rounded-full md:outline-none
+        md:border-4 ${isUserSpeaking ? 'md:border-orange-400 md:animate-pulse' : 'md:border-orange-500'}
+      `}
       >
-        {/* ==============================================
-        1. 비디오 및 캔버스 (항상 켜짐)
-        =============================================== */}
+        {/* 2-1) 비디오 & 캔버스 */}
         <video
           ref={videoRef}
-          className="w-full h-full object-cover" // 'hidden' 클래스 제거
+          className="w-full h-full object-cover"
           autoPlay
           muted
           playsInline
         />
         <canvas ref={canvasRef} className="hidden" />
 
-        {/* ==============================================
-        2. 오버레이 + 안내 문구 (✅ 수정됨)
-        =============================================== */}
+        {/* 2-2) 오버레이 + 안내 문구 */}
         <div
-          className={`absolute inset-0 bg-black 
-                      transition-opacity duration-300
-                      flex flex-col justify-center items-center
-                      ${
-                        isCameraLoading
-                          ? 'opacity-100' // 로딩 중: 100% 불투명
-                          : isRecording
-                            ? 'opacity-0' // 녹화 중: 투명
-                            : 'opacity-50' // 대기 중: 70% 불투명
-                      } 
-                    `}
+          className={`
+          absolute inset-0 flex flex-col justify-center items-center transition-opacity duration-300
+          ${isCameraLoading ? 'opacity-100' : isRecording ? 'opacity-0' : 'opacity-50'}
+          // 모바일: 반투명, md↑: 불투명
+          bg-black/50 md:bg-black
+        `}
         >
           {isCameraLoading ? (
-            // (A) 카메라 로딩 중일 때
-            <div className="text-white text-center px-10">
-              {/* Tailwind 스피너 예시 */}
+            <div className="text-white text-center px-4">
               <svg
-                className="animate-spin h-10 w-10 text-white mx-auto"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
+                className="animate-spin h-8 w-8 md:h-10 md:w-10 text-white mx-auto"
                 viewBox="0 0 24 24"
               >
                 <circle
@@ -650,58 +656,56 @@ export default function VideoRecorder({
                   r="10"
                   stroke="currentColor"
                   strokeWidth="4"
-                ></circle>
+                />
                 <path
                   className="opacity-75"
                   fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
+                  d="M4 12a8 8 0 018-8V0C5.37 0 0 5.37 0 12h4z"
+                />
               </svg>
-              <strong className="text-2xl font-bold mt-4 block">
+              <strong className="block mt-2 text-base md:text-2xl font-bold">
                 카메라 켜는 중...
               </strong>
-              <p className="text-lg opacity-80 mt-1">권한을 허용해주세요</p>
+              <p className="text-xs md:text-lg opacity-80 mt-1">
+                권한을 허용해주세요
+              </p>
             </div>
           ) : (
-            // (B) 카메라 로딩 완료 후 (기존 로직)
             <div
-              className={`text-white text-center px-10 transition-opacity duration-300
-                          ${isRecording ? 'opacity-0' : 'opacity-100'}
-                        `}
+              className={`text-white text-center px-4 transition-opacity duration-300 ${isRecording ? 'opacity-0' : 'opacity-100'}`}
             >
-              <strong className="text-3xl font-bold">{feedbackText}</strong>
+              <strong className="text-sm md:text-3xl font-bold">
+                {feedbackText}
+              </strong>
             </div>
           )}
         </div>
-      </div>{' '}
-      {/* <-- 비디오/오버레이 컨테이너 종료 */}
-      {/* ==============================================
-      3. 녹음 버튼 (✅ 수정됨: disabled, title)
-      =============================================== */}
-      <div className="absolute bottom-4 right-4">
+      </div>
+
+      {/* 3) 녹음 버튼: 모바일은 더 작고, 위치도 살짝 붙임 */}
+      <div className="absolute -bottom-3 -right-3 md:bottom-4 md:right-4">
         {!isRecording ? (
           <button
             onClick={startRecording}
-            // ✅ [수정] 카메라 로딩 중에도 비활성화
             disabled={
               isCharacterSpeaking ||
               isStarting ||
               isWaitingForAI ||
               isCameraLoading
             }
-            className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center
-                       shadow-lg transition-all 
-                       hover:scale-105 active:scale-95
-                       disabled:bg-grayscale-gray30 disabled:opacity-70 disabled:scale-100"
-            // ✅ [수정] 로딩 상태일 때 title 변경
+            className="
+            w-12 h-12 md:w-20 md:h-20
+            bg-orange-100 rounded-full grid place-items-center
+            shadow-lg transition-all hover:scale-105 active:scale-95
+            disabled:bg-grayscale-gray30 disabled:opacity-70 disabled:scale-100
+          "
             title={
               isCameraLoading ? '카메라 준비 중' : disabledReason || '녹음 시작'
             }
           >
-            {/* Mic Icon (SVG ... ) */}
+            {/* Mic 아이콘 */}
             <svg
-              width="40"
-              height="40"
+              className="w-5 h-5 md:w-10 md:h-10"
               viewBox="25 25 40 40"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -740,15 +744,16 @@ export default function VideoRecorder({
         ) : (
           <button
             onClick={stopRecording}
-            className="w-20 h-20 bg-white rounded-full flex items-center justify-center
-                     shadow-lg transition-all animate-pulse
-                     hover:scale-105 active:scale-95"
+            className="
+            w-12 h-12 md:w-20 md:h-20
+            bg-white rounded-full grid place-items-center
+            shadow-lg transition-all animate-pulse hover:scale-105 active:scale-95
+          "
             title="녹음 종료"
           >
-            {/* Stop Icon (SVG ... ) */}
+            {/* Stop 아이콘 */}
             <svg
-              width="90"
-              height="90"
+              className="w-6 h-6 md:w-[90px] md:h-[90px]"
               viewBox="0 0 90 90"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -766,6 +771,6 @@ export default function VideoRecorder({
           </button>
         )}
       </div>
-    </div> // <-- (A) 최상위 래퍼 div 종료
+    </div> // <-- 최상위 래퍼 종료
   );
 }

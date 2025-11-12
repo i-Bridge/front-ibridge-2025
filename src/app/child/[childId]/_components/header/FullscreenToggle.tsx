@@ -1,55 +1,150 @@
 'use client';
 
-import { FullScreenIcon } from '@/ui/icon/icon';
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/ui/Button';
+import { FullscreenEnterIcon, FullscreenExitIcon } from '@/ui/icon/icon';
 
-/**
- * 브라우저의 Fullscreen API를 사용하여 전체 화면 모드로 진입하는 버튼입니다.
- * 전체 화면 상태에서는 버튼이 보이지 않습니다.
- */
+/** ===== 벤더 프리픽스 포함한 타입 보강 ===== */
+type VendorDocument = Document & {
+  webkitFullscreenElement?: Element | null;
+  webkitExitFullscreen?: () => void | Promise<void>;
+  mozFullScreenElement?: Element | null;
+  mozCancelFullScreen?: () => void | Promise<void>;
+  msFullscreenElement?: Element | null;
+  msExitFullscreen?: () => void | Promise<void>;
+};
+
+type VendorElement = Element & {
+  webkitRequestFullscreen?: () => void | Promise<void>;
+  mozRequestFullScreen?: () => void | Promise<void>;
+  msRequestFullscreen?: () => void | Promise<void>;
+};
+
+/** ===== 현재 전체화면 여부 (Safari 등 포함) ===== */
+function isFullscreenNow(): boolean {
+  const d = document as VendorDocument;
+  return Boolean(
+    document.fullscreenElement ??
+      d.webkitFullscreenElement ??
+      d.mozFullScreenElement ??
+      d.msFullscreenElement,
+  );
+}
+
 export default function FullscreenToggle() {
-  // 현재 전체 화면 상태를 추적하는 state
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  // ✅ [추가] 컴포넌트가 클라이언트에서 마운트되었는지 확인하는 상태입니다.
   const [isMounted, setIsMounted] = useState(false);
-  // 전체 화면 상태가 변경될 때마다(Esc 키 포함) state를 업데이트하는 useEffect
-  useEffect(() => {
-    // 이 useEffect는 클라이언트에서만 실행됩니다.
-    // 마운트가 완료되었음을 알리고, 현재의 실제 전체 화면 상태를 즉시 확인하여 동기화합니다.
-    setIsMounted(true);
-    setIsFullscreen(!!document.fullscreenElement);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
-    const onFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+  useEffect(() => {
+    setIsMounted(true);
+    setIsFullscreen(isFullscreenNow());
+
+    const onChange = () => setIsFullscreen(isFullscreenNow());
+
+    // 표준 + 벤더 이벤트 모두 바인딩
+    document.addEventListener('fullscreenchange', onChange);
+    document.addEventListener(
+      'webkitfullscreenchange',
+      onChange as EventListener,
+    );
+    document.addEventListener('mozfullscreenchange', onChange as EventListener);
+    document.addEventListener('MSFullscreenChange', onChange as EventListener);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', onChange);
+      document.removeEventListener(
+        'webkitfullscreenchange',
+        onChange as EventListener,
+      );
+      document.removeEventListener(
+        'mozfullscreenchange',
+        onChange as EventListener,
+      );
+      document.removeEventListener(
+        'MSFullscreenChange',
+        onChange as EventListener,
+      );
     };
-    document.addEventListener('fullscreenchange', onFullscreenChange);
-    return () =>
-      document.removeEventListener('fullscreenchange', onFullscreenChange);
   }, []);
 
   const enterFullscreen = useCallback(() => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch((err) => {
-        console.warn(`전체 화면 전환 실패: ${err.message}`);
-      });
+    const el = document.documentElement as VendorElement;
+
+    const req =
+      el.requestFullscreen ??
+      el.webkitRequestFullscreen ??
+      el.mozRequestFullScreen ??
+      el.msRequestFullscreen;
+
+    if (req) {
+      try {
+        const maybePromise = req.call(el) as void | Promise<void>;
+        // 일부 브라우저는 Promise를 반환
+        if (
+          maybePromise &&
+          typeof (maybePromise as Promise<void>).then === 'function'
+        ) {
+          void (maybePromise as Promise<void>).catch((err: unknown) => {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.warn('전체 화면 전환 실패:', msg);
+          });
+        }
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.warn('전체 화면 전환 실패:', msg);
+      }
     }
   }, []);
 
-  // ✅ [수정] isFullscreen 상태가 true이면, 아무것도 렌더링하지 않습니다(null).
-  if (!isMounted || isFullscreen) {
-    return null;
-  }
+  const exitFullscreen = useCallback(() => {
+    const d = document as VendorDocument;
 
-  return (
+    const exit =
+      document.exitFullscreen ??
+      d.webkitExitFullscreen ??
+      d.mozCancelFullScreen ??
+      d.msExitFullscreen;
+
+    if (exit) {
+      try {
+        const maybePromise = exit.call(document) as void | Promise<void>;
+        if (
+          maybePromise &&
+          typeof (maybePromise as Promise<void>).then === 'function'
+        ) {
+          void (maybePromise as Promise<void>).catch((err: unknown) => {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.warn('전체 화면 종료 실패:', msg);
+          });
+        }
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.warn('전체 화면 종료 실패:', msg);
+      }
+    }
+  }, []);
+
+  if (!isMounted) return null;
+
+  return isFullscreen ? (
+    <Button
+      onClick={exitFullscreen}
+      className="w-10 h-10 px-3.5 py-1 bg-grayscale-gray10 rounded-[10px] justify-center items-center"
+      aria-label="전체 화면 종료"
+      title="전체 화면 종료"
+      data-state="fullscreen"
+    >
+      <FullscreenExitIcon />
+    </Button>
+  ) : (
     <Button
       onClick={enterFullscreen}
-      className="w-10 h-10 px-3.5 py-1 bg-grayscale-gray10 rounded-[10px] 
-                 justify-center items-center "
+      className="w-10 h-10 px-3.5 py-1 bg-grayscale-gray10 rounded-[10px] justify-center items-center"
       aria-label="전체 화면으로 보기"
       title="전체 화면으로 보기"
+      data-state="windowed"
     >
-      <FullScreenIcon/>
+      <FullscreenEnterIcon />
     </Button>
   );
 }
