@@ -28,36 +28,35 @@ export default function ChatExitModal({ isOpen, onClose, onConfirm }: Props) {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.2 }}
         className=""
-        onClick={(e) => e.stopPropagation()} // 모달 내부 클릭 시 닫힘 방지
+        onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()} // 모달 내부 클릭 시 닫힘 방지
       >
-        <ModalCard hasBorder={false} className='gap-0'>
-        <ModalHeader className="gap-4">
-          <AvatarIcon className="w-20 h-20 flex-shrink-0" />
-          <Text variant={'title02'} className="text-center">
-            대화를 종료할 거야?
-          </Text>
-        </ModalHeader>
+        <ModalCard hasBorder={false} className="gap-0">
+          <ModalHeader className="gap-4">
+            <AvatarIcon className="w-20 h-20 flex-shrink-0" />
+            <Text variant={'title02'} className="text-center">
+              대화를 종료할 거야?
+            </Text>
+          </ModalHeader>
 
-        {/* 2.1. 버튼 그룹 */}
-        <ModalFooter >
-          <Button
-            onClick={onClose}
-            variant={'grayscale'}
-            textVariant={'caption02'}
-          >
-            계속 대화하기
-          </Button>
-          <Button
-            onClick={onConfirm}
-            variant={'primary'}
-            textVariant={'caption02'}
-          >
-            종료하기
-          </Button>
-        </ModalFooter>
+          {/* 2.1. 버튼 그룹 */}
+          <ModalFooter>
+            <Button
+              onClick={onClose}
+              variant={'grayscale'}
+              textVariant={'caption02'}
+            >
+              계속 대화하기
+            </Button>
+            <Button
+              onClick={onConfirm}
+              variant={'primary'}
+              textVariant={'caption02'}
+            >
+              종료하기
+            </Button>
+          </ModalFooter>
         </ModalCard>
       </motion.div>
-      
     </PopupOverlay>
   );
 }

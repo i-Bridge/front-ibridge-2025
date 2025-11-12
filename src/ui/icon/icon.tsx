@@ -44,7 +44,6 @@
 //RedXIcon
 //GreenCheckIcon
 
-
 // 여자 아이 아이콘
 export const GirlIcon = () => (
   <svg
@@ -1001,8 +1000,46 @@ export const GrapeBunchIcon = () => (
     </defs>
   </svg>
 );
-
-export const FullScreenIcon = () => (
+export const FullscreenEnterIcon = () => (
+  <svg
+    width="40"
+    height="40"
+    viewBox="0 0 40 40"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="40" height="40" rx="10" fill="white" />
+    <path
+      d="M22.5 12.5H27.5V17.5"
+      stroke="#4E5968"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M17.5 27.5H12.5V22.5"
+      stroke="#4E5968"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M27.4993 12.5L21.666 18.3333"
+      stroke="#4E5968"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M12.5 27.4974L18.3333 21.6641"
+      stroke="#4E5968"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+);
+export const FullscreenExitIcon = () => (
   <svg
     width="17"
     height="17"
@@ -1040,7 +1077,6 @@ export const FullScreenIcon = () => (
     />
   </svg>
 );
-
 
 export const Type1NoticeIcon = () => (
   <svg
@@ -1303,8 +1339,6 @@ export const Type4NoticeIcon = () => (
   </svg>
 );
 
-
-
 export const RerollIcon = () => (
   <svg
     width="17"
@@ -1336,7 +1370,6 @@ export const RerollIcon = () => (
     />
   </svg>
 );
-
 
 export const RedXIcon = () => (
   <svg
