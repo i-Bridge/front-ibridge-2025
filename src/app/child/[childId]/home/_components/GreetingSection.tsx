@@ -13,7 +13,7 @@ type Props = {
 export default function GreetingSection({ childId, specifiedDone }: Props) {
   return (
     // [수정 2] 모바일 최소 너비를 360px로 고정합니다.
-    <div>
+    
     <div className="min-w-[360px] relative rounded-[40px] shadow-md overflow-hidden px-15">
       <Image
         src="/images/child-bg.webp"
