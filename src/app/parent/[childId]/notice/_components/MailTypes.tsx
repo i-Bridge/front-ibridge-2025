@@ -1,6 +1,11 @@
 import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
-import { Type1NoticeIcon, Type2NoticeIcon, Type3NoticeIcon, Type4NoticeIcon } from '@/ui/icon/icon';
+import {
+  Type1NoticeIcon,
+  Type2NoticeIcon,
+  Type3NoticeIcon,
+  Type4NoticeIcon,
+} from '@/ui/icon/icon';
 interface Notice {
   noticeId: number;
   type: 1 | 2 | 3 | 4;
@@ -21,7 +26,7 @@ export function Type1Notice({
 }) {
   return (
     // Figma: Outer container
-    <div className="self-stretch px-7 py-5 bg-white rounded-xl  border border-1 border-grayscale-gray20 inline-flex justify-start items-center gap-4">
+    <div className="self-stretch px-7 py-5 bg-white rounded-xl  border border-1 border-grayscale-gray20 inline-flex flex-col lg:flex-row justify-start lg:items-center gap-4">
       <Type1NoticeIcon />
 
       {/* Figma: Text block (flex-1) */}
@@ -36,17 +41,18 @@ export function Type1Notice({
       </div>
 
       {/* Figma: Button (div -> button 태그로 변경) */}
-
-      <Button
-        onClick={onView}
-        variant={'grayscale'}
-        textVariant={'caption04'}
-        textClass="text-grayscale-gray70"
-        className=" h-10 px-4 py-2.5 bg-grayscale-gray5 w-auto"
-      >
-        {/* Figma 디자인에 맞춰 '열람' 텍스트로 변경 */}
-        열람
-      </Button>
+      <div className="">
+        <Button
+          onClick={onView}
+          variant={'grayscale'}
+          textVariant={'caption04'}
+          textClass="text-grayscale-gray70"
+          className=" h-10 px-4 py-2.5 bg-grayscale-gray5 w-auto"
+        >
+          {/* Figma 디자인에 맞춰 '열람' 텍스트로 변경 */}
+          열람
+        </Button>
+      </div>
     </div>
   );
 }
@@ -62,7 +68,7 @@ export function Type2Notice({
 }) {
   return (
     // Figma: Outer container
-    <div className="self-stretch px-7 py-5 bg-white rounded-xl  border border-1 border-grayscale-gray20 inline-flex justify-start items-center gap-4">
+    <div className="self-stretch px-7 py-5 bg-white rounded-xl  border border-1 border-grayscale-gray20 inline-flex flex-col lg:flex-row justify-start lg:items-center gap-4">
       {/* Figma: Icon container */}
       <Type2NoticeIcon />
 
@@ -84,7 +90,7 @@ export function Type2Notice({
           variant={'grayscale'}
           textVariant={'caption04'}
           textClass="text-grayscale-gray70"
-          className="w-full h-10 px-4 py-2.5 bg-grayscale-gray5"
+          className=" h-10 px-4 py-2.5 bg-grayscale-gray5"
         >
           거절
         </Button>
@@ -93,7 +99,7 @@ export function Type2Notice({
           variant={'grayscale'}
           textVariant={'caption04'}
           textClass="text-grayscale-gray70"
-          className="w-full h-10 px-4 py-2.5 bg-grayscale-gray5"
+          className=" h-10 px-4 py-2.5 bg-grayscale-gray5"
         >
           수락
         </Button>
@@ -106,7 +112,7 @@ export function Type2Notice({
 export function Type3Notice({ mail }: { mail: Notice }) {
   return (
     // Figma: Outer container (opacity-40 제거하여 일반 버전으로 변경)
-    <div className="self-stretch px-7 py-5 bg-white rounded-xl  border border-1 border-grayscale-gray20 inline-flex justify-start items-center gap-4">
+    <div className="self-stretch px-7 py-5 bg-white rounded-xl  border border-1 border-grayscale-gray20 inline-flex flex-col lg:flex-row justify-start lg:items-center gap-4">
       {/* Figma: Icon container */}
       <Type3NoticeIcon />
 
@@ -126,7 +132,7 @@ export function Type3Notice({ mail }: { mail: Notice }) {
 export function Type4Notice({ mail }: { mail: Notice }) {
   return (
     // Figma: Outer container (opacity-40 제거하여 일반 버전으로 변경)
-    <div className="self-stretch px-7 py-5 bg-white rounded-xl  border border-1 border-grayscale-gray20 inline-flex justify-start items-center gap-4">
+    <div className="self-stretch px-7 py-5 bg-white rounded-xl  border border-1 border-grayscale-gray20 inline-flex flex-col lg:flex-row justify-start lg:items-center gap-4">
       {/* Figma: Icon container */}
       <Type4NoticeIcon />
 

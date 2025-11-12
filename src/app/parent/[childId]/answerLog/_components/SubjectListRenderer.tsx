@@ -83,7 +83,7 @@ export default function SubjectListRenderer({
                     subject={subject}
                     isSelected={selectedSubjectId === subject.subjectId}
                     // [수정] prop으로 받은 핸들러 사용
-                    onClick={() => setSelectedSubjectId(subject.subjectId)}
+                    onClick={() => {setSelectedSubjectId(subject.subjectId); console.log('Subject clicked:', subject.subjectId);}}
                     ref={
                       // [수정] prop으로 받은 ref 사용
                       groupIdx === dateGroups.length - 1 &&

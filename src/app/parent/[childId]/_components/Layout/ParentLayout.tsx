@@ -20,7 +20,7 @@ interface ParentLayoutProps {
  */
 export default function ParentLayout({ title, children, containerClassName }: ParentLayoutProps) {
   // [수정] twMerge를 사용하여 기본 클래스와 사용자 정의 클래스를 병합합니다.
-  const baseClasses = 'w-full flex flex-col max-w-[1200px] min-w-[960px]';
+  const baseClasses = 'w-full flex flex-col lg:max-w-[1200px] lg:min-w-[960px]';
   const mergedClasses = twMerge(baseClasses, containerClassName);
 
   return (

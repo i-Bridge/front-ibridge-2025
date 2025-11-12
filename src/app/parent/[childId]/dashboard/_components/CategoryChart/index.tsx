@@ -75,14 +75,14 @@ export default function CategoryRankChart({
 
   return (
     <>
-      <div className="w-full px-10 py-8 bg-white rounded-[20px] border  border-1 border-grayscale-gray20 inline-flex flex-col justify-center items-start gap-10">
+      <div className="w-full px-5 lg:px-10 py-8 bg-white rounded-[20px] border  border-1 border-grayscale-gray20 inline-flex flex-col justify-center items-start gap-10">
         {/* Title */}
         <div className="inline-flex justify-start items-center gap-2">
           <Text variant={'title04'}>카테고리 순위</Text>
         </div>
 
         {/* Chart & List */}
-        <div className="self-stretch inline-flex justify-start items-center gap-20">
+        <div className="self-stretch lg:inline-flex lg:flex-row flex flex-col justify-start items-center gap-20">
           {/* Pie Chart */}
           <CategoryPieChart
             pieData={pieData}

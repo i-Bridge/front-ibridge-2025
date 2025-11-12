@@ -4,13 +4,13 @@ import AiCommentSkeleton from './AIBannerSkeleton';
 import { Suspense } from 'react';
 import { BannerResponse } from '@/types';
 
-interface AiBannerProps{
+interface AiBannerProps {
   bannerData: BannerResponse | null;
   bannerError: string | null;
 }
 
-export default async function AiComment({ bannerData, bannerError}: AiBannerProps) {
-  if( bannerError || !bannerData ) {
+export default async function AiComment({ bannerData, bannerError }: AiBannerProps) {
+  if (bannerError || !bannerData) {
     return (
       <div className="w-full self-stretch inline-flex flex-col justify-start items-start gap-5">
         <Text variant={'body04'} className="text-red-600">
@@ -23,9 +23,8 @@ export default async function AiComment({ bannerData, bannerError}: AiBannerProp
   return (
     <Suspense fallback={<AiCommentSkeleton />}>
       <div className="w-full self-stretch inline-flex flex-col justify-start items-start gap-5">
-        {/* 1. 가장 많이 한 이야기 주제 */}
-        {/* 피그마 레이아웃에 맞게 h-36 클래스 추가 */}
-        <CustomCard className="items-start py-8 bg-secondary-secondaryMedium ">
+        {/* 가장 많이 한 이야기 주제 */}
+        <CustomCard className="items-start py-8 bg-secondary-secondaryMedium">
           <Text variant={'body04'} className="text-black/60">
             가장 많이 한 이야기 주제
           </Text>
@@ -37,10 +36,10 @@ export default async function AiComment({ bannerData, bannerError}: AiBannerProp
           </Text>
         </CustomCard>
 
-        {/* 2. 긍정/부정 주제 래퍼 */}
-        <div className="w-full self-stretch flex justify-start items-start gap-5">
+        {/* 긍정/부정 주제 래퍼 (모바일: 1열 2행, lg: 2열 2행) */}
+        <div className="w-full self-stretch flex flex-col lg:grid lg:grid-cols-2 lg:gap-5">
           {/* 긍정적인 주제 */}
-          <CustomCard className="items-start py-8 bg-other-mint-light ">
+          <CustomCard className="items-start py-8 bg-other-mint-light">
             <Text variant={'body04'} className="text-black/60">
               긍정적인 주제
             </Text>
@@ -53,7 +52,7 @@ export default async function AiComment({ bannerData, bannerError}: AiBannerProp
           </CustomCard>
 
           {/* 부정적인 주제 */}
-          <CustomCard className="items-start py-8 bg-error-errorLight ">
+          <CustomCard className="items-start py-8 mt-5 lg:mt-0 bg-error-errorLight">
             <Text variant={'body04'} className="text-black/60">
               부정적인 주제
             </Text>

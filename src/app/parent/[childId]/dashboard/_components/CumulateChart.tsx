@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Fetcher } from '@/lib/api/fetcher'; // Fetcher 경로는 실제 프로젝트에 맞게 수정하세요.
 import { twMerge } from 'tailwind-merge';
 import { clsx, type ClassValue } from 'clsx';
+import { Text } from '@/ui/Text';
+import { Button } from '@/ui/Button';
 
 // cn 유틸리티 함수 (tailwind-merge와 clsx 결합)
 function cn(...inputs: ClassValue[]) {
@@ -85,50 +87,51 @@ export default function CumulateChart({
     // 1. 최상위 프레임 (Figma 코드 기반)
     <div className="self-stretch h-[520px] p-10 rounded-[20px] outline outline-1 outline-offset-[-1px] outline-gray-200 flex flex-col justify-center items-start gap-7 bg-white font-['Tmoney_RoundWind']">
       {/* 2. 헤더: 타이틀 + 기간 선택 버튼 */}
-      <div className="self-stretch inline-flex justify-between items-center">
+      <div className="self-stretch flex flex-col justify-start items-start gap-7 lg:flex-row lg:justify-between lg:items-center">
         {/* 타이틀 */}
         <div className="flex justify-start items-center gap-2">
-          <div className="text-gray-900 text-xl font-extrabold leading-7">
+          <Text variant="title04" className="text-grayscale-gray90">
             누적 답변 개수
-          </div>
+          </Text>
           {/* API에서 받은 최신 데이터(오늘)를 표시합니다. */}
-          <div className="text-blue-600 text-xl font-extrabold leading-7">
+          <Text variant={'title04'} className="text-primary-primary">
             {cumulative}
-          </div>
+          </Text>
         </div>
 
         {/* 기간 선택 버튼 */}
-        <div className="p-1 bg-gray-100 rounded-lg flex justify-start items-end gap-1">
+        <div className="p-1 bg-grayscale-gray10 rounded-lg flex justify-start items-end gap-1">
           {periodOptions.map((option) => (
-            <button
+            <Button
               key={option.key}
               onClick={() => setPeriodType(option.key)}
-              // cn 유틸리티로 조건부 스타일링
+              textVariant={'caption04'}
               className={cn(
-                'h-8 px-3 rounded-lg flex justify-center items-center gap-2.5 text-sm font-extrabold leading-5 transition-colors',
+                'h-8 px-3 rounded-lg flex justify-center items-center gap-2.5 ',
                 periodType === option.key
-                  ? 'bg-white text-gray-800 shadow-sm' // 활성 상태
-                  : 'bg-transparent text-gray-500 hover:bg-gray-200', // 비활성 상태
+                  ? 'bg-white text-grayscale-gray80 shadow-sm' // 활성 상태
+                  : 'bg-transparent text-grayscale-gray50 hover:bg-grayscale-gray10', // 비활성 상태
               )}
             >
               {option.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
 
       {/* 3. 차트 본문 */}
-      <div className="self-stretch flex-1 inline-flex justify-start items-start gap-1.5 h-[320px]">
+      <div className="self-stretch flex-1 inline-flex justify-start items-start gap-1.5 h-[320px] overflow-x-auto">
         {/* Y축 레이블 */}
         {/* pb-5 대신 flex-col을 늘려서 0이 가장 아래에 오도록 조정 */}
         <div className="self-stretch flex flex-col justify-between items-end pr-2 h-full pb-5">
           {yAxisLabels.map((label) => (
-            <div
+            <Text
               key={label}
-              className="text-right text-gray-600 text-sm font-normal leading-6"
+              variant="body05"
+              className="text-right text-grayscale-gray60"
             >
               {label}
-            </div>
+            </Text>
           ))}
         </div>
 
@@ -137,12 +140,15 @@ export default function CumulateChart({
           {/* Grid Lines (배경) */}
           <div className="w-full h-full pt-2 absolute left-0 top-0 flex flex-col justify-between">
             {/* yAxisLabels.slice(0, -1)로 마지막 0 라벨의 점선을 제거 */}
-            {yAxisLabels.slice(0, -1).map((_, index) => (
-              <div
-                key={index}
-                className="self-stretch border-b border-dashed border-gray-200"
-              />
-            ))}
+             {yAxisLabels.slice(0, -1).map((_, index) => (
+    <div
+      key={index}
+      className="self-stretch border-b border-dashed border-gray-200"
+      style={{
+        maxHeight: "calc(100% / 10)", // 높이를 10개로 나누어서 점선이 겉 테두리를 넘지 않도록 제한
+      }}
+    />
+  ))}
           </div>
 
           {/* Bars (데이터) */}
@@ -161,7 +167,7 @@ export default function CumulateChart({
                 {/* 툴팁 위치 조정을 위해 top: -(높이+꼬리+패딩) 값을 사용 */}
                 <div
                   className="absolute hidden group-hover:flex flex-col items-center pointer-events-none"
-                  style={{ bottom: `${barHeight}%`, marginBottom: '16px' }} // 막대 높이에 따라 bottom 조정 + 꼬리 높이 + 약간의 여백
+                  style={{ bottom: `${barHeight}%`, marginBottom: '20px' }} // 막대 높이에 따라 bottom 조정 + 꼬리 높이 + 약간의 여백
                 >
                   {/* 툴팁 박스 + 텍스트 */}
                   <div className="relative flex items-center justify-center">
@@ -179,9 +185,9 @@ export default function CumulateChart({
                       />
                     </svg>
                     {/* 텍스트 (SVG 내부 텍스트 대신 HTML 텍스트 사용) */}
-                    <span className="absolute text-white text-sm font-extrabold">
+                    <Text  variant='caption04' className="absolute text-white ">
                       {value}
-                    </span>
+                    </Text>
                   </div>
                   {/* 툴팁 꼬리 (image_eedde0.png 참고) */}
                   {/* 꼬리 SVG는 4px 높이 */}
@@ -207,9 +213,9 @@ export default function CumulateChart({
 
                 {/* X축 레이블 */}
                 <div className="self-stretch pt-3">
-                  <div className="flex-1 text-center text-gray-500 text-sm font-extrabold leading-5">
+                  <Text variant={'caption04'} className="flex-1 text-center text-grayscale-gray50 whitespace-nowrap">
                     {label}
-                  </div>
+                  </Text>
                 </div>
               </div>
             );

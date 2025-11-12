@@ -1,7 +1,3 @@
-/*
- * 파일 경로: src/app/parent/[childId]/calendar/_components/Calendar.tsx
- * (이 코드로 덮어쓰세요)
- */
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -23,13 +19,16 @@ import { cn } from '@/lib/utils';
 import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
 import ParentLayout from '../../_components/Layout/ParentLayout';
-// [MODIFIED] AnalysisList 대신 QuestionCard와 관련 타입을 직접 임포트
 import QuestionCard from '../../_components/Question/QuestionCard';
 import { DateSubject, Question } from '@/types';
 import Skeleton from '@/ui/loading/Skeleton';
 import EmptyPlaceHolder from '@/ui/loading/EmptyPlaceHolder';
 import { useSubjectStore } from '@/store/useSubjectStore';
-import { dateSubjectCache } from '@/lib/cache/DateSubjectCache'; // [NEW] 요청하신 날짜 캐시 임포트
+import { dateSubjectCache } from '@/lib/cache/DateSubjectCache';
+import TitleComponent from '@/ui/Modal/TitleComponent';
+import PopupOverlay from '@/ui/Modal/PopupOverlay';
+import { XIcon } from '@/ui/icon/icon';
+import CarouselStepper from '@/components/CarouselStepper';
 
 const WEEKDAYS = ['월', '화', '수', '목', '금', '토', '일'];
 
@@ -63,7 +62,8 @@ export default function Calendar({
   const [emotions, setEmotions] = useState<EmotionId[]>(
     defaultemotions.map((e) => Number(e)),
   );
-  const [mostEmotionState, setMostEmotionState] = useState<EmotionId>(mostEmotion);
+  const [mostEmotionState, setMostEmotionState] =
+    useState<EmotionId>(mostEmotion);
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const setSubjectsInStore = useSubjectStore((state) => state.setSubjects);
@@ -71,8 +71,10 @@ export default function Calendar({
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
-  // [NEW] 비디오 재생 로직
+  // 비디오 재생 로직
+  // playingMap: questionId -> boolean
   const [playingMap, setPlayingMap] = useState<{ [key: number]: boolean }>({});
+  // refs for actual <video> elements
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
 
   const prevYearMonthRef = useRef({
@@ -88,6 +90,12 @@ export default function Calendar({
   const currentMonthStart = startOfMonth(today);
   const isCurrentMonth = startMonth.getTime() === currentMonthStart.getTime();
   const isSignupMonth = startMonth.getTime() === signupMonthStart.getTime();
+
+  // 팝업 상태
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  // 캐러셀 현재 단계 (1-based)
+  const [currentStep, setCurrentStep] = useState(1);
 
   // 감정 데이터 불러오기 (연/월 변경 시)
   useEffect(() => {
@@ -125,28 +133,32 @@ export default function Calendar({
     }
   }, [year, month, childId, setSubjectsInStore]);
 
-  // [MODIFIED] 날짜 클릭 핸들러 (캐시 적용)
+  // 날짜 클릭 핸들러 (캐시 적용) + 팝업 열기
   const handleDateClick = async (day: Date) => {
     setSelectedDate(day);
+    setIsPopupOpen(true);
     setIsLoadingSubjects(true);
     setFetchError(null);
     setDateSubjects([]);
     setSubjectsInStore([]);
+    setCurrentStep(1); // 캐러셀 리셋
+    setPlayingMap({}); // 재생 상태 초기화
 
-    // 1. [NEW] 캐시 키 생성 (dateSubjectCache 사용)
+    // 캐시 키 생성
     const cacheKey = dateSubjectCache.createKey(childId, day);
 
-    // 2. [NEW] 캐시 확인 (dateSubjectCache 사용)
+    // 캐시 확인
     const cachedSubjects = dateSubjectCache.get(cacheKey);
     if (cachedSubjects) {
       console.log('날짜 캐시 사용:', cacheKey);
-      setDateSubjects(cachedSubjects as DateSubject[]); // 타입 단언
-      setSubjectsInStore(cachedSubjects as DateSubject[]);
+      const cs = cachedSubjects as DateSubject[];
+      setDateSubjects(cs);
+      setSubjectsInStore(cs);
       setIsLoadingSubjects(false);
       return; // 캐시된 데이터 사용, API 호출 스킵
     }
 
-    // 3. [NEW] 캐시가 없으면 API 호출
+    // 캐시가 없으면 API 호출
     console.log('API 호출 (날짜):', cacheKey);
     try {
       const res = await Fetcher<SubjectsByDateData>(
@@ -158,7 +170,7 @@ export default function Calendar({
         setDateSubjects(fetchedSubjects);
         setSubjectsInStore(fetchedSubjects);
 
-        // 4. [NEW] API 응답을 캐시에 저장 (dateSubjectCache 사용)
+        // 캐시에 저장
         dateSubjectCache.set(cacheKey, fetchedSubjects);
       } else {
         setDateSubjects([]);
@@ -175,19 +187,89 @@ export default function Calendar({
     }
   };
 
-  // [NEW] 비디오 재생 핸들러
+  // 팝업 닫기: 모든 비디오 중지 + 상태 초기화
+  const handleClose = () => {
+    // pause all videos
+    try {
+      Object.keys(videoRefs.current).forEach((k) => {
+        const id = Number(k);
+        const v = videoRefs.current[id];
+        if (v && !v.paused) {
+          v.pause();
+          // optionally reset currentTime: v.currentTime = 0;
+        }
+      });
+    } catch (e) {
+      // ignore
+      console.log(e);
+    }
+    setPlayingMap({});
+    setIsPopupOpen(false);
+    setSelectedDate(null);
+    setDateSubjects([]);
+    setCurrentStep(1);
+  };
+
+  // 비디오 재생: 해당 questionId만 재생, 다른 비디오들은 멈춤
   const handlePlayClick = (questionId: number) => {
-    setPlayingMap((prev) => ({ ...prev, [questionId]: true }));
-    setTimeout(() => {
-      videoRefs.current[questionId]?.play();
-    }, 0);
+    // Pause every other video first
+    Object.keys(videoRefs.current).forEach((k) => {
+      const id = Number(k);
+      const video = videoRefs.current[id];
+      if (!video) return;
+      if (id === questionId) return;
+      try {
+        if (!video.paused) {
+          video.pause();
+        }
+      } catch (e) {
+        // ignore
+        console.log(e);
+      }
+    });
+
+    // Play target video (if exists)
+    const target = videoRefs.current[questionId];
+    if (target) {
+      try {
+        // Ensure other playingMap entries are false, only this true
+        const newPlaying: { [key: number]: boolean } = {};
+        Object.keys(videoRefs.current).forEach((k) => {
+          const id = Number(k);
+          newPlaying[id] = id === questionId;
+        });
+        // also include questions that may not have refs yet (set true only for target)
+        newPlaying[questionId] = true;
+
+        setPlayingMap(newPlaying);
+
+        // play (some browsers require user gesture; this is called from click)
+        void target.play();
+      } catch (e) {
+        console.error('video play error', e);
+      }
+    } else {
+      // mark playing state for the id so UI reflects it (if video element not mounted yet)
+      setPlayingMap({ [questionId]: true });
+    }
   };
 
   const handleVideoEnd = (questionId: number) => {
+    // mark ended
     setPlayingMap((prev) => ({ ...prev, [questionId]: false }));
+    // ensure videoRef is paused/stopped
+    const v = videoRefs.current[questionId];
+    if (v && !v.paused) {
+      try {
+        v.pause();
+      } catch (e) {
+        // ignore
+        console.log(e);
+      }
+    }
   };
 
-  // 캘린더 날짜 배열 생성
+  // calendar generation
   const startDate = startOfWeek(startMonth, { weekStartsOn: 1 });
   const endDate = endOfWeek(endMonth, { weekStartsOn: 1 });
   const calendarDays = eachDayOfInterval({ start: startDate, end: endDate });
@@ -197,7 +279,7 @@ export default function Calendar({
     weeks.push(calendarDays.slice(i, i + 7));
   }
 
-  // 월 이동 핸들러
+  // month navigation
   const prevMonth = () => {
     if (!isSignupMonth) setCurrentDate(subMonths(currentDate, 1));
   };
@@ -205,7 +287,6 @@ export default function Calendar({
     if (!isCurrentMonth) setCurrentDate(addMonths(currentDate, 1));
   };
 
-  // 감정 아이콘 컴포넌트 가져오기
   const getEmotionIcon = (
     emotionId: EmotionId | null,
   ): EmotionIconComponent | null => {
@@ -216,7 +297,19 @@ export default function Calendar({
     }
     return null;
   };
+
   const MostEmotionIcon = getEmotionIcon(mostEmotionState);
+
+  // reset currentStep when dateSubjects change (new data)
+  useEffect(() => {
+    setCurrentStep(1);
+  }, [dateSubjects]);
+
+  // derive current subject from currentStep (1-based)
+  const currentSubject =
+    dateSubjects && dateSubjects.length >= currentStep
+      ? dateSubjects[currentStep - 1]
+      : undefined;
 
   return (
     <ParentLayout
@@ -247,7 +340,7 @@ export default function Calendar({
                 {'>'}
               </Button>
             </div>
-            <Text variant={'title01'}>가장 많이 선택한 감정은</Text>
+            <TitleComponent title="가장 많이 선택한 감정은" align="start" />
           </div>
           <div className="w-14 h-14 ml-2.5 mt-1.5 mb-6 relative rounded-[60px] overflow-hidden flex items-center justify-center bg-other-yellow-light">
             {MostEmotionIcon ? <MostEmotionIcon className="w-14 h-14" /> : null}
@@ -255,20 +348,15 @@ export default function Calendar({
         </div>
       }
     >
-      {/* 캘린더와 분석 리스트를 가로로 배치 */}
+      {/* 캘린더 UI */}
       <div className="flex flex-col lg:flex-row gap-6 w-full">
-        {/* === 캘린더 섹션 (Left) === */}
         <div className="flex-1 max-w-full">
-          {/* 요일 헤더 */}
-          <div className="self-stretch h-12 bg-Grayscale-gray5 border-b border-Grayscale-gray20 inline-flex justify-start items-center">
-            {WEEKDAYS.map((d, index) => (
+          {/* 요일 헤더 (grid으로 정렬) */}
+          <div className="grid grid-cols-7 w-full border-b border-grayscale-gray20">
+            {WEEKDAYS.map((d) => (
               <div
                 key={d}
-                className={cn(
-                  'flex-1 self-stretch p-2 flex justify-center items-center gap-2.5 overflow-hidden',
-                  index < WEEKDAYS.length - 1 &&
-                    'border-r border-Grayscale-gray20',
-                )}
+                className="h-12 flex justify-center items-center border-r border-grayscale-gray20 last:border-r-0 bg-grayscale-gray5"
               >
                 <Text className="text-grayscale-gray90 text-base font-['NPS_font'] leading-6">
                   {d}
@@ -277,170 +365,189 @@ export default function Calendar({
             ))}
           </div>
 
-          {/* 캘린더 바디 */}
-          <div className="self-stretch flex-col justify-start items-start flex w-full">
-            {weeks.map((week, weekIndex) => (
-              <div
-                key={weekIndex}
-                className={cn(
-                  'self-stretch inline-flex justify-start items-center overflow-hidden',
-                  weekIndex < weeks.length - 1 &&
-                    'border-b border-grayscale-gray20',
-                )}
-              >
-                {week.map((day, dayIndex) => {
-                  const dayNumber = day.getDate();
-                  const dayStart = startOfDay(day);
-                  const isTodayDate = dayStart.getTime() === today.getTime();
-                  const isInMonth = day.getMonth() + 1 === month;
-                  const isBeforeSignupDay =
-                    dayStart.getTime() < signup.getTime();
-                  const isFutureDay = dayStart.getTime() > today.getTime();
-                  const isDisabled =
-                    !isInMonth || isBeforeSignupDay || isFutureDay;
-                  const isLoading =
-                    emotions.length === 0 &&
-                    isInMonth &&
-                    !isBeforeSignupDay &&
-                    !isFutureDay;
-                  const emotionID =
-                    !isDisabled && !isLoading
-                      ? (emotions[dayNumber ] ?? null)
-                      : null;
-                  const EmotionIcon = getEmotionIcon(emotionID);
-                  let dataType: 'disabled' | 'not yet' | 'Default' = 'Default';
-                  if (isDisabled) dataType = 'disabled';
-                  else if (!EmotionIcon && !isLoading) dataType = 'not yet';
-                  const isSelected =
-                    selectedDate &&
-                    startOfDay(day).getTime() ===
-                      startOfDay(selectedDate).getTime();
+          {/* 날짜 바디 */}
+          <div className="grid grid-cols-7 w-full border-l border-t border-grayscale-gray20">
+            {calendarDays.map((day) => {
+              const dayNumber = day.getDate();
+              const dayStart = startOfDay(day);
+              const isTodayDate = dayStart.getTime() === today.getTime();
+              const isInMonth = day.getMonth() + 1 === month;
+              const isBeforeSignupDay = dayStart.getTime() < signup.getTime();
+              const isFutureDay = dayStart.getTime() > today.getTime();
+              const isDisabled = !isInMonth || isBeforeSignupDay || isFutureDay;
+              const isLoading =
+                emotions.length === 0 &&
+                isInMonth &&
+                !isBeforeSignupDay &&
+                !isFutureDay;
+              const emotionID =
+                !isDisabled && !isLoading
+                  ? (emotions[dayNumber] ?? null)
+                  : null;
+              const EmotionIcon = getEmotionIcon(emotionID);
+              let dataType: 'disabled' | 'not yet' | 'Default' = 'Default';
+              if (isDisabled) dataType = 'disabled';
+              else if (!EmotionIcon && !isLoading) dataType = 'not yet';
+              const isSelected =
+                selectedDate &&
+                startOfDay(day).getTime() ===
+                  startOfDay(selectedDate).getTime();
 
-                  return (
-                    <div
-                      key={day.toString()}
-                      onClick={() => !isDisabled && handleDateClick(day)}
-                      className={cn(
-                        'flex-1 h-28 p-2 relative flex justify-center items-center gap-2.5 overflow-hidden',
-                        dayIndex < 6 && 'border-r border-grayscale-gray20',
-                        !isDisabled &&
-                          'hover:bg-grayscale-gray5 cursor-pointer',
-                        isSelected && !isDisabled
-                          ? 'bg-Primary-light ring-2 ring-Primary-purple ring-inset'
-                          : 'bg-white',
-                      )}
-                      data-type={dataType}
-                      data-today={isTodayDate}
-                      data-size="L"
-                    >
-                      {dataType === 'Default' && EmotionIcon && (
-                        <div
-                          data-type="emotion-icon-wrapper"
-                          className={cn(
-                            'w-14 h-14 relative rounded-[60px] overflow-hidden flex items-center justify-center',
-                          )}
-                        >
-                          <EmotionIcon className="w-14 h-14" />
-                        </div>
-                      )}
-                      {isLoading && (
-                        <div className="w-14 h-14 rounded-[60px] bg-grayscale-gray10 animate-pulse" />
-                      )}
-                      <div
-                        className={cn(
-                          'w-7 h-7 p-2.5 left-[8px] top-[8px] absolute rounded-[999px]',
-                          'inline-flex flex-col justify-center items-center gap-2.5',
-                          isTodayDate && 'bg-grayscale-gray80',
-                        )}
-                      >
-                        <div className="pt-0.5 flex flex-col justify-center items-center gap-2.5">
-                          <Text
-                            variant="body05"
-                            className={cn(
-                              isTodayDate
-                                ? 'text-white'
-                                : isDisabled
-                                  ? 'text-grayscale-gray40'
-                                  : 'text-grayscale-gray90',
-                            )}
-                          >
-                            {dayNumber}
-                          </Text>
-                        </div>
-                      </div>
+              return (
+                <div
+                  key={day.toISOString()}
+                  onClick={() => !isDisabled && handleDateClick(day)}
+                  className={cn(
+                    'h-28 flex flex-col justify-center items-center relative border-r border-b border-grayscale-gray20 last:border-r-0 bg-white',
+                    !isDisabled && 'hover:bg-grayscale-gray5 cursor-pointer',
+                    isSelected &&
+                      'bg-primary-light ring-2 ring-primary-purple ring-inset',
+                  )}
+                  data-type={dataType}
+                  data-today={isTodayDate}
+                >
+                  {dataType === 'Default' && EmotionIcon && (
+                    <div className="lg:w-14 lg:h-14 w-9 h-9 rounded-full flex items-center justify-center">
+                      <EmotionIcon className="w-14 h-14" />
                     </div>
-                  );
-                })}
-              </div>
-            ))}
+                  )}
+                  {isLoading && (
+                    <div className="w-14 h-14 rounded-full bg-grayscale-gray10 animate-pulse" />
+                  )}
+                  <div
+                    className={cn(
+                      'absolute left-2 top-2 w-7 h-7 flex items-center justify-center rounded-full',
+                      isTodayDate ? 'bg-grayscale-gray80 text-white' : '',
+                    )}
+                  >
+                    <Text
+                      variant="body05"
+                      className={cn(
+                        isTodayDate
+                          ? 'text-white'
+                          : isDisabled
+                            ? 'text-grayscale-gray40'
+                            : 'text-grayscale-gray90',
+                      )}
+                    >
+                      {dayNumber}
+                    </Text>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* === [MODIFIED] 분석 리스트 섹션 (Right) === */}
-        <div className="w-fullflex-shrink-0">
-          <div className="mb-4">
-            <Text variant="title02" className="text-grayscale-gray80">
-              {selectedDate
-                ? `${format(selectedDate, 'M월 d일')}의 대화`
-                : '날짜를 선택해 주세요'}
-            </Text>
-          </div>
+        {/* 분석 리스트는 팝업으로 대체 (우측 공간 숨김) */}
+        <div className="w-full flex-shrink-0 hidden" />
+      </div>
 
-          {isLoadingSubjects ? (
-            <div className="space-y-4 p-4 bg-white rounded-lg shadow-sm">
-              <Skeleton className="h-8 w-3/4 rounded-lg" />
-              <Skeleton className="h-16 w-full rounded-lg" />
-              <Skeleton className="h-16 w-full rounded-lg" />
-            </div>
-          ) : fetchError ? (
-            <EmptyPlaceHolder> {fetchError} </EmptyPlaceHolder>
-          ) : dateSubjects.length > 0 ? (
-            // [NEW] QuestionCard를 직접 렌더링
-            <div className="flex-1 overflow-y-auto w-full space-y-4">
-              {dateSubjects.map((subject, index) => (
-                // 주제별로 섹션을 나눔
-                <div
-                  key={`subject-${subject}-${index}`}
-                  className="p-4 bg-white rounded-lg shadow-sm"
-                >
-                  <Text variant="title04" className="mb-3">
-                    {subject.subjectTitle}
+      {/* 팝업: 날짜 클릭 시 표시 */}
+      {isPopupOpen && (
+        <PopupOverlay onClose={handleClose}>
+          <div className="px-10">
+            <div className="bg-white flex flex-col  justify-start items-start rounded-[40px] relative gap-10 lg:max-w-7xl w-full max-h-[90vh] overflow-hidden">
+              {/* X 버튼 (오른쪽 상단) */}
+              <button
+                onClick={handleClose}
+                aria-label="닫기"
+                className="absolute right-6 top-6 text-grayscale-gray60 hover:text-grayscale-gray80 transition"
+              >
+                <XIcon />
+              </button>
+
+              <div className="w-full p-10 overflow-y-auto max-h-[90vh]">
+                {/* 타이틀 + 캐러셀 스텝퍼 */}
+                <div className="flex justify-between items-center flex-col lg:flex-row mb-6">
+                  <Text variant="title02" className="text-grayscale-gray80">
+                    {selectedDate
+                      ? `${format(selectedDate, 'M월 d일')}의 대화`
+                      : ''}
                   </Text>
-                  {/* API 응답의 questions 배열을 순회 */}
-                  {subject.questions && subject.questions.length > 0 ? (
-                    subject.questions.map((q: Question) => (
-                      <QuestionCard
-                        key={q.questionId}
-                        question={q}
-                        isPlaying={!!playingMap[q.questionId]}
-                        onPlayClick={() => handlePlayClick(q.questionId)}
-                        onVideoEnd={() => handleVideoEnd(q.questionId)}
-                        videoRef={(el) => {
-                          videoRefs.current[q.questionId] = el;
-                        }}
-                      />
-                    ))
-                  ) : (
-                    <Text variant="body03" className="text-grayscale-gray60">
-                      질문이 없습니다.
-                    </Text>
+
+
+                  {/* 캐러셀 스텝퍼: subject가 2개 이상일 때만 보여줌 */}
+                  {dateSubjects.length > 1 && (
+                    <CarouselStepper
+                      currentStep={currentStep}
+                      totalSteps={dateSubjects.length}
+                      onStepChange={(step) => {
+                        // step은 1-based
+                        setCurrentStep(step);
+                        // reset playingMap when switching subject
+                        setPlayingMap({});
+                        // pause existing video refs
+                        Object.values(videoRefs.current).forEach((v) => {
+                          try {
+                            v?.pause();
+                          } catch (e) {
+                            console.log(e);
+                          }
+                        });
+                      }}
+                    />
                   )}
                 </div>
-              ))}
+
+                {/* content */}
+                {isLoadingSubjects ? (
+                  <div className="space-y-4 p-4 bg-white rounded-lg shadow-sm">
+                    <Skeleton className="h-8 w-3/4 rounded-lg" />
+                    <Skeleton className="h-16 w-full rounded-lg" />
+                    <Skeleton className="h-16 w-full rounded-lg" />
+                  </div>
+                ) : fetchError ? (
+                  <EmptyPlaceHolder> {fetchError} </EmptyPlaceHolder>
+                ) : dateSubjects.length > 0 ? (
+                  <>
+                    {/* 현재 단계의 subject만 렌더링 (currentStep은 1-based) */}
+                    {currentSubject ? (
+                      <div
+                        key={`subject-${currentSubject.subjectId}`} // <- 숫자 대신 고유 문자열 키 사용
+                        className="p-4 bg-white rounded-lg shadow-sm flex flex-col gap-3"
+                      >
+                        
+
+                        {currentSubject.questions &&
+                        currentSubject.questions.length > 0 ? (
+                          currentSubject.questions.map((q: Question,index) => (
+                            <QuestionCard
+                              key={`q-${q.questionId}-${index}`} // <- 질문 key도 문자열 접두사 추가
+                              question={q}
+                              isPlaying={!!playingMap[q.questionId]}
+                              onPlayClick={() => handlePlayClick(q.questionId)}
+                              onVideoEnd={() => handleVideoEnd(q.questionId)}
+                              videoRef={(el: HTMLVideoElement | null) => {
+                                if (el) {
+                                  videoRefs.current[q.questionId] = el;
+                                } else {
+                                  delete videoRefs.current[q.questionId];
+                                }
+                              }}
+                            />
+                          ))
+                        ) : (
+                          <Text
+                            variant="body03"
+                            className="text-grayscale-gray60"
+                          >
+                            질문이 없습니다.
+                          </Text>
+                        )}
+                      </div>
+                    ) : null}
+                  </>
+                ) : (
+                  <EmptyPlaceHolder>
+                    해당 날짜에 완료된 대화가 없습니다.
+                  </EmptyPlaceHolder>
+                )}
+              </div>
             </div>
-          ) : selectedDate ? (
-            <EmptyPlaceHolder>
-              {' '}
-              해당 날짜에 완료된 대화가 없습니다.
-            </EmptyPlaceHolder>
-          ) : (
-            <EmptyPlaceHolder>
-              {' '}
-              캘린더에서 날짜를 선택하면 대화 기록이 표시됩니다.{' '}
-            </EmptyPlaceHolder>
-          )}
-        </div>
-      </div>
+          </div>
+        </PopupOverlay>
+      )}
     </ParentLayout>
   );
 }
