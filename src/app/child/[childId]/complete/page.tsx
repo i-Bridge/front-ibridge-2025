@@ -6,7 +6,7 @@ import FullscreenToggle from '../_components/header/FullscreenToggle';
 import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
 import { showCustom } from '@/lib/toast';
-
+import { GrapeIcon } from '@/ui/icon/icon';
 /**
  * 홈 아이콘 SVG 컴포넌트 (컴포넌트 외부에 정의하여 재사용성을 높였습니다)
  */
@@ -38,7 +38,7 @@ export default function ConversationCompletePage() {
   // ✅ [수정] 컴포넌트가 마운트될 때 (페이지 로드시) 딱 한 번만 토스트를 실행합니다.
   useEffect(() => {
     showCustom({
-      icon: <HomeIcon />,
+      icon: <GrapeIcon />,
       message: '포도알 1개를 받았어요!',
     });
     // 빈 의존성 배열은 마운트 시 한 번만 실행됨을 보장합니다.
