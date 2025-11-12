@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { Subject } from '@/types/index';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { showError } from '@/lib/toast';
 
 // API 응답 타입

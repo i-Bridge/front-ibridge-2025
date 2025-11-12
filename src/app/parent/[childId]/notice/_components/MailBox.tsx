@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { useRouter, useParams } from 'next/navigation';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import {
@@ -151,61 +151,61 @@ export default function MailPage() {
 
     // ✅ 2. 로딩이 끝난 후, 스켈레톤과 동일한 래퍼로 실제 콘텐츠를 감쌉니다.
     return (
-        <div className="self-stretch flex flex-col justify-start items-start gap-4">
-          <div className="self-stretch flex flex-col justify-start items-start gap-5">
-            {/* --- 여기부터 로딩 아닐 때의 분기 --- */}
-            {error ? (
-              <div className="flex justify-center items-center h-24 self-stretch px-7 py-5 bg-red-50 rounded-xl border border-red-200">
-                <Text variant="body01" className="text-red-500">
-                  {error}
-                </Text>
-              </div>
-            ) : noticeData?.notices.length === 0 ? (
-              // EmptyPlaceholder는 self-stretch가 필요할 수 있으므로 래퍼로 감쌀 수 있습니다.
-              // 혹은 EmptyPlaceholder 자체에서 너비를 100%로 설정해도 됩니다.
-              <div className="self-stretch">
-                <EmptyPlaceholder>아직 알림이 없어요!</EmptyPlaceholder>
-              </div>
-            ) : (
-              // 🔹 실제 메일 목록 렌더링
-              noticeData?.notices.map((mail) => {
-                switch (mail.type) {
-                  case 1:
-                    return (
-                      <Type1Notice
-                        key={mail.noticeId}
-                        mail={mail}
-                        onView={() =>
-                          handleView(
-                            mail.noticeId,
-                            mail.senderId,
-                            mail.subject,
-                            mail.time,
-                          )
-                        }
-                      />
-                    );
-                  case 2:
-                    return (
-                      <Type2Notice
-                        key={mail.noticeId}
-                        mail={mail}
-                        onAccept={() => handleAccept(mail.senderId)}
-                        onDecline={() => handleDecline(mail.senderId)}
-                      />
-                    );
-                  case 3:
-                    return <Type3Notice key={mail.noticeId} mail={mail} />;
-                  case 4:
-                    return <Type4Notice key={mail.noticeId} mail={mail} />;
-                  default:
-                    return null;
-                }
-              })
-            )}
-            {/* --- 분기 끝 --- */}
-          </div>
+      <div className="self-stretch flex flex-col justify-start items-start gap-4">
+        <div className="self-stretch flex flex-col justify-start items-start gap-5">
+          {/* --- 여기부터 로딩 아닐 때의 분기 --- */}
+          {error ? (
+            <div className="flex justify-center items-center h-24 self-stretch px-7 py-5 bg-red-50 rounded-xl border border-red-200">
+              <Text variant="body01" className="text-red-500">
+                {error}
+              </Text>
+            </div>
+          ) : noticeData?.notices.length === 0 ? (
+            // EmptyPlaceholder는 self-stretch가 필요할 수 있으므로 래퍼로 감쌀 수 있습니다.
+            // 혹은 EmptyPlaceholder 자체에서 너비를 100%로 설정해도 됩니다.
+            <div className="self-stretch">
+              <EmptyPlaceholder>아직 알림이 없어요!</EmptyPlaceholder>
+            </div>
+          ) : (
+            // 🔹 실제 메일 목록 렌더링
+            noticeData?.notices.map((mail) => {
+              switch (mail.type) {
+                case 1:
+                  return (
+                    <Type1Notice
+                      key={mail.noticeId}
+                      mail={mail}
+                      onView={() =>
+                        handleView(
+                          mail.noticeId,
+                          mail.senderId,
+                          mail.subject,
+                          mail.time,
+                        )
+                      }
+                    />
+                  );
+                case 2:
+                  return (
+                    <Type2Notice
+                      key={mail.noticeId}
+                      mail={mail}
+                      onAccept={() => handleAccept(mail.senderId)}
+                      onDecline={() => handleDecline(mail.senderId)}
+                    />
+                  );
+                case 3:
+                  return <Type3Notice key={mail.noticeId} mail={mail} />;
+                case 4:
+                  return <Type4Notice key={mail.noticeId} mail={mail} />;
+                default:
+                  return null;
+              }
+            })
+          )}
+          {/* --- 분기 끝 --- */}
         </div>
+      </div>
     );
   };
 
@@ -218,7 +218,7 @@ export default function MailPage() {
               새로운 알림이{' '}
               <span className="text-primary-primary">
                 {/* 로딩 중일 땐 카운트가 0 또는 null일 수 있으므로 '...' 등으로 표시하는 것도 좋습니다. */}
-                {loading ? '...' : noticeData?.newCount ?? 0}개
+                {loading ? '...' : (noticeData?.newCount ?? 0)}개
               </span>{' '}
               있어요.
             </Text>

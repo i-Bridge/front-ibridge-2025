@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { showSuccess, showError } from '@/lib/toast';
 import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
@@ -62,10 +62,15 @@ interface PrivacyConsentFormProps {
   content: ConsentContent;
 }
 
-export default function PrivacyConsentForm({ content }: PrivacyConsentFormProps) {
+export default function PrivacyConsentForm({
+  content,
+}: PrivacyConsentFormProps) {
   const router = useRouter();
-  const [agreements, setAgreements] = useState<AgreementItem[]>(INITIAL_AGREEMENTS);
-  const [activeModalId, setActiveModalId] = useState<keyof ConsentContent | null>(null);
+  const [agreements, setAgreements] =
+    useState<AgreementItem[]>(INITIAL_AGREEMENTS);
+  const [activeModalId, setActiveModalId] = useState<
+    keyof ConsentContent | null
+  >(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 필수 항목 전체 동의 여부 확인
@@ -110,8 +115,12 @@ export default function PrivacyConsentForm({ content }: PrivacyConsentFormProps)
     setIsSubmitting(true);
 
     // POST API 호출을 위한 데이터 구성
-    const requiredAgreed = agreements.find(a => a.id === 'privacy_required')?.isAgreed && agreements.find(a => a.id === 'service_required')?.isAgreed;
-    const optionalAgreed = agreements.find(a => a.id === 'marketing_optional')?.isAgreed;
+    const requiredAgreed =
+      agreements.find((a) => a.id === 'privacy_required')?.isAgreed &&
+      agreements.find((a) => a.id === 'service_required')?.isAgreed;
+    const optionalAgreed = agreements.find(
+      (a) => a.id === 'marketing_optional',
+    )?.isAgreed;
 
     try {
       // API 호출: 동의한 내용 서버에 전송
@@ -128,7 +137,7 @@ export default function PrivacyConsentForm({ content }: PrivacyConsentFormProps)
       if (res.isSuccess) {
         showSuccess('약관 동의가 완료되었습니다.');
         // 목표 로직: 다음 층(/family-setup)으로 리디렉션
-        router.replace('/family-setup'); 
+        router.replace('/family-setup');
       } else {
         throw new Error('약관 동의 처리에 실패했습니다.');
       }
@@ -176,7 +185,6 @@ export default function PrivacyConsentForm({ content }: PrivacyConsentFormProps)
     linkUrl,
     isDetail = false,
   }: AgreementItem & { isDetail?: boolean }) => (
-    
     <div className="self-stretch inline-flex justify-between items-center">
       <div
         className="flex justify-start items-center gap-2 cursor-pointer"
@@ -208,9 +216,7 @@ export default function PrivacyConsentForm({ content }: PrivacyConsentFormProps)
         </div>
 
         {/* 텍스트 */}
-        <Text variant="body03">
-          {label}
-        </Text>
+        <Text variant="body03">{label}</Text>
       </div>
 
       {/* 상세 보기 버튼 */}
@@ -226,15 +232,13 @@ export default function PrivacyConsentForm({ content }: PrivacyConsentFormProps)
         </button>
       )}
     </div>
-    
   );
 
-  const modalContent = activeModalId ? content[activeModalId] : "";
+  const modalContent = activeModalId ? content[activeModalId] : '';
   const activeAgreement = agreements.find((a) => a.linkUrl === activeModalId);
 
-
   return (
-    <ModalCard hasBorder={false} >
+    <ModalCard hasBorder={false}>
       <div className="self-stretch flex flex-col justify-start items-center gap-10 ">
         {/* 1. 제목 및 설명 */}
         <div className="self-stretch flex flex-col justify-start items-start gap-3">
@@ -264,13 +268,13 @@ export default function PrivacyConsentForm({ content }: PrivacyConsentFormProps)
             variant={'primary'}
             onClick={handleSubmit}
             disabled={!isSubmitEnabled}
-            className='h-16'
+            className="h-16"
           >
             {isSubmitting ? '처리 중' : '동의 완료'}
           </Button>
         </div>
       </div>
-      
+
       {/* 상세 약관 모달 */}
       {activeModalId && activeAgreement && modalContent && (
         <PopupOverlay onClose={handleCloseModal}>

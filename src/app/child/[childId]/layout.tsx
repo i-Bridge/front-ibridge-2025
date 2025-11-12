@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import HydrateChildStore from './hydrate/HydrateChildStore';
-import { Fetcher, type ApiResponse } from '@/lib/fetcher';
+import { Fetcher, type ApiResponse } from '@/lib/api/fetcher';
 import { redirect } from 'next/navigation';
 
 type HomeData = {

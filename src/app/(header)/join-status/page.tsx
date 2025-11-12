@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { LoginResponse } from '@/types/index';
 import FamilyJoinWaitingForm from '@/app/(header)/join-status/_components/FamilyJoinWaitingForm';
 import FamilyJoinSuccessForm from '@/app/(header)/join-status/_components/FamilyJoinSuccessForm';
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from '@sentry/nextjs';
 
 //서버 컴포넌트에서 클라이언트 함수(toast)를 호출할 수 없습니다.
 
@@ -21,18 +21,18 @@ export default async function JoinStatusPage() {
   try {
     const res = await Fetcher<LoginResponse>('/start/login');
     loginData = res?.data || null;
-    console.log("login", loginData);
-    
-
+    console.log('login', loginData);
   } catch (err) {
-    Sentry.captureException(err); 
+    Sentry.captureException(err);
     console.error('❌ [SC] 가족 상태 확인 실패:', err);
 
-    throw new Error(`[JoinStatusPage] API Fetch Error: ${(err as Error).message}`);
+    throw new Error(
+      `[JoinStatusPage] API Fetch Error: ${(err as Error).message}`,
+    );
   }
 
   // --- 2. 데이터 유효성 검사 ---
-  // loginData가 null이면(API 응답이 비었거나 실패), 
+  // loginData가 null이면(API 응답이 비었거나 실패),
   // TypeError를 내는 대신 error.tsx를 트리거합니다.
   if (!loginData) {
     const err = new Error('[JoinStatusPage] No loginData received from API.');
@@ -47,7 +47,7 @@ export default async function JoinStatusPage() {
   // 3-1. status: 'ACTIVE' ( 프로필 )
   if (status === 'ACTIVE') {
     console.log('🚀 [SC] status 3 확인: /profile로 즉시 리디렉션');
-    redirect('/profile'); 
+    redirect('/profile');
   }
 
   // 3-2. status: 'PENDING' (대기)
@@ -73,5 +73,5 @@ export default async function JoinStatusPage() {
   // 3-4. 예외 케이스 (e.g. PENDING, FIRST_LOGIN, ACTIVE가 아닌 다른 상태값)
   const err = new Error(`[JoinStatusPage] Unknown status received: ${status}`);
   Sentry.captureException(err);
-  throw err; 
+  throw err;
 }

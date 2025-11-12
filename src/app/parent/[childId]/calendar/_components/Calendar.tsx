@@ -6,7 +6,8 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { EmotionId, EMOTIONS } from '@/constants/emotions';
-import { Fetcher } from '@/lib/fetcher';
+import { StatEmotionResponse } from '@/types';
+import { Fetcher } from '@/lib/api/fetcher';
 import {
   addMonths,
   subMonths,
@@ -24,8 +25,8 @@ import { Button } from '@/ui/Button';
 import ParentLayout from '../../_components/Layout/ParentLayout';
 // [MODIFIED] AnalysisList 대신 QuestionCard와 관련 타입을 직접 임포트
 import QuestionCard from '../../_components/Question/QuestionCard';
-import {DateSubject,Question}   from '@/types'; 
-import  Skeleton from '@/ui/loading/Skeleton';
+import { DateSubject, Question } from '@/types';
+import Skeleton from '@/ui/loading/Skeleton';
 import EmptyPlaceHolder from '@/ui/loading/EmptyPlaceHolder';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import { dateSubjectCache } from '@/lib/cache/DateSubjectCache'; // [NEW] 요청하신 날짜 캐시 임포트
@@ -34,8 +35,8 @@ const WEEKDAYS = ['월', '화', '수', '목', '금', '토', '일'];
 
 interface CalendarProps {
   childId: string;
-  defaultemotions: string[];
-  mostEmotion: number[];
+  defaultemotions: number[];
+  mostEmotion: number;
   signupDate: string;
 }
 
@@ -62,6 +63,8 @@ export default function Calendar({
   const [emotions, setEmotions] = useState<EmotionId[]>(
     defaultemotions.map((e) => Number(e)),
   );
+  const [mostEmotionState, setMostEmotionState] = useState<EmotionId>(mostEmotion);
+
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const setSubjectsInStore = useSubjectStore((state) => state.setSubjects);
   const [dateSubjects, setDateSubjects] = useState<DateSubject[]>([]);
@@ -91,6 +94,7 @@ export default function Calendar({
     const prev = prevYearMonthRef.current;
     if (year !== prev.year || month !== prev.month) {
       setEmotions([]);
+      setMostEmotionState(0);
       setSelectedDate(null);
       setDateSubjects([]);
       setSubjectsInStore([]);
@@ -99,17 +103,20 @@ export default function Calendar({
       async function fetchEmotions() {
         const dateStr = `${year}-${String(month).padStart(2, '0')}-01`;
         try {
-          const res = await Fetcher<{ emotions: string[] }>(
+          const res = await Fetcher<StatEmotionResponse>(
             `/parent/${childId}/stat/emotion?date=${dateStr}`,
           );
           if (res.isSuccess && res.data?.emotions) {
             setEmotions(res.data.emotions.map((e) => Number(e)));
+            setMostEmotionState(res.data.emotion);
           } else {
             setEmotions([]);
+            setMostEmotionState(0);
           }
         } catch (err) {
           console.error(err);
           setEmotions([]);
+          setMostEmotionState(0);
         }
       }
 
@@ -209,7 +216,7 @@ export default function Calendar({
     }
     return null;
   };
-  const MostEmotionIcon = getEmotionIcon(mostEmotion[0]);
+  const MostEmotionIcon = getEmotionIcon(mostEmotionState);
 
   return (
     <ParentLayout
@@ -243,7 +250,7 @@ export default function Calendar({
             <Text variant={'title01'}>가장 많이 선택한 감정은</Text>
           </div>
           <div className="w-14 h-14 ml-2.5 mt-1.5 mb-6 relative rounded-[60px] overflow-hidden flex items-center justify-center bg-other-yellow-light">
-            {MostEmotionIcon ? <MostEmotionIcon className="w-10 h-10" /> : null}
+            {MostEmotionIcon ? <MostEmotionIcon className="w-14 h-14" /> : null}
           </div>
         </div>
       }
@@ -298,7 +305,7 @@ export default function Calendar({
                     !isFutureDay;
                   const emotionID =
                     !isDisabled && !isLoading
-                      ? emotions[dayNumber - 1] ?? null
+                      ? (emotions[dayNumber ] ?? null)
                       : null;
                   const EmotionIcon = getEmotionIcon(emotionID);
                   let dataType: 'disabled' | 'not yet' | 'Default' = 'Default';
@@ -316,7 +323,8 @@ export default function Calendar({
                       className={cn(
                         'flex-1 h-28 p-2 relative flex justify-center items-center gap-2.5 overflow-hidden',
                         dayIndex < 6 && 'border-r border-grayscale-gray20',
-                        !isDisabled && 'hover:bg-grayscale-gray5 cursor-pointer',
+                        !isDisabled &&
+                          'hover:bg-grayscale-gray5 cursor-pointer',
                         isSelected && !isDisabled
                           ? 'bg-Primary-light ring-2 ring-Primary-purple ring-inset'
                           : 'bg-white',
@@ -421,9 +429,15 @@ export default function Calendar({
               ))}
             </div>
           ) : selectedDate ? (
-            <EmptyPlaceHolder > 해당 날짜에 완료된 대화가 없습니다.</EmptyPlaceHolder>
+            <EmptyPlaceHolder>
+              {' '}
+              해당 날짜에 완료된 대화가 없습니다.
+            </EmptyPlaceHolder>
           ) : (
-            <EmptyPlaceHolder> 캘린더에서 날짜를 선택하면 대화 기록이 표시됩니다. </EmptyPlaceHolder>
+            <EmptyPlaceHolder>
+              {' '}
+              캘린더에서 날짜를 선택하면 대화 기록이 표시됩니다.{' '}
+            </EmptyPlaceHolder>
           )}
         </div>
       </div>

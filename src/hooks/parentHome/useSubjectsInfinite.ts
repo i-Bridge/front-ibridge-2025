@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { Subject } from '@/types/index';
 import { useParams, useRouter } from 'next/navigation'; // [NEW] useRouter 임포트
 import { useSubjectStore } from '@/store/useSubjectStore'; // [NEW] useSubjectStore 임포트

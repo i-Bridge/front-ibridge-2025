@@ -5,15 +5,13 @@ import { useRouter } from 'next/navigation';
 import ModalCard from '@/ui/Modal/ModalCard';
 import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { useSetupStore } from '@/store/useSetupStore';
 import CommonModalPopup from '@/ui/Modal/CommonModalPopup';
 import { LeftArrow } from '@/ui/icon/icon';
 import { showSuccess, showError } from '@/lib/toast';
-import * as Sentry from "@sentry/nextjs";
-import {SignupExistDupResponse} from '@/types/index';
-
-
+import * as Sentry from '@sentry/nextjs';
+import { SignupExistDupResponse } from '@/types/index';
 
 export default function FindFamilyForm() {
   const router = useRouter();
@@ -81,8 +79,6 @@ export default function FindFamilyForm() {
       });
       console.log('✅ 가족 이름 exist 확인:', res.data);
       if (!res?.data?.exist) {
-        
-
         setIsRequestSentModalOpen(false);
         setIsNotExistModalOpen(true);
         setFamilyName('');
@@ -127,7 +123,7 @@ export default function FindFamilyForm() {
         >
           <LeftArrow />
         </button>
-        
+
         {/* ... (제목, 설명 텍스트) ... */}
         <div className="flex flex-col gap-3">
           <Text as="div" variant="title01">
@@ -157,7 +153,7 @@ export default function FindFamilyForm() {
           onClick={handleFamilyExist}
           variant="primary"
           disabled={loading || inputValue.trim().length === 0}
-          className='h-16'
+          className="h-16"
         >
           참여하기
         </Button>
@@ -173,7 +169,11 @@ export default function FindFamilyForm() {
           subtitle="다시 한 번 확인해주세요."
           onClose={handleCloseNotExistModal}
           footerContent={
-            <Button variant="primary" onClick={handleCloseNotExistModal} className='h-16'>
+            <Button
+              variant="primary"
+              onClick={handleCloseNotExistModal}
+              className="h-16"
+            >
               확인
             </Button>
           }
@@ -196,7 +196,7 @@ export default function FindFamilyForm() {
                 variant="grayscale"
                 textVariant="caption02"
                 onClick={handleCloseRequestSentModal}
-                className='h-16'
+                className="h-16"
               >
                 취소
               </Button>
@@ -217,4 +217,3 @@ export default function FindFamilyForm() {
     </>
   );
 }
-

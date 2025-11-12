@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import LoginSessionCheck from './_components/LoginSessionCheck';
 import { LoginResponse } from '@/types';
 
@@ -15,10 +15,9 @@ export default function StartPage() {
       if (session?.accessToken) {
         try {
           const result = await Fetcher<LoginResponse>('/start/login');
-          if (result?.data?.status==='ACTIVE') {
-            
+          if (result?.data?.status === 'ACTIVE') {
             router.replace('/profile');
-            console.log("login",result);
+            console.log('login', result);
           }
         } catch {}
       }
@@ -27,8 +26,5 @@ export default function StartPage() {
     checkAccepted();
   }, [session, router]);
 
-  return (
-        <LoginSessionCheck />
-
-  );
+  return <LoginSessionCheck />;
 }
