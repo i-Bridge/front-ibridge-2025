@@ -73,15 +73,14 @@ export default function ConversationCompletePage() {
         {/* 4. 홈으로 이동하기 버튼 */}
         <Button
           onClick={handleGoHome}
-          variant={'primary'}
-          textVariant={'caption02'}
-          className=" flex items-center justify-center gap-2 mt-10"
+          variant="primary"
+          textVariant="caption02"
+          textClass="!inline-flex !flex-row items-center gap-2 whitespace-nowrap"
+          className="mt-10"
         >
           <HomeIcon />
           홈으로 이동하기
         </Button>
-
-        {/* 5. 포도알 획득 정보 (토스트로 대체됨) */}
       </div>
     </div>
   );
