@@ -92,7 +92,7 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
         defaultCumList={cumulativeData.cumList}
       />
 
-      <CategoryRankChart categorys={keywordData.categories} />
+      <CategoryRankChart categories={keywordData.categories} />
     </PageLayout>
   );
 }

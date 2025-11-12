@@ -92,7 +92,7 @@ export default function CategoryRankChart({
           />
 
           {/* Rank List */}
-          <CategoryRankList keywords={categories} />
+          <CategoryRankList categories={categories} />
         </div>
       </div>
 
