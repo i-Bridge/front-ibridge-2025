@@ -47,5 +47,5 @@ export interface BannerResponse {
  */
 
 export interface KeywordResponse {
-  keywords: Category[];
+  categories: Category[];
 }
