@@ -1008,7 +1008,7 @@ export const FullscreenEnterIcon = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <rect width="40" height="40" rx="10" fill="white" />
+    <rect width="40" height="40" rx="10" fill="#EEF0F2" />
     <path
       d="M22.5 12.5H27.5V17.5"
       stroke="#4E5968"
@@ -1039,41 +1039,43 @@ export const FullscreenEnterIcon = () => (
     />
   </svg>
 );
+
 export const FullscreenExitIcon = () => (
   <svg
-    width="17"
-    height="17"
-    viewBox="0 0 17 17"
+    width="40"
+    height="40"
+    viewBox="0 0 40 40"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
+    <rect width="40" height="40" rx="10" fill="#EEF0F2" />
     <path
-      d="M1.83301 10.168H6.83301V15.168"
+      d="M13.333 21.668H18.333V26.668"
       stroke="#4E5968"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
     />
     <path
-      d="M15.167 6.83203H10.167V1.83203"
+      d="M26.667 18.332H21.667V13.332"
       stroke="#4E5968"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
     />
     <path
-      d="M10.167 6.83333L16.0003 1"
+      d="M21.667 18.3333L27.5003 12.5"
       stroke="#4E5968"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
     />
     <path
-      d="M1 16.0013L6.83333 10.168"
+      d="M12.5 27.5013L18.3333 21.668"
       stroke="#4E5968"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
     />
   </svg>
 );
