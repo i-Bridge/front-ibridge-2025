@@ -11,6 +11,7 @@ import CategoryTooltip from './CategoryToolTip'; // [2] 커스텀 툴팁을 impo
 import { Text } from '@/ui/Text';
 // [3] useState와 useEffect를 import 합니다. (portalTarget용)
 import { useState, useEffect } from 'react';
+import { Category } from '@/types';
 
 const PIE_COLORS = [
   '#51C2FF', // 1위 (sky-400)
@@ -21,15 +22,11 @@ const PIE_COLORS = [
   '#51C2FF11', // 6. 기타 (gray-100)
 ];
 
-export interface Keyword {
-  category: string;
-  count: number;
-  positiveScore: number;
-}
+
 export interface PieData {
   name: string;
   value: number;
-  original: Keyword | { category: string; count: number; positiveScore: number };
+  original: Category | { category: string; count: number; positiveScore: number };
   [key: string]: unknown;
 }
 

@@ -4,31 +4,26 @@ import {  useMemo } from 'react';
 import CategoryPieChart from './CategoryPieChart';
 import CategoryRankList from './CategoryRankList';
 import { Text } from '@/ui/Text';
-
-export interface Keyword {
-  category: string;
-  count: number;
-  positiveScore: number;
-}
+import {Category} from '@/types';
 
 export interface PieData {
   name: string;
   value: number;
   // 원본 데이터를 툴팁 등에서 사용하기 위해 포함
-  original: Keyword | { category: string; count: number; positiveScore: number };
+  original: Category | { category: string; count: number; positiveScore: number };
 [key: string]: unknown;
 }
 
 // 컴포넌트 Props
 interface CategoryRankChartProps {
-  categorys: Keyword[];
+  categorys: Category[];
 }
 
 /**
  * 차트 데이터를 가공하는 함수
  * (컴포넌트가 리렌더링될 때마다 실행되지 않도록 useMemo와 함께 사용)
  */
-function processChartData(categorys: Keyword[]) {
+function processChartData(categorys: Category[]) {
   const category=categorys ?? [];
   const totalCount = category.reduce((sum, k) => sum + k.count, 0);
 

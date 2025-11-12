@@ -6,15 +6,11 @@ import PageLayout from '@/app/parent/[childId]/_components/Layout/ParentLayout';
 import { Text } from '@/ui/Text';
 import CumulateChart from '@/app/parent/[childId]/dashboard/_components/CumulateChart';
 import CategoryRankChart from './_components/CategoryChart';
+import { Category } from '@/types';
 interface KeywordData {
-  keywords: Keyword[]; // 키워드 배열
+  keywords: Category[]; // 키워드 배열
 }
 
-interface Keyword {
-  keyword: string;
-  count: number;
-  positiveScore: number;
-}
 
 interface CumulativeData {
   cumulative: number; // 누적 응답 수
@@ -68,7 +64,7 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
         defaultCumList={cumulativeData.cumList}
       />
 
-         <CategoryRankChart keyword={keywordData.keywords} />
+         <CategoryRankChart categorys={keywordData.keywords} />
       
     </PageLayout>
   );
