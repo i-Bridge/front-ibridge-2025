@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import type { MouseEvent } from 'react';
 import { twMerge } from 'tailwind-merge';
 import AvatarIcon from '../../../../ui/icon/AvatarIcons';
 import { Text } from '@/ui/Text';
@@ -20,29 +21,23 @@ type Props = {
 };
 
 export default function HistoryModal({ isOpen, onClose, history }: Props) {
-  
-
   // --- 스크롤 디자인 및 블러 로직 ---
   const scrollRef = useRef<HTMLDivElement>(null);
   const [thumbHeight, setThumbHeight] = useState(0);
   const [thumbTop, setThumbTop] = useState(0);
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
 
-  
   const handleScroll = useCallback(() => {
-   
     const element = scrollRef.current;
     if (!element) return;
 
-    
-
     const { scrollTop, scrollHeight, clientHeight } = element;
-    
+
     // 커스텀 스크롤바 높이 계산
     const ratio = clientHeight / scrollHeight;
     const minHeight = 40; // 최소 높이
     const calculatedHeight = Math.max(clientHeight * ratio, minHeight);
-    
+
     // 커스텀 스크롤바 위치 계산
     const trackHeight = clientHeight;
     const scrollableDistance = scrollHeight - clientHeight;
@@ -53,14 +48,12 @@ export default function HistoryModal({ isOpen, onClose, history }: Props) {
 
     setThumbHeight(calculatedHeight);
     setThumbTop(calculatedTop);
-    
+
     // 블러 효과 제어를 위한 스크롤 끝 도달 여부 계산
     setIsScrolledToBottom(
       Math.abs(scrollHeight - (scrollTop + clientHeight)) < 1,
     );
   }, []);
-
-  
 
   useEffect(() => {
     handleScroll();
@@ -84,22 +77,22 @@ export default function HistoryModal({ isOpen, onClose, history }: Props) {
     const element = scrollRef.current;
     if (!element) return false;
     return element.scrollHeight > element.clientHeight;
-  }, [thumbHeight]); 
+  }, [thumbHeight]);
 
-   
-
-  
   const scrollbarHiddenStyles = {
     // 기본 스크롤바를 숨겨서 커스텀 스크롤바만 보이도록 함
-    scrollbarWidth: 'none', 
+    scrollbarWidth: 'none',
     msOverflowStyle: 'none',
   } as React.CSSProperties;
   // ------------------------------------------
-if (!isOpen) return null;
+  if (!isOpen) return null;
   return (
     <CommonModalPopup
       title="이전 대화 기록"
-      modalCardClassName={twMerge('w-[600px] flex flex-col gap-0', 'flex-grow ')}
+      modalCardClassName={twMerge(
+        'w-[600px] flex flex-col gap-0',
+        'flex-grow ',
+      )}
       onClose={onClose}
       footerContent={
         <Button onClick={onClose} className="h-14" variant={'grayscale'}>
@@ -113,8 +106,8 @@ if (!isOpen) return null;
         exit={{ opacity: 0, y: 30 }}
         transition={{ duration: 0.2 }}
         // 대화 영역 전체 컨테이너: 높이 고정 및 relative
-        className="w-full relative flex overflow-hidden h-[450px]" 
-        onClick={(e) => e.stopPropagation()}
+        className="w-full relative flex overflow-hidden h-[450px]"
+        onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
       >
         {/* 1. 실제 대화 스크롤 영역 */}
         <div
@@ -154,13 +147,13 @@ if (!isOpen) return null;
           <div className="self-stretch p-2 flex justify-start items-start overflow-hidden flex-shrink-0 relative">
             {/* 스크롤 트랙 (배경) - CommonModalPopup의 흰색 배경과 구분하기 위해 투명하게 유지 */}
             <div className="w-1.5 h-full relative bg-transparent rounded-[999px]"></div>
-            
+
             {/* 스크롤 썸 (움직이는 부분) */}
             <div
               className="absolute left-1/2 -translate-x-1/2 w-1.5 bg-grayscale-gray20 rounded-[999px] transition-transform duration-100 ease-out"
               style={{
                 height: `${thumbHeight}px`,
-                top: `${thumbTop}px`, 
+                top: `${thumbTop}px`,
               }}
             ></div>
           </div>
@@ -169,12 +162,13 @@ if (!isOpen) return null;
         {/* 3. 스크롤 그라데이션 오버레이 (하단 블러 효과) */}
         {isScrollable && (
           <div
-            className={twMerge(`
+            className={twMerge(
+              `
               absolute bottom-0 left-0 w-full h-20 
               bg-gradient-to-t from-white to-white/0 
               transition-opacity duration-300 pointer-events-none z-10 
             `,
-              isScrolledToBottom ? 'opacity-0' : 'opacity-100' // 스크롤이 끝에 닿으면 투명하게
+              isScrolledToBottom ? 'opacity-0' : 'opacity-100', // 스크롤이 끝에 닿으면 투명하게
             )}
           ></div>
         )}
