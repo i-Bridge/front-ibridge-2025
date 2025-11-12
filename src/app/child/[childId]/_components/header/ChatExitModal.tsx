@@ -44,6 +44,7 @@ export default function ChatExitModal({ isOpen, onClose, onConfirm }: Props) {
             onClick={onClose}
             variant={'grayscale'}
             textVariant={'caption02'}
+            className='w-full '
           >
             계속 대화하기
           </Button>
@@ -51,6 +52,7 @@ export default function ChatExitModal({ isOpen, onClose, onConfirm }: Props) {
             onClick={onConfirm}
             variant={'primary'}
             textVariant={'caption02'}
+            className='w-full '
           >
             종료하기
           </Button>

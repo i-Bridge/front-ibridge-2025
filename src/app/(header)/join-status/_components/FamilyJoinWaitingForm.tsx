@@ -106,7 +106,7 @@ export default function FamilyJoinSuccessForm({
           </div>
         </CustomCard>
 
-        <Button onClick={handleOpenModal} variant="grayscale" className="h-16">
+        <Button onClick={handleOpenModal} variant="grayscale" className="w-full h-16">
           요청 취소하기
         </Button>
       </ModalCard>
@@ -121,7 +121,7 @@ export default function FamilyJoinSuccessForm({
               <Button
                 variant="grayscale"
                 onClick={handleCloseModal}
-                className="h-16"
+                className="w-full h-16"
               >
                 취소
               </Button>
@@ -129,7 +129,7 @@ export default function FamilyJoinSuccessForm({
                 onClick={handleUndoRequest}
                 disabled={loading}
                 variant="primary"
-                className="h-16"
+                className="w-full h-16"
               >
                 {loading ? '요청 취소 중' : '확인'}
               </Button>

@@ -121,7 +121,7 @@ export default function CreateFamilyForm() {
           onClick={handleFamilyExist}
           disabled={loading || inputFamilyName.trim().length === 0} // [개선] 비어있을 때 버튼 비활성화
           variant="primary"
-          className="h-16"
+          className="w-full h-16"
         >
           {loading ? '진행 중' : '생성하기'}
         </Button>
@@ -138,7 +138,7 @@ export default function CreateFamilyForm() {
             <Button
               variant="primary"
               onClick={handleCloseModal}
-              className="h-16"
+              className="w-full hh-16"
             >
               확인
             </Button>

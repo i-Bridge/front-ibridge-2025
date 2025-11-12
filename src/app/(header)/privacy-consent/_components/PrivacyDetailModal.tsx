@@ -82,7 +82,7 @@ export default function PrivacyDetailModal({
       title={title}
       onClose={onClose}
       footerContent={
-        <Button variant={'primary'} onClick={onClose} className='h-16'>
+        <Button variant={'primary'} onClick={onClose} className='w-full h-16'>
           확인
         </Button>
       }

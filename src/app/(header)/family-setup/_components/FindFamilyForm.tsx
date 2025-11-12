@@ -153,7 +153,7 @@ export default function FindFamilyForm() {
           onClick={handleFamilyExist}
           variant="primary"
           disabled={loading || inputValue.trim().length === 0}
-          className="h-16"
+          className="w-full h-16"
         >
           참여하기
         </Button>
@@ -172,7 +172,7 @@ export default function FindFamilyForm() {
             <Button
               variant="primary"
               onClick={handleCloseNotExistModal}
-              className="h-16"
+              className="w-full h-16"
             >
               확인
             </Button>
@@ -196,14 +196,14 @@ export default function FindFamilyForm() {
                 variant="grayscale"
                 textVariant="caption02"
                 onClick={handleCloseRequestSentModal}
-                className="h-16"
+                className="w-full h-16"
               >
                 취소
               </Button>
               <Button
                 variant="primary"
                 textVariant="caption02"
-                className="whitespace-nowrap h-16"
+                className="whitespace-nowrap w-full h-16"
                 onClick={handleRequestSentModal}
               >
                 승인 요청 보내기

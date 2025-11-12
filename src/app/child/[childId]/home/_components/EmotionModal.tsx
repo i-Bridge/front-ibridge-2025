@@ -51,6 +51,7 @@ export default function EmotionModal({
             onClick={onClose}
             disabled={isSubmitting}
             variant={'grayscale'}
+            className='w-full '
           >
             나중에 선택하기
           </Button>
@@ -58,6 +59,7 @@ export default function EmotionModal({
             onClick={handleConfirm}
             disabled={!selectedEmotionId || isSubmitting}
             variant={'primary'}
+            className='w-full '
           >
             선택 완료
           </Button>

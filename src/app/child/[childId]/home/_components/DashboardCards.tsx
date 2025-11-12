@@ -117,9 +117,9 @@ export default function DashboardCards({
         <Button
           onClick={onEmotionSelectClick}
           disabled={emotionDone}
-          className=" bg-secondary-secondary h-14"
+          className=" w-full bg-secondary-secondary h-14"
           textVariant="caption03"
-          textClass="text-grayscale-gray90"
+          textClass="text-grayscale-gray90 "
         >
           {emotionDone ? '감정 선택 완료' : '감정 선택하기'}
         </Button>
@@ -180,7 +180,7 @@ export default function DashboardCards({
           <Button
             onClick={onClaimReward}
             disabled={!rewardAvailable || isClaiming}
-            className="bg-other-purple h-14"
+            className="w-full bg-other-purple h-14"
             textVariant={'caption03'}
             textClass="text-white"
           >
@@ -189,7 +189,7 @@ export default function DashboardCards({
 
           <Button
             disabled={true}
-            className=" bg-other-purple/15 h-14"
+            className=" w-full bg-other-purple/15 h-14"
             textVariant={'caption03'}
             textClass="text-other-purple"
           >

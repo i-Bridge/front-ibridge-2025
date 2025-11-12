@@ -41,7 +41,7 @@ export default function NameChangeModal({
         onClick={onClose}
         disabled={isPending}
         textVariant="title04" 
-        className='h-16'
+        className='w-full h-16'
       >
         취소
       </Button>
@@ -50,7 +50,7 @@ export default function NameChangeModal({
         onClick={handleSave}
         disabled={isPending || name === currentName || name.trim() === ''}
         textVariant="title04" // 피그마 (text-xl font-extrabold) 스펙 반영
-        className='h-16'
+        className='w-full h-16'
       >
         {isPending ? '저장 중...' : '저장하기'}
       </Button>

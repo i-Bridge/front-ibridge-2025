@@ -167,7 +167,7 @@ export default function AddChildrenForm() {
               <div>
                 <Button
                   onClick={handleOpenAddModal}
-                  className=" h-10 px-4 py-2.5 bg-grayscale-gray5   text-grayscale-gray70 "
+                  className="w-full h-10 px-4 py-2.5 bg-grayscale-gray5   text-grayscale-gray70 "
                 >
                   <Text variant="caption04" className="text-grayscale-gray70">
                     자녀 추가하기
@@ -184,7 +184,7 @@ export default function AddChildrenForm() {
             onClick={handleClose}
             variant="grayscale"
             disabled={isLoading}
-            className="h-16"
+            className="w-full h-16"
           >
             이전으로
           </Button>
@@ -192,7 +192,7 @@ export default function AddChildrenForm() {
             onClick={handleComplete}
             variant="primary"
             disabled={isCompleteDisabled}
-            className="h-16"
+            className="w-full h-16"
           >
             {isLoading ? '집 생성 중...' : '완료하기'}
           </Button>

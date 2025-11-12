@@ -66,7 +66,7 @@ export default function FamilyJoinSuccessForm({
         </div>
       </CustomCard>
 
-      <Button as={Link} href="/profile" variant="primary" className='h-16'>
+      <Button as={Link} href="/profile" variant="primary" className='w-full h-16'>
         서비스 이용하기
       </Button>
     </ModalCard>
