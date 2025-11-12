@@ -29,12 +29,14 @@ export default function VideoRecorder({
   childId,
   subjectId,
   isCharacterSpeaking,
+  onWaitingChange,
   onAIResponse,
   onFinished,
 }: {
   childId: string;
   subjectId: number | null;
   isCharacterSpeaking: boolean;
+  onWaitingChange?: (waiting: boolean) => void;
   onAIResponse: (message: string, isFinished: boolean) => void;
   onFinished: () => void;
 }) {
@@ -135,10 +137,18 @@ export default function VideoRecorder({
     subjectIdRef.current = subjectId;
   }, [subjectId]);
 
+  // 대기 상태가 바뀔 때마다 부모에 동기화
+  useEffect(() => {
+    onWaitingChange?.(isWaitingForAI);
+  }, [isWaitingForAI, onWaitingChange]);
+
   /** ===== 역할 교대: 캐릭터가 말하지 않으면 버튼 대기 해제 ===== */
   useEffect(() => {
-    if (!isCharacterSpeaking) setIsWaitingForAI(false);
-  }, [isCharacterSpeaking]);
+    if (!isCharacterSpeaking) {
+      setIsWaitingForAI(false);
+      onWaitingChange?.(false);
+    }
+  }, [isCharacterSpeaking, onWaitingChange]);
 
   /** ===== /uploaded 통지 ===== */
   const postUploaded = useCallback(
@@ -313,12 +323,14 @@ export default function VideoRecorder({
   const sendAnswer = useCallback(
     async ({ mode }: { mode: SendMode }) => {
       setIsWaitingForAI(true);
+      onWaitingChange?.(true);
 
       const currentRecognizedText = recognizedTextRef.current.trim();
       const currentSubjectId = subjectIdRef.current;
 
       if (!currentSubjectId || !childId) {
         setIsWaitingForAI(false);
+        onWaitingChange?.(true);
         return;
       }
 
@@ -334,6 +346,7 @@ export default function VideoRecorder({
         onAIResponse(randomPrompt, false);
         onFinished();
         setIsWaitingForAI(false);
+        onWaitingChange?.(false);
         return;
       }
 
@@ -369,12 +382,16 @@ export default function VideoRecorder({
             videoBlobRef.current = null;
             pendingUploadsRef.current = [];
           }
+          setIsWaitingForAI(false);
+          onWaitingChange?.(false);
         } else {
           setIsWaitingForAI(false);
+          onWaitingChange?.(false);
         }
       } catch (error) {
         console.error('❌ /answer API 호출 중 에러 발생:', error);
         setIsWaitingForAI(false);
+        onWaitingChange?.(false);
       }
     },
     [
@@ -384,6 +401,7 @@ export default function VideoRecorder({
       postUploaded,
       uploadVideo,
       captureAndUploadThumbnail,
+      onWaitingChange,
     ],
   );
 

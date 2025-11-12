@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import TalkingCharacter from './TalkingCharacter';
 import HistoryModal from './HistoryModal';
 import ExitModal from './header/ChatExitModal';
-
+import { DotWaves } from '@/ui/loading/DotWaves';
 import { ChatHistoryIcon, ExitIcon } from '@/ui/icon/icon';
 import ChildHeaderLayout from './header/ChildHeader';
 import FullscreenToggle from './header/FullscreenToggle';
@@ -46,6 +46,7 @@ export default function TalkSession({
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const { isSpeaking, playStreamSmart, cancel, play } = useMinimaxTTS();
+  const [isWaiting, setIsWaiting] = useState(false);
 
   useEffect(() => {
     // "question" 모드이고, history 배열에 항목이 1개 이상 있을 때만 모달을 엽니다.
@@ -143,6 +144,7 @@ export default function TalkSession({
 
   const handleAIResponse = useCallback(
     async (ai: string, isFinished: boolean) => {
+      setIsWaiting(false);
       // 1. 다음 질문(ai)을 상태에 설정합니다.
       setQuestion(ai);
 
@@ -254,9 +256,15 @@ export default function TalkSession({
                          after:rounded-[4px] /* 4px 만큼 모서리를 둥글게 */
                          "
             >
-              <p className="font-bold text-xl leading-[1.6] tracking-normal text-center break-words whitespace-pre-wrap">
-                {displayText}
-              </p>
+              {isWaiting ? (
+                <div className="flex justify-center items-center py-2">
+                  <DotWaves /> {/* 필요시 색상 변경 */}
+                </div>
+              ) : (
+                <p className="font-bold text-xl leading-[1.6] tracking-normal text-center break-words whitespace-pre-wrap">
+                  {displayText}
+                </p>
+              )}
 
               <button
                 onClick={() => void play(question)}
@@ -330,6 +338,7 @@ export default function TalkSession({
                 childId={childId}
                 subjectId={initialSubjectId}
                 isCharacterSpeaking={isSpeaking}
+                onWaitingChange={setIsWaiting}
                 onAIResponse={handleAIResponse}
                 onFinished={() => console.log('✅ 녹화 완료')}
               />
