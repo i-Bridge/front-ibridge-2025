@@ -9,6 +9,8 @@ import { Button } from '@/ui/Button';
 import PrivacyDetailModal from '@/app/(header)/privacy-consent/_components/PrivacyDetailModal'; // 경로 확인 필요
 import PopupOverlay from '@/ui/Modal/PopupOverlay';
 import ModalCard from '@/ui/Modal/ModalCard';
+import ModalFooter from '@/ui/Modal/ModalFooter';
+import TitleComponent from '@/ui/Modal/TitleComponent';
 
 // 서버에서 받은 약관 상세 내용 타입
 interface ConsentContent {
@@ -238,17 +240,11 @@ export default function PrivacyConsentForm({
   const activeAgreement = agreements.find((a) => a.linkUrl === activeModalId);
 
   return (
-    <ModalCard hasBorder={false}>
+    <ModalCard hasBorder={false} className='justify-start'>
       <div className="self-stretch flex flex-col justify-start items-center gap-10 ">
         {/* 1. 제목 및 설명 */}
-        <div className="self-stretch flex flex-col justify-start items-start gap-3">
-          <Text variant="title01" className="text-grayscale-gray90">
-            약관에 동의해 주세요.
-          </Text>
-          <Text variant="body03" className="text-grayscale-gray60">
-            서비스 이용을 위해 약관에 동의해 주세요.
-          </Text>
-        </div>
+        <TitleComponent title='약관에 동의해주세요' subtitle='서비스 이용을 위해 약관에 동의해 주세요.' align="start" />
+          
 
         {/* 2. 동의 항목 리스트 */}
         <div className="self-stretch flex flex-col justify-start items-start gap-5">
@@ -263,16 +259,16 @@ export default function PrivacyConsentForm({
         </div>
 
         {/* 3. 동의 완료 버튼 */}
-        <div className="self-stretch inline-flex justify-start items-center gap-3">
+        <ModalFooter mobileAbsolute={true} className="self-stretch inline-flex justify-start items-center gap-3">
           <Button
             variant={'primary'}
             onClick={handleSubmit}
             disabled={!isSubmitEnabled}
-            className="h-16"
+            className="w-full h-16"
           >
             {isSubmitting ? '처리 중' : '동의 완료'}
           </Button>
-        </div>
+        </ModalFooter>
       </div>
 
       {/* 상세 약관 모달 */}

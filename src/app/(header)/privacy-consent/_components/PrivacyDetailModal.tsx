@@ -82,7 +82,7 @@ export default function PrivacyDetailModal({
       title={title}
       onClose={onClose}
       footerContent={
-        <Button variant={'primary'} onClick={onClose} className='h-16'>
+        <Button variant={'primary'} onClick={onClose} className='w-full h-16'>
           확인
         </Button>
       }
@@ -91,7 +91,7 @@ export default function PrivacyDetailModal({
         CommonModal의 JSDoc에 따라 이 children 내부에서
         h-[480px] 및 스크롤 영역의 패딩(px-7 py-5)을 직접 관리합니다.
       */}
-      <div className="h-[450px] inline-flex justify-start items-start overflow-hidden relative w-full">
+      <div className="h-[300px] lg:h-[450px] inline-flex justify-start items-start overflow-hidden relative w-full">
         {/* 약관 텍스트 */}
         <div
           ref={scrollRef}

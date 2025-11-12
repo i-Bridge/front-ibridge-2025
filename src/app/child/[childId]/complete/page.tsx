@@ -75,7 +75,7 @@ export default function ConversationCompletePage() {
           onClick={handleGoHome}
           variant={'primary'}
           textVariant={'caption02'}
-          className=" flex items-center justify-center gap-2 mt-10"
+          className="w-full  flex items-center justify-center gap-2 mt-10"
         >
           <HomeIcon />
           홈으로 이동하기

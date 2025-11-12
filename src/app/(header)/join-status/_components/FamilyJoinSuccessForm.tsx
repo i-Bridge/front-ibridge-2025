@@ -7,6 +7,8 @@ import { Button } from '@/ui/Button';
 import CustomCard from '@/ui/CustomCard';
 import { AbledCheckCircleIcon } from '@/ui/icon/icon'; // 아이콘 경로가 constants로 가정
 import { Parent } from '@/types';
+import TitleComponent from '@/ui/Modal/TitleComponent';
+import ModalFooter from '@/ui/Modal/ModalFooter';
 
 // 1. props 인터페이스 수정: 불필요한 props(onCancelSuccess, loading) 제거
 interface FamilyJoinSuccessProps {
@@ -25,7 +27,6 @@ export default function FamilyJoinSuccessForm({
 }: FamilyJoinSuccessProps) {
   const displayName = familyName || '요청한 가족';
 
-
   // 2. 'parentNames' 배열을 "이름1님, 이름2님" 형태의 문자열로 변환
   const adminNames =
     parents && parents.length > 0
@@ -42,14 +43,11 @@ export default function FamilyJoinSuccessForm({
         <AbledCheckCircleIcon />
 
         <div className="flex flex-col gap-3">
-          <Text as="div" variant="title01">
-            집 승인 요청이
-            <br />
-            수락되었어요.
-          </Text>
-          <Text as="div" variant="body03" className="text-grayscale-gray60">
-            이제 서비스를 이용할 수 있어요.
-          </Text>
+          <TitleComponent
+            title={'집 승인 요청이\n수락되었어요.'}
+            subtitle="이제 서비스를 이용할 수 있어요."
+            align="center"
+          />
         </div>
       </div>
 
@@ -66,9 +64,16 @@ export default function FamilyJoinSuccessForm({
         </div>
       </CustomCard>
 
-      <Button as={Link} href="/profile" variant="primary" className='h-16'>
-        서비스 이용하기
-      </Button>
+      <ModalFooter mobileAbsolute={true} className="self-stretch">
+        <Button
+          as={Link}
+          href="/profile"
+          variant="primary"
+          className="w-full h-16"
+        >
+          서비스 이용하기
+        </Button>
+      </ModalFooter>
     </ModalCard>
   );
 }

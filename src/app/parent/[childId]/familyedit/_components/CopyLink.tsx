@@ -18,7 +18,7 @@ export default function CopyLinkPopover({ link }: { link: string }) {
       {/* 초대하기  */}
       <Button
         onClick={() => setShowPopover(!showPopover)}
-        variant="grayscale" textVariant="caption03" textClass="text-grayscale-gray60 flex gap-2" className='bg-grayscale-gray5 h-14 p-8 inline-flex justify-center items-center gap-2'
+        variant="grayscale" textVariant="caption03" textClass="text-grayscale-gray60 flex gap-2" className='w-full bg-grayscale-gray5 h-14 p-8 inline-flex justify-center items-center gap-2'
       >
         <PlusIcon/> 
         <div className='flex justify-start items-center gap-2'>초대하기</div>

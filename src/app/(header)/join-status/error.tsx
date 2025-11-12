@@ -31,10 +31,10 @@ export default function Error({
       actions={
         // 런타임 오류는 "다시 시도"와 "메인으로" 2개 버튼 제공
         <>
-          <Button variant="grayscale" onClick={() => reset()} className='h-16'>
+          <Button variant="grayscale" onClick={() => reset()} className='w-full h-16'>
             다시 시도하기
           </Button>
-          <Button as={Link} href="/" variant="primary" className='whitespace-nowrap h-16'>
+          <Button as={Link} href="/" variant="primary" className='whitespace-nowrap w-full h-16'>
             메인으로 이동하기
           </Button>
         </>

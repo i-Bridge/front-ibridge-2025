@@ -10,7 +10,7 @@ import { Category, BannerResponse, ApiError } from '@/types';
 import { serverApi } from '@/lib/api/serverFetcher';
 import { formatDateWithDay } from '@/hooks/formatDateWithDay';
 interface KeywordData {
-  keywords: Category[]; // 키워드 배열
+  categories: Category[]; // 키워드 배열
 }
 
 interface CumulativeData {
@@ -41,9 +41,9 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
       bannerError = '배너를 불러오는 중 알 수 없는 오류가 발생했습니다.';
     }
   }
-  const keywordRes = await Fetcher<KeywordData>(`/parent/${childId}/keywords`);
+  const keywordRes = await Fetcher<KeywordData>(`/parent/${childId}/categories`);
   const keywordData = keywordRes.data;
-  console.log('분석 /keywords api 호출 ', keywordRes);
+  console.log('분석 /categories api 호출 ', keywordRes);
   if (!keywordData) {
     return <div>분석 데이터 불러오기 실패...</div>;
   }
@@ -92,7 +92,7 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
         defaultCumList={cumulativeData.cumList}
       />
 
-      <CategoryRankChart categorys={keywordData.keywords} />
+      <CategoryRankChart categories={keywordData.categories} />
     </PageLayout>
   );
 }

@@ -54,7 +54,7 @@ export default function SubjectPopup({
       
       subtitle={`긍정 ${positiveScore}%의 카테고리`}
       footerContent={
-        <Button variant={'grayscale'} onClick={onClose}>
+        <Button variant={'grayscale'} onClick={onClose} className='w-full '>
           닫기
         </Button>
       }

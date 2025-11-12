@@ -10,7 +10,7 @@ type TextVariantType = VariantProps<typeof textVariants>['variant'];
 const buttonVariants = cva(
   // ---  기본 스타일  ---
   [
-    'inline-flex w-full items-center justify-center text-center whitespace-nowrap', // self-stretch, justify-center
+    'inline-flex  items-center justify-center text-center whitespace-nowrap', // self-stretch, justify-center
     ' px-10 py-5', // h-16, px-10, py-5
     'rounded-[999px]', // rounded-[999px]
     'transition-colors', // 부드러운 호버 효과

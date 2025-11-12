@@ -65,6 +65,8 @@ export default function PostLoginProcessManager({
       // 3. 3가지 규칙에 따라 상태(status)를 설정합니다.
       //    가장 우선순위가 높은 'hasFamilyUser' 상태부터 확인합니다.
 
+      
+
       // 규칙 3: family가 참이거나, (family가 거짓이면서 send가 참이면) -> hasFamilyUser
       if (hasFamily || (!hasFamily && send)) {
         setStatus('hasFamilyUser');

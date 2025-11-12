@@ -96,7 +96,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
               as={Link}
               href={`/child/${childId}/free`}
               variant={'primary'}
-              className="bg-grayscale-gray80 px-10 py-7 rounded-[40px] justify-start text-left whitespace-nowrap"
+              className="w-full bg-grayscale-gray80 px-10 py-7 rounded-[40px] justify-start text-left whitespace-nowrap"
             >
               하고싶은
               <br />

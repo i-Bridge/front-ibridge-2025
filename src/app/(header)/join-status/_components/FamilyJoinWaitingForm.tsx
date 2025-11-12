@@ -11,6 +11,8 @@ import { useRouter } from 'next/navigation';
 import { showError, showSuccess } from '@/lib/toast';
 import * as Sentry from '@sentry/nextjs';
 import { Parent } from '@/types';
+import TitleComponent from '@/ui/Modal/TitleComponent';
+import ModalFooter from '@/ui/Modal/ModalFooter';
 
 // 1. props 인터페이스 수정: 불필요한 props(onCancelSuccess, loading) 제거
 interface FamilyJoinSuccessProps {
@@ -81,15 +83,11 @@ export default function FamilyJoinSuccessForm({
       >
         <div className="flex flex-col gap-7 text-center items-center">
           <div className="flex flex-col gap-3">
-            <Text as="div" variant="title01">
-              집 승인 요청
-              <br />
-              대기 중이에요.
-            </Text>
-            <Text as="div" variant="body03" className="text-grayscale-gray60">
-              초대가 승인되면 해당 집에 참여하여 <br />
-              서비스를 이용할 수 있어요.
-            </Text>
+            <TitleComponent
+              title="집 승인 요청 대기 중이에요."
+              subtitle="초대가 승인되면 해당 집에 참여하여 서비스를 이용할 수 있어요."
+              align="center"
+            />
           </div>
         </div>
 
@@ -106,9 +104,15 @@ export default function FamilyJoinSuccessForm({
           </div>
         </CustomCard>
 
-        <Button onClick={handleOpenModal} variant="grayscale" className="h-16">
-          요청 취소하기
-        </Button>
+        <ModalFooter mobileAbsolute={true} className="self-stretch">
+          <Button
+            onClick={handleOpenModal}
+            variant="grayscale"
+            className="w-full h-16"
+          >
+            요청 취소하기
+          </Button>
+        </ModalFooter>
       </ModalCard>
 
       {isModalOpen && (
@@ -121,7 +125,7 @@ export default function FamilyJoinSuccessForm({
               <Button
                 variant="grayscale"
                 onClick={handleCloseModal}
-                className="h-16"
+                className="w-full h-16"
               >
                 취소
               </Button>
@@ -129,7 +133,7 @@ export default function FamilyJoinSuccessForm({
                 onClick={handleUndoRequest}
                 disabled={loading}
                 variant="primary"
-                className="h-16"
+                className="w-full h-16"
               >
                 {loading ? '요청 취소 중' : '확인'}
               </Button>

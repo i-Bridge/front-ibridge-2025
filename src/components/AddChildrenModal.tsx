@@ -61,7 +61,7 @@ export default function AddChildForm({
             variant="primary"
             onClick={handleSubmit}
             disabled={!isFormValid}
-            className='h-16'
+            className='w-full h-16'
           >
             {isEditing ? '수정하기' : '추가하기'}
           </Button>

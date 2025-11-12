@@ -102,7 +102,7 @@ if (!isOpen) return null;
       modalCardClassName={twMerge('w-[600px] flex flex-col gap-0', 'flex-grow ')}
       onClose={onClose}
       footerContent={
-        <Button onClick={onClose} className="h-14" variant={'grayscale'}>
+        <Button onClick={onClose} className="w-full h-14" variant={'grayscale'}>
           닫기
         </Button>
       }

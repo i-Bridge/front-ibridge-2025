@@ -13,6 +13,8 @@ import CarouselStepper from '@/components/CarouselStepper';
 import { Child } from '@/types';
 import { showSuccess, showError } from '@/lib/toast';
 import * as Sentry from '@sentry/nextjs';
+import TitleComponent from '@/ui/Modal/TitleComponent';
+import ModalFooter from '@/ui/Modal/ModalFooter';
 export default function AddChildrenForm() {
   const router = useRouter();
   const {
@@ -119,10 +121,8 @@ export default function AddChildrenForm() {
     <>
       <ModalCard hasBorder={false} className="gap-10">
         <div className="flex flex-col gap-3 ">
-          <Text variant="title01">자녀 추가하기</Text>
-          <Text variant="body03" className="text-gray-500">
-            자녀를 추가해주세요.
-          </Text>
+          <TitleComponent title="자녀 추가하기" subtitle="자녀를 추가해주세요." align="start" />
+          
           {error && (
             <Text variant="body03" className="text-red-500">
               {error}
@@ -167,7 +167,7 @@ export default function AddChildrenForm() {
               <div>
                 <Button
                   onClick={handleOpenAddModal}
-                  className=" h-10 px-4 py-2.5 bg-grayscale-gray5   text-grayscale-gray70 "
+                  className="w-full h-10 px-4 py-2.5 bg-grayscale-gray5   text-grayscale-gray70 "
                 >
                   <Text variant="caption04" className="text-grayscale-gray70">
                     자녀 추가하기
@@ -180,11 +180,12 @@ export default function AddChildrenForm() {
 
         {/* [수정] 피그마 하단 버튼 */}
         <div className="self-stretch inline-flex justify-start items-center gap-3">
+          <ModalFooter mobileAbsolute={true} className="self-stretch">
           <Button
             onClick={handleClose}
             variant="grayscale"
             disabled={isLoading}
-            className="h-16"
+            className="w-full h-16"
           >
             이전으로
           </Button>
@@ -192,10 +193,11 @@ export default function AddChildrenForm() {
             onClick={handleComplete}
             variant="primary"
             disabled={isCompleteDisabled}
-            className="h-16"
+            className="w-full h-16"
           >
             {isLoading ? '집 생성 중...' : '완료하기'}
           </Button>
+          </ModalFooter>
         </div>
       </ModalCard>
 
