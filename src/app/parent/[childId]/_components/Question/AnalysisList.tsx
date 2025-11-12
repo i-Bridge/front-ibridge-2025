@@ -48,7 +48,7 @@ export default function AnalysisList() {
             </button>
           </div>
           {/* subject의 title을 사용하여 제목 표시 */}
-          <Text variant={'title04'} className=''>{subject.subjectTitle}</Text>
+          <Text variant={'title04'} className='text-center mt-4'>{subject.subjectTitle}</Text>
         </div>
       }
     >

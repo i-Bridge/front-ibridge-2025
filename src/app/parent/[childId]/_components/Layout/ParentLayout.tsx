@@ -32,7 +32,7 @@ export default function ParentLayout({ title, children, containerClassName }: Pa
       </header>
 
       {/* children prop으로 받은 내용을 여기에 렌더링합니다. */}
-      <main className="flex-1 w-full self-stretch px-10 py-5 inline-flex flex-col justify-start items-start gap-5">
+      <main className="flex-1 w-full self-stretch px-10 py-5 inline-flex flex-col justify-center items-start gap-5">
         {children}
       </main>
     </div>

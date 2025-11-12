@@ -5,14 +5,16 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import { useSubjectsInfinite } from '@/hooks/parentHome/useSubjectsInfinite';
-import { Subject } from '@/types/index';
+import { Subject} from '@/types/index';
+import { Suspense, lazy  } from 'react';
 
-import AnalysisList from '../../_components/Question/AnalysisList';
 import { DotWaves } from '@/ui/loading/DotWaves';
 import { Text } from '@/ui/Text';
-import SubjectListRenderer from './SubjectListRenderer';
-import PopupOverlay from '@/ui/Modal/PopupOverlay';
+import AnalysisPopup from '../../_components/Question/AnalysisListPopup';
+import AnswerLogSkeleton from './AnwerLogSkeleton';
 
+
+const SubjectListRenderer = lazy(() => import('./SubjectListRenderer'));
 type Props = {
   initialSubjects: Subject[];
 };
@@ -72,19 +74,19 @@ export default function ScrollSubjectList({ initialSubjects }: Props) {
 
   // [추가] 렌더러에게 전달할 상태값들을 계산합니다.
   const isLoading = loading && allSubjects.length === 0;
-  const isEmpty = !loading && allSubjects.length === 0;
 
   return (
     <div className="relative overflow-x-hidden mx-auto flex justify-center min-h-[600px] ">
       {/* 왼쪽 영역ㅐ */}
       <div className="w-full gap-4 mb-10 ">
         {/* [수정] 렌더링 로직을 SubjectListRenderer 컴포넌트로 위임합니다. */}
-        <SubjectListRenderer
-          subjects={allSubjects}
-          lastItemRef={observeLastSubject}
-          isLoading={isLoading}
-          isEmpty={isEmpty}
-        />
+         <Suspense fallback={<AnswerLogSkeleton/>}>
+          <SubjectListRenderer
+            subjects={allSubjects}
+            lastItemRef={observeLastSubject}
+            isLoading={isLoading}
+          />
+        </Suspense>
 
         {/* [유지] 무한스크롤 하단의 로딩/끝 표시는 컨테이너에 둡니다. */}
         <div className="w-full flex justify-center items-center mt-10">
@@ -102,22 +104,7 @@ export default function ScrollSubjectList({ initialSubjects }: Props) {
 
       {/* 오른쪽 패널 (동일) */}
       {showPanels && selectedSubjectId && (
-        <PopupOverlay onClose={handleClose}>
-          <div className="px-10 w-auto">
-            <div className="bg-white flex flex-col justify-start items-start rounded-[40px] relative  lg:max-w-7xl w-full max-h-[90vh] overflow-hidden">
-              {/* 모달 헤더 */}
-              {/* 팝업 컨텐츠 */}
-              <div
-                className="flex flex-col h-[60vh] overflow-y-auto p-4"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* 오른쪽 패널 (AnalysisList) - lg에서만 나란히 표시 */}
-                {showPanels && selectedSubjectId && <AnalysisList />}
-
-              </div>
-            </div>
-          </div>
-        </PopupOverlay>
+        <AnalysisPopup onClose={handleClose} />
       )}
     </div>
   );

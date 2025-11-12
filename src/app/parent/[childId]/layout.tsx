@@ -67,7 +67,7 @@ export default async function ParentLayout({ children, params }: ParentLayoutPro
       </div>
 
       {/* --- 본문 --- */}
-      <div className="flex-1 overflow-y-auto">{children}</div>
+      <div className="flex-1 w-full flex overflow-y-auto justify-center items-start">{children}</div>
     </div>
   );
 }

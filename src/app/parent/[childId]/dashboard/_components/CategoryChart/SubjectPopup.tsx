@@ -2,7 +2,7 @@
 
 import { Button } from '@/ui/Button';
 import SubjectListRenderer from '../../../answerLog/_components/SubjectListRenderer';
-import AnalysisList from '../../../_components/Question/AnalysisList';
+import AnalysisPopup from '../../../_components/Question/AnalysisListPopup';
 import { Subject } from '@/types/index';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import { useEffect } from 'react';
@@ -10,7 +10,8 @@ import PopupOverlay from '@/ui/Modal/PopupOverlay';
 import TitleComponent from '@/ui/Modal/TitleComponent';
 import ModalHeader from '@/ui/Modal/ModalHeader';
 import ModalFooter from '@/ui/Modal/ModalFooter';
-
+import { Suspense } from 'react';
+import RotatingSpinner from '@/ui/loading/RotatingSpinner';
 interface SubjectPopupProps {
   category: string;
   positiveScore: number;
@@ -39,8 +40,6 @@ export default function SubjectPopup({
     }
   }, [selectedSubjectId, setShowPanels]);
 
-  // isEmpty일 때 오류 처리
-  const isEmpty = subjects.length === 0;
 
   // x 버튼 클릭 시 selectedSubjectId를 null로 설정하여 팝업을 닫습니다.
   const handleClose = () => {
@@ -73,27 +72,18 @@ export default function SubjectPopup({
                 <SubjectListRenderer
                   subjects={subjects}
                   isLoading={false}
-                  isEmpty={isEmpty}
                 />
               </div>
 
               {/* 오른쪽 패널 (AnalysisList) - lg에서만 나란히 표시 */}
               {showPanels && selectedSubjectId && (
-                <PopupOverlay onClose={handleClose}>
-                  <div className="px-10 w-auto">
-                    <div className="bg-white flex flex-col justify-start items-start rounded-[40px] relative  lg:max-w-7xl w-full max-h-[90vh] overflow-hidden">
-                      {/* 모달 헤더 */}
-                      {/* 팝업 컨텐츠 */}
-                      <div
-                        className="flex flex-col h-[60vh] overflow-y-auto p-4"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {/* 오른쪽 패널 (AnalysisList) - lg에서만 나란히 표시 */}
-                        {showPanels && selectedSubjectId && <AnalysisList />}
-                      </div>
-                    </div>
-                  </div>
-                </PopupOverlay>
+                <Suspense
+              fallback={
+                <RotatingSpinner variant='grayscale'/>
+              }
+            >
+                <AnalysisPopup onClose={handleClose} />
+                </Suspense>
               )}
             </div>
 
