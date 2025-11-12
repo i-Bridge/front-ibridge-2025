@@ -6,7 +6,7 @@ import Skeleton from '@/ui/loading/Skeleton';
 const AnswerLogSkeleton = () => {
   return (
     // 전체 레이아웃 (px, pt, pb, gap 등)은 동일하게 유지합니다.
-    <div className="self-stretch px-10 pt-5 pb-10 inline-flex flex-col justify-start items-start gap-10 w-full">
+    <div className="w-full self-stretch px-10 pt-5 pb-10 inline-flex flex-col justify-start items-start gap-10">
       {/* 섹션 1 (카드 3개) */}
       <div className="self-stretch flex flex-col justify-start items-start gap-4 w-full">
         {/* 2. 제목 스켈레톤:

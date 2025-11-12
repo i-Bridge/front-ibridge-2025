@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { EmotionId, EMOTIONS } from '@/constants/emotions';
 import { StatEmotionResponse } from '@/types';
 import { Fetcher } from '@/lib/api/fetcher';
+import RotatingSpinner from '@/ui/loading/RotatingSpinner';
 import {
   addMonths,
   subMonths,
@@ -21,7 +22,6 @@ import { Button } from '@/ui/Button';
 import ParentLayout from '../../_components/Layout/ParentLayout';
 import QuestionCard from '../../_components/Question/QuestionCard';
 import { DateSubject, Question } from '@/types';
-import Skeleton from '@/ui/loading/Skeleton';
 import EmptyPlaceHolder from '@/ui/loading/EmptyPlaceHolder';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import { dateSubjectCache } from '@/lib/cache/DateSubjectCache';
@@ -492,11 +492,9 @@ export default function Calendar({
 
                 {/* content */}
                 {isLoadingSubjects ? (
-                  <div className="space-y-4 p-4 bg-white rounded-lg shadow-sm">
-                    <Skeleton className="h-8 w-3/4 rounded-lg" />
-                    <Skeleton className="h-16 w-full rounded-lg" />
-                    <Skeleton className="h-16 w-full rounded-lg" />
-                  </div>
+                  <div className="flex justify-center items-center min-w-3xl min-h-3xl">
+                <RotatingSpinner variant="grayscale" />
+              </div>
                 ) : fetchError ? (
                   <EmptyPlaceHolder> {fetchError} </EmptyPlaceHolder>
                 ) : dateSubjects.length > 0 ? (
