@@ -213,7 +213,7 @@ export default function MailPage() {
     <ParentLayout
       title={
         <div className="flex w-full items-center justify-between">
-          <div className="flex ">
+          <div className="flex">
             <Text as="span" variant="title01">
               새로운 알림이{' '}
               <span className="text-primary-primary">
@@ -223,16 +223,18 @@ export default function MailPage() {
               있어요.
             </Text>
           </div>
+          <div>
           <Button
             onClick={handleReadAll}
-            disabled={(noticeData?.newCount ?? 0) === 0 || loading}
+            disabled={(noticeData?.notices.length ?? 0) === 0 || loading}
             variant={'grayscale'}
-            className="h-10 px-4 py-2.5 w-auto bg-grayscale-gray5"
+            className="h-10 px-4 py-2.5 w-full bg-grayscale-gray5"
             textVariant={'caption04'}
             textClass="text-grayscale-gray70"
           >
             모두 읽음 처리
           </Button>
+          </div>
         </div>
       }
     >

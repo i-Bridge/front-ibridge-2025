@@ -30,7 +30,7 @@ const ModalCard = ({
   hasBorder = true,
 }: ModalCardProps) => {
   const borderClasses = hasBorder
-    ? 'border border-1 border-grayscale-gray20 p-10 w-80 lg:w-[480px] '
+    ? 'border border-1 border-grayscale-gray20 p-10 w-80  lg:w-[480px] '
     : 'p-0 w-80 lg:w-[480px]';
 
   return (

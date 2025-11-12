@@ -55,7 +55,7 @@ export default function DropMotionMypage({
   }, [pathname]);
 
   return (
-    <div className="bg-transparent">
+    <div className="bg-white">
       {pathname !== '/' && (
         <div
           ref={profileRef}

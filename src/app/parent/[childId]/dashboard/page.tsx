@@ -3,12 +3,12 @@ import AiComment from './_components/AiComment';
 import { ChildPageParams } from '@/types/page-props';
 import NotFound from '@/components/Exception/not-found';
 import PageLayout from '@/app/parent/[childId]/_components/Layout/ParentLayout';
-import { Text } from '@/ui/Text';
 import CumulateChart from '@/app/parent/[childId]/dashboard/_components/CumulateChart';
 import CategoryRankChart from './_components/CategoryChart';
 import { Category, BannerResponse, ApiError } from '@/types';
 import { serverApi } from '@/lib/api/serverFetcher';
 import { formatDateWithDay } from '@/hooks/formatDateWithDay';
+import TitleComponent from '@/ui/Modal/TitleComponent';
 interface KeywordData {
   categories: Category[]; // 키워드 배열
 }
@@ -41,7 +41,9 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
       bannerError = '배너를 불러오는 중 알 수 없는 오류가 발생했습니다.';
     }
   }
-  const keywordRes = await Fetcher<KeywordData>(`/parent/${childId}/categories`);
+  const keywordRes = await Fetcher<KeywordData>(
+    `/parent/${childId}/categories`,
+  );
   const keywordData = keywordRes.data;
   console.log('분석 /categories api 호출 ', keywordRes);
   if (!keywordData) {
@@ -61,24 +63,16 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
   }
 
   const pageTitle = (
-    <>
-      {banners?.date ? (
-        <Text variant={'body03'} className="text-grayscale-gray60">
-          {formatDateWithDay(banners.date)} 업데이트됨
-        </Text>
-      ) : (
-        <Text variant={'body03'} className="text-grayscale-gray60">
-          정보 업데이트를 위해 자녀의 답변 기록이 더 필요합니다.
-        </Text>
-      )}
-
-      <Text variant={'title01'}>
-        {' '}
-        아이가 자주 느낀
-        <br />
-        감정들을 들여다볼까요?
-      </Text>
-    </>
+    <TitleComponent
+      title={'아이가 자주 느낀 \n감정들을 들여다볼까요?'}
+      subtitle={
+        banners?.date
+          ? `${formatDateWithDay(banners.date)} 업데이트됨`
+          : '정보 업데이트를 위해 자녀의 답변 기록이 더 필요합니다.'
+      }
+      align="start"
+      subtitlePosition="top"
+    />
   );
 
   return (

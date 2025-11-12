@@ -8,6 +8,7 @@ import { showError } from '@/lib/toast';
 // [1] Fetcher 대신 캐시 스토어를 import 합니다.
 import { useCategorySubjectsCache } from '@/hooks/parentHome/useCategorySubjects'; // 경로가 맞는지 확인하세요.
 import { Category } from '@/types';
+import { useSubjectStore } from '@/store/useSubjectStore';
 
 // [2] API 응답 타입 정의는 스토어로 이동했으므로 여기서는 제거합니다.
 // interface SubjectListResponse { ... }
@@ -46,6 +47,7 @@ export default function CategoryRankItem({
   // [4] 로컬 'isLoading'을 'isFetching'으로 변경하고, 'subjects' state를 제거합니다.
   const [isFetching, setIsFetching] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const { setSelectedSubjectId } = useSubjectStore();
 
   const params = useParams();
   const childId = params.childId as string;
@@ -84,7 +86,7 @@ export default function CategoryRankItem({
   return (
     // [8] 팝업을 렌더링하기 위해 Fragment(<>)로 감쌉니다.
     <>
-      <div className="self-stretch py-3 inline-flex justify-start items-center gap-3">
+      <div className="self-stretch py-3 inline-flex flex-col lg:flex-row justify-start items-start lg:items-center gap-3">
         <div className="flex-1 flex justify-start items-center gap-3">
           {/* Rank Circle */}
           <div
@@ -152,7 +154,10 @@ export default function CategoryRankItem({
           // [11] 로컬 state (subjects) 대신 스토어에서 가져온 'cachedSubjects'를 전달합니다.
           subjects={cachedSubjects || []}
           positiveScore={category.positiveScore}
-          onClose={() => setShowPopup(false)}
+          onClose={() => {
+            setShowPopup(false);
+            setSelectedSubjectId(null);
+          }}
         />
       )}
     </>

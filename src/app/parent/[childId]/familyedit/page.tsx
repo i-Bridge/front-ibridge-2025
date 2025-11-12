@@ -55,7 +55,7 @@ export default async function FamilyEditPage() {
           <div className="self-stretch flex flex-col gap-4">
             {/* 1. 이름, 수정 버튼, 이메일이 있는 첫 번째 줄 */}
             <div className="self-stretch p-8 rounded-2xl border border-gray-200 flex flex-col justify-center items-start gap-7">
-              <div className="flex flex-col gap-2">
+              <div className="w-full flex flex-col gap-2">
                 {familyInfo.parents.map((parent, index) => (
                   <ParentProfileRow
                     key={parent.id || `parent-${index}`}

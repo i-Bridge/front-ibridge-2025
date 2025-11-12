@@ -15,7 +15,7 @@ export default function CategoryRankList({
   categories = [],
 }: CategoryRankListProps) {
   return (
-    <div className="flex-1 inline-flex flex-col justify-start items-start">
+    <div className="w-full lg:w-auto flex-1 inline-flex flex-col justify-start items-start">
       {categories.map((category, index) => (
         <CategoryRankItem
           key={category + '-' + index}
