@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { showError } from '@/lib/toast';
 
 /** ===== 공용 타입 ===== */

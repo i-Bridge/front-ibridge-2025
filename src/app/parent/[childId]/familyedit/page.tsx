@@ -1,4 +1,4 @@
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import EditFamilyName from '@/app/parent/[childId]/familyedit/_components/EditFamilyName';
 import PageLayout from '../_components/Layout/ParentLayout';
 import { Child, Parent } from '@/types';

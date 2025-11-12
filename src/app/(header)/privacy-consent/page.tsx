@@ -1,8 +1,7 @@
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import PrivacyConsentForm from './_components/PrivacyConsentForm';
 import { Text } from '@/ui/Text';
 import ModalCard from '@/ui/Modal/ModalCard'; // ModalCard가 UI 컨테이너 역할을 하므로 유지
-
 
 export const dynamic = 'force-dynamic';
 

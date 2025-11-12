@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { API } from '@/constants/api';
 import { useMinimaxTTS } from '@/hooks/useMinimaxTTS';
 import VideoRecorder from './VideoRecorder'; // VideoRecorder 경로에 맞게 수정
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { useRouter } from 'next/navigation';
 import TalkingCharacter from './TalkingCharacter';
 import HistoryModal from './HistoryModal';

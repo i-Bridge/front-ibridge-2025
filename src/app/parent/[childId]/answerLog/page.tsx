@@ -1,7 +1,7 @@
 import { ChildPageParams } from '@/types/page-props';
 import NotFound from '@/components/Exception/not-found';
 import { Subject } from '@/types/index';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import SubjectList from './_components/ScrollSubjectList';
 import { Text } from '@/ui/Text';
 import ParentLayout from '../_components/Layout/ParentLayout';

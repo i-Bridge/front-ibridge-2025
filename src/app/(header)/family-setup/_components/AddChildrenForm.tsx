@@ -7,12 +7,12 @@ import AddChildrenModal from '@/components/AddChildrenModal';
 import { useSetupStore } from '@/store/useSetupStore';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { ChildCard } from '@/components/ChildCard';
 import CarouselStepper from '@/components/CarouselStepper';
 import { Child } from '@/types';
 import { showSuccess, showError } from '@/lib/toast';
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from '@sentry/nextjs';
 export default function AddChildrenForm() {
   const router = useRouter();
   const {
@@ -134,7 +134,7 @@ export default function AddChildrenForm() {
         <div className="self-stretch flex flex-col justify-start items-center gap-5 ">
           {visibleChild ? (
             <ChildCard
-            key={visibleChild.id}
+              key={visibleChild.id}
               child={visibleChild}
               onEdit={() => handleOpenEditModal(currentChildIndex)} // 수정
               onDelete={() => handleRemoveChild(currentChildIndex)} // 삭제
@@ -184,7 +184,7 @@ export default function AddChildrenForm() {
             onClick={handleClose}
             variant="grayscale"
             disabled={isLoading}
-            className='h-16'
+            className="h-16"
           >
             이전으로
           </Button>
@@ -192,7 +192,7 @@ export default function AddChildrenForm() {
             onClick={handleComplete}
             variant="primary"
             disabled={isCompleteDisabled}
-            className='h-16'
+            className="h-16"
           >
             {isLoading ? '집 생성 중...' : '완료하기'}
           </Button>
