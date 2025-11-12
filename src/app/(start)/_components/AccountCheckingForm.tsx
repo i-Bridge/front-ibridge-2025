@@ -1,7 +1,7 @@
-import { Text } from '@/ui/Text';
 import RotatingSpinner from '@/ui/loading/RotatingSpinner';
 import LogoutButton from '@/components/Headers/LogoutButton';
 import ModalCard from '@/ui/Modal/ModalCard';
+import TitleComponent from '@/ui/Modal/TitleComponent';
 
 interface AccountCheckingProps {
   userName: string;
@@ -18,15 +18,14 @@ export default function AccountCheckingForm({
         <RotatingSpinner />
 
         <div className="flex flex-col items-center justify-start gap-2">
-          <Text variant="title02" className=" text-grayscale-gray90 ">
-            {displayUserName} 님, 반가워요!
-          </Text>
-
-          <Text variant="body05" className="text-grayscale-gray60 ">
-            계정 확인 중입니다.
-          </Text>
+          <TitleComponent
+            title={`${displayUserName} 님, 반가워요!`}
+            subtitle={`계정 확인 중입니다.`}
+            align="center"
+            subtitlePosition="bottom"
+          />
         </div>
-        <LogoutButton className='h-auto'>로그아웃</LogoutButton>
+        <LogoutButton className="w-full h-auto">로그아웃</LogoutButton>
       </div>
     </ModalCard>
   );

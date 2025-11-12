@@ -42,7 +42,7 @@ export function Type1Notice({
         variant={'grayscale'}
         textVariant={'caption04'}
         textClass="text-grayscale-gray70"
-        className="h-10 px-4 py-2.5 bg-grayscale-gray5 w-auto"
+        className=" h-10 px-4 py-2.5 bg-grayscale-gray5 w-auto"
       >
         {/* Figma 디자인에 맞춰 '열람' 텍스트로 변경 */}
         열람
@@ -84,7 +84,7 @@ export function Type2Notice({
           variant={'grayscale'}
           textVariant={'caption04'}
           textClass="text-grayscale-gray70"
-          className="h-10 px-4 py-2.5 bg-grayscale-gray5"
+          className="w-full h-10 px-4 py-2.5 bg-grayscale-gray5"
         >
           거절
         </Button>
@@ -93,7 +93,7 @@ export function Type2Notice({
           variant={'grayscale'}
           textVariant={'caption04'}
           textClass="text-grayscale-gray70"
-          className="h-10 px-4 py-2.5 bg-grayscale-gray5"
+          className="w-full h-10 px-4 py-2.5 bg-grayscale-gray5"
         >
           수락
         </Button>

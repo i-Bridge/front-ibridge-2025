@@ -6,11 +6,13 @@ import { Button } from '@/ui/Button';
 import CustomCard from '@/ui/CustomCard';
 import { useState } from 'react';
 import CommonModalPopup from '@/ui/Modal/CommonModalPopup';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { useRouter } from 'next/navigation';
 import { showError, showSuccess } from '@/lib/toast';
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from '@sentry/nextjs';
 import { Parent } from '@/types';
+import TitleComponent from '@/ui/Modal/TitleComponent';
+import ModalFooter from '@/ui/Modal/ModalFooter';
 
 // 1. props 인터페이스 수정: 불필요한 props(onCancelSuccess, loading) 제거
 interface FamilyJoinSuccessProps {
@@ -53,19 +55,19 @@ export default function FamilyJoinSuccessForm({
     setLoading(true);
     try {
       const res = await Fetcher('/start/signup/undo', {
-        method: 'POST'
-      }); 
+        method: 'POST',
+      });
 
       if (res.isSuccess) {
         // 요청 취소 성공
         showSuccess('집 참여 요청이 성공적으로 취소되었어요!');
-        setIsModalOpen(false); 
+        setIsModalOpen(false);
         router.replace('/family-setup');
       } else {
         showError('집 요청 취소 오류가 발생했어요. 다시 시도해주세요.');
       }
     } catch (err) {
-       Sentry.captureException(err); 
+      Sentry.captureException(err);
       console.error('집 요청 취소 중 오류 발생:', err);
       showError('집 요청 취소 오류가 발생했어요. 다시 시도해주세요.');
       setIsModalOpen(false);
@@ -81,15 +83,11 @@ export default function FamilyJoinSuccessForm({
       >
         <div className="flex flex-col gap-7 text-center items-center">
           <div className="flex flex-col gap-3">
-            <Text as="div" variant="title01">
-              집 승인 요청
-              <br />
-              대기 중이에요.
-            </Text>
-            <Text as="div" variant="body03" className="text-grayscale-gray60">
-              초대가 승인되면 해당 집에 참여하여 <br />
-              서비스를 이용할 수 있어요.
-            </Text>
+            <TitleComponent
+              title="집 승인 요청 대기 중이에요."
+              subtitle="초대가 승인되면 해당 집에 참여하여 서비스를 이용할 수 있어요."
+              align="center"
+            />
           </div>
         </div>
 
@@ -106,9 +104,15 @@ export default function FamilyJoinSuccessForm({
           </div>
         </CustomCard>
 
-        <Button onClick={handleOpenModal} variant="grayscale" className='h-16'>
-          요청 취소하기
-        </Button>
+        <ModalFooter mobileAbsolute={true} className="self-stretch">
+          <Button
+            onClick={handleOpenModal}
+            variant="grayscale"
+            className="w-full h-16"
+          >
+            요청 취소하기
+          </Button>
+        </ModalFooter>
       </ModalCard>
 
       {isModalOpen && (
@@ -117,20 +121,23 @@ export default function FamilyJoinSuccessForm({
           titleLine2="취소할까요?"
           onClose={handleCloseModal} // 'x' 버튼이나 외부 클릭 시
           footerContent={
-            
-              <div className="w-full flex flex-row gap-3">
-                <Button variant="grayscale" onClick={handleCloseModal} className='h-16'>
-                  취소
-                </Button>
-                <Button
-                  onClick={handleUndoRequest}
-                  disabled={loading}
-                  variant="primary"
-                  className='h-16'
-                >
-                  {loading ? '요청 취소 중' : '확인'}
-                </Button>
-              </div>
+            <div className="w-full flex flex-row gap-3">
+              <Button
+                variant="grayscale"
+                onClick={handleCloseModal}
+                className="w-full h-16"
+              >
+                취소
+              </Button>
+              <Button
+                onClick={handleUndoRequest}
+                disabled={loading}
+                variant="primary"
+                className="w-full h-16"
+              >
+                {loading ? '요청 취소 중' : '확인'}
+              </Button>
+            </div>
           }
         >
           <></>

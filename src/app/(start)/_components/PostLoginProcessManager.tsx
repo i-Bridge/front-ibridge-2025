@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { showSuccess, showError } from '@/lib/toast';
 import { Session } from 'next-auth';
 import { SigninResponse } from '@/types';
@@ -18,7 +18,6 @@ type LoginStatus =
 
 // /start/signin 응답 타입
 
-
 export default function PostLoginProcessManager({
   session,
 }: {
@@ -26,8 +25,8 @@ export default function PostLoginProcessManager({
 }) {
   const router = useRouter();
   const [status, setStatus] = useState<LoginStatus>('idle');
-  
-  // 💡 [수정] 
+
+  // 💡 [수정]
   // API 호출 시도를 추적하는 ref를 추가합니다.
   // ref는 컴포넌트가 unmount 되어도 값을 유지합니다.
   const hasAttemptedApiCall = useRef(false);
@@ -49,8 +48,6 @@ export default function PostLoginProcessManager({
         },
       });
 
-      
-
       const data = signinRes?.data;
 
       console.log('signin: ', data);
@@ -68,6 +65,8 @@ export default function PostLoginProcessManager({
       // 3. 3가지 규칙에 따라 상태(status)를 설정합니다.
       //    가장 우선순위가 높은 'hasFamilyUser' 상태부터 확인합니다.
 
+      
+
       // 규칙 3: family가 참이거나, (family가 거짓이면서 send가 참이면) -> hasFamilyUser
       if (hasFamily || (!hasFamily && send)) {
         setStatus('hasFamilyUser');
@@ -84,8 +83,6 @@ export default function PostLoginProcessManager({
       // (hasFamily: F, send: T) -> hasFamilyUser
       // (hasFamily: F, send: F, requiredPIIConsent: T) -> needsFamily
       // (hasFamily: F, send: F, requiredPIIConsent: F) -> needsConsent
-
-
     } catch (error) {
       console.error('❌ 사용자 정보 확인 실패:', error);
       showError('사용자 정보를 확인하는 중 오류가 발생했습니다.');
@@ -103,9 +100,14 @@ export default function PostLoginProcessManager({
 
   //  API 호출 트리거
   useEffect(() => {
-    // 💡 [수정] 
+    // 💡 [수정]
     // 기존 조건과 더불어, "아직 API 호출을 시도한 적이 없는지" 확인합니다.
-    if (!session?.user || !session?.accessToken || status !== 'idle' || hasAttemptedApiCall.current) {
+    if (
+      !session?.user ||
+      !session?.accessToken ||
+      status !== 'idle' ||
+      hasAttemptedApiCall.current
+    ) {
       return;
     }
 

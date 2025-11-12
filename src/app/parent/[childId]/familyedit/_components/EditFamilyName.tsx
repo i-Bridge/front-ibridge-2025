@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useTransition } from 'react';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { Text } from '@/ui/Text';
 import { EditIcon } from '@/ui/icon/icon';
 import { Button } from '@/ui/Button'; // 1. Button 컴포넌트 import
@@ -11,13 +11,13 @@ import { showError } from '@/lib/toast';
 export default function EditFamilyName({ familyName }: { familyName: string }) {
   // 3. 모달 열림/닫힘 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   // 4. 모달 내부 input 상태
   const [newFamilyName, setNewFamilyName] = useState(familyName);
-  
+
   // 5. 페이지에 표시되는 현재 이름 (저장 성공 시 업데이트)
   const [displayedName, setDisplayedName] = useState(familyName);
-  
+
   // 6. 로딩 상태
   const [isPending, startTransition] = useTransition();
 
@@ -47,7 +47,7 @@ export default function EditFamilyName({ familyName }: { familyName: string }) {
         onClick={() => setIsModalOpen(false)} // 모달 닫기
         disabled={isPending}
         textVariant="title04"
-        className='h-16'
+        className="w-full h-16"
       >
         취소
       </Button>
@@ -60,7 +60,7 @@ export default function EditFamilyName({ familyName }: { familyName: string }) {
           newFamilyName.trim() === '' // 비어있으면 비활성화
         }
         textVariant="title04"
-        className='h-16'
+        className="w-full h-16"
       >
         {isPending ? '저장 중...' : '저장하기'}
       </Button>
@@ -70,15 +70,15 @@ export default function EditFamilyName({ familyName }: { familyName: string }) {
   return (
     // 9. flex-col -> flex (가로 배치)
     <div className="flex items-center gap-3">
-      
-      
       {/* 11. 기존 EditIcon 버튼은 모달을 여는 트리거로 사용 */}
-      <button onClick={() => {
-        // 모달을 열 때, input 값을 현재 표시되는 이름으로 동기화
-        setNewFamilyName(displayedName); 
-        setIsModalOpen(true);
-
-      }} className="ml-2 p-2 rounded-lg transition-colors hover:bg-grayscale-gray5">
+      <button
+        onClick={() => {
+          // 모달을 열 때, input 값을 현재 표시되는 이름으로 동기화
+          setNewFamilyName(displayedName);
+          setIsModalOpen(true);
+        }}
+        className="ml-2 p-2 rounded-lg transition-colors hover:bg-grayscale-gray5"
+      >
         <EditIcon />
       </button>
 
@@ -95,8 +95,8 @@ export default function EditFamilyName({ familyName }: { familyName: string }) {
               <Text variant={'body03'} className="text-grayscale-gray60">
                 가족 이름
               </Text>
-              <div className='w-full '>
-                <Text variant={'body04'} className=''>
+              <div className="w-full ">
+                <Text variant={'body04'} className="">
                   <input
                     type="text"
                     value={newFamilyName}

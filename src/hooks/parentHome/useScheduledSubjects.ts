@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { ScheduledSubject } from '@/types/index';
 
 interface ScheduledSubjectsData {
@@ -19,10 +19,12 @@ export function useScheduledSubjects() {
 
     setLoading(true);
     try {
-      const res = await Fetcher<ScheduledSubjectsData>(`/parent/${childId}/scheduled`);
+      const res = await Fetcher<ScheduledSubjectsData>(
+        `/parent/${childId}/scheduled`,
+      );
       const scheduledSubjectData = res?.data;
 
-      console.log("scheduled subjects 호출함", scheduledSubjectData);
+      console.log('scheduled subjects 호출함', scheduledSubjectData);
 
       setSubjects(scheduledSubjectData?.subjects ?? []);
     } catch (err) {
@@ -32,7 +34,6 @@ export function useScheduledSubjects() {
       setLoading(false);
     }
   }, [childId]);
-
 
   return { subjects, loading, refetch: fetchScheduledSubjects, setSubjects };
 }

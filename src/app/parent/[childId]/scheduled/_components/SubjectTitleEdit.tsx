@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { useScheduledSubjects } from '@/hooks/parentHome/useScheduledSubjects';
 import { showError } from '@/lib/toast';
 import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
 import { formatDateWithDay } from '@/hooks/formatDateWithDay';
-import { EditIcon,RerollIcon,GreenCheckIcon,  RedXIcon} from '@/ui/icon/icon';
+import { EditIcon, RerollIcon, GreenCheckIcon, RedXIcon } from '@/ui/icon/icon';
 interface Props {
   subjectId: number;
   subjectTitle: string;
@@ -16,9 +16,6 @@ interface Props {
 }
 
 const MAX_REFRESH_COUNT = 2;
-
-
-
 
 const SubjectTitleEdit = ({ subjectId, subjectTitle, date }: Props) => {
   const { childId } = useParams();

@@ -4,12 +4,11 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useSubjectStore } from '@/store/useSubjectStore';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { useParams } from 'next/navigation';
 import { Question, Subject } from '@/types/index';
 // [NEW] 분리된 캐시 서비스와 타입을 임포트합니다.
-import { subjectCache} from '@/lib/cache/SubjectCache';
-
+import { subjectCache } from '@/lib/cache/SubjectCache';
 
 // API 응답 데이터 타입
 interface ApiSubjectsData {
@@ -23,7 +22,7 @@ export const useSubjectData = () => {
   const [questions, setQuestions] = useState<Question[] | null>(null);
   const [loading, setLoading] = useState(false);
   const params = useParams();
-  
+
   // [MODIFIED] useParams의 childId가 string | string[] | undefined일 수 있으므로 string으로 처리
   const childIdParam = params?.childId;
   const childId = Array.isArray(childIdParam) ? childIdParam[0] : childIdParam;
@@ -57,7 +56,7 @@ export const useSubjectData = () => {
       // 로딩 시작 시 이전 데이터를 비워줍니다.
       setSubject(null);
       setQuestions(null);
-      
+
       try {
         const res = await Fetcher<ApiSubjectsData>(
           `/parent/${childId}/${selectedSubjectId}`,
@@ -92,7 +91,6 @@ export const useSubjectData = () => {
     };
 
     fetchSubjectData();
-    
   }, [childId, selectedSubjectId]); // [MODIFIED] 의존성 배열 정리
 
   return {

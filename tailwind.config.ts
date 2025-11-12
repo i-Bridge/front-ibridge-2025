@@ -22,7 +22,7 @@ export default {
       screens: {
         //기본: 모바일 기준점
       md: "768px", // 태블릿 기준점
-      lg: "1280px", // 데스크탑 기준점
+      lg: "1040px", // 데스크탑 기준점
     },
 
       colors: {

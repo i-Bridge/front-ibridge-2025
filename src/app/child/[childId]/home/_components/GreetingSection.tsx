@@ -108,7 +108,18 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
                 <br />
                 말이 있어!
               </Button>
-            </div>
+            )}
+
+            <Button
+              as={Link}
+              href={`/child/${childId}/free`}
+              variant={'primary'}
+              className="w-full bg-grayscale-gray80 px-10 py-7 rounded-[40px] justify-start text-left whitespace-nowrap"
+            >
+              하고싶은
+              <br />
+              말이 있어!
+            </Button>
           </div>
         </div>
       </div>

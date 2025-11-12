@@ -16,7 +16,7 @@ export interface PieData {
 
 // 컴포넌트 Props
 interface CategoryRankChartProps {
-  categorys: Category[];
+  categories: Category[];
 }
 
 /**
@@ -62,13 +62,13 @@ function processChartData(categorys: Category[]) {
  * (기존 CategoryRankChart)
  */
 export default function CategoryRankChart({
-  categorys,
+  categories,
 }: CategoryRankChartProps) {
 
   // useMemo를 사용해 keywords props가 변경될 때만 데이터 재가공
   const { totalCount, totalPositive, totalNegative, pieData } = useMemo(
-    () => processChartData(categorys),
-    [categorys],
+    () => processChartData(categories),
+    [categories],
   );
 
  
@@ -92,7 +92,7 @@ export default function CategoryRankChart({
           />
 
           {/* Rank List */}
-          <CategoryRankList keywords={categorys} />
+          <CategoryRankList categories={categories} />
         </div>
       </div>
 

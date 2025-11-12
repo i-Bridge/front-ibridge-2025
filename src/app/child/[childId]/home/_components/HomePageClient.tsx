@@ -5,7 +5,7 @@ import GreetingSection from './GreetingSection';
 import DashboardCards from './DashboardCards';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { API } from '@/constants/api';
 import { EmotionId } from '@/constants/emotions';
 import EmotionModal from './EmotionModal';

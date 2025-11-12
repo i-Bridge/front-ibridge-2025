@@ -95,7 +95,7 @@ export default function HistoryModal({ isOpen, onClose, history }: Props) {
       )}
       onClose={onClose}
       footerContent={
-        <Button onClick={onClose} className="h-14" variant={'grayscale'}>
+        <Button onClick={onClose} className="w-full h-14" variant={'grayscale'}>
           닫기
         </Button>
       }

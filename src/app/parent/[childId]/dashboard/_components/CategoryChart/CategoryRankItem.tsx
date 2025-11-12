@@ -14,7 +14,7 @@ import { Category } from '@/types';
 
 interface CategoryRankItemProps {
   // [3] prop 이름은 keyword로 유지하되, 내부 필드 keyword.category를 사용합니다.
-  keyword: Category;
+  category: Category;
   rank: number;
 }
 
@@ -22,14 +22,14 @@ interface CategoryRankItemProps {
  * 카테고리 랭킹 아이템 (오른쪽 리스트의 개별 항목)
  */
 export default function CategoryRankItem({
-  keyword,
+  category,
   rank,
 }: CategoryRankItemProps) {
   // ... (긍정/부정, 스타일 로직은 동일) ...
-  const isPositive = keyword.positiveScore >= 50;
+  const isPositive = category.positiveScore >= 50;
   const sentimentPercent = isPositive
-    ? keyword.positiveScore
-    : 100 - keyword.positiveScore;
+    ? category.positiveScore
+    : 100 - category.positiveScore;
 
   const sentimentLabel = isPositive ? '긍정' : '부정';
   const sentimentBgClass = isPositive
@@ -55,7 +55,7 @@ export default function CategoryRankItem({
     (state) => state.fetchSubjects,
   );
   const cachedSubjects = useCategorySubjectsCache((state) =>
-    state.cache.get(keyword.category),
+    state.cache.get(category.category),
   );
 
   // [6] onClick 핸들러를 스토어를 사용하도록 수정합니다.
@@ -65,7 +65,7 @@ export default function CategoryRankItem({
 
     try {
       // [7] 스토어의 fetchSubjects를 'category' 키로 호출합니다.
-      const subjects = await fetchSubjects(childId, keyword.category);
+      const subjects = await fetchSubjects(childId, category.category);
 
       // 스토어 함수가 성공적으로 데이터를 반환하면 (신규 또는 캐시)
       if (subjects !== null) {
@@ -102,7 +102,7 @@ export default function CategoryRankItem({
           {/* Keyword(Category) & Sentiment */}
           <div className="flex justify-start items-center gap-3">
             <Text variant={'body03'} className="">
-              {keyword.category}
+              {category.category}
             </Text>
             <div
               className={`px-2 py-1.5 rounded-md flex justify-start items-start gap-1 ${sentimentBgClass}`}
@@ -122,7 +122,7 @@ export default function CategoryRankItem({
           }`}
         >
           <Text variant={'body03'} className=" text-grayscale-gray50 ">
-            {keyword.count}개의 대화
+            {category.count}개의 대화
           </Text>
           {/* --- 아이콘 --- */}
           <div className="w-6 h-6 flex justify-center items-center">
@@ -148,10 +148,10 @@ export default function CategoryRankItem({
       {/* [10] showPopup이 true일 때 SubjectPopup을 렌더링합니다. */}
       {showPopup && (
         <SubjectPopup
-          category={keyword.category}
+          category={category.category}
           // [11] 로컬 state (subjects) 대신 스토어에서 가져온 'cachedSubjects'를 전달합니다.
           subjects={cachedSubjects || []}
-          positiveScore={keyword.positiveScore}
+          positiveScore={category.positiveScore}
           onClose={() => setShowPopup(false)}
         />
       )}

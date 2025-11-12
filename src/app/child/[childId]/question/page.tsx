@@ -1,4 +1,4 @@
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import { API } from '@/constants/api';
 import TalkSession from '../_components/TalkSession';
 import { ChildPageParams } from '@/types/page-props';

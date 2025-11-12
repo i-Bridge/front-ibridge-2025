@@ -1,7 +1,6 @@
-// components/ModalCard.tsx
+'use client';
 
 import type { ReactNode } from 'react';
-// [추가] twMerge를 import합니다.
 import { twMerge } from 'tailwind-merge';
 
 // 모달 카드 컴포넌트 - className prop으로 추가 스타일링 가능
@@ -9,9 +8,9 @@ import { twMerge } from 'tailwind-merge';
 type ModalCardProps = {
   children: ReactNode;
   className?: string;
-  /** 테두리(outline) 노출 여부 (기본값: true) */
   hasBorder?: boolean;
 };
+
 /**
  * 모달 UI의 기본 카드 형태를 제공하는 컴포넌트입니다.
  * `hasBorder` prop을 통해 두 가지 주요 스타일을 제어합니다.
@@ -30,28 +29,21 @@ const ModalCard = ({
   className = '',
   hasBorder = true,
 }: ModalCardProps) => {
-  // [유지] 기존 로직은 그대로 둡니다.
   const borderClasses = hasBorder
-    ? 'outline outline-1 outline-offset-[-1px] outline-grayscale-gray20 p-10 '
-    : '';
+    ? 'border border-1 border-grayscale-gray20 p-10 w-80 lg:w-[480px] '
+    : 'p-0 w-80 lg:w-[480px]';
 
   return (
-    <div className="w-[480px]">
-      <div
-        // [수정] 템플릿 리터럴 대신 twMerge 함수를 사용합니다.
-        // twMerge는 전달된 클래스들을 순서대로 병합합니다.
-        className={twMerge(
-          'w-full bg-white',
-          'flex self-stretch flex-col justify-start items-start rounded-[40px] gap-10',
-        
-          borderClasses,
-          
-          className,
-        )}
-      >
+    <div
+      className={twMerge(
+        'lg:w-[480px] bg-white flex flex-col justify-start items-start rounded-[40px] relative gap-10',
+        borderClasses,
+        className,
+      )}
+    >
         {children}
-      </div>
-    </div>
+        </div>
+    
   );
 };
 

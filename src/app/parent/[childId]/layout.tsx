@@ -1,6 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import DropMotionMypage from '@/app/parent/[childId]/_components/SideBar/DropMotionMypage';
 import SidebarNav from '@/app/parent/[childId]/_components/SideBar/SideBarNav';
 import { Suspense } from 'react';
@@ -89,12 +89,11 @@ async function Sidebar({ childId }: { childId: string }) {
   );
 }
 
-
 export default function PageLayout({ children, params }: ParentLayoutProps) {
   const childId = params.childId;
 
   return (
-    <div className='flex'>
+    <div className="flex">
       <Suspense fallback={<SidebarSkeleton />}>
         <Sidebar childId={childId} />
       </Suspense>
@@ -112,4 +111,3 @@ export default function PageLayout({ children, params }: ParentLayoutProps) {
     </div>
   );
 }
-

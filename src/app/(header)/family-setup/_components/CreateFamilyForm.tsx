@@ -1,7 +1,6 @@
 import ModalCard from '@/ui/Modal/ModalCard';
-import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
-import { Fetcher } from '@/lib/fetcher';
+import { Fetcher } from '@/lib/api/fetcher';
 import CommonModalPopup from '@/ui/Modal/CommonModalPopup';
 import { useState } from 'react';
 import { useSetupStore } from '@/store/useSetupStore';
@@ -9,6 +8,8 @@ import { LeftArrow } from '@/ui/icon/icon';
 import { showError } from '@/lib/toast';
 import * as Sentry from '@sentry/nextjs';
 import { SignupExistDupResponse } from '@/types/index';
+import TitleComponent from '@/ui/Modal/TitleComponent';
+import ModalFooter from '@/ui/Modal/ModalFooter';
 
 export default function CreateFamilyForm() {
   const [loading, setLoading] = useState(false);
@@ -21,7 +22,9 @@ export default function CreateFamilyForm() {
     resetChildrenInfo,
   } = useSetupStore();
 
-  const [inputFamilyName, setInputFamilyName] = useState(storedFamilyName || '');
+  const [inputFamilyName, setInputFamilyName] = useState(
+    storedFamilyName || '',
+  );
 
   // [신규] '뒤로가기' 버튼 핸들러
   const handleBack = () => {
@@ -56,9 +59,8 @@ export default function CreateFamilyForm() {
         data: { familyName: inputFamilyName },
       });
 
-        console.log('✅ 가족 이름 dup 확인:', res);
+      console.log('✅ 가족 이름 dup 확인:', res);
       if (res.data?.exist) {
-        
         setIsModalOpen(true);
       } else {
         setFamilyName(inputFamilyName);
@@ -92,12 +94,7 @@ export default function CreateFamilyForm() {
         </button>
 
         <div className="flex flex-col gap-3">
-          <Text as="div" variant="title01">
-            집 생성하기
-          </Text>
-          <Text as="div" variant="body03" className="text-grayscale-gray60">
-            생성할 집 이름을 입력해주세요.
-          </Text>
+          <TitleComponent title='집 생성하기' subtitle='생성할 집 이름을 입력해주세요.' align="start" />
         </div>
 
         {/* 입력창 및 오류 메시지 */}
@@ -116,14 +113,16 @@ export default function CreateFamilyForm() {
           />
         </div>
 
+<ModalFooter mobileAbsolute={true} className="self-stretch inline-flex justify-start items-center gap-3">
         <Button
           onClick={handleFamilyExist}
           disabled={loading || inputFamilyName.trim().length === 0} // [개선] 비어있을 때 버튼 비활성화
           variant="primary"
-          className='h-16'
+          className="w-full h-16"
         >
           {loading ? '진행 중' : '생성하기'}
         </Button>
+        </ModalFooter>
       </ModalCard>
 
       {/* 7. 중복 이름 팝업 (조건부 렌더링) */}
@@ -134,7 +133,11 @@ export default function CreateFamilyForm() {
           subtitle="중복되지 않는 집 이름을 입력해야 합니다"
           onClose={handleCloseModal} // 'x' 버튼이나 외부 클릭 시
           footerContent={
-            <Button variant="primary" onClick={handleCloseModal} className='h-16'>
+            <Button
+              variant="primary"
+              onClick={handleCloseModal}
+              className="w-full hh-16"
+            >
               확인
             </Button>
           }

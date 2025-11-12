@@ -5,21 +5,21 @@ import { Category } from '@/types';
 
 
 interface CategoryRankListProps {
-  keywords: Category[];
+  categories: Category[];
 }
 
 /**
  * 카테고리 랭킹 리스트 (오른쪽 영역)
  */
 export default function CategoryRankList({
-  keywords = [],
+  categories = [],
 }: CategoryRankListProps) {
   return (
     <div className="flex-1 inline-flex flex-col justify-start items-start">
-      {keywords.map((category, index) => (
+      {categories.map((category, index) => (
         <CategoryRankItem
           key={category + '-' + index}
-          keyword={category}
+          category={category}
           rank={index + 1}
         
         />

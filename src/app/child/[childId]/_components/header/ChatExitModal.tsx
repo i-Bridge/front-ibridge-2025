@@ -38,23 +38,25 @@ export default function ChatExitModal({ isOpen, onClose, onConfirm }: Props) {
             </Text>
           </ModalHeader>
 
-          {/* 2.1. 버튼 그룹 */}
-          <ModalFooter>
-            <Button
-              onClick={onClose}
-              variant={'grayscale'}
-              textVariant={'caption02'}
-            >
-              계속 대화하기
-            </Button>
-            <Button
-              onClick={onConfirm}
-              variant={'primary'}
-              textVariant={'caption02'}
-            >
-              종료하기
-            </Button>
-          </ModalFooter>
+        {/* 2.1. 버튼 그룹 */}
+        <ModalFooter >
+          <Button
+            onClick={onClose}
+            variant={'grayscale'}
+            textVariant={'caption02'}
+            className='w-full '
+          >
+            계속 대화하기
+          </Button>
+          <Button
+            onClick={onConfirm}
+            variant={'primary'}
+            textVariant={'caption02'}
+            className='w-full '
+          >
+            종료하기
+          </Button>
+        </ModalFooter>
         </ModalCard>
       </motion.div>
     </PopupOverlay>
