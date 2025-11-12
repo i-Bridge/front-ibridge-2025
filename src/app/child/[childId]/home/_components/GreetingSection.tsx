@@ -13,16 +13,16 @@ type Props = {
 export default function GreetingSection({ childId, specifiedDone }: Props) {
   return (
     // [수정 2] 모바일 최소 너비를 360px로 고정합니다.
-    <div>
-      <div className="min-w-[360px] relative rounded-[40px] shadow-md overflow-hidden px-15">
-        <Image
-          src="/images/child-bg.webp"
-          alt="교실 배경"
-          fill
-          priority
-          sizes="100vw"
-          className="z-0 object-cover object-top"
-        />
+    
+    <div className="min-w-[360px] relative rounded-[40px] shadow-md overflow-hidden px-15">
+      <Image
+        src="/images/child-bg.webp"
+        alt="교실 배경"
+        fill
+        priority
+        sizes="100vw"
+        className="z-0 object-cover object-top"
+      />
 
         <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center gap-x-5 p-6 md:px-12 md:py-0">
           {/* [수정 1]
@@ -108,21 +108,12 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
                 <br />
                 말이 있어!
               </Button>
-            )}
-
-            <Button
-              as={Link}
-              href={`/child/${childId}/free`}
-              variant={'primary'}
-              className="w-full bg-grayscale-gray80 px-10 py-7 rounded-[40px] justify-start text-left whitespace-nowrap"
-            >
-              하고싶은
-              <br />
-              말이 있어!
-            </Button>
-          </div>
+              </div>
         </div>
       </div>
     </div>
   );
 }
+            
+
+
