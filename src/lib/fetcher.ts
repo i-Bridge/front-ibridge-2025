@@ -75,7 +75,7 @@ console.log(`✅ API 호출 확인:  ${fullUrl}`, { response:  res.data } );
         { response: responseData },
       );
     } else {
-      console.log(`✅ API 호출 성공:  ${fullUrl}`, { response: res } );
+      console.log(`✅ API 호출 성공:  ${fullUrl}`, { response: res.data } );
     }
 
     return responseData;

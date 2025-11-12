@@ -6,6 +6,15 @@ export interface Subject {
   image?: string | null;
 }
 
+
+export interface DateSubject{
+  subjectId: number;
+  subjectTitle: string;
+  answer: boolean;
+  date: string; // yyyy-MM-dd
+  questions: Question[];
+}
+
 export interface ScheduledSubject {
   subjectId: number;
   subjectTitle: string;
