@@ -3,6 +3,7 @@ import CustomCard from '@/ui/CustomCard';
 import { GirlIcon, BoyIcon, EditIcon, DeleteIcon } from '@/ui/icon/icon';
 import { Child } from '@/types';
 import { twMerge } from 'tailwind-merge';
+import TitleComponent from '@/ui/Modal/TitleComponent';
 
 interface ChildListItemProps {
   child: Child;
@@ -52,7 +53,7 @@ export function ChildCard({
   return (
     <CustomCard
       className={twMerge(
-        'flex flex-row items-start',
+        'flex flex-row items-start ',
         showActions ? 'self-stretch justify-between' : 'justify-center',
         bgColor,
         cardClassName,
@@ -76,26 +77,24 @@ export function ChildCard({
           'inline-flex flex-col  gap-2',
           showActions ? 'justify-start items-start' : 'justify-center items-center',
         )}>
-          <Text variant="title02" className='group-hover:scale-100'>{child.name}</Text>
-          <Text variant="body03" className="text-grayscale-gray60 ">
-            {formattedBirthday}
-          </Text>
+          <TitleComponent title={child.name} subtitle={formattedBirthday} align={showActions ? "start" : "center"} />
+          
         </div>
       </div>
 
       {/* 오른쪽: 버튼 */}
       {showActions && (
-        <div className="flex self-stretch justify-start items-start gap-2">
+        <div className="flex self-stretch justify-start items-start lg:gap-2 gap-1">
           <button
             onClick={handleEdit}
-            className="w-10 h-10 p-1 bg-white rounded-full flex justify-center items-center"
+            className="w-10 h-10 p-1 lg:bg-white rounded-full flex justify-center items-center"
             aria-label={`${child.name} 정보 수정`}
           >
             <EditIcon />
           </button>
           <button
             onClick={handleDelete}
-            className="w-10 h-10 p-1 bg-white rounded-full flex justify-center items-center"
+            className="w-10 h-10 p-1 lg:bg-white rounded-full flex justify-center items-center"
             aria-label={`${child.name} 정보 삭제`}
           >
             <DeleteIcon />

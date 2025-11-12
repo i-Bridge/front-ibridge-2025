@@ -36,7 +36,7 @@ const CustomCard = ({ children, className = '', onClick }: CustomCardProps) => {
       // 2. twMerge 함수로 클래스를 병합합니다.
       className={twMerge(
         // --- 1. 기본 스타일 ---
-        'w-full self-stretch px-10 py-10 rounded-3xl',
+        'w-full self-stretch px-7 py-7 lg:px-10 lg:py-10 rounded-3xl',
         'flex flex-col justify-start items-center gap-3',
         className,
         // --- 2. 조건부 스타일 (onClick이 있을 때) ---

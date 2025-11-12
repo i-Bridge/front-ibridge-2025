@@ -1,19 +1,24 @@
 import type { ReactNode } from 'react';
 
-// 모달 카드 Footer 컴포넌트 - className prop으로 추가 스타일링 가능
-
 type ModalFooterProps = {
   children: ReactNode;
   className?: string;
+  /** 모바일에서 화면 하단 고정 여부 */
+  mobileAbsolute?: boolean;
 };
 
-const ModalFooter = ({ children, className = '' }: ModalFooterProps) => {
+const ModalFooter = ({
+  children,
+  className = '',
+  mobileAbsolute = false,
+}: ModalFooterProps) => {
   return (
     <div
       className={`
-        self-stretch flex justify-center items-center w-full ]
+        self-stretch flex justify-center items-center w-full
         p-5 gap-2.5 overflow-hidden
-        ${className} 
+        ${mobileAbsolute ? 'fixed bottom-0 left-0 w-full lg:static lg:w-auto' : ''}
+        ${className}
       `}
     >
       {children}

@@ -108,7 +108,7 @@ export default function CommonModalPopup({
         {/* 헤더 영역 */}
         <ModalHeader>
           {/* 첫 번째 제목 줄 */}
-          <div className="flex flex-col justify-center items-center">
+          <div className="flex flex-col justify-center items-center ">
             <Text as="div" variant="title02" className={titleClassName}>
               {title}
             </Text>
