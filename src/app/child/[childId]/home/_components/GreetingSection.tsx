@@ -106,6 +106,5 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
         </div>
       </div>
     </div>
-    </div>
   );
 }
