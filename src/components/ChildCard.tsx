@@ -1,4 +1,4 @@
-import { Text } from '@/ui/Text';
+
 import CustomCard from '@/ui/CustomCard';
 import { GirlIcon, BoyIcon, EditIcon, DeleteIcon } from '@/ui/icon/icon';
 import { Child } from '@/types';
