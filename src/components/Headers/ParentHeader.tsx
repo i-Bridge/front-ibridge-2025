@@ -2,11 +2,10 @@
 
 import { useRouter } from 'next/navigation';
 import LogoutButton from '@/components/Headers/LogoutButton';
-import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
 import { OwlIcon } from '@/ui/icon/OwlIcon';
 import { Logo } from '@/ui/icon/Logo';
-
+import NotFound from '@/components/Exception/not-found';
 interface HeaderProps {
   /** 관리자 페이지로 이동할 때 사용할 firstchild ID. ID가 0 또는 null/undefined일 경우 버튼을 숨기거나 비활성화할 수 있습니다. */
   firstchildId: number | undefined;
@@ -30,38 +29,40 @@ export default function ParentHeader({ firstchildId }: HeaderProps) {
       router.push(path);
     } else {
       console.error('관리자 ID가 유효하지 않아 이동할 수 없습니다.');
+      return <NotFound message="자녀 ID가 존재하지 않습니다." />;
+      
     }
   };
 
   return (
-    <header className="bg-white flex fixed items-center justify-center top-0 left-0 w-full h-16 px-10 overflow-hidden whitespace-nowrap z-50 ">
-      <div className="flex justify-between items-center w-full max-w-7xl mx-auto">
+    <header className="bg-white flex fixed items-center justify-center top-0 left-0 w-full h-16 px-5 lg:px-10 overflow-hidden whitespace-nowrap z-50 ">
+      <div className="flex justify-between items-center w-full">
         {/* 좌측: 로고 그룹 (클릭 가능하도록 수정) */}
-        <div className="flex justify-center items-start gap-2 cursor-pointer focus:outline-none">
+        <div className="flex justify-center items-start gap-2">
           <OwlIcon className="w-6 h-6" />
           <Logo className="w-[73px] h-[28px]" />
         </div>
 
         {/* 우측: 버튼 그룹 (관리자 페이지, 로그아웃) */}
-        <div className="flex items-center gap-2">
+        <div className="self-stretch flex items-center gap-2">
           {/* 1. 관리자 페이지 버튼 */}
           {showAdminButton && (
             <Button
-              onClick={handleAdminClick} // 💡 수정된 핸들러 연결
-              className="h-10 px-4 py-2.5 bg-gray-50 "
+              onClick={handleAdminClick} 
+              className=" w-full h-10 px-4 py-2.5 bg-grayscale-gray5"
+              textVariant={'caption04'}
+              textClass="text-grayscale-gray70"
             >
-              <Text variant="caption04" className="text-gray-700">
-                관리자 페이지
-              </Text>
+              관리자 페이지
             </Button>
           )}
 
           {/* 2. 로그아웃 버튼 */}
           <LogoutButton
-            className="h-10 px-4 py-2.5 bg-gray-50"
-            textVariant="caption04" // [!!] textVariant prop을 직접 사용
+            className=" w-full h-10 px-4 py-2.5 bg-grayscale-gray5 text-grayscale-gray70"
+            textVariant="caption04" 
           >
-            로그아웃 {/* [!!] children으로는 순수 텍스트만 전달 */}
+            로그아웃 
           </LogoutButton>
         </div>
       </div>

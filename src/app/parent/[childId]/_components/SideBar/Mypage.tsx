@@ -84,12 +84,12 @@ export default function Mypage({ childId, mypageData }: MypageDataProps) {
          
           variant={'primary'}
           textVariant="caption04"
-          className=" h-10 px-4 py-2 inline-flex justify-center items-center gap-1"
+          className="w-full h-10 px-4 py-2 inline-flex justify-center items-center gap-1"
         >
           자녀 페이지로 이동
         </Button>
 
-        <LogoutButton className=" h-10 px-4 py-2" textVariant="caption04">
+        <LogoutButton className="w-full h-10 px-4 py-2" textVariant="caption04">
           로그아웃
         </LogoutButton>
 
