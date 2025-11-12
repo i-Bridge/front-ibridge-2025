@@ -1,7 +1,7 @@
 export * from './api';
 //부모페이지 api Respose 타입들 
 export * from './api.start.types';
-export * from './api.stats.types';
+// export * from './api.stats.types';
 export * from './api.parententer.types';
 //export * from './api.familyedit.types';
 //export * from './api.notice.types';
