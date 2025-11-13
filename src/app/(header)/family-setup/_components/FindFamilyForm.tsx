@@ -184,7 +184,7 @@ export default function FindFamilyForm() {
       {/* 가입 요청 팝업 (familyName 기준) */}
       {isRequestSentModalOpen && (
         <CommonModalPopup
-          title={`{${familyName}}`}
+          title={`🏠${familyName}🏠`}
           titleLine2="집에 참여할까요?"
           subtitle="해당 집 관리자에게 승인 요청이 전송됩니다."
           onClose={handleCloseRequestSentModal}
@@ -195,7 +195,7 @@ export default function FindFamilyForm() {
                 variant="grayscale"
                 textVariant="caption02"
                 onClick={handleCloseRequestSentModal}
-                className="w-full h-16"
+                className="h-16"
               >
                 취소
               </Button>

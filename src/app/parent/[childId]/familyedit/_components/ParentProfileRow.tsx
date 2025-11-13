@@ -29,7 +29,7 @@ export default function ParentProfileRow({
     <>
      
         {/* 1. 이름, 수정 버튼, 이메일이 있는 첫 번째 줄 */}
-        <div className="self-stretch inline-flex justify-between items-center w-full">
+        <div className="w-full self-stretch flex flex-col justify-start items-start lg:flex-row lg:justify-between lg:items-center ">
           {/* 1.1 이름 표시 영역 */}
           <div className="flex-1 flex justify-start items-center gap-2">
             <Text variant={'title04'}>
@@ -51,7 +51,7 @@ export default function ParentProfileRow({
           </div>
 
           {/* 1.2 이메일 (항상 표시) */}
-          <Text variant={'body03'} className="text-grayscale-gray60">
+          <Text as='div' variant={'body03'} className="text-grayscale-gray60">
             {email}
           </Text>
         </div>

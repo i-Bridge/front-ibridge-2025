@@ -49,7 +49,7 @@ export default function QuestionCard({
     const videoUrl = question.video; // 비디오 URL
 
     return (
-      <div className="w-48 h-48 rounded-[20px] flex flex-col justify-center items-center gap-1.5 overflow-hidden relative flex-shrink-0">
+      <div className=" rounded-[20px] flex flex-col justify-center items-center gap-1.5 overflow-hidden relative flex-shrink-0">
         
         {/* [FIX] isPlaying이 true이고 videoUrl이 있을 때만 비디오 재생 */}
         {isPlaying && videoUrl ? (
@@ -92,14 +92,14 @@ export default function QuestionCard({
   };
 
   return (
-    <div className="w-full self-stretch p-8 bg-grayscale-gray5 rounded-[20px] flex flex-col justify-start items-start gap-7">
+    <div className="w-auto p-8 bg-grayscale-gray5 rounded-[20px] flex flex-col lg:flex-row justify-start items-start gap-7">
       {/* 1. 비디오/썸네일 영역 */}
       {renderVideoOrThumbnail()}
 
       {/* 2. 텍스트 영역 */}
-      <div className="self-stretch flex flex-col justify-start items-start gap-3">
+      <div className=" flex flex-col justify-start items-start gap-3">
         {/* 질문 제목 */}
-        <div className="self-stretch inline-flex justify-start items-start gap-3">
+        <div className=" inline-flex justify-start items-start gap-3">
           <Text variant={'title04'} className="">
             {question.text} {/* 질문이 제목 역할을 한다고 가정 */}
           </Text>

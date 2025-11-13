@@ -3,10 +3,10 @@ import NotFound from '@/components/Exception/not-found';
 import { Subject } from '@/types/index';
 import { Fetcher } from '@/lib/api/fetcher';
 import SubjectList from './_components/ScrollSubjectList';
-import { Text } from '@/ui/Text';
 import ParentLayout from '../_components/Layout/ParentLayout';
 import { Suspense } from 'react';
 import AnswerLogSkeleton from './_components/AnwerLogSkeleton';
+import TitleComponent from '@/ui/Modal/TitleComponent';
 
 interface HomeData {
   hasNext: boolean;
@@ -35,13 +35,8 @@ export default async function HomePage({ params }: ChildPageParams) {
   return (
     <ParentLayout
       title={
-        <div className="flex ">
-          <Text variant={'title01'}>
-            우리 아이의
-            <br />
-            대화 기록이에요.{' '}
-          </Text>
-        </div>
+        <TitleComponent title={'우리 아이의\n대화 기록이에요.'} align='start' />
+        
       }
     >
       <Suspense fallback={<AnswerLogSkeleton />}>

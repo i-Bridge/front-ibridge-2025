@@ -67,7 +67,7 @@ function FigmaToast({ icon, message }: FigmaToastProps) {
         className="
           shadow-[0px_0px_20px_0px_rgba(0,0,0,0.12)] 
           px-6 py-3 bg-white rounded-2xl 
-          inline-flex justify-start items-center gap-4 whitespace-nowrap
+          inline-flex justify-start items-center gap-4 
           w-auto  
         "
       >

@@ -33,8 +33,8 @@ export default function TitleComponent({
   const titleVariant = size === 's' ? 'title03' : 'title01';
   const subtitleVariant = size === 's' ? 'body04' : 'body03';
 
-  const subtitleElement = subtitle ? <Text variant={subtitleVariant} className='text-grayscale-gray60'>{subtitle}</Text> : null;
-  const titleElement = <Text variant={titleVariant} className='text-grayscale-gray90'>{title}</Text>;
+  const subtitleElement = subtitle ? <Text variant={subtitleVariant} className='text-grayscale-gray60 whitespace-pre-line'>{subtitle}</Text> : null;
+  const titleElement = <Text variant={titleVariant} className='text-grayscale-gray90 whitespace-pre-line'>{title}</Text>;
 
   return (
     <div className={`self-stretch inline-flex flex-col justify-start ${alignClass} gap-3`}>
