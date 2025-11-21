@@ -7,6 +7,7 @@
 
 # 0. Getting Started (시작하기)
 ```bash
+$ npm run build
 $ npm start
 ```
 [서비스 링크](https://ibridge.framer.website/)
