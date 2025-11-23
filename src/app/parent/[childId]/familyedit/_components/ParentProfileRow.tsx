@@ -29,13 +29,13 @@ export default function ParentProfileRow({
     <>
      
         {/* 1. 이름, 수정 버튼, 이메일이 있는 첫 번째 줄 */}
-        <div className="w-full self-stretch flex flex-col justify-start items-start lg:flex-row lg:justify-between lg:items-center ">
+        <div className="w-full self-stretch flex flex-col justify-start items-start md:flex-row md:justify-between md:items-center gap-2">
           {/* 1.1 이름 표시 영역 */}
           <div className="flex-1 flex justify-start items-center gap-2">
             <Text variant={'title04'}>
               {initialName}
               {/* isMe가 true일 때만 '(나)' 표시 */}
-              {isMe && <Text  variant={'title04'}>(나)</Text>}
+              {isMe && <Text  variant={'title04'}> (나)</Text>}
             </Text>
 
             {/* isMe가 true일 때만 수정 버튼 표시 */}

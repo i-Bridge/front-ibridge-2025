@@ -78,6 +78,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
             이전 대화에서 적용했던 버튼 줄바꿈(flex-wrap)은
             현재 코드에 다시 적용하지 않았습니다.
           */}
+
           <div className="w-full self-stretch flex justify-start items-center gap-5">
             {specifiedDone ? (
               <Button

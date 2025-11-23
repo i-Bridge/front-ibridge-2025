@@ -135,7 +135,7 @@ export default function ChildrenProfile({ childrenInfo }: ChildrenProfileProps) 
 
   return (
     <>
-      <div className="self-stretch grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div className="self-stretch grid grid-cols-1 lg:grid-cols-2 gap-5 mp-5">
         {childrenInfo.map((child, index) => (
           <ChildCard
             key={child.id || `child-${index}`}

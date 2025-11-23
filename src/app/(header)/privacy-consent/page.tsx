@@ -42,7 +42,7 @@ export default async function PrivacyConsentPage() {
   if (hasError || !consentContent) {
     return (
       <div className="flex items-center justify-center min-h-screen p-4">
-        <ModalCard hasBorder={true} className="w-full max-w-md p-8 text-center">
+        <ModalCard hasBorder={true} className="w-full p-8 text-center">
           <Text variant="title01" className="text-red-600 mb-4">
             약관 정보를 불러올 수 없습니다.
           </Text>

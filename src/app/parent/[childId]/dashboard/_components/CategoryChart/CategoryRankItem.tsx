@@ -86,7 +86,7 @@ export default function CategoryRankItem({
   return (
     // [8] 팝업을 렌더링하기 위해 Fragment(<>)로 감쌉니다.
     <>
-      <div className="self-stretch py-3 inline-flex flex-col lg:flex-row justify-start items-start lg:items-center gap-3">
+      <div className="self-stretch py-3 inline-flex flex-col md:flex-row justify-start items-start md:items-center gap-3">
         <div className="flex-1 flex justify-start items-center gap-3">
           {/* Rank Circle */}
           <div

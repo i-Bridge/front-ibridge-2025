@@ -86,12 +86,13 @@ export default function PrivacyDetailModal({
           확인
         </Button>
       }
+      footerClassName='w-full p-5 md:p-5 '
     >
       {/* 💡 CommonModal의 children prop으로 약관 본문 영역 전달
         CommonModal의 JSDoc에 따라 이 children 내부에서
         h-[480px] 및 스크롤 영역의 패딩(px-7 py-5)을 직접 관리합니다.
       */}
-      <div className="h-[300px] lg:h-[450px] inline-flex justify-start items-start overflow-hidden relative w-full">
+      <div className="h-[450px] inline-flex justify-start items-start overflow-hidden relative w-full">
         {/* 약관 텍스트 */}
         <div
           ref={scrollRef}
