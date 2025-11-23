@@ -99,7 +99,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
                 href={`/child/${childId}/question`}
                 variant="primary"
                 className="relative flex-1 self-stretch px-10 py-7 rounded-[40px] justify-start text-left whitespace-nowrap
-               {/* [수정] w-full -> flex-1 */}
+              
                after:content-[''] after:absolute after:inset-0 after:rounded-[40px] after:pointer-events-none
                after:transition-colors hover:after:bg-black/10"
               >
@@ -107,12 +107,11 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
                 <br />
                 대답할게!
               </Button>
-              </div>
+            )}
         </div>
       </div>
     </div>
+    </div>
+    </div>
   );
 }
-            
-
-
