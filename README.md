@@ -6,16 +6,19 @@
 <br/>
 
 # 0. Getting Started (시작하기)
+
 ```bash
 $ npm run build
 $ npm start
 ```
+
 [서비스 링크](https://ibridge.framer.website/)
 
 <br/>
 <br/>
 
 # 1. Project Overview (프로젝트 개요)
+
 - 프로젝트 이름: i-Bridge
 - 프로젝트 설명: 부모와 아이의 소통을 돕는 AI 웹 서비스
 
@@ -23,16 +26,18 @@ $ npm start
 <br/>
 
 # 2. Team Members (팀원 및 팀 소개)
-| 김현호 | 남윤아 | 이해린 | 황지웅 |
-|:------:|:------:|:------:|:------:|
-| <img src="" alt="김현호" width="150"> | <img src="" alt="남윤아" width="150"> | <img src="" alt="이해린" width="150"> | <img src="" alt="황지웅" width="150"> |
-| BE | FE | FE | BE |
-| [GitHub]() | [GitHub]() | [GitHub]() | [GitHub]() |
+
+| 남윤아 | 이해린 | 김현호 | 황지웅 |
+| :----: | :----: | :----: | :----: |
+
+| FE | FE | BE | BE |
+| [GitHub](https://github.com/219yoona) | [GitHub](https://github.com/rin00000) | [GitHub](https://github.com/Aqoom01) | [GitHub](https://github.com/woongjee) |
 
 <br/>
 <br/>
 
 # 3. Key Features (주요 기능)
+
 - **회원가입&로그인**:
   - SNS 계정을 통해 로그인합니다.
 
@@ -47,64 +52,68 @@ $ npm start
   - 6번의 문답으로 이루어진 대화를 완료하면 포도알 하나를 받습니다.
 
 - **아이 대화 통계**:
-  1) 전체 대화 기록 (텍스트, 영상)
-  2) GPT-5가 동적으로 생성한 개인화된 대화 군집화 결과
-  3) 카테고리별 긍정적/부정적 비율 시각화
-  4) 아이의 최대 관심, 긍정비율 1위, 부정비율 1위 카테고리 
-  5) 특정 카테고리 또는 날짜별 대화 기록을 필터링하여 확인하는 기능
-
+  1. 전체 대화 기록 (텍스트, 영상)
+  2. GPT-5가 동적으로 생성한 개인화된 대화 군집화 결과
+  3. 카테고리별 긍정적/부정적 비율 시각화
+  4. 아이의 최대 관심, 긍정비율 1위, 부정비율 1위 카테고리
+  5. 특정 카테고리 또는 날짜별 대화 기록을 필터링하여 확인하는 기능
 
 <br/>
 <br/>
 
 # 4. Tasks & Responsibilities (작업 및 역할 분담)
-|  |  |  |
-|-----------------|-----------------|-----------------|
-| 김현호    |  <img src="" alt="김현호" width="100"> | <ul><li>프로젝트 계획 및 관리</li><li>팀 리딩 및 커뮤니케이션</li><li>커스텀훅 개발</li></ul>     |
-| 남윤아   |  <img src="" alt="남윤아" width="100">| <ul><li>메인 페이지 개발</li><li>동아리 만들기 페이지 개발</li><li>커스텀훅 개발</li></ul> |
-| 이해린   |  <img src="" alt="이해린" width="100">    |<ul><li>홈 페이지 개발</li><li>로그인 페이지 개발</li><li>동아리 찾기 페이지 개발</li><li>동아리 프로필 페이지 개발</li><li>커스텀훅 개발</li></ul>  |
-| 황지웅    |  <img src="" alt="황지웅" width="100">    | <ul><li>회원가입 페이지 개발</li><li>마이 프로필 페이지 개발</li><li>커스텀훅 개발</li></ul>    |
+
+| 김현호 | <ul><li>프로젝트 계획 및 관리</li><li>팀 리딩 및 커뮤니케이션</li><li>커스텀훅 개발</li></ul> |
+| 남윤아 | <ul><li>메인 페이지 개발</li><li>동아리 만들기 페이지 개발</li><li>커스텀훅 개발</li></ul> |
+| 이해린 | <ul><li>아이용 서비스 개발</li><li>로그인 로직 개발</li>
+| 황지웅 | <ul><li>회원가입 페이지 개발</li><li>마이 프로필 페이지 개발</li><li>커스텀훅 개발</li></ul> |
 
 <br/>
 <br/>
 
 # 5. Technology Stack (기술 스택)
+
 ## 5.1 Language
-|  |  |
-|-----------------|-----------------|
-| HTML5    |<img src="https://github.com/user-attachments/assets/2e122e74-a28b-4ce7-aff6-382959216d31" alt="HTML5" width="100">| 
-| CSS3    |   <img src="https://github.com/user-attachments/assets/c531b03d-55a3-40bf-9195-9ff8c4688f13" alt="CSS3" width="100">|
-| Javascript    |  <img src="https://github.com/user-attachments/assets/4a7d7074-8c71-48b4-8652-7431477669d1" alt="Javascript" width="100"> | 
+
+|            |                                                                                                                          |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| HTML5      | <img src="https://github.com/user-attachments/assets/2e122e74-a28b-4ce7-aff6-382959216d31" alt="HTML5" width="100">      |
+| CSS3       | <img src="https://github.com/user-attachments/assets/c531b03d-55a3-40bf-9195-9ff8c4688f13" alt="CSS3" width="100">       |
+| Javascript | <img src="https://github.com/user-attachments/assets/4a7d7074-8c71-48b4-8652-7431477669d1" alt="Javascript" width="100"> |
 
 <br/>
 
 ## 5.2 Frotend
-|  |  |  |
-|-----------------|-----------------|-----------------|
-| React    |  <img src="https://github.com/user-attachments/assets/e3b49dbb-981b-4804-acf9-012c854a2fd2" alt="React" width="100"> | 18.3.1    |
-| StyledComponents    |  <img src="https://github.com/user-attachments/assets/c9b26078-5d79-40cc-b120-69d9b3882786" alt="StyledComponents" width="100">| 6.1.12   |
-| MaterialUI    |  <img src="https://github.com/user-attachments/assets/75a46fa7-ebc0-4a9d-b648-c589f87c4b55" alt="MUI" width="100">    | 5.0.0  |
-| DayJs    |  <img src="https://github.com/user-attachments/assets/3632d7d6-8d43-4dd5-ba7a-501a2bc3a3e4" alt="DayJs" width="100">    | 1.11.12    |
+
+|                  |                                                                                                                                |         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| React            | <img src="https://github.com/user-attachments/assets/e3b49dbb-981b-4804-acf9-012c854a2fd2" alt="React" width="100">            | 18.3.1  |
+| StyledComponents | <img src="https://github.com/user-attachments/assets/c9b26078-5d79-40cc-b120-69d9b3882786" alt="StyledComponents" width="100"> | 6.1.12  |
+| MaterialUI       | <img src="https://github.com/user-attachments/assets/75a46fa7-ebc0-4a9d-b648-c589f87c4b55" alt="MUI" width="100">              | 5.0.0   |
+| DayJs            | <img src="https://github.com/user-attachments/assets/3632d7d6-8d43-4dd5-ba7a-501a2bc3a3e4" alt="DayJs" width="100">            | 1.11.12 |
 
 <br/>
 
 ## 5.3 Backend
-|  |  |  |
-|-----------------|-----------------|-----------------|
-| Firebase    |  <img src="https://github.com/user-attachments/assets/1694e458-9bb0-4a0b-8fe6-8efc6e675fa1" alt="Firebase" width="100">    | 10.12.5    |
+
+|          |                                                                                                                        |         |
+| -------- | ---------------------------------------------------------------------------------------------------------------------- | ------- |
+| Firebase | <img src="https://github.com/user-attachments/assets/1694e458-9bb0-4a0b-8fe6-8efc6e675fa1" alt="Firebase" width="100"> | 10.12.5 |
 
 <br/>
 
 ## 5.4 Cooperation
-|  |  |
-|-----------------|-----------------|
-| Git    |  <img src="https://github.com/user-attachments/assets/483abc38-ed4d-487c-b43a-3963b33430e6" alt="git" width="100">    |
-| Git Kraken    |  <img src="https://github.com/user-attachments/assets/32c615cb-7bc0-45cd-91ea-0d1450bfc8a9" alt="git kraken" width="100">    |
-| Notion    |  <img src="https://github.com/user-attachments/assets/34141eb9-deca-416a-a83f-ff9543cc2f9a" alt="Notion" width="100">    |
+
+|            |                                                                                                                          |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Git        | <img src="https://github.com/user-attachments/assets/483abc38-ed4d-487c-b43a-3963b33430e6" alt="git" width="100">        |
+| Git Kraken | <img src="https://github.com/user-attachments/assets/32c615cb-7bc0-45cd-91ea-0d1450bfc8a9" alt="git kraken" width="100"> |
+| Notion     | <img src="https://github.com/user-attachments/assets/34141eb9-deca-416a-a83f-ff9543cc2f9a" alt="Notion" width="100">     |
 
 <br/>
 
 # 6. Project Structure (프로젝트 구조)
+
 ```plaintext
 project/
 ├── public/
@@ -128,18 +137,20 @@ project/
 <br/>
 <br/>
 
-
 # 7. 커밋 컨벤션
+
 ## 기본 구조
+
 ```
 type : subject
 
-body 
+body
 ```
 
 <br/>
 
 ## type 종류
+
 ```
 feat : 새로운 기능 추가
 fix : 버그 수정
@@ -151,6 +162,3 @@ chore : 빌드 업무 수정, 패키지 매니저 수정
 ```
 
 <br/>
-
-
-

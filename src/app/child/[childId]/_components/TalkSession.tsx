@@ -139,6 +139,7 @@ export default function TalkSession({
 
   const handleExitConfirm = () => {
     setIsExitModalOpen(false);
+    sendFinished();
     router.push(`/child/${childId}/home`);
   };
 
