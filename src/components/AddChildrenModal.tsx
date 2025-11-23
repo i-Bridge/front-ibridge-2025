@@ -50,11 +50,11 @@ export default function AddChildForm({
     <CommonModal
       title={isEditing ? '자녀 수정하기' : '자녀 추가하기'}
       onClose={onClose}
-      footerClassName="flex-row" // 💡 버튼 가로 정렬
+      footerClassName="flex-row " // 💡 버튼 가로 정렬
       footerContent={
         // 💡 푸터 영역에 버튼들 전달
         <>
-          <Button variant="grayscale" onClick={handleCancel} className='h-16'>
+          <Button variant="grayscale" onClick={handleCancel} className='w-full h-16'>
             취소
           </Button>
           <Button
@@ -69,7 +69,7 @@ export default function AddChildForm({
       }
     >
       {/* 💡 CommonModal의 children으로 폼 영역 전달 (p-10 포함) */}
-      <div className="self-stretch p-10 flex flex-col gap-5">
+      <div className="self-stretch px-5  md:p-10 flex flex-col gap-5">
         {/* 이름 필드 */}
         <div className="flex flex-col gap-3">
           <Text variant="body02" className="text-gray-500">
@@ -109,16 +109,16 @@ export default function AddChildForm({
           <div className="self-stretch inline-flex gap-2">
             <div
               className={`flex-1 h-14 px-5 rounded-xl border flex justify-center items-center cursor-pointer ${
-                selectedGender === 'Female'
+                selectedGender === 'FEMALE'
                   ? 'border-primary-primary'
                   : 'border-gray-300'
               }`}
-              onClick={() => setSelectedGender('Female')}
+              onClick={() => setSelectedGender('FEMALE')}
             >
               <Text
                 variant="body03"
                 className={
-                  selectedGender === 'Female'
+                  selectedGender === 'FEMALE'
                     ? 'text-primary-primary'
                     : 'text-gray-500'
                 }
@@ -128,16 +128,16 @@ export default function AddChildForm({
             </div>
             <div
               className={`flex-1 h-14 px-5 rounded-xl border flex justify-center items-center cursor-pointer ${
-                selectedGender === 'Male'
+                selectedGender === 'MALE'
                   ? 'border-primary-primary'
                   : 'border-gray-300'
               }`}
-              onClick={() => setSelectedGender('Male')}
+              onClick={() => setSelectedGender('MALE')}
             >
               <Text
                 variant="body03"
                 className={
-                  selectedGender === 'Male'
+                  selectedGender === 'MALE'
                     ? 'text-primary-primary'
                     : 'text-gray-500'
                 }

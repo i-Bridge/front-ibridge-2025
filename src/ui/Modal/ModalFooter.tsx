@@ -16,8 +16,8 @@ const ModalFooter = ({
     <div
       className={`
         self-stretch flex justify-center items-center w-full
-        p-5 gap-2.5 overflow-hidden
-        ${mobileAbsolute ? 'fixed bottom-0 left-0 w-full lg:static lg:w-auto' : ''}
+         gap-2.5 overflow-hidden md:p-0 p-5
+        ${mobileAbsolute ? 'fixed bottom-0 left-0 w-full min-w-80 md:static  md:p-0 p-5' : ''}
         ${className}
       `}
     >

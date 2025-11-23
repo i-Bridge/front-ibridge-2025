@@ -27,8 +27,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* 💡 overflow-auto: 내용이 길어지면 main 영역 내에서 스크롤 허용 */}
       <main
         className={twMerge(
-          'flex-1 pt-20 overflow-auto px-5 lg:px-10', // 레이아웃 및 패딩 기본 설정
-          'flex flex-col  justify-start lg:justify-center items-center', // 중앙 정렬 설정
+          'flex-1 mt-20 overflow-auto px-5 py-10 md:px-10 md:py-0', // 레이아웃 및 패딩 기본 설정
+          'flex flex-col justify-start md:justify-center items-center', // 중앙 정렬 설정
         )}
       >
         {/* 컨텐츠가 짧을 때만 중앙 정렬 효과를 내고, 길 때도 정상적으로 작동하도록 

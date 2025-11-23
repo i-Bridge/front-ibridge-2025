@@ -240,7 +240,7 @@ export default function PrivacyConsentForm({
   const activeAgreement = agreements.find((a) => a.linkUrl === activeModalId);
 
   return (
-    <ModalCard hasBorder={false} className='justify-start'>
+    <ModalCard hasBorder={false} className='justify-start md:justify-center '>
       <div className="self-stretch flex flex-col justify-start items-center gap-10 ">
         {/* 1. 제목 및 설명 */}
         <TitleComponent title='약관에 동의해주세요' subtitle='서비스 이용을 위해 약관에 동의해 주세요.' align="start" />

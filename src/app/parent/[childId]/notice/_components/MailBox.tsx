@@ -18,6 +18,7 @@ import ParentLayout from '../../_components/Layout/ParentLayout';
 import { Text } from '@/ui/Text';
 import { Button } from '@/ui/Button';
 import EmptyPlaceholder from '@/ui/loading/EmptyPlaceHolder';
+import TitleComponent from '@/ui/Modal/TitleComponent';
 
 // ✅ 스켈레톤 컴포넌트 임포트
 // (경로는 실제 MailBoxSkeleton.tsx 파일 위치에 맞게 수정해주세요)
@@ -209,21 +210,21 @@ export default function MailPage() {
     );
   };
 
-  return (
-    <ParentLayout
-      title={
-        <div className="flex w-full items-center justify-between">
-          <div className="flex">
-            <Text as="span" variant="title01">
+  const pageTitle = (
+    <div className="flex w-full flex-col md:flex-row md:items-center items-start justify-start md:justify-between gap-3">
+      <TitleComponent
+        title={<span>
               새로운 알림이{' '}
               <span className="text-primary-primary">
                 {/* 로딩 중일 땐 카운트가 0 또는 null일 수 있으므로 '...' 등으로 표시하는 것도 좋습니다. */}
                 {loading ? '...' : (noticeData?.newCount ?? 0)}개
               </span>{' '}
               있어요.
-            </Text>
-          </div>
-          <div>
+            </span>}
+        align="start"
+        subtitlePosition="top"
+      />
+      <div>
           <Button
             onClick={handleReadAll}
             disabled={(noticeData?.notices.length ?? 0) === 0 || loading}
@@ -235,9 +236,12 @@ export default function MailPage() {
             모두 읽음 처리
           </Button>
           </div>
-        </div>
-      }
-    >
+          </div>
+    );
+  
+
+  return (
+    <ParentLayout title={pageTitle}>
       {/* ✅ renderMailList가 이제 스켈레톤 또는
         실제 콘텐츠 래퍼를 '직접' 반환하므로,
         여기서는 추가 래퍼가 필요 없습니다.

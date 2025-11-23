@@ -31,7 +31,7 @@ export default function ErrorDisplay({
 }: ErrorDisplayProps) {
   return (
     // Figma 디자인을 기반으로 한 레이아웃
-    <div className="w-full h-full min-h-[600px] bg-white inline-flex flex-col justify-center items-center gap-10 p-4">
+    <div className="w-full min-h-screen bg-white inline-flex flex-col justify-center items-center gap-10 p-4 ">
       <div className="self-stretch flex flex-col justify-center items-center gap-7">
         
         {/* 1. 동적 아이콘 */}

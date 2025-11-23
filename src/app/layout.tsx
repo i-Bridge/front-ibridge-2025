@@ -10,12 +10,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: Readonly<{ 
   children: React.ReactNode;
 }>) {
   return (
     <html lang="ko" className={nps.variable}>
-      <body className="font-nps">
+      <body className="font-nps min-w-[375px]">
         <Providers>
           {children}
         </Providers>

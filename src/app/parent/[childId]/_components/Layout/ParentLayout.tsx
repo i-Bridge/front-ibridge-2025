@@ -27,12 +27,12 @@ export default function ParentLayout({ title, children, containerClassName }: Pa
     // [적용] 병합된 클래스를 최상위 div에 적용합니다.
     <div className={mergedClasses}> 
       {/* title prop으로 받은 내용을 여기에 렌더링합니다. */}
-      <header className="self-stretch px-10 pt-14 pb-5 inline-flex flex-col justify-start items-start gap-3">
+      <header className="self-stretch px-5 pt-5 md:px-10 md:pt-14 md:pb-5 inline-flex flex-col justify-start items-start gap-3">
         {title}
       </header>
 
       {/* children prop으로 받은 내용을 여기에 렌더링합니다. */}
-      <main className="flex-1 w-full self-stretch px-10 py-5 inline-flex flex-col justify-center items-start gap-5">
+      <main className="flex-1 w-full self-stretch p-5 md:px-10 md:py-5 inline-flex flex-col justify-center items-start gap-5">
         {children}
       </main>
     </div>

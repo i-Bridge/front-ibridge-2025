@@ -53,7 +53,7 @@ export function ChildCard({
   return (
     <CustomCard
       className={twMerge(
-        'flex lg:flex-row lg:items-start ',
+        'flex flex-row ',
         showActions ? 'self-stretch justify-between' : 'justify-center',
         bgColor,
         cardClassName,
@@ -84,18 +84,18 @@ export function ChildCard({
 
       {/* 오른쪽: 버튼 */}
       {showActions && (
-        <div className=''>
-        <div className="flex self-stretch justify-start items-start lg:gap-2 gap-1">
+        <div className='flex justify-start items-start'>
+        <div className="flex self-stretch justify-start items-start md:gap-2 gap-1">
           <button
             onClick={handleEdit}
-            className=" p-1 lg:bg-white rounded-full flex justify-center items-center"
+            className="md:w-10 md:h-10 p-1 md:bg-white rounded-full flex justify-center items-center"
             aria-label={`${child.name} 정보 수정`}
           >
             <EditIcon />
           </button>
           <button
             onClick={handleDelete}
-            className=" p-1 lg:bg-white rounded-full flex justify-center items-center"
+            className="md:w-10 md:h-10 p-1 md:bg-white rounded-full flex justify-center items-center"
             aria-label={`${child.name} 정보 삭제`}
           >
             <DeleteIcon />

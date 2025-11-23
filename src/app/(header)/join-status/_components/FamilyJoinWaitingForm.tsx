@@ -92,7 +92,7 @@ export default function FamilyJoinSuccessForm({
         </div>
 
         {/* 합류한 가족 정보 카드 */}
-        <CustomCard className=" bg-grayscale-gray5  items-start">
+        <CustomCard className=" w-full bg-grayscale-gray5  items-start">
           <div className="flex flex-col justify-start items-start gap-2">
             <Text as="div" variant="title02">
               {displayName}

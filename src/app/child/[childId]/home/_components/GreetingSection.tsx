@@ -73,7 +73,7 @@ export default function GreetingSection({ childId, specifiedDone }: Props) {
                 <Button
                   variant={'primary'}
                   disabled={specifiedDone}
-                  className="relative w-full h-auto self-stretch px-10 py-7 rounded-[40px] justify-start text-left whitespace-nowrap
+                  className="relative w-fulQl h-auto self-stretch px-10 py-7 rounded-[40px] justify-start text-left whitespace-nowrap
                  after:content-[''] after:absolute after:inset-0 after:rounded-[40px] after:pointer-events-none
                  after:transition-colors hover:after:bg-black/10"
                 >

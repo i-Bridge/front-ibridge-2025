@@ -30,13 +30,13 @@ const ModalCard = ({
   hasBorder = true,
 }: ModalCardProps) => {
   const borderClasses = hasBorder
-    ? 'border border-1 border-grayscale-gray20 p-10 w-80  lg:w-[480px] '
-    : 'p-0 w-80 lg:w-[480px]';
+    ? 'border border-1 border-grayscale-gray20 p-10  '
+    : 'p-0';
 
   return (
     <div
       className={twMerge(
-        'lg:w-[480px] bg-white flex flex-col justify-start items-start rounded-[40px] relative gap-10',
+        'w-80 md:w-[480px] bg-white flex flex-col justify-start md:justify-center items-start rounded-3xl relative gap-10',
         borderClasses,
         className,
       )}

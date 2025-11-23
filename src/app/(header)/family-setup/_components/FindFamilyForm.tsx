@@ -117,7 +117,6 @@ export default function FindFamilyForm() {
   return (
     <>
       <ModalCard hasBorder={false} className="flex flex-col gap-10">
-        {/* [수정] onClick에 새로 만든 handleBack 함수 연결 */}
         <button
           onClick={handleBack}
           className="w-10 h-10 relative overflow-hidden stroke-grayscale-gray40"
@@ -195,7 +194,7 @@ export default function FindFamilyForm() {
                 variant="grayscale"
                 textVariant="caption02"
                 onClick={handleCloseRequestSentModal}
-                className="h-16"
+                className="w-full h-16"
               >
                 취소
               </Button>
