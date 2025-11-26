@@ -92,7 +92,7 @@ export default function QuestionCard({
   };
 
   return (
-    <div className="w-auto p-8 bg-grayscale-gray5 rounded-[20px] flex flex-col lg:flex-row justify-start items-start gap-7">
+    <div className="w-auto p-8 bg-grayscale-gray5 rounded-[20px] flex flex-col  justify-start items-start gap-7">
       {/* 1. 비디오/썸네일 영역 */}
       {renderVideoOrThumbnail()}
 
