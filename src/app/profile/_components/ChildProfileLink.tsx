@@ -3,9 +3,7 @@
 import Link from 'next/link';
 import { ChildCard } from '@/components/ChildCard';
 import { Child } from '@/types';
-// [추가] 3명 이상일 때 캐러셀 상태 관리를 위해 import
 import { useState } from 'react';
-// [추가] 3명 이상일 때 사용할 스텝퍼 import (경로 확인 필요)
 import CarouselStepper from '@/components/CarouselStepper';
 import { twMerge } from 'tailwind-merge';
 
@@ -13,47 +11,70 @@ interface ChildProfileLinkProps {
   childList: Child[];
 }
 
-/**
- * [수정]
- * 자녀 수에 따라 프로필 선택 UI를 분기합니다.
- * - 1명: 중앙 (w-56)
- * - 2명: 꽉찬 2열 (flex-1)
- * - 3명 이상: 2명씩 페이징되는 캐러셀
- */
 export default function ChildProfileLink({ childList }: ChildProfileLinkProps) {
-  // --- 캐러셀 상태 관리 ---
+  // --- 캐러셀 상태 관리 (데스크탑용) ---
   const [currentPage, setCurrentPage] = useState(1);
   const totalChildren = childList.length;
-  const itemsPerPage = 2; // [수정] 한 페이지에 2명씩
+  const itemsPerPage = 2;
   const totalPages = Math.ceil(totalChildren / itemsPerPage);
 
-  // --- 0명일 때 ---
   if (totalChildren === 0) {
     return null;
   }
 
-  // --- 1. 현재 페이지에 보여줄 자녀 계산 ---
+  // --- 데스크탑용: 현재 페이지에 보여줄 자녀 계산 ---
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const childrenOnPage = childList.slice(startIndex, endIndex);
 
-  // --- 2. 렌더링 ---
   return (
     <div className="w-full flex flex-col items-center justify-start gap-5">
-      {/* 2-1. 카드 영역 */}
-      {/* 이 컨테이너는 1명이든 2명이든 화면에 맞게 중앙 정렬/배치합니다. */}
-      <div className="w-full inline-flex justify-center items-start gap-5">
+      
+      {/* -------------------------------------------------------------------------
+        [Mobile View] md 미만 (< 768px)
+        - overflow-x-auto: 이 영역 내부에서만 스크롤 발생
+        - w-full: 부모 너비에 딱 맞춤 (화면 전체 확장 방지)
+        - -mx-5: 부모의 px-5 패딩을 상쇄하여 화면 끝까지 영역 확장
+        - px-5: 내부 콘텐츠의 시작점은 다시 20px 안쪽으로 정렬
+        -------------------------------------------------------------------------
+      */}
+      <div className="md:hidden w-full relative">
+        <div 
+          className="flex items-center gap-5 overflow-x-auto snap-x snap-mandatory scrollbar-hide -mx-5 px-5"
+          // 아래 스타일은 모바일에서 스크롤바를 숨기기 위한 CSS 유틸리티입니다.
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }} 
+        >
+          {childList.map((child) => (
+            <Link
+              key={child.id}
+              href={`/child/${child.id}/home`}
+              // flex-shrink-0: 공간이 좁아도 카드가 찌그러지지 않음
+              className="snap-center flex-shrink-0 min-w-[14rem] transition-transform duration-150 active:scale-95"
+            >
+              <ChildCard
+                child={child}
+                showActions={false}
+                cardClassName="w-full"
+              />
+            </Link>
+          ))}
+          
+          {/* 오른쪽 끝 여백 확보용 (선택사항) */}
+          <div className="w-0.5 flex-shrink-0" />
+        </div>
+      </div>
+
+      {/* -------------------------------------------------------------------------
+        [Desktop View] md 이상 (>= 768px)
+        -------------------------------------------------------------------------
+      */}
+      <div className="hidden md:inline-flex w-full justify-center items-start gap-5">
         {childrenOnPage.map((child) => (
           <Link
             key={child.id}
             href={`/child/${child.id}/home`}
-            // [수정] 레이아웃 로직
-            // 1명일 땐(totalChildren=1) Link가 너비 X
-            // 2명일 땐(totalChildren=2) Link가 'flex-1'
-            // 3명 이상(캐러셀)일 땐, Link가 'flex-1' (페이지가 2명 꽉차게)
             className={twMerge(
               'block transition-transform duration-150 group hover:scale-[1.01]',
-              // 2명일 때, 또는 3명 이상 캐러셀 모드일 때
               (totalChildren === 2 || totalChildren >= 3) && 'flex-1',
             )}
           >
@@ -61,22 +82,25 @@ export default function ChildProfileLink({ childList }: ChildProfileLinkProps) {
               child={child}
               showActions={false}
               cardClassName={twMerge(
-                'group-hover:scale-[1.01]', // 모든 경우에 적용되는 기본 클래스
-                totalChildren === 1 ? 'w-56' : 'w-full', // 조건부 클래스
+                'group-hover:scale-[1.01]',
+                totalChildren === 1 ? 'w-56' : 'w-full',
               )}
             />
           </Link>
         ))}
       </div>
 
-      {/* 2-2. 스텝퍼 (3명 이상일 때만 보임) */}
-      {totalPages > 1 && (
-        <CarouselStepper
-          currentStep={currentPage}
-          totalSteps={totalPages}
-          onStepChange={setCurrentPage}
-        />
-      )}
+      {/* 스텝퍼 (데스크탑 모드) */}
+      <div className="hidden md:block">
+        {totalPages > 1 && (
+          <CarouselStepper
+            currentStep={currentPage}
+            totalSteps={totalPages}
+            onStepChange={setCurrentPage}
+            variant='profile'
+          />
+        )}
+      </div>
     </div>
   );
 }

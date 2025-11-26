@@ -1,144 +1,166 @@
 'use client';
 
 import React from 'react';
-import { twMerge } from 'tailwind-merge'; // 설치하신 tailwind-merge를 사용합니다.
+import { twMerge } from 'tailwind-merge';
+import { Text } from '@/ui/Text';
+
+type StepperVariant = 'profile' | 'calendar';
 
 interface CarouselStepperProps {
   /** 현재 단계 (1부터 시작) */
   currentStep: number;
   /** 전체 단계 수 */
   totalSteps: number;
-  /** 단계 변경 시 호출되는 콜백 (예: (newStep) => setStep(newStep)) */
+  /** 단계 변경 시 호출되는 콜백 */
   onStepChange: (newStep: number) => void;
+  /** 스타일 변형 선택 ('profile' | 'calendar') - 기본값: 'profile' */
+  variant?: StepperVariant;
   /** 추가적인 Tailwind 클래스 */
   className?: string;
 }
 
 /**
- * 캐러셀이나 단계별 폼에서 사용되는 `< 1/2 >` 형태의 네비게이션 컴포넌트입니다.
- * 부모 상태를 제어하는 'Controlled Component'입니다.
- *
- * @example
- * // 부모 컴포넌트 (예: app/some-page.tsx)
- * 'use client';
- * import { useState } from 'react';
- * import CarouselStepper from './CarouselStepper';
- *
- * export default function MyPage() {
- * const [currentStep, setCurrentStep] = useState(1);
- * const TOTAL_STEPS = 3;
- *
- * return (
- * <div className="p-10 flex flex-col items-center gap-4">
- * <h2 className="text-lg font-bold">
- * 현재 페이지: {currentStep}
- * </h2>
- *
- * <CarouselStepper
- * currentStep={currentStep}
- * totalSteps={TOTAL_STEPS}
- * onStepChange={setCurrentStep}
- * />
- * </div>
- * );
- * }
+ * 캐러셀이나 단계별 폼에서 사용되는 네비게이션 컴포넌트입니다.
+ * variant prop에 따라 'profile' 또는 'calendar' 스타일을 렌더링합니다.
  */
 export default function CarouselStepper({
   currentStep,
   totalSteps,
   onStepChange,
+  variant = 'calendar',
   className,
 }: CarouselStepperProps) {
   // 비활성화 상태 로직
   const isPrevDisabled = currentStep <= 1;
   const isNextDisabled = currentStep >= totalSteps;
 
-  // 이전 버튼 핸들러
   const handlePrev = () => {
-    if (!isPrevDisabled) {
-      onStepChange(currentStep - 1);
-    }
+    if (!isPrevDisabled) onStepChange(currentStep - 1);
   };
 
-  // 다음 버튼 핸들러
   const handleNext = () => {
-    if (!isNextDisabled) {
-      onStepChange(currentStep + 1);
+    if (!isNextDisabled) onStepChange(currentStep + 1);
+  };
+
+  // --- 스타일 설정 ---
+
+  // 1. 컨테이너 스타일
+  const containerClass = twMerge(
+    'inline-flex justify-start items-center',
+    variant === 'profile' ? 'gap-5' : 'gap-3',
+    className,
+  );
+
+  // 2. 버튼 공통 스타일 (크기, 배경, 둥글기)
+  const buttonBaseClass = twMerge(
+    'flex justify-center items-center transition-all',
+    'rounded-full', // rounded-[999px] 등은 rounded-full로 대체 가능
+    variant === 'profile'
+      ? 'w-10 h-10 gap-2.5 bg-grayscale-gray5 '
+      : 'w-6 h-6 gap-2 bg-grayscale-gray10 ', // p-1.5 등은 flex 정렬로 자동 처리
+    // Hover 효과 (비활성화 아닐 때만)
+    variant === 'profile' && !isPrevDisabled && !isNextDisabled
+      ? 'hover:bg-grayscale-gray10'
+      : '',
+    variant === 'calendar' && !isPrevDisabled && !isNextDisabled
+      ? 'hover:bg-grayscale-gray20'
+      : '',
+  );
+
+  // 3. 아이콘 크기 (SVG)
+  const iconSizeClass = variant === 'profile' ? 'w-6 h-6' : 'w-3 h-3'; // Calendar는 작게
+
+  // 4. 텍스트 렌더링 (Variant별 구조 차이 반영)
+  const renderText = () => {
+    if (variant === 'profile') {
+      return (
+        <Text variant="body02" className="text-center select-none">
+          {currentStep}/{totalSteps}
+        </Text>
+      );
     }
+    // Calendar variant: 숫자와 슬래시가 분리된 구조
+    return (
+      <Text
+        variant="caption03"
+        className="text-grayscale-gray70 text-center select-none"
+      >
+        {currentStep}/{totalSteps}
+      </Text>
+    );
   };
 
   return (
-    <div
-      className={twMerge(
-        'inline-flex justify-start items-center gap-5',
-        className,
-      )}
-    >
-      {/* 1. 이전 버튼 */}
+    <div className={containerClass}>
+      {/* 이전 버튼 */}
       <button
         type="button"
         onClick={handlePrev}
         disabled={isPrevDisabled}
-        aria-label="이전"
+        aria-label="이전 단계"
         className={twMerge(
-          'w-10 h-10 bg-grayscale-gray5 rounded-full flex justify-center items-center gap-2.5 transition-opacity',
-          'text-grayscale-gray60', // SVG 아이콘 색상
-          isPrevDisabled
-            ? 'opacity-40 '
-            : 'hover:bg-grayscale-gray10', // (tailwind.config.js에 gray10이 있다는 가정)
+          buttonBaseClass,
+          isPrevDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',
         )}
       >
-        {/* [수정] Figma div 아이콘 -> 인라인 SVG로 교체 */}
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M15.75 19.5 8.25 12l7.5-7.5"
-          />
-        </svg>
+        <ChevronLeftIcon className={iconSizeClass} />
       </button>
 
-      {/* 2. 단계 표시 (예: 1/2) */}
-      <div className="justify-start text-grayscale-gray90 text-xl font-normal font-['Tmoney_RoundWind'] leading-8 select-none">
-        {currentStep}/{totalSteps}
-      </div>
+      {/* 텍스트 영역 */}
+      {renderText()}
 
-      {/* 3. 다음 버튼 */}
+      {/* 다음 버튼 */}
       <button
         type="button"
         onClick={handleNext}
         disabled={isNextDisabled}
-        aria-label="다음"
+        aria-label="다음 단계"
         className={twMerge(
-          'w-10 h-10 bg-grayscale-gray5 rounded-full flex justify-center items-center gap-2.5 transition-opacity',
-          'text-grayscale-gray60',
-          isNextDisabled
-            ? 'opacity-40 '
-            : 'hover:bg-grayscale-gray10', // [수정] 오타 수정
+          buttonBaseClass,
+          isNextDisabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',
         )}
       >
-        {/* [수정] Figma div 아이콘 -> 인라인 SVG로 교체 */}
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="m8.25 4.5 7.5 7.5-7.5 7.5"
-          />
-        </svg>
+        <ChevronRightIcon className={iconSizeClass} />
       </button>
     </div>
   );
 }
 
+// --- 아이콘 컴포넌트 (SVG) ---
+// Figma의 div outline 아이콘 대신 깨끗한 SVG를 사용합니다.
+
+function ChevronLeftIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={2.5} // font-extrabold 느낌을 위해 두께 조정
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15.75 19.5 8.25 12l7.5-7.5"
+      />
+    </svg>
+  );
+}
+
+function ChevronRightIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={2.5}
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m8.25 4.5 7.5 7.5-7.5 7.5"
+      />
+    </svg>
+  );
+}

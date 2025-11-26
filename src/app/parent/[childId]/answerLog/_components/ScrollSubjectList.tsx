@@ -1,30 +1,31 @@
-// /app/parent/[childId]/answerLog/_components/SubjectList.tsx
+// /app/parent/[childId]/answerLog/_components/ScrollSubjectList.tsx
 
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, Suspense, lazy } from 'react';
 import { useSubjectStore } from '@/store/useSubjectStore';
 import { useSubjectsInfinite } from '@/hooks/parentHome/useSubjectsInfinite';
-import { Subject} from '@/types/index';
-import { Suspense, lazy  } from 'react';
+import { Subject } from '@/types/index';
+import { cn } from '@/lib/utils';
 
 import { DotWaves } from '@/ui/loading/DotWaves';
 import { Text } from '@/ui/Text';
-import AnalysisPopup from '../../_components/Question/AnalysisListPopup';
+import { XIcon } from '@/ui/icon/icon'; // 닫기 버튼 아이콘
+import RotatingSpinner from '@/ui/loading/RotatingSpinner';
 import AnswerLogSkeleton from './AnwerLogSkeleton';
 
+// 모바일/태블릿용 팝업 컴포넌트
+import AnalysisPopup from '../../_components/Question/AnalysisListPopup';
 
 const SubjectListRenderer = lazy(() => import('./SubjectListRenderer'));
+// 데스크탑 패널 내부 콘텐츠
+const AnalysisList = lazy(() => import('../../_components/Question/AnalysisList'));
+
 type Props = {
   initialSubjects: Subject[];
 };
 
-/**
- * Subject 리스트의 데이터 페칭, 상태 관리, 무한 스크롤 로직을 담당하는
- * 컨테이너 컴포넌트입니다.
- */
 export default function ScrollSubjectList({ initialSubjects }: Props) {
-  // [유지] 모든 훅 로직은 컨테이너가 담당합니다.
   const { selectedSubjectId, setSelectedSubjectId, showPanels, setShowPanels } =
     useSubjectStore();
 
@@ -33,14 +34,12 @@ export default function ScrollSubjectList({ initialSubjects }: Props) {
 
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // [유지] 초기 데이터 세팅 useEffect
   useEffect(() => {
     if (initialSubjects) {
       initFirstPage(initialSubjects);
     }
   }, [initialSubjects, initFirstPage]);
 
-  // [유지] 애니메이션 상태 관리 useEffect
   useEffect(() => {
     if (selectedSubjectId) {
       setShowPanels(true);
@@ -49,7 +48,6 @@ export default function ScrollSubjectList({ initialSubjects }: Props) {
     }
   }, [selectedSubjectId, setShowPanels]);
 
-  // [유지] 무한스크롤 IntersectionObserver 로직
   const observeLastSubject = useCallback(
     (node: HTMLDivElement | null) => {
       if (loading) return;
@@ -66,21 +64,26 @@ export default function ScrollSubjectList({ initialSubjects }: Props) {
     [loading, loadNext, hasNext],
   );
 
-  // x 버튼 클릭 시 selectedSubjectId를 null로 설정하여 팝업을 닫습니다.
   const handleClose = () => {
     setSelectedSubjectId(null);
     setShowPanels(false);
   };
 
-  // [추가] 렌더러에게 전달할 상태값들을 계산합니다.
   const isLoading = loading && allSubjects.length === 0;
+  const isPanelOpen = showPanels && selectedSubjectId;
 
   return (
-    <div className="relative overflow-x-hidden mx-auto flex justify-center min-h-[600px] ">
-      {/* 왼쪽 영역ㅐ */}
-      <div className="w-full gap-4 mb-10 ">
-        {/* [수정] 렌더링 로직을 SubjectListRenderer 컴포넌트로 위임합니다. */}
-         <Suspense fallback={<AnswerLogSkeleton/>}>
+    <div className="relative flex w-full justify-center overflow-x-hidden min-h-[600px]">
+      
+      {/* 왼쪽 리스트 영역 */}
+      {/* lg: 패널이 열리면 mr-[600px]을 적용하여 리스트를 왼쪽으로 밀어냄(너비 축소) */}
+      <div
+        className={cn(
+          "w-full gap-4 mb-10 transition-all duration-300 ease-in-out",
+          isPanelOpen && "lg:mr-[600px]" 
+        )}
+      >
+        <Suspense fallback={<AnswerLogSkeleton />}>
           <SubjectListRenderer
             subjects={allSubjects}
             lastItemRef={observeLastSubject}
@@ -88,9 +91,7 @@ export default function ScrollSubjectList({ initialSubjects }: Props) {
           />
         </Suspense>
 
-        {/* [유지] 무한스크롤 하단의 로딩/끝 표시는 컨테이너에 둡니다. */}
         <div className="w-full flex justify-center items-center mt-10">
-          {/* [수정] 초기 로딩(isLoading)이 아닐 때만 하단 로더를 보여줍니다. */}
           {loading && !isLoading && (
             <DotWaves className="bg-grayscale-gray30" />
           )}
@@ -102,9 +103,44 @@ export default function ScrollSubjectList({ initialSubjects }: Props) {
         </div>
       </div>
 
-      {/* 오른쪽 패널 (동일) */}
-      {showPanels && selectedSubjectId && (
-        <AnalysisPopup onClose={handleClose} />
+      {/* 오른쪽 패널 / 팝업 영역 */}
+      {isPanelOpen && (
+        <>
+          {/* 1. LG 화면용: In-Page Sidebar (오버레이 없음, 리스트 옆에 붙음) */}
+          <div
+            className={cn(
+              "hidden lg:flex fixed top-0 right-0 h-full w-[600px] bg-white z-40 flex-col border-l border-grayscale-gray20 shadow-none transition-transform duration-300 ease-in-out",
+              showPanels ? "translate-x-0" : "translate-x-full"
+            )}
+          >
+            {/* 데스크탑 패널 헤더 */}
+            <div className="px-10 pt-10 pb-5 flex justify-between items-center">
+               {/* 필요하다면 타이틀 추가 */}
+               <div className="w-6 h-6" /> {/* Spacer */}
+               <button onClick={handleClose} className="text-grayscale-gray60 hover:text-black transition-colors">
+                  <XIcon  />
+               </button>
+            </div>
+
+            {/* 패널 내용 */}
+            <div className="flex-1 overflow-y-auto px-10 pb-10">
+              <Suspense
+                fallback={
+                  <div className="flex justify-center items-center h-full w-full">
+                    <RotatingSpinner variant="grayscale" />
+                  </div>
+                }
+              >
+                <AnalysisList />
+              </Suspense>
+            </div>
+          </div>
+
+          {/* 2. Mobile(~md) & Tablet(md) 화면용: 팝업 오버레이 */}
+          <div className="lg:hidden">
+            <AnalysisPopup onClose={handleClose} />
+          </div>
+        </>
       )}
     </div>
   );
