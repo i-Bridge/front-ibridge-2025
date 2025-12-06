@@ -46,9 +46,7 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
   );
   const keywordData = keywordRes.data;
   console.log('분석 /categories api 호출 ', keywordRes);
-  if (!keywordData) {
-    return <div>분석 데이터 불러오기 실패...</div>;
-  }
+  
 
   const cumulativeRes = await Fetcher<CumulativeData>(
     `/parent/${childId}/stat/cumulative?periodType='day'`,
@@ -58,8 +56,8 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
     "분석 /stat/cumulative?periodType='day' api 호출 ",
     cumulativeRes,
   );
-  if (!cumulativeData) {
-    return <div>분석 데이터 불러오기 실패...</div>;
+  if(!cumulativeData){
+     return <div>누적 데이터가 존재하지 않는 오류가 발생했습니다.</div>
   }
 
   const pageTitle = (
@@ -86,7 +84,7 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
         defaultCumList={cumulativeData.cumList}
       />
 
-      <CategoryRankChart categories={keywordData.categories} />
+      <CategoryRankChart categories={keywordData?.categories} />
     </PageLayout>
   );
 }
