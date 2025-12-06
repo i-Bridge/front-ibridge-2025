@@ -1,6 +1,6 @@
 import React from "react";
 import Image from 'next/image';
-import bgImage from '@/src/images/parent-bg.webp';
+import bgImage from '@/images/parent-bg.webp';
 
 /**
  * (start) 라우트 그룹 레이아웃
