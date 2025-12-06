@@ -1,5 +1,6 @@
 import React from "react";
 import Image from 'next/image';
+import bgImage from '@/src/images/parent-bg.webp';
 
 /**
  * (start) 라우트 그룹 레이아웃
@@ -14,7 +15,7 @@ export default function StartLayout({
     <div className="relative min-h-screen flex items-center justify-center px-10">
       {/* 우선 로드되는 배경 이미지 */}
       <Image
-        src="/images/parent-bg.webp"
+        src={bgImage}
         alt="배경 이미지"
         fill
         priority
