@@ -5,7 +5,7 @@ import { Category } from '@/types';
 
 
 interface CategoryRankListProps {
-  categories: Category[];
+  categories?: Category[] | undefined;
 }
 
 /**

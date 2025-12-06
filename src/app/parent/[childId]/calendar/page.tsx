@@ -16,7 +16,7 @@ export default async function DashBoardPage({ params }: ChildPageParams) {
   const statisticData = statisticRes.data;
   console.log('로그 찍기', statisticData);
   if (!statisticData) {
-    return <div>분석 데이터 불러오기 실패...</div>;
+    return <div>달력 데이터 불러오기 실패...</div>;
   }
   return (
     <Calendar
