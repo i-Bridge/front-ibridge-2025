@@ -16,13 +16,11 @@ interface MyPageData {
 
 type ParentLayoutProps = {
   children: React.ReactNode;
-  params: {
-    childId: string;
-  };
+  params: Promise<{ childId: string }>;
 };
 
 export default async function ParentLayout({ children, params }: ParentLayoutProps) {
-  const { childId } = params;
+  const { childId } = await params;
 
   let myPageData: MyPageData = {
     noticeExist: false,
